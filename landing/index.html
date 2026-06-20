@@ -3,1268 +3,709 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Oriya — Different devices. One score. Same game.</title>
-  <meta name="description" content="Oriya auto-levels Oura, Garmin, Whoop, and Apple Health into one 0–100 recovery score, then drops you into challenges with real prize pools, leaderboards, and shareable badges. Join the Sleep League — private beta in SF & NYC.">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 78 22 A 40 40 0 1 0 79 23' stroke='%231de9a4' stroke-width='5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='50' cy='55' r='14' fill='%231de9a4'/%3E%3Ccircle cx='78' cy='22' r='7' fill='%231de9a4'/%3E%3C/svg%3E">
+  <title>Oriya — Your ring. Their watch. One score.</title>
+  <meta name="description" content="Oriya gives every wearable a handicap, so your whole squad competes fairly on how well you recover. Oura, Garmin, Apple, Whoop — one normalized 0–100 index. The recovery network. Private beta in SF & NYC.">
+  <meta property="og:title" content="Oriya — Your ring. Their watch. One score.">
+  <meta property="og:description" content="The recovery network. Every wearable handicapped onto one fair 0–100 index, so the whole squad competes on how well you recover.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 78 22 A 40 40 0 1 0 79 23' stroke='%237FB79E' stroke-width='5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='50' cy='55' r='14' fill='%237FB79E'/%3E%3Ccircle cx='78' cy='22' r='7' fill='%23D7A25C'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
+    /* ============================================================
+       ORIYA — "Obsidian & Circadian"
+       A warm obsidian canvas, lit by a circadian accent spectrum
+       (cool jade = recovered → warm amber = the dawn/readiness moment
+        → ember = strain). One overnight arc, night → dawn.
+       Premium faces (PP Editorial New / PP Neue Montreal / Berkeley Mono)
+       are commercial; these are the brief's free fallbacks.
+       ============================================================ */
     :root {
-      --bg-primary: #060611;
-      --bg-secondary: #0c0c1c;
-      --bg-card: #10101f;
-      --bg-card-hover: #17172e;
-      --bg-glass: rgba(255,255,255,0.035);
-      --bg-glass-hover: rgba(255,255,255,0.065);
-      --text-primary: #f0f0f8;
-      --text-secondary: #888899;
-      --text-tertiary: #484860;
-      --accent: #1de9a4;
-      --accent-dim: rgba(29,233,164,0.1);
-      --accent-glow: rgba(29,233,164,0.22);
-      --accent-secondary: rgb(79,141,225);
-      --gradient-accent: linear-gradient(135deg,#1de9a4 0%,rgb(79,141,225) 100%);
-      --gradient-warm: linear-gradient(135deg,#ff6b4a,#ffb84d);
-      --orange: #ff5c35;
-      --orange-dim: rgba(255,92,53,0.1);
-      --border: rgba(255,255,255,0.08);
-      --border-accent: rgba(29,233,164,0.22);
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 16px;
-      --radius-xl: 22px;
-      --radius-full: 9999px;
-      --shadow-sm: 0 1px 6px rgba(0,0,0,0.5);
-      --shadow-md: 0 8px 32px rgba(0,0,0,0.5);
-      --shadow-lg: 0 24px 64px rgba(0,0,0,0.6);
-      --shadow-glow: 0 0 12px rgba(29,233,164,0.1);
-      --font-display: "Inter",-apple-system,BlinkMacSystemFont,sans-serif;
-      --font-body: "Inter",-apple-system,BlinkMacSystemFont,sans-serif;
-      --ease-out: cubic-bezier(0.16,1,0.3,1);
-      --ease-spring: cubic-bezier(0.34,1.56,0.64,1);
+      --void:     #070809;
+      --obsidian: #0E1014;
+      --graphite: #1A1E24;
+      --hairline: #2A2F38;
+      --bone:     #ECEAE4;
+      --ash:      #878D99;
+
+      --jade:      #7FB79E;
+      --jade-deep: #3E6F5E;
+      --jade-glow: #9FD3BB;
+      --amber:      #D7A25C;
+      --amber-deep: #B5723C;
+      --amber-glow: #F0C083;
+      --ember:      #B96A4A;
+
+      --font-display: "Instrument Serif", "PP Editorial New", "GT Sectra", Georgia, serif;
+      --font-sans: "Inter", "PP Neue Montreal", "Suisse Intl", system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "Berkeley Mono", ui-monospace, monospace;
+
+      --circadian: cubic-bezier(0.16, 1, 0.3, 1);   /* confident expo-out — reveals */
+      --settle:    cubic-bezier(0.22, 0.61, 0.36, 1); /* gentle — hovers */
+      --glass:     cubic-bezier(0.65, 0.05, 0.36, 1);  /* weighted — drags/merges */
+
+      --glow-jade:  0 0 60px -10px rgba(127,183,158,0.45);
+      --glow-amber: 0 0 90px -12px rgba(215,162,92,0.50);
+
+      --maxw: 1180px;
     }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-    body{font-family:var(--font-body);background:var(--bg-primary);color:var(--text-primary);line-height:1.6;overflow-x:hidden;min-width:320px}
-    a{color:inherit;text-decoration:none}
-    button{cursor:pointer;border:none;background:none;font-family:inherit}
-    img{display:block;max-width:100%}
-    .container{max-width:1200px;margin:0 auto;padding:0 24px}
-    .section{padding:120px 0;position:relative}
-    .section-label{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:20px;padding:5px 14px;border-radius:var(--radius-full);background:var(--accent-dim);border:1px solid var(--border-accent)}
-    .section-label::before{display:none}
-    .section-title{font-family:var(--font-display);font-size:clamp(32px,5vw,52px);font-weight:800;line-height:1.08;color:var(--text-primary);margin-bottom:20px;letter-spacing:-0.03em}
-    .section-subtitle{font-size:18px;color:var(--text-secondary);max-width:560px;line-height:1.7}
-    .dim{color:var(--text-tertiary)}
-    .reveal{opacity:0;transform:translateY(28px);transition:opacity 0.65s var(--ease-out),transform 0.65s var(--ease-out)}
-    .reveal.is-visible{opacity:1;transform:translateY(0)}
-    @media(prefers-reduced-motion:reduce){.reveal{opacity:1!important;transform:none!important;transition:none!important}}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:600;border-radius:var(--radius-full);padding:14px 32px;transition:all 0.3s var(--ease-out);position:relative;overflow:hidden}
-    .btn-primary{background:var(--accent);color:#060611;box-shadow:0 4px 20px rgba(29,233,164,0.2)}
-    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(29,233,164,0.3)}
-    .btn-secondary{background:var(--bg-glass);color:var(--text-primary);border:1px solid var(--border);backdrop-filter:blur(10px)}
-    .btn-secondary:hover{background:var(--bg-glass-hover);border-color:rgba(255,255,255,0.12);transform:translateY(-2px)}
 
-    /* NAV */
-    .nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:16px 0;background:rgba(6,6,17,0.88);backdrop-filter:blur(20px) saturate(1.2);border-bottom:1px solid transparent;transition:all 0.3s ease}
-    .nav.scrolled{border-bottom-color:var(--border)}
-    .nav-inner{display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto;padding:0 24px}
-    .nav-logo{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:-0.02em}
-    .nav-logo svg{width:28px;height:28px}
-    .nav-links{display:flex;align-items:center;gap:32px}
-    .nav-link{font-size:14px;font-weight:500;color:var(--text-secondary);transition:color 0.2s}
-    .nav-link:hover{color:var(--text-primary)}
-    .nav-cta{display:flex;align-items:center;gap:12px}
-    .nav-cta .btn{padding:10px 24px;font-size:14px}
-
-    /* HERO */
-    .hero{display:flex;align-items:center;justify-content:center;position:relative;padding:140px 0 80px;text-align:center;overflow:hidden}
-    .hero-bg{position:absolute;inset:0;z-index:0}
-    .hero-bg::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(29,233,164,0.07),transparent 65%),radial-gradient(ellipse 40% 40% at 80% 90%,rgba(124,90,247,0.04),transparent 55%)}
-    .hero-grid{position:absolute;inset:0;opacity:0.012;background-image:linear-gradient(rgba(255,255,255,0.6) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.6) 1px,transparent 1px);background-size:80px 80px}
-    .hero-content{position:relative;z-index:1;max-width:800px;margin:0 auto}
-    .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 20px;border-radius:var(--radius-full);background:var(--accent-dim);border:1px solid var(--border-accent);font-size:13px;font-weight:600;color:var(--accent);margin-bottom:32px;animation:fadeUp 0.8s var(--ease-out) 0.2s both}
-    .hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s ease infinite}
-    @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(29,233,164,0.4)}50%{box-shadow:0 0 0 6px rgba(29,233,164,0)}}
-    .hero h1{font-family:var(--font-display);font-size:clamp(36px,5.5vw,68px);font-weight:900;line-height:1.05;letter-spacing:-0.04em;margin-bottom:24px;animation:fadeUp 0.8s var(--ease-out) 0.4s both}
-    .hero h1 .gradient-text{color:var(--accent)}
-    .hero-sub{font-size:clamp(15px,2.2vw,20px);color:var(--text-secondary);max-width:600px;margin:0 auto 24px;line-height:1.5;animation:fadeUp 0.8s var(--ease-out) 0.6s both}
-    .hero-sub strong{color:var(--text-primary);font-weight:500}
-    .hero-form-wrap{max-width:620px;margin:0 auto;animation:fadeUp 0.8s var(--ease-out) 0.8s both}
-    .hero-form{display:flex;gap:12px;padding:6px;border-radius:calc(var(--radius-lg) + 4px);background:rgba(255,255,255,0.04);border:1px solid var(--border);backdrop-filter:blur(12px);box-shadow:var(--shadow-md)}
-    .hero-input{flex:1;min-width:0;border:none;background:transparent;color:var(--text-primary);font-size:16px;padding:14px 16px;outline:none}
-    .hero-input::placeholder{color:var(--text-tertiary)}
-    .hero-form .btn{white-space:nowrap;padding:14px 26px;flex-shrink:0}
-    .hero-trust{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:20px;animation:fadeUp 0.8s var(--ease-out) 1s both}
-    .trust-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-tertiary);font-weight:500}
-    .trust-item .chk{width:16px;height:16px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--border-accent);display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--accent)}
-    .hero-error{font-size:13px;color:#ff8a7a;margin-top:10px;display:none}
-    .hero-kicker{display:inline-block;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;animation:fadeUp 0.8s var(--ease-out) 0.1s both}
-    /* HERO NORMALIZER */
-    .hero-normalizer{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;max-width:680px;margin:40px auto 0;animation:fadeUp 0.8s var(--ease-out) 1s both}
-    .hn-col{display:flex;flex-direction:column;gap:8px;align-items:stretch}
-    .hn-col-label{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:2px;text-align:left}
-    .hn-chip{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:9px 16px;border-radius:var(--radius-md);background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--c);text-align:left;min-width:182px;opacity:0;animation:hnIn 0.5s var(--ease-out) forwards}
-    .hn-chip:nth-child(2){animation-delay:1.15s}
-    .hn-chip:nth-child(3){animation-delay:1.3s}
-    .hn-chip:nth-child(4){animation-delay:1.45s}
-    .hn-dev{font-size:12px;font-weight:700;color:var(--text-primary)}
-    .hn-raw{font-size:11.5px;color:var(--text-tertiary);font-weight:500}
-    .hn-arrow{display:flex;flex-direction:column;align-items:center;gap:6px}
-    .hn-arrow-label{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);white-space:nowrap}
-    .hn-arrow svg{width:52px;height:24px;color:var(--text-tertiary)}
-    .hn-arrow .flow{stroke:var(--accent);stroke-dasharray:4 5;animation:flow 0.9s linear infinite}
-    @keyframes flow{to{stroke-dashoffset:-18}}
-    .hn-output{display:flex;flex-direction:column;align-items:center;justify-content:center;width:132px;height:132px;border-radius:50%;background:var(--accent-dim);border:1.5px solid var(--accent);box-shadow:0 0 44px rgba(29,233,164,0.2);opacity:0;transform:scale(0.7);animation:hnPop 0.6s var(--ease-spring) 1.6s forwards}
-    .hn-score{font-family:var(--font-display);font-size:46px;font-weight:800;color:var(--accent);line-height:1}
-    .hn-score-label{font-size:12px;font-weight:700;color:var(--text-primary);margin-top:3px}
-    .hn-score-sub{font-size:10px;color:var(--text-tertiary);margin-top:2px}
-    @keyframes hnIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
-    @keyframes hnPop{to{opacity:1;transform:scale(1)}}
-    @media(prefers-reduced-motion:reduce){.hn-chip,.hn-output{opacity:1!important;transform:none!important;animation:none!important}.hn-arrow .flow{animation:none!important}}
-
-    /* TICKER */
-    .ticker{background:var(--bg-card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:14px 0;overflow:hidden;position:relative}
-    .ticker::before,.ticker::after{content:"";position:absolute;top:0;bottom:0;width:80px;z-index:2}
-    .ticker::before{left:0;background:linear-gradient(90deg,var(--bg-card),transparent)}
-    .ticker::after{right:0;background:linear-gradient(-90deg,var(--bg-card),transparent)}
-    .ticker-track{display:flex;gap:0;animation:ticker 32s linear infinite;width:max-content}
-    .ticker-item{display:flex;align-items:center;gap:8px;padding:0 36px;font-size:12px;color:var(--text-tertiary);white-space:nowrap;letter-spacing:0.02em;font-weight:500}
-    .ticker-item .val{color:var(--accent);font-weight:600}
-    .ticker-item .sep{color:var(--text-tertiary);margin:0 -24px;opacity:0.4}
-    @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-
-    /* PROBLEM */
-    .problem-section{background:var(--bg-primary)}
-    .cliff-container{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-top:48px}
-    .cliff-chart{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;position:relative;overflow:hidden}
-    .cliff-chart::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,92,53,0.03) 0%,transparent 40%)}
-    .cliff-label{font-size:10px;font-weight:600;letter-spacing:0.08em;color:var(--text-tertiary);margin-bottom:16px;text-transform:uppercase;position:relative}
-    .cliff-bars{display:flex;align-items:flex-end;gap:8px;height:140px;position:relative}
-    .cliff-bar{flex:1;border-radius:4px 4px 0 0;position:relative;display:flex;align-items:flex-start;justify-content:center}
-    .cliff-bar .bar-val{font-size:10px;font-weight:600;position:absolute;top:-18px;color:var(--text-secondary)}
-    .cliff-x{display:flex;gap:8px;margin-top:8px}
-    .cliff-x-label{flex:1;text-align:center;font-size:10px;color:var(--text-tertiary);font-weight:500}
-    .cliff-oriya{margin-top:16px;display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--accent-dim);border:1px solid var(--border-accent);border-radius:var(--radius-md);position:relative}
-    .cliff-oriya .oriya-val{font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--accent)}
-    .cliff-oriya .oriya-label{font-size:13px;color:var(--text-secondary);line-height:1.4}
-    .cliff-oriya .oriya-label span{font-size:11px;color:var(--text-tertiary)}
-    .problem-points{display:flex;flex-direction:column;gap:16px}
-    .problem-point{padding:20px 24px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);position:relative;overflow:hidden}
-    .problem-point::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--orange)}
-    .problem-point h4{font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:6px}
-    .problem-point p{font-size:13px;color:var(--text-secondary);margin:0;line-height:1.6}
-
-    /* DEMO */
-    .demo-section{background:var(--bg-secondary);padding:80px 0 88px}
-    .demo-header{text-align:center;margin-bottom:24px}
-    .demo-header .section-title{font-size:clamp(22px,3vw,34px);margin-bottom:12px}
-    .demo-header .section-subtitle{font-size:15px;margin:0 auto}
-    .demo-steps-nav{display:flex;justify-content:center;gap:4px;margin:0 0 12px;position:relative}
-    .demo-step-btn{display:flex;align-items:center;gap:8px;padding:12px 24px;border-radius:var(--radius-full);font-size:14px;font-weight:600;color:var(--text-tertiary);background:transparent;border:1px solid transparent;transition:all 0.3s var(--ease-out);cursor:pointer}
-    .demo-step-btn .step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--bg-glass);border:1px solid var(--border);transition:all 0.3s var(--ease-out)}
-    .demo-step-btn:hover{color:var(--text-secondary)}
-    .demo-step-btn.active{color:var(--text-primary);background:var(--bg-glass);border-color:var(--border-accent)}
-    .demo-step-btn.active .step-num{background:var(--accent);color:#060611;border-color:transparent}
-    .demo-step-btn.completed .step-num{background:var(--accent);color:#060611;border-color:transparent}
-    .demo-step-btn.completed{color:var(--accent)}
-    .demo-viewport{max-width:780px;margin:0 auto;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;min-height:284px;position:relative}
-    .demo-viewport::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 65% 55% at 50% -5%,rgba(29,233,164,0.07),transparent 70%)}
-    .demo-viewport::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;opacity:0.6;background-image:linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px);background-size:100% 27px;-webkit-mask-image:linear-gradient(180deg,transparent,#000 28%,#000 72%,transparent);mask-image:linear-gradient(180deg,transparent,#000 28%,#000 72%,transparent)}
-    .demo-panel{display:none;padding:26px 34px;animation:fadeIn 0.4s var(--ease-out);position:relative;z-index:1}
-    .demo-panel.active{display:block}
-    .demo-panel h3,.demo-panel h4{font-family:var(--font-display);font-size:24px;font-weight:700;margin-bottom:8px;letter-spacing:-0.02em}
-    .demo-panel .panel-sub{font-size:15px;color:var(--text-secondary);margin-bottom:32px}
-    .wearable-grid{display:flex;flex-wrap:wrap;gap:9px;justify-content:center}
-    .wearable-item{display:flex;flex-direction:row;align-items:center;gap:9px;padding:8px 15px 8px 9px;border-radius:var(--radius-full);background:var(--bg-glass);border:1px solid var(--border);cursor:pointer;transition:all 0.22s var(--ease-out);user-select:none}
-    .wearable-item:hover{background:var(--bg-glass-hover);border-color:rgba(255,255,255,0.1)}
-    .wearable-item.selected{background:var(--accent-dim);border-color:var(--accent);box-shadow:0 0 16px rgba(29,233,164,0.1)}
-    .wearable-icon{width:30px;height:30px;border-radius:var(--radius-sm);background:var(--bg-card);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:all 0.3s}
-    .wearable-item.selected .wearable-icon{background:rgba(29,233,164,0.18)}
-    .wearable-name{font-size:13px;font-weight:600;color:var(--text-secondary);white-space:nowrap}
-    .wearable-item.selected .wearable-name{color:var(--accent)}
-    .leaderboard{display:flex;flex-direction:column;gap:8px}
-    .lb-row{display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:var(--radius-md);background:var(--bg-glass);border:1px solid var(--border);transition:all 0.3s}
-    .lb-row.you{border-color:var(--border-accent);background:var(--accent-dim)}
-    .lb-rank{font-family:var(--font-display);font-size:18px;font-weight:800;width:32px;text-align:center;color:var(--text-tertiary)}
-    .lb-row.you .lb-rank{color:var(--accent)}
-    .lb-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#060611}
-    .lb-info{flex:1}
-    .lb-name{font-size:15px;font-weight:600}
-    .lb-metric{font-size:13px;color:var(--text-secondary)}
-    .lb-score{font-family:var(--font-display);font-size:22px;font-weight:800}
-    .normalize-card{background:var(--bg-glass);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;text-align:center}
-    .normalize-score{font-family:var(--font-display);font-size:52px;font-weight:800;color:var(--accent)}
-    .normalize-label{font-size:14px;color:var(--text-secondary);margin-top:4px}
-    .normalize-details{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:24px}
-    .normalize-detail{background:var(--bg-card);border-radius:var(--radius-md);padding:16px}
-    .normalize-detail-value{font-family:var(--font-display);font-size:20px;font-weight:700}
-    .normalize-detail-label{font-size:11px;color:var(--text-secondary);margin-top:2px}
-    .normalize-detail-source{font-size:10px;color:var(--text-tertiary);margin-top:4px}
-    .win-celebration{text-align:center}
-    .win-trophy{font-size:64px;margin-bottom:16px;line-height:1}
-    .win-amount{font-family:var(--font-display);font-size:48px;font-weight:800;color:var(--accent)}
-    .win-sub{font-size:20px;color:var(--text-secondary);font-weight:600;margin-top:4px}
-    .win-msg{font-size:16px;color:var(--text-secondary);margin-top:16px;line-height:1.7}
-    .demo-nav{display:flex;justify-content:space-between;align-items:center;padding:16px 38px;border-top:1px solid var(--border);position:relative;z-index:1}
-    .demo-nav .btn{padding:10px 24px;font-size:14px}
-    .demo-panel h3,.demo-panel h4{margin-bottom:4px}
-    .demo-panel .panel-sub{margin-bottom:22px}
-    /* SCORE RING DASHBOARD */
-    .score-dash{display:grid;grid-template-columns:178px 1fr;gap:36px;align-items:center;margin-top:4px}
-    .ring-wrap{position:relative;width:178px;height:178px;margin:0 auto}
-    .score-ring{width:100%;height:100%;transform:rotate(-90deg)}
-    .ring-track{fill:none;stroke:rgba(255,255,255,0.06);stroke-width:9}
-    .ring-prog{fill:none;stroke:url(#ringGrad);stroke-width:9;stroke-linecap:round;stroke-dasharray:326.7;stroke-dashoffset:326.7;transition:stroke-dashoffset 1.3s var(--ease-out);filter:drop-shadow(0 0 7px rgba(29,233,164,0.4))}
-    .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-    .ring-score{font-family:var(--font-display);font-size:54px;font-weight:800;color:var(--text-primary);line-height:1}
-    .ring-cap{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-tertiary);margin-top:5px}
-    .ring-delta{font-size:11px;color:var(--accent);font-weight:700;margin-top:7px}
-    .score-dash .sb-rows{gap:11px}
-    .score-dash .sb-row{padding:13px 16px}
-    .score-dash .sb-row-top{margin-bottom:9px;gap:12px}
-    .score-dash .sb-emoji{width:34px;height:34px;font-size:17px}
-    .score-dash .sb-name{font-size:14px}
-    .score-dash .sb-pts{font-size:21px}
-    .autolevel{margin-top:2px;font-size:12px;color:var(--text-secondary);line-height:1.5;text-align:center}
-    .autolevel strong{color:var(--accent)}
-    @media(max-width:560px){.score-dash{grid-template-columns:1fr;gap:20px}.ring-wrap{width:150px;height:150px}}
-
-    /* PROOF */
-    .proof-section{background:var(--bg-primary)}
-    .proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:48px}
-    .proof-card{background:var(--bg-card);padding:32px 28px;position:relative}
-    .proof-card::after{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent)}
-    .proof-num{font-family:var(--font-display);font-size:48px;font-weight:800;color:var(--accent);line-height:1;display:block;margin-bottom:4px}
-    .proof-label{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:14px}
-    .proof-text{font-size:14px;color:var(--text-secondary);line-height:1.6}
-    .proof-vs{font-size:11px;color:var(--text-tertiary);margin-top:8px;font-weight:500}
-    .proof-quote-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .quote-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;position:relative}
-    .quote-card::before{content:"\201C";font-size:64px;color:var(--text-tertiary);position:absolute;top:-8px;left:16px;line-height:1;opacity:0.3}
-    .quote-text{font-size:14px;color:var(--text-secondary);line-height:1.65;margin-bottom:14px;padding-top:8px;font-style:italic}
-    .quote-attr{font-size:11px;color:var(--text-tertiary);font-weight:500}
-
-    /* PRIVACY */
-    .privacy-section{background:var(--bg-primary)}
-    .privacy-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;margin-top:48px}
-    .privacy-principles{display:flex;flex-direction:column;gap:14px}
-    .principle{padding:20px 24px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);display:flex;gap:16px;align-items:flex-start;transition:border-color 0.2s}
-    .principle:hover{border-color:var(--border-accent)}
-    .principle-icon{width:36px;height:36px;border-radius:var(--radius-sm);background:var(--accent-dim);border:1px solid var(--border-accent);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-    .principle h4{font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:4px}
-    .principle p{font-size:12px;color:var(--text-secondary);margin:0;line-height:1.5}
-    .privacy-incidents{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;position:relative;overflow:hidden}
-    .privacy-incidents::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,92,53,0.03) 0%,transparent 50%)}
-    .incident-label{font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--orange);text-transform:uppercase;margin-bottom:16px;position:relative}
-    .incident-item{padding:14px 0;border-bottom:1px solid var(--border);position:relative}
-    .incident-item:last-child{border-bottom:none}
-    .incident-item h5{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px}
-    .incident-item p{font-size:12px;color:var(--text-tertiary);margin:0;line-height:1.5}
-    .incident-item .year{font-size:10px;color:var(--orange);font-weight:600;float:right;margin-top:-2px}
-    .privacy-statement{margin-top:20px;padding:18px 20px;background:var(--accent-dim);border:1px solid var(--border-accent);border-radius:var(--radius-md);font-size:13px;color:var(--text-secondary);line-height:1.65;position:relative}
-    .privacy-statement strong{color:var(--accent)}
-
-    /* COMPETE TABLE */
-    .compete-section{background:var(--bg-secondary)}
-    .compete-table{width:100%;border-collapse:collapse;margin-top:48px;font-size:13px}
-    .compete-table th{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-tertiary);padding:12px 16px;text-align:left;border-bottom:1px solid var(--border)}
-    .compete-table th.oriya-col{color:var(--accent)}
-    .compete-table td{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--text-secondary);vertical-align:middle}
-    .compete-table td:first-child{color:var(--text-primary);font-weight:500}
-    .compete-table td.oriya-col{color:var(--accent);background:rgba(29,233,164,0.02)}
-    .compete-table tr:hover td{background:rgba(255,255,255,0.015)}
-    .compete-table .oriya-col-header{background:rgba(29,233,164,0.04);border-top:1px solid var(--border-accent)}
-    .ck{color:var(--accent)}.cx{color:var(--text-tertiary)}.cp{color:var(--accent-secondary)}
-    .compete-note{margin-top:24px;padding:20px 24px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);font-size:13px;color:var(--text-secondary);line-height:1.7}
-    .compete-note strong{color:var(--text-primary)}
-
-    /* TEAMS */
-    .teams-section{background:var(--bg-primary)}
-    .teams-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
-    .teams-features{display:flex;flex-direction:column;gap:12px}
-    .team-feature{padding:18px 22px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);display:flex;gap:14px;align-items:flex-start}
-    .team-feature .icon{width:32px;height:32px;border-radius:var(--radius-sm);background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-    .team-feature h4{font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:4px}
-    .team-feature p{font-size:12px;color:var(--text-secondary);margin:0;line-height:1.5}
-    .teams-proof{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px}
-    .teams-stat{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)}
-    .teams-stat:last-of-type{margin-bottom:0;padding-bottom:0;border-bottom:none}
-    .teams-stat .ts-num{font-family:var(--font-display);font-size:36px;font-weight:800;color:var(--accent);display:block;line-height:1}
-    .teams-stat .ts-label{font-size:13px;color:var(--text-secondary);margin-top:4px;display:block}
-    .teams-stat .ts-sub{font-size:11px;color:var(--text-tertiary);margin-top:4px;font-weight:500}
-    .teams-cta{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap}
-
-    /* BOTTOM CTA */
-    .bottom-cta{background:var(--bg-secondary);text-align:center;padding:120px 24px}
-    .bottom-cta .section-title{font-size:clamp(36px,5vw,64px)}
-    .bottom-cta .sub{font-size:17px;color:var(--text-secondary);margin:16px auto 40px;max-width:480px;font-weight:400}
-    .email-form-center{display:flex;gap:12px;max-width:480px;margin:0 auto 20px;padding:6px;border-radius:calc(var(--radius-lg) + 4px);background:rgba(255,255,255,0.04);border:1px solid var(--border);backdrop-filter:blur(12px)}
-    .email-form-center .hero-input{flex:1;min-width:0;border:none;background:transparent;color:var(--text-primary);font-size:16px;padding:14px 16px;outline:none}
-    .email-form-center .hero-input::placeholder{color:var(--text-tertiary)}
-    .compatible-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px}
-    .compat-pill{display:flex;align-items:center;gap:6px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-full);padding:6px 14px;font-size:11px;color:var(--text-tertiary);font-weight:500}
-
-    /* FOOTER */
-    .footer{padding:64px 0 32px;border-top:1px solid var(--border)}
-    .footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
-    .footer-brand .fb-logo{font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:-0.02em;margin-bottom:12px}
-    .footer-brand .fb-logo span{color:var(--accent)}
-    .footer-brand .fb-desc{font-size:13px;color:var(--text-tertiary);line-height:1.7;max-width:280px}
-    .footer-brand .fb-tagline{font-size:11px;color:var(--accent);font-weight:600;margin-top:14px;letter-spacing:0.04em}
-    .footer-col h5{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:14px}
-    .footer-col a{display:block;font-size:13px;color:var(--text-tertiary);margin-bottom:8px;transition:color 0.2s}
-    .footer-col a:hover{color:var(--text-primary)}
-    .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid var(--border)}
-    .footer-bottom p{font-size:11px;color:var(--text-tertiary);font-weight:500}
-
-    /* MODAL */
-    .modal-overlay{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px}
-    .modal-overlay.open{display:flex}
-    .modal{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-xl);padding:40px;max-width:480px;width:100%;position:relative}
-    .modal-close{position:absolute;top:16px;right:16px;font-size:24px;color:var(--text-tertiary);cursor:pointer;background:none;border:none;line-height:1}
-    .modal-state{display:none;text-align:center}
-    .modal-state.active{display:block}
-    .modal-success-icon{width:56px;height:56px;border-radius:50%;background:var(--accent-dim);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
-    .modal-success-icon svg{width:24px;height:24px;color:var(--accent)}
-    .modal h3{font-family:var(--font-display);font-size:24px;font-weight:700;margin-bottom:8px}
-    .modal p{color:var(--text-secondary);margin-bottom:20px}
-    .referral-link-box{display:flex;gap:12px;align-items:center;padding:14px 16px;border-radius:var(--radius-md);background:rgba(0,0,0,0.22);border:1px solid var(--border);margin-bottom:18px}
-    .referral-link{flex:1;min-width:0;color:var(--text-primary);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .referral-actions{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:18px;justify-content:center}
-    .referral-actions .btn{padding:10px 18px;font-size:13px}
-    .referral-tiers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    .referral-tier{padding:16px;border-radius:var(--radius-md);background:var(--bg-glass);border:1px solid var(--border)}
-    .referral-tier strong{display:block;margin-bottom:6px;color:var(--text-primary)}
-    .referral-tier span{color:var(--text-secondary);font-size:13px;line-height:1.5}
-
-    /* SCORE BREAKDOWN */
-    .score-section{background:var(--bg-secondary)}
-    .score-wrap{display:grid;grid-template-columns:0.85fr 1.15fr;gap:48px;align-items:center;margin-top:48px}
-    .score-ring-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-xl);padding:44px 32px;text-align:center;position:relative;overflow:hidden}
-    .score-ring-card::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(29,233,164,0.07),transparent 70%)}
-    .score-big{font-family:var(--font-display);font-size:clamp(72px,12vw,104px);font-weight:800;color:var(--accent);line-height:1;position:relative}
-    .score-big-label{font-size:13px;color:var(--text-secondary);font-weight:600;position:relative;margin-top:6px}
-    .score-autoleveled{margin-top:24px;font-size:13px;color:var(--text-secondary);position:relative;padding-top:18px;border-top:1px solid var(--border);line-height:1.6}
-    .score-autoleveled strong{color:var(--accent)}
-    .sb-rows{display:flex;flex-direction:column;gap:14px}
-    .sb-row{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px 20px}
-    .sb-row-top{display:flex;align-items:center;gap:14px;margin-bottom:12px}
-    .sb-emoji{width:40px;height:40px;border-radius:var(--radius-sm);background:var(--bg-glass);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-    .sb-name{font-weight:700;font-size:15px;color:var(--text-primary)}
-    .sb-src{font-size:12px;color:var(--text-tertiary)}
-    .sb-pts{margin-left:auto;font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--accent)}
-    .sb-track{height:8px;border-radius:var(--radius-full);background:var(--bg-glass);overflow:hidden}
-    .sb-fill{height:100%;border-radius:var(--radius-full);background:var(--gradient-accent);width:0;transition:width 1.1s var(--ease-out)}
-
-    /* SOCIAL LAYER */
-    .social-section{background:var(--bg-primary)}
-    .social-tagline{margin:22px auto 0;max-width:640px;font-size:18px;color:var(--text-secondary);text-align:center;line-height:1.6}
-    .social-tagline strong{color:var(--accent);font-weight:600}
-    .challenge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px}
-    .challenge-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:all 0.3s var(--ease-out);display:flex;flex-direction:column}
-    .challenge-card:hover{transform:translateY(-4px);border-color:var(--border-accent);box-shadow:var(--shadow-md)}
-    .cc-banner{padding:14px 18px;background:var(--gradient-accent);color:#060611;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:space-between}
-    .cc-banner.warm{background:var(--gradient-warm)}
-    .cc-banner.blue{background:linear-gradient(135deg,#4f8de1,#7c5af7);color:#fff}
-    .cc-live{font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;display:flex;align-items:center;gap:5px}
-    .cc-live .dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse2 1.6s ease infinite}
-    @keyframes pulse2{0%,100%{opacity:1}50%{opacity:0.25}}
-    .cc-body{padding:20px;flex:1;display:flex;flex-direction:column}
-    .cc-title{font-family:var(--font-display);font-size:17px;font-weight:700;margin-bottom:6px}
-    .cc-desc{font-size:13px;color:var(--text-secondary);line-height:1.5;margin-bottom:18px;flex:1}
-    .cc-meta{display:flex;gap:20px;margin-bottom:14px}
-    .cc-stat .v{font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--text-primary);display:block;line-height:1}
-    .cc-stat .v.prize{color:var(--accent)}
-    .cc-stat .l{font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.05em;margin-top:3px}
-    .cc-foot{display:flex;align-items:center;justify-content:space-between}
-    .cc-avatars{display:flex;align-items:center}
-    .cc-av{width:26px;height:26px;border-radius:50%;border:2px solid var(--bg-card);margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#060611}
-    .cc-av:first-child{margin-left:0}
-    .cc-join{margin-top:16px;width:100%;padding:11px;border-radius:var(--radius-full);background:var(--bg-glass);border:1px solid var(--border);color:var(--text-primary);font-weight:600;font-size:13px;transition:all 0.2s}
-    .cc-join:hover{background:var(--accent);color:#060611;border-color:transparent}
-
-    /* WINS / BADGES */
-    .wins-block{margin-top:64px}
-    .wins-head{text-align:center;margin-bottom:32px}
-    .wins-head h3{font-family:var(--font-display);font-size:clamp(22px,3vw,30px);font-weight:700;margin-bottom:8px;letter-spacing:-0.02em}
-    .wins-head p{font-size:15px;color:var(--text-secondary);max-width:520px;margin:0 auto}
-    .wins-strip{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
-    .badge-card{width:210px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:26px 20px;text-align:center;position:relative;transition:transform 0.35s var(--ease-spring),border-color 0.3s,box-shadow 0.3s}
-    .badge-card:hover{transform:translateY(-6px) rotate(-1.5deg);border-color:var(--border-accent);box-shadow:var(--shadow-md)}
-    .badge-medal{width:66px;height:66px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:30px;background:var(--accent-dim);border:2px solid var(--accent);box-shadow:0 0 26px rgba(29,233,164,0.2)}
-    .badge-title{font-family:var(--font-display);font-weight:700;font-size:15px;margin-bottom:4px}
-    .badge-sub{font-size:12px;color:var(--text-tertiary);margin-bottom:16px}
-    .badge-share{display:flex;gap:8px;justify-content:center}
-    .badge-share span{font-size:10px;font-weight:600;color:var(--text-secondary);padding:5px 11px;border-radius:var(--radius-full);background:var(--bg-glass);border:1px solid var(--border)}
-
-    /* FLYWHEEL / PARTNER */
-    .partner-section{background:var(--bg-secondary)}
-    .partner-lead{max-width:700px;margin-top:20px;font-size:17px;color:var(--text-secondary);line-height:1.7}
-    .partner-lead strong{color:var(--text-primary)}
-    .flywheel{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:48px}
-    .fly-stage{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;position:relative}
-    .fly-stage::after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:var(--text-tertiary);font-size:18px;z-index:2}
-    .fly-stage:last-child::after{display:none}
-    .fly-num{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:0.08em;margin-bottom:10px}
-    .fly-stage h4{font-family:var(--font-display);font-size:16px;font-weight:700;margin-bottom:8px}
-    .fly-stage p{font-size:12px;color:var(--text-secondary);line-height:1.55}
-    .partner-note{margin-top:24px;padding:24px 28px;background:var(--accent-dim);border:1px solid var(--border-accent);border-radius:var(--radius-lg);font-size:15px;color:var(--text-secondary);line-height:1.7}
-    .partner-note strong{color:var(--accent)}
-
-    /* RUN A CHALLENGE */
-    .run-challenge{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px}
-    .run-challenge h4{font-family:var(--font-display);font-size:18px;font-weight:700;margin-bottom:8px}
-    .run-challenge p{font-size:14px;color:var(--text-secondary);line-height:1.6}
-    .run-checks{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
-    .run-check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);font-weight:500}
-    .run-check .ck{color:var(--accent);font-weight:700}
-    .run-contact{font-size:13px;color:var(--text-tertiary);margin-top:6px}
-    .run-contact a{color:var(--accent);font-weight:600}
-
-    /* PRIVACY SIMPLE */
-    .privacy-simple{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px}
-    .ps-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:26px 22px;text-align:center;transition:border-color 0.2s}
-    .ps-card:hover{border-color:var(--border-accent)}
-    .ps-icon{font-size:26px;margin-bottom:12px}
-    .ps-card h4{font-family:var(--font-display);font-size:14px;font-weight:700;margin-bottom:6px}
-    .ps-card p{font-size:12px;color:var(--text-secondary);line-height:1.55}
-
-    /* WALKTHROUGH VIDEO */
-    .video-section{background:var(--bg-primary);padding:64px 0 24px}
-    .video-frame{position:relative;max-width:900px;margin:0 auto;aspect-ratio:16/9;border-radius:var(--radius-xl);overflow:hidden;border:1px solid var(--border-accent);box-shadow:var(--shadow-lg);background:radial-gradient(ellipse 80% 80% at 50% -10%,rgba(29,233,164,0.14),transparent 60%),var(--bg-card)}
-    .video-frame::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);background-size:42px 42px;-webkit-mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,#000,transparent);mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,#000,transparent)}
-    .video-poster{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px}
-    .video-play{width:82px;height:82px;border-radius:50%;background:var(--accent);color:#060611;display:flex;align-items:center;justify-content:center;font-size:26px;padding-left:5px;box-shadow:0 14px 40px rgba(29,233,164,0.4);animation:oriPulse 2.6s ease infinite;transition:transform 0.25s var(--ease-spring)}
-    .video-play:hover{transform:scale(1.08)}
-    .video-poster h3{font-family:var(--font-display);font-size:clamp(20px,3vw,30px);font-weight:800;letter-spacing:-0.02em}
-    .video-poster p{font-size:15px;color:var(--text-secondary);max-width:440px;line-height:1.6}
-    .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-    /* Explore-live deep links under the walkthrough */
-    .peek-explore{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;max-width:900px;margin:20px auto 0}
-    .peek-explore .peek-lead{font-size:13px;color:var(--text-tertiary)}
-    .peek-chip{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--radius-full);background:var(--bg-glass);border:1px solid var(--border);font-size:13px;font-weight:600;color:var(--text-secondary);transition:all 0.25s var(--ease-out)}
-    .peek-chip:hover{border-color:var(--border-accent);color:var(--text-primary);transform:translateY(-2px)}
-    .peek-chip .arr{color:var(--accent);font-weight:700}
-    /* Normalization science pipeline */
-    .science-section{background:radial-gradient(ellipse 60% 50% at 50% 0,rgba(29,233,164,0.05),transparent 70%)}
-    .sci-head{text-align:center;margin-bottom:40px}
-    .sci-pipe{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;align-items:stretch}
-    .sci-node{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px 20px;position:relative;overflow:hidden}
-    .sci-node.final{border-color:var(--border-accent);background:radial-gradient(ellipse 130% 120% at 50% 0,rgba(29,233,164,0.13),transparent 72%),var(--bg-card)}
-    .sci-step{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
-    .sci-node h4{font-family:var(--font-display);font-size:17px;font-weight:700;margin-bottom:8px;letter-spacing:-0.01em;line-height:1.2}
-    .sci-node p{font-size:12.5px;color:var(--text-secondary);line-height:1.55}
-    .sci-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
-    .sci-tag{font-size:10px;font-weight:600;padding:3px 9px;border-radius:var(--radius-full);background:var(--bg-glass);border:1px solid var(--border);color:var(--text-tertiary)}
-    .sci-bignum{font-family:var(--font-display);font-size:36px;font-weight:900;background:var(--gradient-accent);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1;margin-bottom:6px}
-    .sci-arrow{display:flex;align-items:center;justify-content:center;padding:0 4px;color:var(--text-tertiary)}
-    .sci-arrow svg{width:26px;height:14px}
-    .sci-arrow .flow{stroke:var(--accent);stroke-dasharray:4 5;animation:flow 0.9s linear infinite}
-    .sci-note{margin:26px auto 0;text-align:center;font-size:13.5px;color:var(--text-secondary);max-width:700px;line-height:1.65}
-    .sci-note strong{color:var(--text-primary)}
-    @media(prefers-reduced-motion:reduce){.sci-arrow .flow{animation:none!important}}
-    @media(max-width:860px){.sci-pipe{grid-template-columns:1fr;gap:4px}.sci-arrow{transform:rotate(90deg);padding:6px 0}}
-
-    /* SPONSOR STRIP */
-    .sponsor-strip{margin-top:48px;text-align:center}
-    .ss-label{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-tertiary)}
-    .ss-logos{display:flex;flex-wrap:wrap;gap:16px 30px;justify-content:center;align-items:center;margin-top:16px}
-    .ss-logos span{font-family:var(--font-display);font-size:19px;font-weight:800;letter-spacing:0.01em;color:var(--text-secondary);opacity:0.5;transition:opacity 0.25s,color 0.25s,transform 0.25s}
-    .ss-logos span:hover{opacity:1;color:var(--text-primary);transform:translateY(-2px)}
-
-    /* CLIFF BAR ANIMATION */
-    .cliff-bar{transform-origin:bottom;transform:scaleY(0);transition:transform 0.85s var(--ease-out)}
-    .cliff-chart.in .cliff-bar{transform:scaleY(1)}
-    .cliff-chart.in .cliff-bar:nth-child(1){transition-delay:0.05s}
-    .cliff-chart.in .cliff-bar:nth-child(2){transition-delay:0.13s}
-    .cliff-chart.in .cliff-bar:nth-child(3){transition-delay:0.21s}
-    .cliff-chart.in .cliff-bar:nth-child(4){transition-delay:0.29s}
-    .cliff-chart.in .cliff-bar:nth-child(5){transition-delay:0.37s}
-    .cliff-chart.in .cliff-bar:nth-child(6){transition-delay:0.45s}
-    @media(prefers-reduced-motion:reduce){.cliff-bar{transform:none!important;transition:none!important}}
-
-    /* PARTNERSHIPS FOLD */
-    .fold{display:flex;flex-direction:column;gap:14px;margin-top:40px}
-    .fold-item{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:border-color 0.3s}
-    .fold-item.open{border-color:var(--border-accent)}
-    .fold-summary{display:flex;align-items:center;gap:16px;width:100%;padding:22px 24px;text-align:left;background:none;border:none;cursor:pointer;font-family:inherit}
-    .fold-summary:hover .fs-title{color:var(--accent)}
-    .fs-ico{width:44px;height:44px;border-radius:var(--radius-md);background:var(--accent-dim);border:1px solid var(--border-accent);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-    .fs-text{flex:1;display:flex;flex-direction:column;gap:3px}
-    .fs-title{font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--text-primary);transition:color 0.2s}
-    .fs-sub{font-size:13px;color:var(--text-secondary)}
-    .fs-arrow{font-size:28px;font-weight:300;color:var(--accent);transition:transform 0.35s var(--ease-spring);line-height:1;flex-shrink:0}
-    .fold-item.open .fs-arrow{transform:rotate(135deg)}
-    .fold-detail{max-height:0;overflow:hidden;transition:max-height 0.55s var(--ease-out)}
-    .fold-item.open .fold-detail{max-height:2600px}
-    .fold-inner{padding:2px 24px 30px}
-
-    /* ORI CHATBOT */
-    .ori-fab{position:fixed;bottom:24px;right:24px;z-index:1500;display:flex;align-items:center;gap:9px;padding:11px 18px 11px 12px;border-radius:var(--radius-full);background:var(--gradient-accent);color:#060611;font-weight:700;font-size:14px;box-shadow:0 10px 30px rgba(29,233,164,0.4);transition:transform 0.25s var(--ease-spring)}
-    .ori-fab:hover{transform:translateY(-3px) scale(1.03)}
-    .ori-fab .ori-ava{width:28px;height:28px;border-radius:50%;background:#060611;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--accent);font-weight:800}
-    .ori-fab .ori-pulse{position:absolute;inset:0;border-radius:var(--radius-full);animation:oriPulse 2.4s ease infinite;pointer-events:none}
-    @keyframes oriPulse{0%{box-shadow:0 0 0 0 rgba(29,233,164,0.45)}70%{box-shadow:0 0 0 16px rgba(29,233,164,0)}100%{box-shadow:0 0 0 0 rgba(29,233,164,0)}}
-    .ori-fab.hidden{opacity:0;pointer-events:none;transform:scale(0.8)}
-    .ori-panel{position:fixed;bottom:24px;right:24px;z-index:1600;width:384px;max-width:calc(100vw - 32px);height:580px;max-height:calc(100vh - 48px);background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;overflow:hidden;transform:translateY(16px) scale(0.97);opacity:0;pointer-events:none;transition:opacity 0.25s var(--ease-out),transform 0.25s var(--ease-out)}
-    .ori-panel.open{opacity:1;transform:none;pointer-events:auto}
-    .ori-head{display:flex;align-items:center;gap:12px;padding:15px 18px;background:linear-gradient(135deg,rgba(29,233,164,0.14),rgba(79,141,225,0.1));border-bottom:1px solid var(--border)}
-    .ori-head .ava{width:38px;height:38px;border-radius:50%;background:var(--gradient-accent);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#060611}
-    .ori-head .meta{flex:1}
-    .ori-head .nm{font-weight:700;font-size:15px}
-    .ori-head .st{font-size:11px;color:var(--accent);display:flex;align-items:center;gap:5px}
-    .ori-head .st .d{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s ease infinite}
-    .ori-head .x{font-size:24px;color:var(--text-tertiary);cursor:pointer;line-height:1;background:none;border:none;padding:0 4px}
-    .ori-body{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px}
-    .ori-msg{display:flex;gap:9px;max-width:92%;animation:fadeUp 0.35s var(--ease-out)}
-    .ori-msg .b{font-size:13.5px;line-height:1.55;padding:11px 14px;border-radius:14px}
-    .ori-msg.bot{align-self:flex-start}
-    .ori-msg.bot .av{width:26px;height:26px;border-radius:50%;background:var(--gradient-accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#060611;flex-shrink:0}
-    .ori-msg.bot .b{background:var(--bg-glass);color:var(--text-primary);border:1px solid var(--border);border-bottom-left-radius:4px}
-    .ori-msg.user{align-self:flex-end}
-    .ori-msg.user .b{background:var(--accent);color:#060611;font-weight:600;border-bottom-right-radius:4px}
-    .ori-chips{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px 16px;border-top:1px solid var(--border);max-height:160px;overflow-y:auto}
-    .ori-chip{font-size:12.5px;font-weight:600;color:var(--text-primary);padding:8px 13px;border-radius:var(--radius-full);background:var(--bg-glass);border:1px solid var(--border-accent);cursor:pointer;transition:all 0.2s;font-family:inherit}
-    .ori-chip:hover{background:var(--accent-dim);border-color:var(--accent)}
-    .ori-steps{display:flex;flex-direction:column;gap:9px;margin-top:10px}
-    .ori-step{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
-    .ori-step .t{font-size:13px;font-weight:700;margin-bottom:3px}
-    .ori-step .d{font-size:12px;color:var(--text-secondary);line-height:1.5;margin-bottom:8px}
-    .ori-step a{font-size:12px;font-weight:700;color:var(--accent)}
-    .ori-ref{display:flex;gap:8px;margin-top:10px}
-    .ori-ref input{flex:1;min-width:0;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 11px;color:var(--text-primary);font-size:13px;outline:none}
-    .ori-ref button{padding:9px 14px;border-radius:var(--radius-sm);background:var(--accent);color:#060611;font-weight:700;font-size:12px;border:none;cursor:pointer}
-    @media(max-width:480px){.ori-fab .lbl{display:none}.ori-panel{height:calc(100vh - 24px);bottom:12px;right:12px}}
-
-    /* ANIMATIONS */
-    @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-
-    /* RESPONSIVE */
-    @media(max-width:820px){
-      .nav-links{display:none}
-      .cliff-container{grid-template-columns:1fr}
-      .privacy-grid{grid-template-columns:1fr}
-      .teams-grid{grid-template-columns:1fr}
-      .proof-grid{grid-template-columns:1fr}
-      .proof-quote-row{grid-template-columns:1fr}
-      .footer-top{grid-template-columns:1fr 1fr}
-      .compete-table{font-size:11px;display:block;overflow-x:auto}
-      .demo-steps-nav{flex-wrap:wrap}
-      .demo-step-btn{padding:8px 14px;font-size:12px}
-      .demo-step-btn .step-label{display:none}
-      .demo-panel{padding:28px 20px}
-      .demo-nav{padding:16px 20px}
-      .score-wrap{grid-template-columns:1fr;gap:28px}
-      .challenge-grid{grid-template-columns:1fr}
-      .flywheel{grid-template-columns:1fr 1fr}
-      .fly-stage::after{display:none}
-      .privacy-simple{grid-template-columns:1fr 1fr}
-      .run-challenge-grid{grid-template-columns:1fr!important}
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; overflow-x:hidden; }
+    body {
+      font-family:var(--font-sans);
+      background:var(--obsidian);
+      color:var(--bone);
+      line-height:1.6;
+      overflow-x:hidden;
+      min-width:320px;
+      position:relative;
     }
-    @media(max-width:560px){
-      .hero-normalizer{flex-direction:column;gap:12px}
-      .hn-arrow svg{transform:rotate(90deg)}
+    a { color:inherit; text-decoration:none; }
+    button { cursor:pointer; border:none; background:none; font-family:inherit; color:inherit; }
+    ::selection { background:rgba(127,183,158,0.25); color:var(--bone); }
+
+    /* ---- Global circadian background (night → dawn luminance drift) ---- */
+    .canvas {
+      position:fixed; inset:0; z-index:-2;
+      background:radial-gradient(120% 120% at 50% 0%, #14171C 0%, #0E1014 45%, #070809 100%);
     }
-    @media(max-width:480px){
-      .wearable-grid{grid-template-columns:repeat(3,1fr);gap:8px}
-      .footer-top{grid-template-columns:1fr}
-      .footer-bottom{flex-direction:column;gap:8px;text-align:center}
-      .referral-tiers{grid-template-columns:1fr}
-      .normalize-details{grid-template-columns:1fr}
-      .privacy-simple{grid-template-columns:1fr}
-      .flywheel{grid-template-columns:1fr}
-      .run-checks{grid-template-columns:1fr}
+    /* dawn wash — opacity driven by scroll progress via JS */
+    .canvas-dawn {
+      position:fixed; inset:0; z-index:-1; opacity:0; pointer-events:none;
+      background:radial-gradient(110% 80% at 50% 110%, rgba(215,162,92,0.16), rgba(185,106,74,0.05) 40%, transparent 70%);
+      transition:opacity 0.2s linear;
+    }
+    .vignette {
+      position:fixed; inset:0; z-index:-1; pointer-events:none;
+      box-shadow:inset 0 0 240px 40px rgba(7,8,9,0.9);
+    }
+
+    /* ---- Layout ---- */
+    .wrap { max-width:var(--maxw); margin:0 auto; padding:0 28px; }
+    section { position:relative; }
+    .act { padding:clamp(90px,16vh,180px) 0; }
+
+    .eyebrow {
+      font-family:var(--font-mono); font-size:11px; font-weight:500;
+      letter-spacing:0.18em; text-transform:uppercase; color:var(--ash);
+    }
+    .display {
+      font-family:var(--font-display); font-weight:400;
+      line-height:0.94; letter-spacing:-0.02em; color:var(--bone);
+    }
+    .display-xl { font-size:clamp(3.2rem, 9vw, 9rem); line-height:0.92; letter-spacing:-0.03em; }
+    .display-l  { font-size:clamp(2.4rem, 5.5vw, 4.6rem); line-height:0.98; }
+    .lede { color:var(--ash); font-size:clamp(1rem,1.5vw,1.18rem); line-height:1.6; max-width:44ch; }
+    .data { font-family:var(--font-mono); font-variant-numeric:tabular-nums; }
+
+    /* ---- Buttons ---- */
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center; gap:9px;
+      font-size:15px; font-weight:500; border-radius:999px; padding:15px 30px;
+      transition:transform 0.45s var(--settle), box-shadow 0.45s var(--settle), background 0.3s;
+      position:relative; will-change:transform;
+    }
+    .btn-primary {
+      background:var(--jade); color:var(--void);
+      box-shadow:var(--glow-jade);
+    }
+    .btn-primary.amber { background:var(--amber); box-shadow:var(--glow-amber); }
+    .btn-primary:hover { transform:translateY(-2px); }
+    .btn-ghost { color:var(--ash); font-size:14px; padding:8px 4px; }
+    .btn-ghost:hover { color:var(--bone); }
+
+    /* ---- Nav (hairline-quiet) ---- */
+    .nav {
+      position:fixed; top:0; left:0; right:0; z-index:900;
+      padding:20px 0; transition:padding 0.4s var(--circadian), background 0.4s, border-color 0.4s;
+      border-bottom:1px solid transparent;
+    }
+    .nav.scrolled {
+      padding:13px 0; background:rgba(10,12,16,0.72);
+      backdrop-filter:blur(18px) saturate(1.1); border-bottom-color:var(--hairline);
+    }
+    .nav-inner { display:flex; align-items:center; justify-content:space-between; max-width:var(--maxw); margin:0 auto; padding:0 28px; }
+    .logo { display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-size:24px; letter-spacing:-0.01em; }
+    .logo svg { width:26px; height:26px; }
+    .nav-links { display:flex; align-items:center; gap:34px; }
+    .nav-link { font-size:13.5px; color:var(--ash); transition:color 0.2s; }
+    .nav-link:hover { color:var(--bone); }
+    .nav-right { display:flex; align-items:center; gap:18px; }
+    .nav-right .btn { padding:10px 22px; font-size:13.5px; }
+
+    /* ============================================================
+       ACT 0 — PRE-LOAD : jade HRV waveform draws, collapses to a point.
+       ============================================================ */
+    .preload {
+      position:fixed; inset:0; z-index:2000; background:var(--void);
+      display:flex; align-items:center; justify-content:center;
+      transition:opacity 0.9s var(--circadian);
+    }
+    .preload.done { opacity:0; pointer-events:none; }
+    .preload svg { width:min(420px,70vw); height:120px; overflow:visible; }
+    .preload .hrv {
+      fill:none; stroke:var(--jade); stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
+      filter:drop-shadow(0 0 8px rgba(127,183,158,0.6));
+      stroke-dasharray:1400; stroke-dashoffset:1400;
+      animation:hrvdraw 1.2s var(--circadian) forwards;
+    }
+    .preload .seed {
+      r:0; fill:var(--jade-glow); filter:drop-shadow(0 0 12px rgba(159,211,187,0.9));
+      animation:seedpop 0.5s var(--circadian) 1.05s forwards;
+    }
+    @keyframes hrvdraw { to { stroke-dashoffset:0; } }
+    @keyframes seedpop { 0%{r:0;opacity:0} 60%{opacity:1} 100%{r:7;opacity:1} }
+
+    /* ============================================================
+       THE ORB — one luminous sphere = your normalized 0–100.
+       It breathes (~12 breaths/min). Spend the boldness here.
+       ============================================================ */
+    .orb-stage { position:relative; display:flex; align-items:center; justify-content:center; }
+    .orb {
+      position:relative; border-radius:50%;
+      background:radial-gradient(circle at 38% 32%, #232830 0%, var(--graphite) 55%, #0c0e12 100%);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      box-shadow:var(--glow-jade), inset 0 1px 1px rgba(255,255,255,0.05);
+      animation:breathe 5s ease-in-out infinite;
+      will-change:transform;
+      transition:box-shadow 1.2s var(--circadian);
+    }
+    .orb::before { /* inner readiness arc glow */
+      content:""; position:absolute; inset:6%; border-radius:50%;
+      background:conic-gradient(from 220deg, var(--jade-deep), var(--jade), var(--amber), var(--ember));
+      opacity:0.16; filter:blur(26px); transition:opacity 1.2s var(--circadian);
+    }
+    .orb.ignite { box-shadow:var(--glow-amber), inset 0 1px 1px rgba(255,255,255,0.06); }
+    .orb.ignite::before { opacity:0.34; }
+    .orb-num { font-family:var(--font-mono); font-variant-numeric:tabular-nums; font-weight:500; color:var(--bone); line-height:1; }
+    .orb-cap { font-family:var(--font-mono); font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--ash); margin-top:8px; }
+    @keyframes breathe { 0%,100%{transform:scale(1);opacity:0.92} 50%{transform:scale(1.035);opacity:1} }
+
+    /* ============================================================
+       ACT 1 — HERO / NIGHT
+       ============================================================ */
+    .hero { min-height:100vh; display:flex; align-items:center; padding-top:80px; }
+    .hero-inner { display:grid; grid-template-columns:1.05fr 0.95fr; gap:40px; align-items:center; width:100%; }
+    .hero h1 { margin:22px 0 26px; }
+    .hero h1 .line { display:block; overflow:hidden; }
+    .hero h1 .line > span { display:block; transform:translateY(110%); }
+    .hero.in h1 .line > span { animation:linemask 1s var(--circadian) forwards; }
+    .hero.in h1 .line:nth-child(1) > span { animation-delay:0.05s; }
+    .hero.in h1 .line:nth-child(2) > span { animation-delay:0.18s; }
+    .hero.in h1 .line:nth-child(3) > span { animation-delay:0.31s; }
+    @keyframes linemask { to { transform:translateY(0); } }
+    .hero-sub { opacity:0; animation:fadeup 0.9s var(--circadian) 0.6s forwards; }
+    .hero-actions { display:flex; align-items:center; gap:22px; margin-top:34px; flex-wrap:wrap; opacity:0; animation:fadeup 0.9s var(--circadian) 0.78s forwards; }
+    @keyframes fadeup { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .hero-orb-wrap { display:flex; justify-content:center; }
+
+    /* ============================================================
+       ACT 2 — THE BIOMETRIC HANDICAP (interactive centerpiece)
+       ============================================================ */
+    .act-head { max-width:640px; }
+    .act-head .eyebrow { display:block; margin-bottom:18px; }
+    .act-head h2 { margin-bottom:18px; }
+    .normalizer {
+      position:relative; margin:60px auto 0;
+      width:100%; max-width:580px; aspect-ratio:1/1;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .chip {
+      position:absolute; left:50%; top:50%;
+      transform:translate(-50%,-50%) translate(var(--x), var(--y));
+      border:1px solid var(--hairline); background:rgba(26,30,36,0.82);
+      backdrop-filter:blur(6px); border-radius:13px; padding:11px 15px; text-align:left;
+      min-width:158px; outline:none;
+      transition:transform 0.7s var(--glass), opacity 0.45s var(--settle), border-color 0.3s, box-shadow 0.4s;
+      will-change:transform;
+    }
+    .chip:hover, .chip:focus-visible { border-color:var(--jade-deep); box-shadow:0 0 0 1px rgba(127,183,158,0.25); }
+    .chip.dim { opacity:0.32; }
+    .chip.merged { transform:translate(-50%,-50%) translate(0,0) scale(0.4); opacity:0; }
+    .chip-dev { display:block; font-family:var(--font-mono); font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--ash); }
+    .chip-read { display:block; font-family:var(--font-mono); font-size:13px; color:var(--bone); margin-top:3px; }
+    .chip-norm { display:block; font-family:var(--font-mono); font-size:10px; letter-spacing:0.1em; color:var(--jade); margin-top:5px; height:0; opacity:0; overflow:hidden; transition:all 0.4s var(--settle); }
+    .chip:hover .chip-norm, .chip:focus-visible .chip-norm { height:14px; opacity:1; }
+    .norm-orb { width:182px; height:182px; }
+    .norm-orb .orb-num { font-size:60px; }
+    .normalizer-foot { display:flex; flex-direction:column; align-items:center; gap:14px; margin-top:46px; }
+    .merge-btn {
+      font-family:var(--font-mono); font-size:11px; letter-spacing:0.16em; text-transform:uppercase;
+      color:var(--ash); border:1px solid var(--hairline); border-radius:999px; padding:11px 22px;
+      transition:color 0.3s, border-color 0.3s, background 0.3s;
+    }
+    .merge-btn:hover { color:var(--bone); border-color:var(--jade-deep); }
+    .merge-btn.active { color:var(--jade); border-color:var(--jade-deep); background:rgba(127,183,158,0.06); }
+
+    /* ============================================================
+       ACT 3 — COMPETITIVE RECOVERY / THE SQUAD (editorial ranking)
+       ============================================================ */
+    .squad { max-width:760px; margin:54px auto 0; }
+    .rank-row {
+      display:grid; grid-template-columns:auto 36px 1fr auto auto; gap:22px; align-items:center;
+      padding:22px 6px; border-bottom:1px solid var(--hairline);
+    }
+    .rank-row:first-child { border-top:1px solid var(--hairline); }
+    .rank-num { font-family:var(--font-mono); font-size:clamp(26px,4vw,40px); color:var(--ash); font-weight:400; }
+    .rank-row.lead .rank-num { color:var(--jade); }
+    .mini-orb {
+      width:32px; height:32px; border-radius:50%;
+      background:radial-gradient(circle at 38% 32%, #2a3038, var(--graphite));
+      box-shadow:0 0 16px -4px var(--c, rgba(127,183,158,0.5));
+      animation:breathe 5s ease-in-out infinite;
+    }
+    .rank-name { font-size:17px; color:var(--bone); }
+    .rank-name span { display:block; font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; color:var(--ash); }
+    .rank-score { font-family:var(--font-mono); font-variant-numeric:tabular-nums; font-size:22px; color:var(--bone); }
+    .rank-delta { font-family:var(--font-mono); font-size:12px; color:var(--jade); min-width:42px; text-align:right; }
+    .rank-delta.down { color:var(--ember); }
+
+    /* ============================================================
+       ACT 4 — THE BODY PASSPORT
+       ============================================================ */
+    .passport-act { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; }
+    .passport {
+      position:relative; aspect-ratio:1.586/1; border-radius:20px;
+      background:linear-gradient(155deg, #16191F 0%, #0c0e12 100%);
+      border:1px solid var(--hairline); padding:30px;
+      display:flex; flex-direction:column; justify-content:space-between;
+      box-shadow:0 40px 80px -30px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.04);
+      overflow:hidden;
+    }
+    .passport::after {
+      content:""; position:absolute; top:-40%; left:-20%; width:80%; height:180%;
+      background:linear-gradient(90deg, transparent, rgba(236,234,228,0.04), transparent);
+      transform:rotate(18deg); pointer-events:none;
+    }
+    .pp-top { display:flex; justify-content:space-between; align-items:flex-start; }
+    .pp-label { font-family:var(--font-mono); font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--ash); }
+    .pp-chip { width:38px; height:28px; border-radius:6px; background:linear-gradient(135deg, var(--amber-deep), var(--amber)); opacity:0.85; }
+    .pp-score { font-family:var(--font-mono); font-variant-numeric:tabular-nums; font-size:64px; color:var(--bone); line-height:1; }
+    .pp-meta { display:flex; justify-content:space-between; align-items:flex-end; }
+    .pp-meta div span { display:block; }
+    .pp-k { font-family:var(--font-mono); font-size:9px; letter-spacing:0.16em; text-transform:uppercase; color:var(--ash); margin-bottom:4px; }
+    .pp-v { font-family:var(--font-mono); font-size:13px; color:var(--bone); transition:color 0.4s; }
+    .pp-v.flash { color:var(--jade); }
+    .pp-devices { display:flex; gap:10px; margin-top:26px; }
+    .pp-dev {
+      font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em;
+      padding:8px 14px; border:1px solid var(--hairline); border-radius:999px; color:var(--ash);
+      transition:all 0.3s var(--settle);
+    }
+    .pp-dev:hover { color:var(--bone); border-color:var(--jade-deep); }
+    .pp-dev.active { color:var(--void); background:var(--jade); border-color:var(--jade); }
+
+    /* ============================================================
+       ACT 5 — AMBIENT PRESENCE (squad ticker + coach pull-quote)
+       ============================================================ */
+    .ticker { position:relative; width:100%; overflow:hidden; padding:18px 0; mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent); }
+    .ticker-track { display:flex; gap:48px; width:max-content; animation:marquee 48s linear infinite; will-change:transform; }
+    .ticker:hover .ticker-track { animation-play-state:paused; }
+    .ticker-item { font-family:var(--font-mono); font-size:12px; letter-spacing:0.04em; color:var(--ash); opacity:0.6; white-space:nowrap; }
+    .ticker-item b { color:var(--jade); font-weight:500; }
+    .ticker-item .crew { color:var(--bone); }
+    @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+    .pullquote { max-width:880px; margin:90px auto 0; text-align:center; }
+    .pullquote q { font-family:var(--font-display); font-size:clamp(1.8rem,4vw,3.4rem); line-height:1.1; color:var(--bone); quotes:none; }
+    .pullquote q::before { content:"\201C"; } .pullquote q::after { content:"\201D"; }
+    .pullquote cite { display:block; margin-top:26px; font-family:var(--font-mono); font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--ash); font-style:normal; }
+
+    /* ============================================================
+       ACT 6 — DAWN / CTA
+       ============================================================ */
+    .dawn { text-align:center; }
+    .dawn .orb-stage { margin:0 auto 50px; }
+    .dawn h2 { margin:0 auto 14px; max-width:18ch; }
+    .email-form { display:flex; gap:10px; padding:6px; max-width:480px; margin:34px auto 0;
+      border-radius:16px; background:rgba(255,255,255,0.03); border:1px solid var(--hairline); backdrop-filter:blur(10px); }
+    .email-form input {
+      flex:1; min-width:0; border:none; background:transparent; color:var(--bone);
+      font-family:var(--font-mono); font-size:14px; padding:13px 16px; outline:none;
+    }
+    .email-form input::placeholder { color:var(--ash); }
+    .email-form .btn { white-space:nowrap; padding:13px 24px; flex-shrink:0; }
+    .form-note { font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--ash); margin-top:18px; }
+    .form-error { font-family:var(--font-mono); font-size:12px; color:var(--ember); margin-top:12px; display:none; }
+    .compat { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:28px; }
+    .compat span { font-family:var(--font-mono); font-size:11px; letter-spacing:0.08em; color:var(--ash); border:1px solid var(--hairline); border-radius:999px; padding:7px 14px; }
+
+    /* ---- Footer (hairline-quiet) ---- */
+    .footer { border-top:1px solid var(--hairline); padding:70px 0 50px; }
+    .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:40px; }
+    .footer .logo { margin-bottom:16px; }
+    .footer-desc { color:var(--ash); font-size:13.5px; max-width:34ch; line-height:1.7; }
+    .footer-col h5 { font-family:var(--font-mono); font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--ash); margin-bottom:16px; }
+    .footer-col a { display:block; font-size:13.5px; color:var(--bone); opacity:0.7; margin-bottom:11px; transition:opacity 0.2s; }
+    .footer-col a:hover { opacity:1; }
+    .footer-bottom { display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-top:56px; padding-top:26px; border-top:1px solid var(--hairline); font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--ash); }
+
+    /* ============================================================
+       SCROLL "WAKE INTO FOCUS" — opening your eyes in the morning
+       ============================================================ */
+    .reveal { opacity:0.32; transform:translateY(48px) scale(0.96); filter:blur(10px);
+      transition:opacity 1s var(--circadian), transform 1s var(--circadian), filter 1s var(--circadian); will-change:transform,opacity,filter; }
+    .reveal.awake { opacity:1; transform:none; filter:blur(0); }
+
+    /* ============================================================
+       REFERRAL CONFIRM MODAL  (preserved)
+       ============================================================ */
+    .modal-overlay { position:fixed; inset:0; z-index:1500; background:rgba(7,8,9,0.82); backdrop-filter:blur(8px); display:none; align-items:center; justify-content:center; padding:24px; }
+    .modal-overlay.open { display:flex; }
+    .modal { position:relative; width:100%; max-width:460px; background:var(--graphite); border:1px solid var(--hairline); border-radius:22px; padding:40px 34px; text-align:center; box-shadow:0 40px 90px -30px rgba(0,0,0,0.9); }
+    .modal-close { position:absolute; top:16px; right:20px; font-size:26px; color:var(--ash); line-height:1; }
+    .modal-success-icon { width:56px; height:56px; margin:0 auto 20px; border-radius:50%; background:rgba(127,183,158,0.12); border:1px solid var(--jade-deep); display:flex; align-items:center; justify-content:center; color:var(--jade); }
+    .modal-success-icon svg { width:26px; height:26px; }
+    .modal h3 { font-family:var(--font-display); font-size:32px; margin-bottom:10px; }
+    .modal p { color:var(--ash); font-size:14px; margin-bottom:22px; }
+    .referral-link-box { display:flex; gap:8px; padding:6px; border:1px solid var(--hairline); border-radius:12px; margin-bottom:14px; }
+    .referral-link { flex:1; min-width:0; font-family:var(--font-mono); font-size:12px; color:var(--bone); padding:10px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:left; }
+    .referral-actions { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:22px; }
+    .referral-actions .btn, .referral-link-box .btn { padding:9px 16px; font-size:13px; }
+    .btn-secondary { background:rgba(255,255,255,0.04); color:var(--bone); border:1px solid var(--hairline); }
+    .btn-secondary:hover { background:rgba(255,255,255,0.08); }
+    .referral-tiers { display:flex; flex-direction:column; gap:10px; text-align:left; }
+    .referral-tier { display:flex; flex-direction:column; padding:12px 14px; border:1px solid var(--hairline); border-radius:10px; }
+    .referral-tier strong { font-family:var(--font-mono); font-size:13px; color:var(--jade); }
+    .referral-tier span { font-size:12.5px; color:var(--ash); }
+
+    /* ============================================================
+       ORI CHATBOT  (preserved)
+       ============================================================ */
+    .ori-fab { position:fixed; bottom:24px; right:24px; z-index:1200; display:flex; align-items:center; gap:10px; padding:11px 18px 11px 12px; border-radius:999px; background:var(--graphite); border:1px solid var(--hairline); box-shadow:0 14px 40px -12px rgba(0,0,0,0.7); transition:transform 0.3s var(--settle); }
+    .ori-fab:hover { transform:translateY(-2px); }
+    .ori-fab.hidden { display:none; }
+    .ori-ava, .ori-head .ava { width:30px; height:30px; border-radius:50%; background:var(--jade); color:var(--void); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:17px; }
+    .ori-fab .lbl { font-size:14px; font-weight:500; }
+    .ori-pulse { position:absolute; left:12px; top:11px; width:30px; height:30px; border-radius:50%; box-shadow:0 0 0 0 rgba(127,183,158,0.4); animation:opulse 2.4s ease infinite; }
+    @keyframes opulse { 0%{box-shadow:0 0 0 0 rgba(127,183,158,0.4)} 70%,100%{box-shadow:0 0 0 12px rgba(127,183,158,0)} }
+    .ori-panel { position:fixed; bottom:24px; right:24px; z-index:1200; width:min(380px,calc(100vw - 32px)); height:min(560px,72vh); background:var(--graphite); border:1px solid var(--hairline); border-radius:20px; box-shadow:0 30px 80px -20px rgba(0,0,0,0.8); display:none; flex-direction:column; overflow:hidden; }
+    .ori-panel.open { display:flex; }
+    .ori-head { display:flex; align-items:center; gap:11px; padding:16px 18px; border-bottom:1px solid var(--hairline); }
+    .ori-head .meta { flex:1; } .ori-head .nm { font-weight:600; font-size:14px; } .ori-head .st { font-size:11px; color:var(--ash); display:flex; align-items:center; gap:5px; }
+    .ori-head .st .d { width:6px; height:6px; border-radius:50%; background:var(--jade); }
+    .ori-head .x { font-size:24px; color:var(--ash); }
+    .ori-body { flex:1; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:12px; }
+    .ori-msg { display:flex; gap:9px; align-items:flex-start; max-width:90%; }
+    .ori-msg.user { align-self:flex-end; } .ori-msg .av { width:24px; height:24px; border-radius:50%; background:var(--jade); color:var(--void); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:13px; flex-shrink:0; }
+    .ori-msg .b { background:rgba(255,255,255,0.04); border:1px solid var(--hairline); border-radius:13px; padding:10px 13px; font-size:13.5px; line-height:1.55; }
+    .ori-msg.user .b { background:var(--jade-deep); border-color:transparent; color:var(--bone); }
+    .ori-chips { display:flex; gap:8px; flex-wrap:wrap; padding:14px; border-top:1px solid var(--hairline); }
+    .ori-chip { font-size:12px; padding:7px 12px; border-radius:999px; border:1px solid var(--hairline); color:var(--ash); transition:all 0.2s; }
+    .ori-chip:hover { color:var(--bone); border-color:var(--jade-deep); }
+    .ori-steps { display:flex; flex-direction:column; gap:9px; margin-top:10px; }
+    .ori-step { border:1px solid var(--hairline); border-radius:11px; padding:11px; }
+    .ori-step .t { font-weight:600; font-size:13px; margin-bottom:3px; } .ori-step .d { font-size:12px; color:var(--ash); margin-bottom:7px; }
+    .ori-step a { font-family:var(--font-mono); font-size:11.5px; color:var(--jade); }
+    .ori-ref { display:flex; gap:7px; margin-top:10px; } .ori-ref input { flex:1; min-width:0; background:rgba(255,255,255,0.04); border:1px solid var(--hairline); border-radius:9px; padding:9px; color:var(--bone); font-size:13px; outline:none; }
+    .ori-ref button { background:var(--jade); color:var(--void); border-radius:9px; padding:0 16px; font-size:13px; font-weight:600; }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns:1fr; gap:50px; text-align:left; }
+      .hero-orb-wrap { order:-1; }
+      .passport-act { grid-template-columns:1fr; gap:44px; }
+      .footer-grid { grid-template-columns:1fr 1fr; gap:32px; }
+      .nav-links { display:none; }
+      .rank-row { grid-template-columns:auto 28px 1fr auto; gap:14px; }
+      .rank-delta { display:none; }
+    }
+    @media (max-width: 560px) {
+      .ori-fab .lbl { display:none; }
+      .footer-grid { grid-template-columns:1fr 1fr; }
+      .display-xl { font-size:clamp(2.8rem,13vw,4rem); }
+      .normalizer { max-width:340px; }
+    }
+
+    /* ============================================================
+       REDUCED MOTION — breath, parallax, blur disable; fades remain.
+       ============================================================ */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration:0.001ms !important; animation-iteration-count:1 !important; }
+      html { scroll-behavior:auto; }
+      .orb, .mini-orb { animation:none !important; }
+      .reveal { filter:none; transform:none; }
+      .reveal { opacity:0; transition:opacity 0.6s var(--circadian); }
+      .reveal.awake { opacity:1; }
+      .ticker-track { animation:none !important; }
+      .hero h1 .line > span { transform:none !important; }
     }
   </style>
 </head>
 <body>
 
+<!-- Global circadian canvas (night → dawn) -->
+<div class="canvas"></div>
+<div class="canvas-dawn" id="dawnWash"></div>
+<div class="vignette"></div>
+
+<!-- ACT 0 — PRE-LOAD : the orb, asleep -->
+<div class="preload" id="preload">
+  <svg viewBox="0 0 420 120" preserveAspectRatio="xMidYMid meet">
+    <path class="hrv" d="M0,60 L120,60 L138,60 L150,22 L162,98 L176,60 L300,60 L312,42 L324,78 L336,60 L420,60"/>
+    <circle class="seed" cx="210" cy="60"/>
+  </svg>
+</div>
+
 <!-- NAV -->
-<nav class="nav scrolled" id="nav">
+<nav class="nav" id="nav">
   <div class="nav-inner">
-    <a href="#" class="nav-logo">
-      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M 78 22 A 40 40 0 1 0 79 23" stroke="url(#navOrbGrad)" stroke-width="5" stroke-linecap="round" fill="none"/>
-        <circle cx="50" cy="55" r="14" fill="url(#navOrbGrad)"/>
-        <circle cx="78" cy="22" r="7" fill="url(#navOrbGrad)"/>
-        <defs>
-          <linearGradient id="navOrbGrad" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#00e09e"/>
-            <stop offset="1" stop-color="#00c2ff"/>
-          </linearGradient>
-        </defs>
-      </svg>
+    <a href="#" class="logo">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M 78 22 A 40 40 0 1 0 79 23" stroke="#7FB79E" stroke-width="5" stroke-linecap="round"/><circle cx="50" cy="55" r="14" fill="#7FB79E"/><circle cx="78" cy="22" r="7" fill="#D7A25C"/></svg>
       Oriya
     </a>
     <div class="nav-links">
-      <a href="#how" class="nav-link">How it works</a>
-      <a href="#challenges" class="nav-link">Challenges</a>
-      <a href="#wins" class="nav-link">Wins</a>
-      <a href="#watch" class="nav-link">Watch</a>
-      <a href="#partnerships" class="nav-link">Partnerships</a>
+      <a href="#handicap" class="nav-link">The Handicap</a>
+      <a href="#squad" class="nav-link">Squads</a>
+      <a href="#passport" class="nav-link">Body Passport</a>
     </div>
-    <div class="nav-cta">
-      <a class="btn btn-primary" href="#signup">Join the Sleep League</a>
+    <div class="nav-right">
+      <a href="#join" class="nav-link">Sign in</a>
+      <a href="#join" class="btn btn-primary" data-magnetic>Claim your Passport</a>
     </div>
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-bg"><div class="hero-grid"></div></div>
-  <div class="hero-content container">
-    <div class="hero-kicker">🏆 The Sleep League · private beta in SF &amp; NYC</div>
-    <div class="hero-badge">
-      <div class="dot"></div>
-      8 live challenges · SF &amp; NYC · real prize pools
-    </div>
-    <h1>Different devices.<br><span class="gradient-text">One score. Same game.</span></h1>
-    <p class="hero-sub" id="signup">
-      Every device scores recovery differently. <strong>Oriya auto-levels Oura, Garmin, Whoop &amp; Apple
-      into one 0–100 score</strong> — then drops you into challenges with real prizes and badges worth sharing.
-    </p>
-    <div class="hero-form-wrap">
-      <form class="hero-form" onsubmit="submitWaitlist(event)">
-        <input type="email" class="hero-input" id="waitlistEmail" placeholder="you@example.com" autocomplete="email" required>
-        <button type="submit" class="btn btn-primary" id="waitlistSubmitBtn">Get early access</button>
-      </form>
-      <div class="hero-error" id="waitlistError"></div>
-    </div>
-    <div class="hero-trust">
-      <div class="trust-item"><div class="chk">✓</div>Free to join</div>
-      <div class="trust-item"><div class="chk">✓</div>Any wearable</div>
-      <div class="trust-item"><div class="chk">✓</div>Win real prizes</div>
-      <div class="trust-item"><div class="chk">✓</div>No data sold. Ever.</div>
-    </div>
-    <div class="hero-normalizer">
-      <div class="hn-col">
-        <div class="hn-col-label">Raw · incompatible</div>
-        <div class="hn-chip" style="--c:#1de9a4"><span class="hn-dev">Oura</span><span class="hn-raw">Readiness 87</span></div>
-        <div class="hn-chip" style="--c:#9b6fff"><span class="hn-dev">Garmin</span><span class="hn-raw">Body Battery 62</span></div>
-        <div class="hn-chip" style="--c:#ff9f45"><span class="hn-dev">Whoop</span><span class="hn-raw">Recovery 71%</span></div>
+<!-- ACT 1 — HERO / NIGHT -->
+<section class="hero" id="hero">
+  <div class="wrap hero-inner">
+    <div>
+      <span class="eyebrow">The recovery network · any device</span>
+      <h1 class="display display-xl">
+        <span class="line"><span>Your ring.</span></span>
+        <span class="line"><span>Their watch.</span></span>
+        <span class="line"><span>One score.</span></span>
+      </h1>
+      <p class="hero-sub lede">Oriya gives every wearable a handicap, so the whole squad competes fairly on how well you recover.</p>
+      <div class="hero-actions">
+        <a href="#join" class="btn btn-primary" data-magnetic>Claim your Passport</a>
+        <a href="#handicap" class="btn-ghost">See how the Handicap works ↓</a>
       </div>
-      <div class="hn-arrow">
-        <span class="hn-arrow-label">Sensor Ontology</span>
-        <svg viewBox="0 0 52 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line class="flow" x1="2" y1="12" x2="42" y2="12"/><polyline points="36 6 44 12 36 18"/></svg>
-      </div>
-      <div class="hn-output">
-        <div class="hn-score">78</div>
-        <div class="hn-score-label">Oriya Score</div>
-        <div class="hn-score-sub">one number · every device</div>
+    </div>
+    <div class="hero-orb-wrap">
+      <div class="orb-stage" id="heroOrbStage">
+        <div class="orb" id="heroOrb" style="width:280px;height:280px;">
+          <span class="orb-num" style="font-size:74px;">82</span>
+          <span class="orb-cap">Oriya Index</span>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- TICKER -->
-<div class="ticker">
-  <div class="ticker-track">
-    <div class="ticker-item">🤖 <span class="val">AI Company Showdown</span> — Anthropic vs OpenAI vs Stripe<span class="sep">·</span></div>
-    <div class="ticker-item">💍 <span class="val">Win an Oura Ring</span> — Bay Area Night Owl<span class="sep">·</span></div>
-    <div class="ticker-item">🏆 <span class="val">$2,000</span> Founders vs Operators<span class="sep">·</span></div>
-    <div class="ticker-item">Oura 85 <span class="val">=</span> Whoop 85, auto-leveled<span class="sep">·</span></div>
-    <div class="ticker-item">Sponsored by <span class="val">Whoop · Oura · Sequoia · Lululemon</span><span class="sep">·</span></div>
-    <div class="ticker-item">🥇 <span class="val">Win badges</span> you can share to LinkedIn &amp; Strava<span class="sep">·</span></div>
-    <div class="ticker-item">🤖 <span class="val">AI Company Showdown</span> — Anthropic vs OpenAI vs Stripe<span class="sep">·</span></div>
-    <div class="ticker-item">💍 <span class="val">Win an Oura Ring</span> — Bay Area Night Owl<span class="sep">·</span></div>
-    <div class="ticker-item">🏆 <span class="val">$2,000</span> Founders vs Operators<span class="sep">·</span></div>
-    <div class="ticker-item">Oura 85 <span class="val">=</span> Whoop 85, auto-leveled<span class="sep">·</span></div>
-    <div class="ticker-item">Sponsored by <span class="val">Whoop · Oura · Sequoia · Lululemon</span><span class="sep">·</span></div>
-    <div class="ticker-item">🥇 <span class="val">Win badges</span> you can share to LinkedIn &amp; Strava<span class="sep">·</span></div>
-  </div>
-</div>
+<!-- ACT 2 — THE BIOMETRIC HANDICAP -->
+<section class="act" id="handicap">
+  <div class="wrap reveal">
+    <div class="act-head" style="margin:0 auto; text-align:center;">
+      <span class="eyebrow">The Biometric Handicap</span>
+      <h2 class="display display-l">Four devices. Four scales.<br>One fair number.</h2>
+      <p class="lede" style="margin:18px auto 0;">Oura reads Readiness. Garmin rolls a Battery. Apple counts SDNN, Whoop counts RMSSD. Hover a device to see it normalize — then collapse all four into one.</p>
+    </div>
 
-<!-- WALKTHROUGH VIDEO -->
-<section class="video-section" id="watch">
-  <div class="container">
-    <div class="section-label" style="display:flex;width:fit-content;margin:0 auto 18px">▶ 2-minute walkthrough</div>
-    <!-- To go live: set data-video to your Loom/YouTube embed URL, e.g. data-video="https://www.youtube.com/embed/XXXX?autoplay=1" -->
-    <div class="video-frame" id="videoFrame" data-video="">
-      <div class="video-poster" id="videoPoster">
-        <button class="video-play" onclick="playWalkthrough()" aria-label="Play walkthrough">▶</button>
+    <div class="normalizer" id="normalizer">
+      <button class="chip" data-id="oura" data-oriya="82" style="--x:0px; --y:-208px;">
+        <span class="chip-dev">Oura Ring 4</span>
+        <span class="chip-read">Readiness 82</span>
+        <span class="chip-norm">→ ORIYA 82</span>
+      </button>
+      <button class="chip" data-id="garmin" data-oriya="71" style="--x:208px; --y:0px;">
+        <span class="chip-dev">Garmin</span>
+        <span class="chip-read">Body Battery 64</span>
+        <span class="chip-norm">→ ORIYA 71</span>
+      </button>
+      <button class="chip" data-id="apple" data-oriya="68" style="--x:0px; --y:208px;">
+        <span class="chip-dev">Apple Watch</span>
+        <span class="chip-read">SDNN 48 ms</span>
+        <span class="chip-norm">→ ORIYA 68</span>
+      </button>
+      <button class="chip" data-id="whoop" data-oriya="74" style="--x:-208px; --y:0px;">
+        <span class="chip-dev">WHOOP 5.0</span>
+        <span class="chip-read">RMSSD 57 %</span>
+        <span class="chip-norm">→ ORIYA 74</span>
+      </button>
+
+      <div class="orb-stage">
+        <div class="orb norm-orb" id="normOrb">
+          <span class="orb-num" id="normScore">74</span>
+          <span class="orb-cap">Oriya Index</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="normalizer-foot">
+      <button class="merge-btn" id="mergeBtn">⟶ Collapse to one ⟵</button>
+      <span class="eyebrow" style="opacity:0.7;">Your whole thesis as a four-second gesture</span>
+    </div>
+  </div>
+</section>
+
+<!-- ACT 3 — COMPETITIVE RECOVERY / THE SQUAD -->
+<section class="act" id="squad">
+  <div class="wrap reveal">
+    <div class="act-head" style="margin:0 auto; text-align:center;">
+      <span class="eyebrow">Competitive recovery</span>
+      <h2 class="display display-l">You're not chasing a number.<br>You're chasing yesterday's you.</h2>
+      <p class="lede" style="margin:18px auto 0;">Rank is measured against your own baseline — supportive, not a raw public number. The board never shames a red morning.</p>
+    </div>
+
+    <div class="squad">
+      <div class="rank-row lead">
+        <span class="rank-num">01</span>
+        <span class="mini-orb" style="--c:rgba(127,183,158,0.7);"></span>
+        <span class="rank-name">Maya R.<span>Ridgeline RC · Oura</span></span>
+        <span class="rank-score">+9 vs base</span>
+        <span class="rank-delta">▲2</span>
+      </div>
+      <div class="rank-row">
+        <span class="rank-num">02</span>
+        <span class="mini-orb" style="--c:rgba(159,211,187,0.6);"></span>
+        <span class="rank-name">Dev K.<span>Eastside Barbell · Whoop</span></span>
+        <span class="rank-score">+7 vs base</span>
+        <span class="rank-delta">▲1</span>
+      </div>
+      <div class="rank-row">
+        <span class="rank-num">03</span>
+        <span class="mini-orb" style="--c:rgba(215,162,92,0.6);"></span>
+        <span class="rank-name">Talia S.<span>Mission Tri · Garmin</span></span>
+        <span class="rank-score">+4 vs base</span>
+        <span class="rank-delta down">▼1</span>
+      </div>
+      <div class="rank-row">
+        <span class="rank-num">04</span>
+        <span class="mini-orb" style="--c:rgba(185,106,74,0.5);"></span>
+        <span class="rank-name">Jordan P.<span>Ridgeline RC · Apple</span></span>
+        <span class="rank-score">+2 vs base</span>
+        <span class="rank-delta">▲3</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACT 4 — THE BODY PASSPORT -->
+<section class="act" id="passport">
+  <div class="wrap reveal">
+    <div class="passport-act">
+      <div class="passport">
+        <div class="pp-top">
+          <span class="pp-label">Oriya · Body Passport</span>
+          <span class="pp-chip"></span>
+        </div>
         <div>
-          <h3>See a challenge run, end to end</h3>
-          <p>Connect a device, get your score, climb the leaderboard, win the badge — in two minutes.</p>
+          <span class="pp-label">Oriya Index</span>
+          <div class="pp-score">74</div>
+        </div>
+        <div class="pp-meta">
+          <div>
+            <span class="pp-k">Source sensor</span>
+            <span class="pp-v" id="ppSource">Oura Ring 4</span>
+          </div>
+          <div style="text-align:right;">
+            <span class="pp-k">Squad</span>
+            <span class="pp-v">Ridgeline RC</span>
+          </div>
+        </div>
+        <div class="pp-devices" id="ppDevices">
+          <button class="pp-dev active" data-src="Oura Ring 4">Oura</button>
+          <button class="pp-dev" data-src="Garmin Fenix">Garmin</button>
+          <button class="pp-dev" data-src="Apple Watch">Apple</button>
+          <button class="pp-dev" data-src="WHOOP 5.0">Whoop</button>
         </div>
       </div>
-    </div>
-    <div class="peek-explore">
-      <span class="peek-lead">Can't wait for the video? Open the live app:</span>
-      <a class="peek-chip" href="https://oriyachallenge.replit.app/dashboard" target="_blank" rel="noopener">📊 Your score <span class="arr">↗</span></a>
-      <a class="peek-chip" href="https://oriyachallenge.replit.app/leaderboard" target="_blank" rel="noopener">🏆 Leaderboard <span class="arr">↗</span></a>
-      <a class="peek-chip" href="https://oriyachallenge.replit.app/challenges" target="_blank" rel="noopener">⚡ Challenges <span class="arr">↗</span></a>
+      <div class="act-head">
+        <span class="eyebrow">The Body Passport</span>
+        <h2 class="display display-l">Switch your ring for a watch.</h2>
+        <p class="lede" style="margin:18px 0 0;">Keep your history, your rank, your people. A portable, normalized identity that survives switching — or abandoning — hardware. Tap a device: the source label swaps, the score and the squad stay put.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- THE SCIENCE -->
-<section class="section science-section" id="science">
-  <div class="container">
-    <div class="sci-head">
-      <div class="section-label" style="margin-bottom:18px">The science</div>
-      <h2 class="section-title">Four devices. <span class="dim">One fair score.</span></h2>
-      <p class="section-subtitle" style="margin:0 auto">No two wearables read recovery the same way. The Sensor Ontology is the layer that makes them comparable — here's the actual pipeline behind your number.</p>
+<!-- ACT 5 — AMBIENT PRESENCE -->
+<section class="act" id="presence">
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+  <div class="wrap reveal">
+    <div class="pullquote">
+      <q>The morning check used to be private and forgettable. Now my whole box shows up for it — recovery finally became the thing we talk about.</q>
+      <cite>— Coach, Eastside Barbell</cite>
     </div>
-    <div class="sci-pipe">
-      <div class="sci-node">
-        <div class="sci-step">Step 1 · Raw signals</div>
-        <h4>Every wearable, raw</h4>
-        <p>Each device exports a different number from different math — and none of them line up.</p>
-        <div class="sci-tags"><span class="sci-tag">Oura RMSSD</span><span class="sci-tag">Apple SDNN</span><span class="sci-tag">Garmin Body Battery</span><span class="sci-tag">Whoop recovery %</span></div>
-      </div>
-      <div class="sci-arrow"><svg viewBox="0 0 26 14" fill="none" stroke="currentColor" stroke-width="1.5"><path class="flow" d="M1 7h21" stroke-linecap="round"/><path d="M17 2l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="sci-node">
-        <div class="sci-step">Step 2 · Sensor Ontology</div>
-        <h4>Mapped to one physiology</h4>
-        <p>Each raw metric is matched to the same underlying signals — so a heartbeat is a heartbeat, whatever read it.</p>
-        <div class="sci-tags"><span class="sci-tag">HRV</span><span class="sci-tag">Resting HR</span><span class="sci-tag">Sleep depth</span><span class="sci-tag">Strain</span></div>
-      </div>
-      <div class="sci-arrow"><svg viewBox="0 0 26 14" fill="none" stroke="currentColor" stroke-width="1.5"><path class="flow" d="M1 7h21" stroke-linecap="round"/><path d="M17 2l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="sci-node">
-        <div class="sci-step">Step 3 · Personal baseline</div>
-        <h4>Measured against you</h4>
-        <p>Your trailing 30 days set your normal. Today is scored against your own baseline — not a population average.</p>
-        <div class="sci-tags"><span class="sci-tag">30-day baseline</span><span class="sci-tag">Percentile mapping</span></div>
-      </div>
-      <div class="sci-arrow"><svg viewBox="0 0 26 14" fill="none" stroke="currentColor" stroke-width="1.5"><path class="flow" d="M1 7h21" stroke-linecap="round"/><path d="M17 2l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="sci-node final">
-        <div class="sci-step">Step 4 · Oriya Score</div>
-        <div class="sci-bignum">0–100</div>
-        <p>Mapped to one shared scale. That's why an Oura 85 and a Whoop 85 are finally the same 85 — and why you can compete fairly with anyone.</p>
-      </div>
-    </div>
-    <p class="sci-note"><strong>The network sharpens itself.</strong> Every new device type teaches the Sensor Ontology another dialect of recovery — so normalization gets more accurate as more athletes join. The science compounds.</p>
   </div>
 </section>
 
-<!-- PROBLEM -->
-<section class="section problem-section" id="problem">
-  <div class="container">
-    <div class="section-label">The problem</div>
-    <h2 class="section-title">Every device measures recovery.<br>None of them <span class="dim">agree.</span></h2>
-    <p class="section-subtitle">Oura reads RMSSD overnight. Apple reads SDNN in a 60-second breath session. Garmin rolls it into a Battery score. Different math, different numbers — so you could never actually compete.</p>
-    <div class="cliff-container">
+<!-- ACT 6 — DAWN / CTA -->
+<section class="act dawn" id="join">
+  <div class="wrap reveal">
+    <div class="orb-stage">
+      <div class="orb" id="dawnOrb" style="width:200px;height:200px;">
+        <span class="orb-num" style="font-size:52px;">88</span>
+        <span class="orb-cap">Readiness · dawn</span>
+      </div>
+    </div>
+    <span class="eyebrow">🏆 Sleep League · Season 1 · SF &amp; NYC</span>
+    <h2 class="display display-l" style="margin-top:16px;">Tomorrow morning, don't check your score alone.</h2>
+    <form class="email-form" onsubmit="submitWaitlist(event)">
+      <input id="pilotEmail" type="email" placeholder="your@email.com" required aria-label="Email address">
+      <button class="btn btn-primary amber" type="submit" data-magnetic>Claim your Passport →</button>
+    </form>
+    <div class="form-error" id="waitlistError">Something went wrong. Please try again.</div>
+    <p class="form-note">Private beta · free · any wearable · no credit card</p>
+    <div class="compat">
+      <span>Apple Health</span><span>Oura</span><span>Garmin</span><span>Whoop</span><span>Samsung</span><span>+ more</span>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
       <div>
-        <div class="cliff-chart">
-          <div class="cliff-label">Most tracking apps — % of people still opening them</div>
-          <div class="cliff-bars">
-            <div class="cliff-bar" style="background:rgba(255,92,53,0.7);height:86%"><span class="bar-val">86%</span></div>
-            <div class="cliff-bar" style="background:rgba(255,92,53,0.55);height:68%"><span class="bar-val">68%</span></div>
-            <div class="cliff-bar" style="background:rgba(255,92,53,0.35);height:42%"><span class="bar-val">42%</span></div>
-            <div class="cliff-bar" style="background:rgba(255,92,53,0.2);height:28%"><span class="bar-val">28%</span></div>
-            <div class="cliff-bar" style="background:rgba(255,92,53,0.12);height:17%"><span class="bar-val">17%</span></div>
-            <div class="cliff-bar" style="background:rgba(255,92,53,0.08);height:9%"><span class="bar-val">9%</span></div>
-          </div>
-          <div class="cliff-x">
-            <div class="cliff-x-label">Day 1</div>
-            <div class="cliff-x-label">Day 7</div>
-            <div class="cliff-x-label">Day 14</div>
-            <div class="cliff-x-label">Day 21</div>
-            <div class="cliff-x-label">Day 28</div>
-            <div class="cliff-x-label">Day 30</div>
-          </div>
-          <div class="cliff-oriya">
-            <div class="oriya-val" data-count="74" data-suffix="%">74%</div>
-            <div class="oriya-label">of Oriya athletes are still in the game at day 7<br><span>most apps have already lost you</span></div>
-          </div>
+        <div class="logo">
+          <svg viewBox="0 0 100 100" fill="none"><path d="M 78 22 A 40 40 0 1 0 79 23" stroke="#7FB79E" stroke-width="5" stroke-linecap="round"/><circle cx="50" cy="55" r="14" fill="#7FB79E"/><circle cx="78" cy="22" r="7" fill="#D7A25C"/></svg>
+          Oriya
         </div>
+        <p class="footer-desc">The recovery network. We give every wearable a handicap, normalize it onto one fair index, and make rest something you do together — on any device.</p>
       </div>
-      <div class="problem-points">
-        <div class="problem-point">
-          <h4>Your 80 ≠ their 80</h4>
-          <p>An Oura 80 and a Garmin 80 mean completely different things. No shared scale, no real competition.</p>
-        </div>
-        <div class="problem-point">
-          <h4>Staring at your HRV does nothing</h4>
-          <p>You've seen the dashboard. It never got you to bed earlier. A leaderboard does.</p>
-        </div>
-        <div class="problem-point">
-          <h4>Tracking solo gets old fast</h4>
-          <p>Most people quit by week two. Competing with your crew is the part that sticks.</p>
-        </div>
+      <div class="footer-col">
+        <h5>Product</h5>
+        <a href="#handicap">The Handicap</a>
+        <a href="#squad">Squads</a>
+        <a href="#passport">Body Passport</a>
+        <a href="#join">Join the beta</a>
       </div>
+      <div class="footer-col">
+        <h5>Connect</h5>
+        <a href="https://oriya.substack.com/">Substack</a>
+        <a href="mailto:hello@oriya.app">hello@oriya.app</a>
+        <a href="mailto:team@oriya.app">team@oriya.app</a>
+      </div>
+      <div class="footer-col">
+        <h5>Legal</h5>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Data deletion</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Oriya Inc. — Palo Alto, CA — No data sold. No advertising. Ever.</span>
+      <span>Different devices. Same game.</span>
     </div>
   </div>
-</section>
+</footer>
 
-<!-- HOW IT WORKS -->
-<section class="demo-section section" id="how">
-  <div class="container">
-    <div class="demo-header">
-      <div class="section-label">How it works</div>
-      <h2 class="section-title">Connect. Score. Compete. <span class="dim">Win.</span></h2>
-      <p class="section-subtitle" style="margin:0 auto">From wearable to leaderboard in five minutes. Tap through it 👇</p>
-    </div>
-    <div class="demo-steps-nav" id="demoNav">
-      <button class="demo-step-btn active" data-step="0" onclick="goToStep(0)"><span class="step-num">1</span><span class="step-label">Connect</span></button>
-      <button class="demo-step-btn" data-step="1" onclick="goToStep(1)"><span class="step-num">2</span><span class="step-label">Your score</span></button>
-      <button class="demo-step-btn" data-step="2" onclick="goToStep(2)"><span class="step-num">3</span><span class="step-label">Compete</span></button>
-      <button class="demo-step-btn" data-step="3" onclick="goToStep(3)"><span class="step-num">4</span><span class="step-label">Win &amp; share</span></button>
-    </div>
-    <div class="demo-viewport">
-      <!-- Step 1: Connect -->
-      <div class="demo-panel active" id="panel-0">
-        <h4>Connect your wearable</h4>
-        <p class="panel-sub">One tap. Any device. No new hardware — pick yours 👇</p>
-        <div class="wearable-grid" id="wearableGrid">
-          <div class="wearable-item" onclick="toggleWearable(this)">
-            <div class="wearable-icon">
-              <svg stroke="currentColor" fill="currentColor" stroke-width="0" role="img" viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>
-            </div>
-            <div class="wearable-name">Apple Health</div>
-          </div>
-          <div class="wearable-item" onclick="toggleWearable(this)">
-            <div class="wearable-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6"/><polyline points="12 10 12 12 13 13"/><path d="m16.13 7.66-.81-4.05a2 2 0 0 0-2-1.61h-2.68a2 2 0 0 0-2 1.61l-.78 4.05"/><path d="m7.88 16.36.8 4a2 2 0 0 0 2 1.61h2.72a2 2 0 0 0 2-1.61l.81-4.05"/></svg>
-            </div>
-            <div class="wearable-name">Oura Ring</div>
-          </div>
-          <div class="wearable-item" onclick="toggleWearable(this)">
-            <div class="wearable-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
-            </div>
-            <div class="wearable-name">Garmin</div>
-          </div>
-          <div class="wearable-item" onclick="toggleWearable(this)">
-            <div class="wearable-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
-            </div>
-            <div class="wearable-name">WHOOP</div>
-          </div>
-          <div class="wearable-item" onclick="toggleWearable(this)">
-            <div class="wearable-icon">
-              <svg stroke="currentColor" fill="currentColor" stroke-width="0" role="img" viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg"><path d="M19.8166 10.2808l.0459 2.6934h-.023l-.7793-2.6934h-1.2837v3.3925h.8481l-.0458-2.785h.023l.8366 2.785h1.2264v-3.3925zm-16.149 0l-.6418 3.427h.9284l.4699-3.1175h.0229l.4585 3.1174h.9169l-.6304-3.4269zm5.1805 0l-.424 2.6132h-.023l-.424-2.6132H6.5788l-.0688 3.427h.8596l.023-3.0832h.0114l.573 3.0831h.8711l.5731-3.083h.023l.0228 3.083h.8596l-.0802-3.4269zm-7.2664 2.4527c.0343.0802.0229.1949.0114.2522-.0229.1146-.1031.2292-.3324.2292-.2177 0-.3438-.126-.3438-.3095v-.3323H0v.2636c0 .7679.6074.9971 1.2493.9971.6189 0 1.1346-.2178 1.2149-.7794.0458-.298.0114-.4928 0-.5616-.1605-.722-1.467-.9283-1.5588-1.3295-.0114-.0688-.0114-.1375 0-.1834.023-.1146.1032-.2292.3095-.2292.2063 0 .321.126.321.3095v.2063h.8595v-.2407c0-.745-.6762-.8596-1.1576-.8596-.6074 0-1.1117.2063-1.2034.7564-.023.149-.0344.2866.0114.4585.1376.7106 1.364.9169 1.5358 1.3524m11.152 0c.0343.0803.0228.1834.0114.2522-.023.1146-.1032.2292-.3324.2292-.2178 0-.3438-.126-.3438-.3095v-.3323h-.917v.2636c0 .7564.596.9857 1.2379.9857.6189 0 1.1232-.2063 1.2034-.7794.0459-.298.0115-.4814 0-.5616-.1375-.7106-1.4327-.9284-1.5243-1.318-.0115-.0688-.0115-.1376 0-.1835.0229-.1146.1031-.2292.3094-.2292.1948 0 .321.126.321.3095v.2063h.848v-.2407c0-.745-.6647-.8596-1.146-.8596-.6075 0-1.1004.1948-1.192.7564-.023.149-.023.2866.0114.4585.1376.7106 1.341.9054 1.513 1.3524m2.8882.4585c.2407 0 .3094-.1605.3323-.2522.0115-.0343.0115-.0917.0115-.126v-2.533h.871v2.4642c0 .0688 0 .1948-.0114.2292-.0573.6419-.5616.8482-1.192.8482-.6303 0-1.1346-.2063-1.192-.8482 0-.0344-.0114-.1604-.0114-.2292v-2.4642h.871v2.533c0 .0458 0 .0916.0115.126 0 .0917.0688.2522.3095.2522m7.1518-.0344c.2522 0 .3324-.1605.3553-.2522.0115-.0343.0115-.0917.0115-.126v-.4929h-.3553v-.5043H24v.917c0 .0687 0 .1145-.0115.2292-.0573.6303-.596.8481-1.2034.8481-.6075 0-1.1461-.2178-1.2034-.8481-.0115-.1147-.0115-.1605-.0115-.2293v-1.444c0-.0574.0115-.172.0115-.2293.0802-.6419.596-.8482 1.2034-.8482s1.1347.2063 1.2034.8482c.0115.1031.0115.2292.0115.2292v.1146h-.8596v-.1948s0-.0803-.0115-.1261c-.0114-.0802-.0802-.2521-.3438-.2521-.2521 0-.321.1604-.3438.2521-.0115.0458-.0115.1032-.0115.1605v1.5702c0 .0458 0 .0916.0115.126 0 .0917.0917.2522.3323.2522"/></svg>
-            </div>
-            <div class="wearable-name">Samsung Health</div>
-          </div>
-          <div class="wearable-item" onclick="toggleWearable(this)">
-            <div class="wearable-icon">
-              <svg stroke="currentColor" fill="currentColor" stroke-width="0" role="img" viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg"><path d="M13.298 1.825c0 .976-.81 1.785-1.786 1.785-.972 0-1.784-.81-1.784-1.785 0-.973.813-1.785 1.784-1.785.976 0 1.786.813 1.786 1.785zm-1.786 3.243c-1.052 0-1.863.81-1.863 1.866 0 1.053.81 1.865 1.865 1.865 1.053 0 1.865-.811 1.865-1.865s-.825-1.866-1.875-1.866h.008zm0 5.029c-1.052 0-1.945.891-1.945 1.945s.894 1.945 1.947 1.945 1.946-.891 1.946-1.945-.894-1.945-1.946-1.945h-.002zm0 5.107c-1.052 0-1.863.81-1.863 1.864s.81 1.866 1.865 1.866c1.053 0 1.865-.811 1.865-1.866 0-.972-.825-1.864-1.875-1.864h.008zm0 5.191c-.972 0-1.784.809-1.784 1.784 0 .97.813 1.781 1.784 1.781.977 0 1.786-.809 1.786-1.784 0-.973-.81-1.781-1.786-1.781zM16.46 4.823c-1.136 0-2.108.977-2.108 2.111 0 1.134.973 2.107 2.108 2.107 1.135 0 2.106-.975 2.106-2.107 0-1.135-.972-2.109-2.106-2.109v-.002zm0 5.03c-1.216 0-2.19.973-2.19 2.19 0 1.216.975 2.187 2.19 2.187 1.215 0 2.189-.971 2.189-2.189 0-1.216-.974-2.188-2.189-2.188zm0 5.108c-1.136 0-2.108.976-2.108 2.107 0 1.135.973 2.109 2.108 2.109 1.135 0 2.106-.976 2.106-2.109s-.971-2.107-2.106-2.107zm5.106-5.353c-1.296 0-2.43 1.055-2.43 2.434 0 1.297 1.051 2.433 2.43 2.433 1.381 0 2.434-1.065 2.434-2.444-.082-1.382-1.135-2.431-2.434-2.431v.008zM6.486 5.312c-.892 0-1.62.73-1.62 1.623 0 .891.729 1.62 1.62 1.62.893 0 1.619-.729 1.619-1.62 0-.893-.727-1.62-1.619-1.62v-.003zm0 5.027c-.973 0-1.703.729-1.703 1.703 0 .975.721 1.703 1.695 1.703s1.695-.73 1.695-1.703c0-.975-.735-1.703-1.71-1.703h.023zm0 5.107c-.892 0-1.62.731-1.62 1.62 0 .895.729 1.623 1.62 1.623.893 0 1.619-.735 1.619-1.635s-.727-1.62-1.619-1.62v.012zm-5.025-4.863c-.813 0-1.461.646-1.461 1.459 0 .81.648 1.459 1.46 1.459.81 0 1.459-.648 1.459-1.459s-.648-1.459-1.458-1.459z"/></svg>
-            </div>
-            <div class="wearable-name">Fitbit</div>
-          </div>
-          <div class="wearable-item" onclick="toggleWearable(this)">
-            <div class="wearable-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/></svg>
-            </div>
-            <div class="wearable-name">Ultrahuman</div>
-          </div>
-          <div class="wearable-item" onclick="toggleWearable(this)">
-            <div class="wearable-icon">
-              <svg stroke="currentColor" fill="currentColor" stroke-width="0" role="img" viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
-            </div>
-            <div class="wearable-name">Strava</div>
-          </div>
-          <div class="wearable-item" onclick="toggleWearable(this)">
-            <div class="wearable-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-            </div>
-            <div class="wearable-name">COROS</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 2: Your score -->
-      <div class="demo-panel" id="panel-1">
-        <h3>What's inside your score</h3>
-        <p class="panel-sub">One score from whatever you wear — leveled to your own 30-day baseline.</p>
-        <div class="score-dash">
-          <div class="ring-wrap">
-            <svg class="score-ring" viewBox="0 0 120 120">
-              <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1de9a4"/><stop offset="1" stop-color="#4f8de1"/></linearGradient></defs>
-              <circle class="ring-track" cx="60" cy="60" r="52"/>
-              <circle class="ring-prog" cx="60" cy="60" r="52"/>
-            </svg>
-            <div class="ring-center">
-              <div class="ring-score">0</div>
-              <div class="ring-cap">Oriya Score</div>
-              <div class="ring-delta">▲ 6 vs baseline</div>
-            </div>
-          </div>
-          <div class="sb-rows">
-            <div class="sb-row">
-              <div class="sb-row-top"><div class="sb-emoji">🌙</div><div><div class="sb-name">Deep rest</div><div class="sb-src">via Oura · 40% weight</div></div><div class="sb-pts">36</div></div>
-              <div class="sb-track"><div class="sb-fill" data-fill="90"></div></div>
-            </div>
-            <div class="sb-row">
-              <div class="sb-row-top"><div class="sb-emoji">⚡</div><div><div class="sb-name">Bounce-back</div><div class="sb-src">via Garmin · 35% weight</div></div><div class="sb-pts">25</div></div>
-              <div class="sb-track"><div class="sb-fill" data-fill="71"></div></div>
-            </div>
-            <div class="sb-row">
-              <div class="sb-row-top"><div class="sb-emoji">🏃</div><div><div class="sb-name">Move output</div><div class="sb-src">via Apple · 25% weight</div></div><div class="sb-pts">16</div></div>
-              <div class="sb-track"><div class="sb-fill" data-fill="64"></div></div>
-            </div>
-            <div class="autolevel">Auto-leveled so <strong>Oura 85 = Whoop 85</strong> — compare with anyone, on any device.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 3: Compete -->
-      <div class="demo-panel" id="panel-2">
-        <h3>Join a challenge with real stakes</h3>
-        <p class="panel-sub">Sleep League · Season 1 — a 30-day recovery challenge. Sarah's Oura and your Garmin are finally on the same leaderboard. Winner takes the pooled prize.</p>
-        <div class="cc-banner" style="border-radius:var(--radius-md);margin-bottom:14px">🏆 $1,240 prize pool <span class="cc-live"><span class="dot"></span>Live · 42 athletes</span></div>
-        <div class="leaderboard">
-          <div class="lb-row">
-            <div class="lb-rank">#1</div>
-            <div class="lb-avatar" style="background:linear-gradient(135deg,#1de9a4,#4a90e2)">S</div>
-            <div class="lb-info"><div class="lb-name">sarah_k</div><div class="lb-metric">Oura Ring</div></div>
-            <div class="lb-score" style="color:var(--accent)">91</div>
-          </div>
-          <div class="lb-row">
-            <div class="lb-rank">#2</div>
-            <div class="lb-avatar" style="background:linear-gradient(135deg,#6b5ce7,#a78bfa)">M</div>
-            <div class="lb-info"><div class="lb-name">m.roth</div><div class="lb-metric">Whoop</div></div>
-            <div class="lb-score" style="color:var(--text-secondary)">86</div>
-          </div>
-          <div class="lb-row you">
-            <div class="lb-rank">#3</div>
-            <div class="lb-avatar" style="background:var(--accent)">Y</div>
-            <div class="lb-info"><div class="lb-name">You</div><div class="lb-metric">Garmin</div></div>
-            <div class="lb-score" style="color:var(--accent)">78</div>
-          </div>
-          <div class="lb-row">
-            <div class="lb-rank">#4</div>
-            <div class="lb-avatar" style="background:linear-gradient(135deg,#ff9f45,#ffb84d)">T</div>
-            <div class="lb-info"><div class="lb-name">t.lee</div><div class="lb-metric">Apple Health</div></div>
-            <div class="lb-score" style="color:var(--text-secondary)">75</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 4: Win & share -->
-      <div class="demo-panel" id="panel-3">
-        <h3>Win it. Flex it.</h3>
-        <p class="panel-sub">Place on the board and you earn a verified proof card — your own Strava stamp for recovery. One tap to post it to LinkedIn or Strava, and every share brings the next athlete in.</p>
-        <div class="win-celebration">
-          <div class="win-trophy">🥇</div>
-          <div class="win-amount">Sleep League Champ</div>
-          <div class="win-sub">Season 1 · Top 1% recovery</div>
-          <p class="win-msg">Verified by your wearable, normalized by Oriya. Share it anywhere — it's proof, not a screenshot.</p>
-          <div class="badge-share" style="margin-top:18px"><span>Share to LinkedIn</span><span>Share to Strava</span><span>Copy card</span></div>
-        </div>
-      </div>
-
-      <div class="demo-nav">
-        <button class="btn btn-secondary" id="demoPrev" onclick="prevStep()" style="visibility:hidden">Back</button>
-        <button class="btn btn-primary" id="demoNext" onclick="nextStep()">Next Step</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SOCIAL LAYER -->
-<section class="section social-section" id="challenges">
-  <div class="container">
-    <div class="section-label">The fun part</div>
-    <h2 class="section-title">Recovery, but make it a <span class="dim">competition.</span></h2>
-    <p class="social-tagline">Real rivalries, real prize pools — sponsored by the brands you already wear. Your Oura, Whoop, or Garmin score finally competes on one board.</p>
-    <div class="challenge-grid">
-      <div class="challenge-card">
-        <div class="cc-banner">🤖 Whoop × Oriya <span class="cc-live"><span class="dot"></span>Live</span></div>
-        <div class="cc-body">
-          <div class="cc-title">AI Company Showdown</div>
-          <div class="cc-desc">Anthropic vs OpenAI vs Stripe — team average over 14 days. Anthropic leads at 82.</div>
-          <div class="cc-meta">
-            <div class="cc-stat"><span class="v prize">$1,200</span><span class="l">Prize pool</span></div>
-            <div class="cc-stat"><span class="v">53</span><span class="l">Athletes</span></div>
-            <div class="cc-stat"><span class="v">9d</span><span class="l">Left</span></div>
-          </div>
-          <div class="cc-foot">
-            <div class="cc-avatars">
-              <span class="cc-av" style="background:linear-gradient(135deg,#1de9a4,#4a90e2)">R</span>
-              <span class="cc-av" style="background:linear-gradient(135deg,#6b5ce7,#a78bfa)">C</span>
-              <span class="cc-av" style="background:linear-gradient(135deg,#ff9f45,#ffb84d)">B</span>
-              <span class="cc-av" style="background:linear-gradient(135deg,#1de9a4,#9b6fff)">+</span>
-            </div>
-            <span style="font-size:12px;color:var(--text-tertiary)">+50 more</span>
-          </div>
-          <button class="cc-join" onclick="focusSignup()">Join challenge →</button>
-        </div>
-      </div>
-      <div class="challenge-card">
-        <div class="cc-banner blue">💍 Oura × Oriya <span class="cc-live"><span class="dot"></span>Live</span></div>
-        <div class="cc-body">
-          <div class="cc-title">Bay Area Night Owl</div>
-          <div class="cc-desc">YC vs a16z — most consecutive 10 PM nights wins. 1st takes an Oura Ring Gen 4.</div>
-          <div class="cc-meta">
-            <div class="cc-stat"><span class="v prize">Oura Ring</span><span class="l">Top prize</span></div>
-            <div class="cc-stat"><span class="v">29</span><span class="l">Athletes</span></div>
-            <div class="cc-stat"><span class="v">11d</span><span class="l">Left</span></div>
-          </div>
-          <div class="cc-foot">
-            <div class="cc-avatars">
-              <span class="cc-av" style="background:linear-gradient(135deg,#4f8de1,#7c5af7)">B</span>
-              <span class="cc-av" style="background:linear-gradient(135deg,#1de9a4,#4a90e2)">V</span>
-              <span class="cc-av" style="background:linear-gradient(135deg,#ff6b4a,#ffb84d)">P</span>
-              <span class="cc-av" style="background:linear-gradient(135deg,#9b6fff,#4f8de1)">+</span>
-            </div>
-            <span style="font-size:12px;color:var(--text-tertiary)">+26 more</span>
-          </div>
-          <button class="cc-join" onclick="focusSignup()">Join challenge →</button>
-        </div>
-      </div>
-      <div class="challenge-card">
-        <div class="cc-banner warm">⚡ Sequoia Capital <span class="cc-live"><span class="dot"></span>Live</span></div>
-        <div class="cc-body">
-          <div class="cc-title">Founders vs Operators</div>
-          <div class="cc-desc">YC &amp; a16z founders vs operators — 5 teams, 21 days. The biggest of the season.</div>
-          <div class="cc-meta">
-            <div class="cc-stat"><span class="v prize">$2,000</span><span class="l">Prize pool</span></div>
-            <div class="cc-stat"><span class="v">71</span><span class="l">Athletes</span></div>
-            <div class="cc-stat"><span class="v">14d</span><span class="l">Left</span></div>
-          </div>
-          <div class="cc-foot">
-            <div class="cc-avatars">
-              <span class="cc-av" style="background:linear-gradient(135deg,#ff9f45,#ff6b4a)">B</span>
-              <span class="cc-av" style="background:linear-gradient(135deg,#1de9a4,#4a90e2)">R</span>
-              <span class="cc-av" style="background:linear-gradient(135deg,#6b5ce7,#a78bfa)">J</span>
-              <span class="cc-av" style="background:linear-gradient(135deg,#1de9a4,#9b6fff)">+</span>
-            </div>
-            <span style="font-size:12px;color:var(--text-tertiary)">+68 more</span>
-          </div>
-          <button class="cc-join" onclick="focusSignup()">Join challenge →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="wins-block" id="wins">
-      <div class="wins-head">
-        <h3>Every win is a badge. Every badge is an invite.</h3>
-        <p>Place on a board and earn a verified proof card — your Strava stamp for recovery. 23% of athletes share one within 48 hours, unprompted. That's the whole marketing budget.</p>
-      </div>
-      <div class="wins-strip">
-        <div class="badge-card">
-          <div class="badge-medal">🥇</div>
-          <div class="badge-title">Sleep League Champ</div>
-          <div class="badge-sub">Season 1 · Top 1%</div>
-          <div class="badge-share"><span>LinkedIn</span><span>Strava</span></div>
-        </div>
-        <div class="badge-card">
-          <div class="badge-medal">🔥</div>
-          <div class="badge-title">14-Day Streak</div>
-          <div class="badge-sub">Two weeks, unbroken</div>
-          <div class="badge-share"><span>LinkedIn</span><span>Strava</span></div>
-        </div>
-        <div class="badge-card">
-          <div class="badge-medal">⚡</div>
-          <div class="badge-title">Top 1% Recovery</div>
-          <div class="badge-sub">Best in your cohort</div>
-          <div class="badge-share"><span>LinkedIn</span><span>Strava</span></div>
-        </div>
-        <div class="badge-card">
-          <div class="badge-medal">🤝</div>
-          <div class="badge-title">Team MVP</div>
-          <div class="badge-sub">Carried the squad</div>
-          <div class="badge-share"><span>LinkedIn</span><span>Strava</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PROOF -->
-<section class="section proof-section" id="proof">
-  <div class="container">
-    <div class="section-label">Already a scene</div>
-    <h2 class="section-title">150 athletes.<br>Zero ad <span class="dim">spend.</span></h2>
-    <p class="section-subtitle">It spreads on its own — because winning is worth sharing, and the brands you already wear want in.</p>
-    <div class="proof-grid" style="margin-top:48px">
-      <div class="proof-card">
-        <span class="proof-num" data-count="5">5</span>
-        <div class="proof-label">Brands sponsoring prizes</div>
-        <div class="proof-text">Whoop, Oura, Sequoia, Lululemon and New Balance fund the prize pools on live challenges.</div>
-        <div class="proof-vs">They pay. You compete for free.</div>
-      </div>
-      <div class="proof-card">
-        <span class="proof-num" data-count="8">8</span>
-        <div class="proof-label">Challenges live right now</div>
-        <div class="proof-text">From AI labs to run clubs to VC portfolios — head-to-head across SF &amp; NYC, with two more starting this month.</div>
-        <div class="proof-vs">New matchups drop every week</div>
-      </div>
-      <div class="proof-card">
-        <span class="proof-num" data-count="23" data-suffix="%">23%</span>
-        <div class="proof-label">Invite a friend in 48h</div>
-        <div class="proof-text">Nearly a quarter of athletes share a challenge link within two days of joining — nobody asked them to.</div>
-        <div class="proof-vs">Winning is worth showing off</div>
-      </div>
-    </div>
-    <div class="proof-quote-row">
-      <div class="quote-card">
-        <div class="quote-text">I stopped checking my sleep score and started checking my rank. That's when it clicked — this is the first one that actually stuck.</div>
-        <div class="quote-attr">— Athlete, Oura Ring + Garmin</div>
-      </div>
-      <div class="quote-card">
-        <div class="quote-text">My whole portfolio company jumped into Founders vs Operators. Standups now open with who's winning. Never thought recovery would be the trash talk.</div>
-        <div class="quote-attr">— Founder, YC W24</div>
-      </div>
-    </div>
-    <div class="sponsor-strip">
-      <div class="ss-label">Prize pools sponsored by</div>
-      <div class="ss-logos">
-        <span>WHOOP</span><span>OURA</span><span>SEQUOIA</span><span>lululemon</span><span>New Balance</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PRIVACY -->
-<section class="section privacy-section" id="privacy">
-  <div class="container">
-    <div class="section-label">Yours, always</div>
-    <h2 class="section-title">Your data plays for <span class="dim">you.</span></h2>
-    <p class="section-subtitle">Compete hard, share your wins — and keep full control the whole way. No ads, no data brokers, no surprises.</p>
-    <div class="privacy-simple">
-      <div class="ps-card"><div class="ps-icon">🙅</div><h4>Never sold</h4><p>No advertisers, no data brokers — ever. We earn from subscriptions, not your health profile.</p></div>
-      <div class="ps-card"><div class="ps-icon">🎚️</div><h4>You choose what shows</h4><p>Share a score, a streak, or nothing at all. Every setting is per challenge and reversible anytime.</p></div>
-      <div class="ps-card"><div class="ps-icon">🏢</div><h4>Teams see totals, not you</h4><p>Captains and companies see leaderboards and team trends — never your individual health data.</p></div>
-      <div class="ps-card"><div class="ps-icon">🗑️</div><h4>Leave clean</h4><p>Export everything in 24 hours, delete it all in 48 — backups included. No 30-day runaround.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- PARTNERSHIPS (foldable) -->
-<section class="section partners-fold" id="partnerships">
-  <div class="container">
-    <div class="section-label">Partnerships</div>
-    <h2 class="section-title">Bring Oriya to your <span class="dim">crew or company.</span></h2>
-    <p class="section-subtitle">For run clubs, companies and VC portfolios — and for the wearable brands themselves. Tap to open.</p>
-    <div class="fold">
-      <div class="fold-item">
-        <button class="fold-summary" onclick="toggleFold(this)" aria-expanded="false">
-          <span class="fs-ico">🏢</span>
-          <span class="fs-text"><span class="fs-title">For teams &amp; clubs</span><span class="fs-sub">Run a challenge for your company, run club, or portfolio</span></span>
-          <span class="fs-arrow">+</span>
-        </button>
-        <div class="fold-detail">
-          <div class="fold-inner">
-            <div class="teams-grid">
-              <div class="teams-features">
-                <div class="team-feature">
-                  <div class="icon">⚡</div>
-                  <div><h4>Everyone on one leaderboard</h4><p>Oura, Garmin, Apple, Whoop, Samsung — whatever your crew already wears, all in the same game. Nobody buys new hardware.</p></div>
-                </div>
-                <div class="team-feature">
-                  <div class="icon">🏆</div>
-                  <div><h4>Set a prize, watch it go</h4><p>Pick a prize pool, theme, and rules. Streaks, leaderboards, and badges do the rest.</p></div>
-                </div>
-                <div class="team-feature">
-                  <div class="icon">🤫</div>
-                  <div><h4>Totals, not surveillance</h4><p>Captains and managers see engagement and team trends. Nobody sees anyone's individual health data.</p></div>
-                </div>
-                <div class="team-feature">
-                  <div class="icon">📣</div>
-                  <div><h4>Wins recruit for you</h4><p>Every badge your crew shares to LinkedIn or Strava pulls the next member in.</p></div>
-                </div>
-              </div>
-              <div>
-                <div class="run-challenge">
-                  <h4>Run a challenge for your team</h4>
-                  <p>We'll set up the leaderboard, handle normalization across every device, and manage the prize payout. You pick the stakes — we do the rest.</p>
-                  <div class="run-checks">
-                    <div class="run-check"><span class="ck">✓</span>Any prize pool</div>
-                    <div class="run-check"><span class="ck">✓</span>Any wearable</div>
-                    <div class="run-check"><span class="ck">✓</span>Custom rules</div>
-                    <div class="run-check"><span class="ck">✓</span>24h setup</div>
-                  </div>
-                  <div class="teams-cta">
-                    <button class="btn btn-primary" onclick="focusSignup()">Start a challenge →</button>
-                    <a class="btn btn-secondary" href="mailto:team@oriya.app">team@oriya.app</a>
-                  </div>
-                  <p class="run-contact">Minimum 10 participants · first 3 teams run free · general questions → <a href="mailto:hello@oriya.app">hello@oriya.app</a></p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="fold-item">
-        <button class="fold-summary" onclick="toggleFold(this)" aria-expanded="false">
-          <span class="fs-ico">⌚</span>
-          <span class="fs-text"><span class="fs-title">For wearables &amp; data partners</span><span class="fs-sub">The retention layer Oura &amp; Whoop can't build alone</span></span>
-          <span class="fs-arrow">+</span>
-        </button>
-        <div class="fold-detail">
-          <div class="fold-inner">
-            <p class="partner-lead">Oriya is the Strava that Garmin needed but couldn't build without alienating Shimano. <strong>We're not competing with Oura and Whoop — we're their missing retention layer.</strong> Every Oriya athlete must wear a device. Every challenge keeps that device on the wrist and the subscription renewing. That's user-activation infrastructure for a $40B hardware market.</p>
-            <div class="flywheel">
-              <div class="fly-stage"><div class="fly-num">STAGE 1</div><h4>Sensor sync</h4><p>Low-friction OAuth onboarding. Athletes connect the devices they already own and get value on day one.</p></div>
-              <div class="fly-stage"><div class="fly-num">STAGE 2</div><h4>Normalization</h4><p>The Sensor Ontology turns Oura RMSSD, Garmin Body Battery, Apple SDNN, and Whoop recovery into one 0–100 score. More device types → better normalization. The data network effect.</p></div>
-              <div class="fly-stage"><div class="fly-num">STAGE 3</div><h4>Engagement loop</h4><p>Challenges, leaderboards, streaks, viral invites. 74% Day-7 retention vs ~30% industry. Lock-in that compounds with every athlete.</p></div>
-              <div class="fly-stage"><div class="fly-num">STAGE 4</div><h4>Data wealth</h4><p>Longitudinal, normalized, permissioned biometric data at scale — the asset insurers, researchers, and AI health agents can't build themselves.</p></div>
-            </div>
-            <div class="partner-note"><strong>The moat compounds with scale.</strong> More device types → better normalization → more athletes willing to compete fairly → more device diversity. Each turn makes the next harder to replicate. The conversation opens as a data partnership — the traction makes the rest obvious.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- COMPETITIVE MAP (hidden) -->
-<section class="section compete-section" id="compete" style="display:none">
-  <div class="container">
-    <div class="section-label">How we're different</div>
-    <h2 class="section-title">Not a data layer.<br>Not just a <span class="dim">wellness app.</span></h2>
-    <p class="section-subtitle">Every existing solution solves one piece of the problem. Oriya connects them all.</p>
-    <table class="compete-table">
-      <thead>
-        <tr>
-          <th style="min-width:160px">Capability</th>
-          <th class="oriya-col oriya-col-header">Oriya</th>
-          <th>Terra / Rook API</th>
-          <th>Strava</th>
-          <th>Virgin Pulse / Wellable</th>
-          <th>Device apps</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Cross-device aggregation</td><td class="oriya-col ck">✓ All major devices</td><td class="ck">✓ API-only, no UI</td><td class="cx">✗ GPS/fitness only</td><td class="cp">◑ Steps only</td><td class="cx">✗ Own device only</td></tr>
-        <tr><td>Cross-device normalization</td><td class="oriya-col ck">✓ Sensor Ontology</td><td class="cx">✗ Raw pass-through</td><td class="cx">✗ No HRV/recovery</td><td class="cx">✗ No normalization</td><td class="cx">✗ Own schema only</td></tr>
-        <tr><td>Social / competitive</td><td class="oriya-col ck">✓ Cross-device leaderboards</td><td class="cx">✗ No UX</td><td class="ck">✓ Fitness only</td><td class="cp">◑ Generic steps</td><td class="cp">◑ Own ecosystem</td></tr>
-        <tr><td>Behavior change (Day-7)</td><td class="oriya-col ck">✓ 74% measured</td><td class="cx">✗ N/A</td><td class="cp">◑ ~35-40%</td><td class="cx">✗ ~20-30%</td><td class="cp">◑ Device-dependent</td></tr>
-        <tr><td>Privacy-first architecture</td><td class="oriya-col ck">✓ Granular consent</td><td class="cp">◑ API compliance</td><td class="cx">✗ Heatmap incident</td><td class="cp">◑ HIPAA compliant</td><td class="cp">◑ Platform-dependent</td></tr>
-        <tr><td>Corporate wellness</td><td class="oriya-col ck">✓ Aggregate-only</td><td class="cp">◑ B2B licensing</td><td class="cx">✗ Consumer only</td><td class="ck">✓ Enterprise focus</td><td class="cx">✗ No team features</td></tr>
-        <tr><td>Business model</td><td class="oriya-col ck">✓ Consumer + B2B. No ads.</td><td class="cp">API usage fees</td><td class="cx">Freemium + ads</td><td class="cp">Per-seat enterprise</td><td class="cp">Hardware + sub</td></tr>
-      </tbody>
-    </table>
-    <div class="compete-note">
-      <strong>The honest competitive position:</strong> Terra API and Rook API solve the developer integration problem — they're excellent API products. But they have no consumer engagement layer, no normalization standard, and no behavior change proof. Strava solved social fitness, not health data coordination. <strong>Oriya is the missing middle:</strong> a consumer engagement layer with cross-device normalization, built on a privacy architecture that can support the corporate and infrastructure markets that others can't safely enter.
-    </div>
-  </div>
-</section>
-
-<!-- BOTTOM CTA -->
-<section class="bottom-cta" id="join">
-  <div class="section-label" style="margin:0 auto 20px">🏆 Sleep League · Season 1</div>
-  <h2 class="section-title">Claim your spot.<br><span style="color:var(--accent)">SF &amp; NYC first.</span></h2>
-  <p class="sub">Private beta, free to join, any wearable, no credit card. Season 1 is filling now — get in before it locks.</p>
-  <form class="email-form-center" onsubmit="submitWaitlist(event)">
-    <input id="pilotEmail" class="hero-input" type="email" placeholder="your@email.com" required>
-    <button class="btn btn-primary" type="submit">Get early access →</button>
-  </form>
-  <div class="compatible-row">
-    <div class="compat-pill"><span>🍎</span> Apple Health</div>
-    <div class="compat-pill"><span>💍</span> Oura Ring</div>
-    <div class="compat-pill"><span>🏃</span> Garmin</div>
-    <div class="compat-pill"><span>💪</span> Whoop</div>
-    <div class="compat-pill"><span>📱</span> Samsung Health</div>
-    <div class="compat-pill"><span>+</span> More soon</div>
-  </div>
-</section>
-
-<!-- MODAL -->
+<!-- REFERRAL CONFIRM MODAL (preserved) -->
 <div class="modal-overlay" id="waitlistConfirmModal" aria-hidden="true">
   <div class="modal">
-    <button class="modal-close" type="button" onclick="closeWaitlistConfirmModal()">×</button>
+    <button class="modal-close" type="button" onclick="closeWaitlistConfirmModal()" aria-label="Close">×</button>
     <div class="modal-state active" id="waitlistConfirmState">
       <div class="modal-success-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
-      <h3>You're in. 🎉</h3>
+      <h3>You're in.</h3>
       <p>Share your link to jump the queue and earn founding-athlete perks before Season 1 locks.</p>
       <div class="referral-link-box">
         <div class="referral-link" id="referralLink"></div>
@@ -1272,7 +713,7 @@
       </div>
       <div class="referral-actions">
         <button class="btn btn-secondary" type="button" onclick="shareReferral('x')">Share on X</button>
-        <button class="btn btn-secondary" type="button" onclick="shareReferral('whatsapp')">Share on WhatsApp</button>
+        <button class="btn btn-secondary" type="button" onclick="shareReferral('whatsapp')">WhatsApp</button>
         <button class="btn btn-secondary" type="button" onclick="shareReferral('native')">Share</button>
       </div>
       <div class="referral-tiers">
@@ -1283,46 +724,7 @@
   </div>
 </div>
 
-<!-- FOOTER -->
-<footer class="footer">
-  <div class="container">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <div class="fb-logo">Ori<span>ya</span></div>
-        <p class="fb-desc">The coordination layer for wearable health. We auto-level every device into one score, then turn it into challenges, leaderboards, and badges worth sharing.</p>
-        <div class="fb-tagline">Different devices. Same game.</div>
-      </div>
-      <div class="footer-col">
-        <h5>Product</h5>
-        <a href="#how">How it works</a>
-        <a href="#challenges">Challenges</a>
-        <a href="#watch">Watch the walkthrough</a>
-        <a href="#science">The science</a>
-        <a href="#wins">Wins &amp; badges</a>
-      </div>
-      <div class="footer-col">
-        <h5>Connect</h5>
-        <a href="#partnerships">Partnerships</a>
-        <a href="https://oriya.substack.com/">Substack</a>
-        <a href="mailto:hello@oriya.app">hello@oriya.app</a>
-        <a href="mailto:team@oriya.app">team@oriya.app</a>
-      </div>
-      <div class="footer-col">
-        <h5>Legal</h5>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-        <a href="#">Data Deletion</a>
-        <a href="#">Security</a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>© 2026 Oriya Inc. — Palo Alto, CA — No data sold. No advertising. Ever.</p>
-      <p>The coordination layer for human health.</p>
-    </div>
-  </div>
-</footer>
-
-<!-- ORI CHATBOT -->
+<!-- ORI CHATBOT (preserved) -->
 <button class="ori-fab" id="oriFab" onclick="oriToggle(true)" aria-label="Chat with Ori">
   <span class="ori-pulse"></span>
   <span class="ori-ava">O</span>
@@ -1339,6 +741,161 @@
 </div>
 
 <script>
+  const REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ========== ACT 0 — preload: orb wakes ========== */
+  (function () {
+    const pre = document.getElementById("preload");
+    if (!pre) return;
+    const dismiss = () => pre.classList.add("done");
+    if (REDUCE) { setTimeout(dismiss, 200); return; }
+    setTimeout(dismiss, 1700);
+    setTimeout(() => pre.remove(), 2700);
+  })();
+
+  /* ========== NAV scroll state ========== */
+  window.addEventListener("scroll", () => {
+    document.getElementById("nav").classList.toggle("scrolled", window.scrollY > 40);
+  }, { passive: true });
+
+  /* ========== Global luminance drift (night → dawn) ========== */
+  (function () {
+    const wash = document.getElementById("dawnWash");
+    if (!wash) return;
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(window.scrollY / max, 1) : 0;
+      wash.style.opacity = (p * p).toFixed(3); // ease-in toward dawn
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  })();
+
+  /* ========== Scroll "wake into focus" ========== */
+  (function () {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("awake"); io.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: "0px 0px -10% 0px" });
+    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+    // hero line-mask trigger
+    requestAnimationFrame(() => document.getElementById("hero").classList.add("in"));
+  })();
+
+  /* ========== Magnetic CTAs ========== */
+  (function () {
+    if (REDUCE) return;
+    document.querySelectorAll("[data-magnetic]").forEach((el) => {
+      el.addEventListener("pointermove", (e) => {
+        const r = el.getBoundingClientRect();
+        const mx = e.clientX - (r.left + r.width / 2);
+        const my = e.clientY - (r.top + r.height / 2);
+        el.style.transform = `translate(${mx * 0.18}px, ${my * 0.28}px)`;
+      });
+      el.addEventListener("pointerleave", () => { el.style.transform = ""; });
+    });
+  })();
+
+  /* ========== Hero orb — cursor parallax tilt ========== */
+  (function () {
+    if (REDUCE) return;
+    const stage = document.getElementById("heroOrbStage");
+    const orb = document.getElementById("heroOrb");
+    if (!stage || !orb) return;
+    window.addEventListener("pointermove", (e) => {
+      const dx = (e.clientX / window.innerWidth - 0.5) * 2;
+      const dy = (e.clientY / window.innerHeight - 0.5) * 2;
+      orb.style.transform = `translate(${dx * 14}px, ${dy * 14}px)`;
+    });
+  })();
+
+  /* ========== ACT 2 — DeviceNormalizer (spring number roll + merge) ========== */
+  (function () {
+    const root = document.getElementById("normalizer");
+    if (!root) return;
+    const chips = Array.from(root.querySelectorAll(".chip"));
+    const scoreEl = document.getElementById("normScore");
+    const orb = document.getElementById("normOrb");
+    const mergeBtn = document.getElementById("mergeBtn");
+    const blended = Math.round(chips.reduce((s, c) => s + +c.dataset.oriya, 0) / chips.length);
+
+    // vanilla spring toward target (replaces framer-motion useSpring)
+    let current = blended, target = blended, raf = null;
+    function tick() {
+      current += (target - current) * 0.16;
+      if (Math.abs(target - current) < 0.4) { current = target; scoreEl.textContent = Math.round(current); raf = null; return; }
+      scoreEl.textContent = Math.round(current);
+      raf = requestAnimationFrame(tick);
+    }
+    function setTarget(v) { target = v; if (REDUCE) { current = v; scoreEl.textContent = v; return; } if (!raf) raf = requestAnimationFrame(tick); }
+
+    let merged = false;
+    chips.forEach((chip) => {
+      const enter = () => {
+        if (merged) return;
+        chips.forEach((c) => c.classList.toggle("dim", c !== chip));
+        setTarget(+chip.dataset.oriya);
+      };
+      const leave = () => { if (merged) return; chips.forEach((c) => c.classList.remove("dim")); setTarget(blended); };
+      chip.addEventListener("pointerenter", enter);
+      chip.addEventListener("pointerleave", leave);
+      chip.addEventListener("focus", enter);
+      chip.addEventListener("blur", leave);
+    });
+
+    mergeBtn.addEventListener("click", () => {
+      merged = !merged;
+      mergeBtn.classList.toggle("active", merged);
+      chips.forEach((c) => { c.classList.toggle("merged", merged); c.classList.remove("dim"); });
+      mergeBtn.textContent = merged ? "↺ Pull them apart" : "⟶ Collapse to one ⟵";
+      setTarget(blended);
+    });
+  })();
+
+  /* ========== ACT 4 — Body Passport device swap ========== */
+  (function () {
+    const wrap = document.getElementById("ppDevices");
+    const src = document.getElementById("ppSource");
+    if (!wrap || !src) return;
+    wrap.querySelectorAll(".pp-dev").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        wrap.querySelectorAll(".pp-dev").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        src.textContent = btn.dataset.src;
+        src.classList.add("flash");
+        setTimeout(() => src.classList.remove("flash"), 500);
+      });
+    });
+  })();
+
+  /* ========== ACT 5 — squad ticker (ambient presence) ========== */
+  (function () {
+    const track = document.getElementById("tickerTrack");
+    if (!track) return;
+    const events = [
+      ['RIDGELINE RC', 'maya woke green', '+4'],
+      ['EASTSIDE BARBELL', 'streak 31d', ''],
+      ['MISSION TRI', 'talia +6 vs base', '+6'],
+      ['DOLORES RUN CLUB', 'new squad record', ''],
+      ['NOE LIFTING CO', 'dev climbed to 02', '▲1'],
+      ['BAYVIEW MASTERS', 'first green week', ''],
+      ['PRESIDIO PACERS', 'jordan ▲3', '▲3'],
+      ['SOMA CROSSFIT', 'streak 12d', ''],
+    ];
+    const render = (e) => `<span class="ticker-item"><span class="crew">${e[0]}</span> · ${e[1]}${e[2] ? ' <b>' + e[2] + '</b>' : ''}</span>`;
+    // duplicate the track for a seamless -50% wrap
+    track.innerHTML = (events.map(render).join('') ).repeat(2);
+  })();
+
+  /* ========== ACT 6 — dawn orb ignites amber when in view ========== */
+  (function () {
+    const orb = document.getElementById("dawnOrb");
+    if (!orb) return;
+    new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) orb.classList.add("ignite"); }), { threshold: 0.4 }).observe(orb);
+  })();
+
+  /* ============================================================
+     PRESERVED: Supabase waitlist + referral + modal
+     ============================================================ */
   const SUPABASE_URL = "https://aorbjcfffzrsswywtzai.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvcmJqY2ZmZnpyc3N3eXd0emFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwMTYwODYsImV4cCI6MjA5MDU5MjA4Nn0.cJlTJLHXuH-IleX5tixAf3nUntmA9gIiLF147qPjANQ";
 
@@ -1356,96 +913,84 @@
     return { error: null };
   }
 
-  window.addEventListener("scroll", () => {
-    document.getElementById("nav").classList.toggle("scrolled", window.scrollY > 40);
-  });
+  function generateReferralCode(email) {
+    const base = email.split("@")[0].toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    const suffix = Math.random().toString(36).slice(2, 8);
+    return `${base || "oriya"}-${suffix}`;
+  }
+  function getReferralStorage() { try { return JSON.parse(localStorage.getItem("oriyaReferral") || "null"); } catch { return null; } }
+  function saveReferralStorage(d) { localStorage.setItem("oriyaReferral", JSON.stringify(d)); }
+  function getReferralLink(code) { return `${window.location.origin}${window.location.pathname}?ref=${code}`; }
+  function setReferralLink(code) { const el = document.getElementById("referralLink"); if (el) el.textContent = getReferralLink(code); }
 
-  let currentStep = 0;
-  const totalSteps = 4;
+  function openWaitlistConfirmModal() {
+    const m = document.getElementById("waitlistConfirmModal");
+    m.classList.add("open"); m.setAttribute("aria-hidden", "false");
+  }
+  function closeWaitlistConfirmModal() {
+    const m = document.getElementById("waitlistConfirmModal");
+    m.classList.remove("open"); m.setAttribute("aria-hidden", "true");
+  }
+  document.getElementById("waitlistConfirmModal").addEventListener("click", (e) => { if (e.target.id === "waitlistConfirmModal") closeWaitlistConfirmModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeWaitlistConfirmModal(); });
 
-  function goToStep(step) {
-    currentStep = step;
-    document.querySelectorAll(".demo-panel").forEach((p, i) => p.classList.toggle("active", i === step));
-    document.querySelectorAll(".demo-step-btn").forEach((btn, i) => {
-      btn.classList.remove("active", "completed");
-      if (i === step) btn.classList.add("active");
-      else if (i < step) btn.classList.add("completed");
-    });
-    document.getElementById("demoPrev").style.visibility = step === 0 ? "hidden" : "visible";
-    const nextBtn = document.getElementById("demoNext");
-    if (step === totalSteps - 1) { nextBtn.textContent = "Get early access"; nextBtn.onclick = () => focusSignup(); }
-    else { nextBtn.textContent = "Next Step"; nextBtn.onclick = () => nextStep(); }
-    if (step === 1) animateScorePanel();
+  async function copyReferralLink(event) {
+    const d = getReferralStorage();
+    if (!d?.code) return;
+    const link = getReferralLink(d.code);
+    try {
+      await navigator.clipboard.writeText(link);
+      const btn = event?.currentTarget;
+      if (btn) { const prev = btn.textContent; btn.textContent = "Copied"; setTimeout(() => { btn.textContent = prev; }, 1500); }
+    } catch { window.prompt("Copy your referral link", link); }
+  }
+  function shareReferral(channel) {
+    const d = getReferralStorage();
+    if (!d?.code) return;
+    const link = getReferralLink(d.code);
+    const text = "I'm in the Oriya Sleep League — every wearable on one leaderboard, real prize pools, shareable badges. Join my challenge:";
+    if (channel === "native" && navigator.share) { navigator.share({ title: "Join Oriya", text, url: link }); return; }
+    if (channel === "x") { window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(link)}`, "_blank", "noopener,noreferrer"); return; }
+    if (channel === "whatsapp") { window.open(`https://wa.me/?text=${encodeURIComponent(`${text} ${link}`)}`, "_blank", "noopener,noreferrer"); return; }
+    copyReferralLink();
   }
 
-  const demoReduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  function animateScorePanel() {
-    const ring = document.querySelector(".ring-prog");
-    const scoreEl = document.querySelector(".ring-score");
-    const fills = document.querySelectorAll("#panel-1 .sb-fill");
-    const C = 326.7, target = 77;
-    if (ring) {
-      ring.style.strokeDashoffset = C;
-      fills.forEach((f) => (f.style.width = "0%"));
-      requestAnimationFrame(() => {
-        ring.style.strokeDashoffset = C * (1 - target / 100);
-        fills.forEach((f) => (f.style.width = (f.dataset.fill || 0) + "%"));
-      });
-    }
-    if (scoreEl) {
-      if (demoReduceMotion) { scoreEl.textContent = target; return; }
-      const dur = 1200, start = performance.now();
-      (function t(now) {
-        const p = Math.min(Math.max((now - start) / dur, 0), 1);
-        scoreEl.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
-        if (p < 1) requestAnimationFrame(t);
-      })(start);
+  async function submitWaitlist(e) {
+    e.preventDefault();
+    const form = e.target;
+    const input = form.querySelector('input[type="email"]');
+    const email = input.value.trim();
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const errorEl = document.getElementById("waitlistError");
+    if (!email) return;
+    const original = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Joining…";
+    if (errorEl) errorEl.style.display = "none";
+    try {
+      await supabaseInsert("waitlist", { email, type: "waitlist", created_at: new Date().toISOString() });
+      const referralData = { email, code: generateReferralCode(email) };
+      saveReferralStorage(referralData);
+      setReferralLink(referralData.code);
+      openWaitlistConfirmModal();
+      input.value = "";
+    } catch (err) {
+      console.error("Waitlist error:", err);
+      if (errorEl) { errorEl.textContent = "Something went wrong. Please try again."; errorEl.style.display = "block"; }
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = original;
     }
   }
-
-  function nextStep() { if (currentStep < totalSteps - 1) goToStep(currentStep + 1); }
-  function prevStep() { if (currentStep > 0) goToStep(currentStep - 1); }
-  goToStep(0);
-
-  // Gentle auto-advance — runs only while the demo is on screen, stops on any interaction
-  let demoTimer = null, demoLocked = false;
-  function startDemoAuto() { if (demoLocked || demoTimer || demoReduceMotion) return; demoTimer = setInterval(() => goToStep((currentStep + 1) % totalSteps), 4600); }
-  function stopDemoAuto(lock) { if (lock) demoLocked = true; if (demoTimer) { clearInterval(demoTimer); demoTimer = null; } }
-  (function () {
-    const how = document.getElementById("how");
-    const vp = document.querySelector(".demo-viewport");
-    if (!how || !vp) return;
-    how.addEventListener("click", () => stopDemoAuto(true));
-    new IntersectionObserver((es) => es.forEach((e) => (e.isIntersecting ? startDemoAuto() : stopDemoAuto(false))), { threshold: 0.4 }).observe(vp);
-  })();
 
   function focusSignup() {
-    document.getElementById("signup").scrollIntoView({ behavior: "smooth", block: "center" });
-    document.getElementById("waitlistEmail").focus();
+    document.getElementById("join").scrollIntoView({ behavior: "smooth", block: "center" });
+    document.getElementById("pilotEmail").focus();
   }
 
-  function toggleWearable(el) { el.classList.toggle("selected"); }
-
-  // Walkthrough video
-  function playWalkthrough() {
-    const f = document.getElementById("videoFrame");
-    const url = f.getAttribute("data-video");
-    if (url) {
-      f.innerHTML = '<iframe src="' + url + '" title="Oriya walkthrough" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>';
-    } else {
-      document.getElementById("videoPoster").innerHTML =
-        '<div style="max-width:440px"><h3>Walkthrough drops soon 🎬</h3><p>We\'re recording it now. Join the beta and we\'ll send it to you first.</p><button class="btn btn-primary" style="margin-top:18px" onclick="focusSignup()">Get early access →</button></div>';
-    }
-  }
-
-  // Partnerships fold
-  function toggleFold(btn) {
-    const item = btn.closest(".fold-item");
-    const open = item.classList.toggle("open");
-    btn.setAttribute("aria-expanded", open ? "true" : "false");
-  }
-
-  // Ori chatbot
+  /* ============================================================
+     PRESERVED: Ori chatbot
+     ============================================================ */
   const oriQA = {
     walkthrough: { q: "Walk me through the app (4 steps)", a: "Perfect. 4 steps to get you competing. Tap each one to go there directly. 👇", steps: [
       { t: "📊 1. Log your score daily", d: "Open the app every morning, tap Log Recovery, and sync from your Oura, Whoop, Garmin, or Apple Watch.", cta: "Log now →", href: "https://oriyachallenge.replit.app/dashboard" },
@@ -1453,9 +998,9 @@
       { t: "⚡ 3. Join a challenge", d: "Pick a team battle or individual sprint. Log every day or you cost your team points — it counts.", cta: "Browse Challenges →", href: "https://oriyachallenge.replit.app/challenges" },
       { t: "🤝 4. Build your crew", d: "Join a corporate wellness team or a run club. Compete together — it's more fun when your employer is watching.", cta: "Find a Team →", href: "https://oriyachallenge.replit.app/teams" }
     ] },
-    scoring: { q: "How is scoring calculated?", a: "Your Oriya Score is made of 3 components: 🌙 Deep Rest (40%), ⚡ Bounce-back (35%), 🏃 Move Output (25%). Every device is normalized — so Oura 85 and Whoop 85 are adjusted to be genuinely comparable. See /science for the full breakdown." },
+    scoring: { q: "How is scoring calculated?", a: "Your Oriya Index is made of 3 components: 🌙 Deep Rest (40%), ⚡ Bounce-back (35%), 🏃 Move Output (25%). Every device is normalized via the Biometric Handicap — so Oura 85 and Whoop 85 are adjusted to be genuinely comparable." },
     devices: { q: "Which devices work?", a: "We normalize across 12 devices: Oura, Whoop, Apple Watch, Garmin, Samsung Galaxy Watch, Fitbit, Polar, COROS, and more. Even manual entry is supported — just upload a screenshot and we'll OCR your score." },
-    beat: { q: "How do I beat someone?", a: "Find someone on the leaderboard, open their profile, and check their 30-day chart. Then log your score consistently for 5+ days — streaks matter. The fastest way to climb? Sleep by 10 PM for a week. Seriously." },
+    beat: { q: "How do I beat someone?", a: "Rank is vs your own baseline, so the real game is beating yesterday's you. Log consistently for 5+ days — streaks matter. The fastest way to climb? Sleep by 10 PM for a week. Seriously." },
     referral: { q: "I have a referral code", a: "Got an invite code? Drop it below — it unlocks your beta access and credits the person who sent you.", ref: true },
     company: { q: "Run a challenge for my company", a: "Email team@oriya.app with your company name, headcount, and any prize pool you have in mind. We handle all the logistics — leaderboard, normalization, prize distribution. Minimum 10 participants, 24-hour setup." }
   };
@@ -1470,8 +1015,6 @@
     document.getElementById("oriFab").classList.toggle("hidden", open);
     if (open && !oriStarted) { oriStarted = true; oriBubble("bot", "Hey 👋 I'm Ori — your Oriya guide. New here? I can walk you through the app in 4 steps, or answer any question."); oriRenderChips(); }
   }
-
-  // Auto-greet first-time visitors once, after a few seconds (desktop only, respects prior dismissal)
   (function () {
     let seen = true;
     try { seen = !!localStorage.getItem("oriSeen"); } catch (e) {}
@@ -1511,122 +1054,8 @@
     const el = document.getElementById("oriRefInput");
     const v = el ? el.value.trim() : "";
     oriBubble("user", v ? escapeHtml(v) : "(no code yet)");
-    setTimeout(() => oriBubble("bot", "Nice — that's applied. 🎉 Drop your email and you're in the beta. Want me to take you there?<div class=\"ori-steps\"><div class=\"ori-step\"><a href=\"#\" onclick=\"focusSignup();return false;\">Get early access →</a></div></div>"), 380);
+    setTimeout(() => oriBubble("bot", "Nice — that's applied. 🎉 Drop your email and you're in the beta. Want me to take you there?<div class=\"ori-steps\"><div class=\"ori-step\"><a href=\"#\" onclick=\"focusSignup();return false;\">Claim your Passport →</a></div></div>"), 380);
   }
-
-  function generateReferralCode(email) {
-    const base = email.split("@")[0].toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-    const suffix = Math.random().toString(36).slice(2, 8);
-    return `${base || "oriya"}-${suffix}`;
-  }
-
-  function getReferralStorage() { try { return JSON.parse(localStorage.getItem("oriyaReferral") || "null"); } catch { return null; } }
-  function saveReferralStorage(d) { localStorage.setItem("oriyaReferral", JSON.stringify(d)); }
-  function getReferralLink(code) { return `${window.location.origin}${window.location.pathname}?ref=${code}`; }
-  function setReferralLink(code) { const el = document.getElementById("referralLink"); if (el) el.textContent = getReferralLink(code); }
-
-  function openWaitlistConfirmModal() {
-    document.getElementById("waitlistConfirmModal").classList.add("open");
-    document.getElementById("waitlistConfirmModal").setAttribute("aria-hidden", "false");
-  }
-  function closeWaitlistConfirmModal() {
-    document.getElementById("waitlistConfirmModal").classList.remove("open");
-    document.getElementById("waitlistConfirmModal").setAttribute("aria-hidden", "true");
-  }
-
-  document.getElementById("waitlistConfirmModal").addEventListener("click", (e) => { if (e.target.id === "waitlistConfirmModal") closeWaitlistConfirmModal(); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeWaitlistConfirmModal(); });
-
-  async function copyReferralLink(event) {
-    const d = getReferralStorage();
-    if (!d?.code) return;
-    const link = getReferralLink(d.code);
-    try {
-      await navigator.clipboard.writeText(link);
-      const btn = event?.currentTarget;
-      if (btn) { const prev = btn.textContent; btn.textContent = "Copied"; setTimeout(() => { btn.textContent = prev; }, 1500); }
-    } catch { window.prompt("Copy your referral link", link); }
-  }
-
-  function shareReferral(channel) {
-    const d = getReferralStorage();
-    if (!d?.code) return;
-    const link = getReferralLink(d.code);
-    const text = "I'm in the Oriya Sleep League — every wearable on one leaderboard, real prize pools, shareable badges. Join my challenge:";
-    if (channel === "native" && navigator.share) { navigator.share({ title: "Join Oriya", text, url: link }); return; }
-    if (channel === "x") { window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(link)}`, "_blank", "noopener,noreferrer"); return; }
-    if (channel === "whatsapp") { window.open(`https://wa.me/?text=${encodeURIComponent(`${text} ${link}`)}`, "_blank", "noopener,noreferrer"); return; }
-    copyReferralLink();
-  }
-
-  async function submitWaitlist(e) {
-    e.preventDefault();
-    const form = e.target;
-    const input = form.querySelector('input[type="email"]');
-    const email = input.value.trim();
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const errorEl = document.getElementById("waitlistError");
-    if (!email) return;
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Joining...";
-    if (errorEl) errorEl.style.display = "none";
-    try {
-      await supabaseInsert("waitlist", { email, type: "waitlist", created_at: new Date().toISOString() });
-      const referralData = { email, code: generateReferralCode(email) };
-      saveReferralStorage(referralData);
-      setReferralLink(referralData.code);
-      openWaitlistConfirmModal();
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Join early beta";
-      if (errorEl) errorEl.style.display = "none";
-      input.value = "";
-    } catch (err) {
-      console.error("Waitlist error:", err);
-      if (errorEl) { errorEl.textContent = "Something went wrong. Please try again."; errorEl.style.display = "block"; }
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Join early beta";
-    }
-  }
-
-  (function () {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add("is-visible"); io.unobserve(entry.target); } });
-    }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
-    function reveal(el, delayMs) { el.classList.add("reveal"); if (delayMs) el.style.transitionDelay = delayMs + "ms"; io.observe(el); }
-    document.querySelectorAll(".problem-point").forEach((el, i) => reveal(el, i * 100));
-    document.querySelectorAll(".sci-node").forEach((el, i) => reveal(el, i * 110));
-    document.querySelectorAll(".proof-card").forEach((el, i) => reveal(el, i * 100));
-    document.querySelectorAll(".ps-card").forEach((el, i) => reveal(el, i * 80));
-    document.querySelectorAll(".challenge-card").forEach((el, i) => reveal(el, i * 90));
-    document.querySelectorAll(".badge-card").forEach((el, i) => reveal(el, i * 90));
-    document.querySelectorAll(".quote-card").forEach((el, i) => reveal(el, i * 100));
-    document.querySelectorAll(".ss-logos span").forEach((el, i) => reveal(el, i * 70));
-
-    // Cliff bars grow when scrolled into view
-    const cliffIO = new IntersectionObserver((entries) => {
-      entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); cliffIO.unobserve(e.target); } });
-    }, { threshold: 0.35 });
-    document.querySelectorAll(".cliff-chart").forEach((el) => cliffIO.observe(el));
-
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    function animateCount(el) {
-      const target = parseFloat(el.dataset.count);
-      const suffix = el.dataset.suffix || "";
-      const prefix = el.dataset.prefix || "";
-      if (reduceMotion || isNaN(target)) { el.textContent = prefix + target + suffix; return; }
-      const dur = 1100, start = performance.now();
-      (function tick(now) {
-        const p = Math.min((now - start) / dur, 1);
-        const eased = 1 - Math.pow(1 - p, 3);
-        el.textContent = prefix + Math.round(target * eased) + suffix;
-        if (p < 1) requestAnimationFrame(tick);
-      })(start);
-    }
-    const countIO = new IntersectionObserver((entries) => {
-      entries.forEach((e) => { if (e.isIntersecting) { animateCount(e.target); countIO.unobserve(e.target); } });
-    }, { threshold: 0.4 });
-    document.querySelectorAll("[data-count]").forEach((el) => countIO.observe(el));
-  })();
 </script>
 </body>
 </html>
