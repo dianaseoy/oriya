@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Science — Oriya | How we normalize every wearable onto one fair score</title>
+  <meta name="description" content="How Oriya normalizes Oura, Whoop, Garmin, Apple, Samsung and more onto one comparable 0–100 recovery index — the device-specific correction model, validation, and the research it's grounded in.">
+  <meta property="og:title" content="The Science behind Oriya's recovery score">
+  <meta property="og:description" content="A Whoop 83 isn't an Oura 83. Here's the per-device correction model that puts every wearable on one honest scale.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 78 22 A 40 40 0 1 0 79 23' stroke='%237FB79E' stroke-width='5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='50' cy='55' r='14' fill='%237FB79E'/%3E%3Ccircle cx='78' cy='22' r='7' fill='%23D7A25C'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --void:#070809; --obsidian:#0E1014; --graphite:#1A1E24; --hairline:#2A2F38;
+      --bone:#ECEAE4; --ash:#878D99;
+      --jade:#7FB79E; --jade-deep:#3E6F5E; --jade-glow:#9FD3BB;
+      --amber:#D7A25C; --amber-deep:#B5723C; --amber-glow:#F0C083; --ember:#B96A4A;
+      --font-display:"Instrument Serif",Georgia,serif;
+      --font-sans:"Inter",system-ui,sans-serif;
+      --font-mono:"JetBrains Mono",ui-monospace,monospace;
+      --settle:cubic-bezier(0.22,0.61,0.36,1);
+      --circadian:cubic-bezier(0.16,1,0.3,1);
+      --maxw:980px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+    body{font-family:var(--font-sans);background:var(--obsidian);color:var(--bone);line-height:1.65;min-width:320px;overflow-x:hidden;}
+    .canvas{position:fixed;inset:0;z-index:-2;background:radial-gradient(120% 120% at 50% 0%,#14171C 0%,#0E1014 45%,#070809 100%);}
+    .vignette{position:fixed;inset:0;z-index:-1;pointer-events:none;box-shadow:inset 0 0 240px 40px rgba(7,8,9,0.9);}
+    a{color:inherit;text-decoration:none;}
+    ::selection{background:rgba(127,183,158,0.25);}
+    .wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px;}
+    .eyebrow{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--ash);}
+    .display{font-family:var(--font-display);font-weight:400;line-height:0.98;letter-spacing:-0.02em;color:var(--bone);}
+    .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
+
+    /* nav */
+    .nav{position:sticky;top:0;z-index:100;backdrop-filter:blur(14px);background:rgba(14,16,20,0.7);border-bottom:1px solid var(--hairline);}
+    .nav-inner{max-width:1180px;margin:0 auto;padding:14px 26px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+    .logo{display:inline-flex;align-items:center;gap:9px;font-family:var(--font-display);font-size:21px;}
+    .logo svg{width:26px;height:26px;}
+    .nav-right{display:flex;align-items:center;gap:18px;}
+    .nav-link{font-size:14px;color:var(--ash);transition:color .2s;}
+    .nav-link:hover{color:var(--bone);}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:500;border-radius:999px;padding:11px 22px;transition:transform .4s var(--settle);}
+    .btn-primary{background:var(--jade);color:var(--void);box-shadow:0 0 60px -10px rgba(127,183,158,0.45);}
+    .btn-primary:hover{transform:translateY(-2px);}
+    .btn-ghost{color:var(--ash);}
+    .btn-ghost:hover{color:var(--bone);}
+
+    /* hero */
+    .hero{padding:clamp(70px,12vh,130px) 0 40px;text-align:center;}
+    .hero h1{font-size:clamp(2.6rem,7vw,5rem);line-height:0.96;letter-spacing:-0.025em;margin:18px auto 0;max-width:14ch;}
+    .hero .lede{color:var(--ash);font-size:clamp(1rem,1.5vw,1.18rem);max-width:54ch;margin:22px auto 0;}
+    .hero .credit{margin-top:20px;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--jade);}
+
+    section{position:relative;}
+    .blk{padding:clamp(46px,8vh,84px) 0;border-top:1px solid var(--hairline);}
+    .blk-head{max-width:60ch;}
+    .blk-head h2{font-family:var(--font-display);font-size:clamp(1.9rem,4vw,2.9rem);line-height:1.04;margin:14px 0 0;}
+    .blk-head p{color:var(--ash);font-size:15px;margin-top:16px;line-height:1.7;}
+
+    /* analogy card */
+    .analogy{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:34px;}
+    .anacard{border:1px solid var(--hairline);border-radius:16px;padding:26px 24px;background:rgba(26,30,36,0.5);}
+    .anacard .t{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash);margin-bottom:12px;}
+    .anacard.bad{border-color:rgba(185,106,74,.4);}
+    .anacard.bad .t{color:var(--ember);}
+    .anacard.good{border-color:var(--jade-deep);}
+    .anacard.good .t{color:var(--jade);}
+    .anacard p{font-size:14px;color:var(--ash);line-height:1.6;}
+    .anacard b{color:var(--bone);}
+
+    /* formula highlight */
+    .formula{margin-top:30px;border:1px solid var(--hairline);border-radius:18px;background:rgba(0,0,0,.28);padding:32px 28px;text-align:center;}
+    .formula .eq{font-family:var(--font-mono);font-size:clamp(15px,2.6vw,22px);color:var(--bone);letter-spacing:.01em;}
+    .formula .eq .var{color:var(--amber-glow);}
+    .formula .eq .res{color:var(--jade);font-weight:700;}
+    .formula .note{margin-top:14px;font-size:13px;color:var(--ash);}
+
+    /* worked example */
+    .worked{display:flex;align-items:center;justify-content:center;gap:clamp(14px,4vw,40px);flex-wrap:wrap;margin-top:30px;}
+    .wstep{text-align:center;}
+    .wstep .k{font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ash);margin-bottom:8px;}
+    .wstep .v{font-family:var(--font-mono);font-size:34px;font-variant-numeric:tabular-nums;color:var(--bone);line-height:1;}
+    .wstep.final .v{color:var(--jade);}
+    .wstep .s{font-size:12px;color:var(--ash);margin-top:6px;}
+    .warrow{font-size:22px;color:var(--jade-deep);}
+
+    /* device table */
+    .tablewrap{margin-top:30px;border:1px solid var(--hairline);border-radius:16px;overflow:hidden;}
+    .scroll{overflow-x:auto;}
+    table.dev{width:100%;border-collapse:collapse;font-family:var(--font-mono);min-width:560px;}
+    table.dev th{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ash);text-align:right;padding:15px 18px;font-weight:500;background:rgba(0,0,0,.2);border-bottom:1px solid var(--hairline);}
+    table.dev th:first-child{text-align:left;}
+    table.dev td{font-size:12.5px;color:var(--bone);text-align:right;padding:12px 18px;border-bottom:1px solid rgba(42,47,56,.5);}
+    table.dev td:first-child{text-align:left;color:var(--bone);}
+    table.dev tr:last-child td{border-bottom:none;}
+    table.dev .metric{color:var(--ash);}
+    table.dev .val{display:inline-block;font-size:9px;letter-spacing:.06em;padding:3px 8px;border-radius:999px;border:1px solid var(--hairline);}
+    table.dev .val.High{color:var(--jade);border-color:var(--jade-deep);}
+    table.dev .val.Med{color:var(--amber-glow);border-color:rgba(240,192,131,.35);}
+    table.dev .val.Low{color:var(--ember);border-color:rgba(185,106,74,.4);}
+    .tnote{font-size:12px;color:var(--ash);margin-top:14px;line-height:1.6;}
+
+    /* steps */
+    .steps{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:30px;}
+    .step{border:1px solid var(--hairline);border-radius:14px;padding:22px 20px;background:rgba(26,30,36,0.5);}
+    .step .n{font-family:var(--font-mono);font-size:11px;color:var(--jade);letter-spacing:.1em;}
+    .step h4{font-size:15px;font-weight:600;margin:9px 0 6px;color:var(--bone);}
+    .step p{font-size:13px;color:var(--ash);line-height:1.6;}
+
+    /* source / honesty */
+    .source{margin-top:30px;border-left:2px solid var(--jade-deep);padding:6px 0 6px 20px;}
+    .source p{font-size:13.5px;color:var(--ash);line-height:1.6;margin-bottom:18px;}
+    .source p:last-child{margin-bottom:0;}
+    .source p b{color:var(--jade);font-weight:600;}
+    .source em{color:var(--bone);font-style:italic;}
+    .source .cnote{display:block;font-size:12px;color:var(--ash);opacity:.78;margin-top:5px;line-height:1.55;}
+    .honesty{margin-top:24px;border:1px solid var(--hairline);border-radius:14px;padding:20px 22px;background:rgba(26,30,36,0.4);font-size:13.5px;color:var(--ash);line-height:1.65;}
+    .honesty b{color:var(--bone);}
+
+    /* trust grid */
+    .trust{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:30px;}
+    .tcard{border:1px solid var(--hairline);border-radius:14px;padding:22px 20px;background:rgba(26,30,36,0.5);}
+    .tcard .ic{width:30px;height:30px;color:var(--jade);margin-bottom:12px;}
+    .tcard h4{font-size:14.5px;font-weight:600;margin-bottom:6px;color:var(--bone);}
+    .tcard p{font-size:13px;color:var(--ash);line-height:1.6;}
+    .tcard .ref{display:inline-block;margin-top:9px;font-family:var(--font-mono);font-size:10.5px;color:var(--ash);}
+
+    /* cta */
+    .endcta{text-align:center;padding:clamp(56px,10vh,100px) 0;border-top:1px solid var(--hairline);}
+    .endcta h2{font-family:var(--font-display);font-size:clamp(2rem,5vw,3.4rem);line-height:1.02;margin-bottom:18px;}
+    .endcta .row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
+    .endcta .btn{padding:15px 30px;font-size:15px;}
+
+    footer{border-top:1px solid var(--hairline);padding:40px 0;}
+    .foot-inner{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;color:var(--ash);}
+    .foot-inner a{color:var(--ash);}
+    .foot-inner a:hover{color:var(--bone);}
+
+    @media (max-width:680px){
+      .analogy,.steps,.trust{grid-template-columns:1fr;}
+      .nav-right .nav-link{display:none;}
+      .worked{gap:14px;}
+      .wstep .v{font-size:27px;}
+    }
+    /* ===== scroll & interaction animations (progressive enhancement) ===== */
+    /* generic on-scroll reveal — only hidden when JS is active & motion allowed */
+    html.anim .reveal-up{opacity:0;transform:translateY(26px);transition:opacity .7s var(--circadian),transform .7s var(--circadian);will-change:transform,opacity;}
+    html.anim .reveal-up.in{opacity:1;transform:none;}
+
+    /* 1 · Combine & Collapse */
+    .collide{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:36px;min-height:150px;}
+    .cc-card{position:relative;width:166px;padding:22px 18px;border:1px solid var(--hairline);border-radius:16px;background:rgba(26,30,36,.6);text-align:center;
+      transition:transform .85s var(--circadian),border-color .6s,box-shadow .6s;will-change:transform;}
+    .cc-card .cc-dev{display:block;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash);margin-bottom:10px;}
+    .cc-card .cc-raw{display:block;font-family:var(--font-mono);font-size:46px;color:var(--bone);line-height:1;font-variant-numeric:tabular-nums;}
+    .cc-card .cc-state{display:block;margin-top:11px;font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;color:var(--ash);min-height:13px;transition:opacity .5s;}
+    .cc-op{font-family:var(--font-mono);font-size:22px;color:var(--ember);transition:opacity .4s,transform .4s;opacity:0;}
+    .collide.resolved .cc-card.whoop{border-color:rgba(185,106,74,.5);box-shadow:0 0 44px -18px var(--ember);}
+    .collide.resolved .cc-card.whoop .cc-raw{color:var(--amber-glow);}
+    .collide.resolved .cc-card.oura{border-color:var(--jade-deep);box-shadow:0 0 44px -18px var(--jade);}
+    .collide.resolved .cc-card.oura .cc-raw{color:var(--jade);}
+    /* phase: colliding inward */
+    .collide.colliding .cc-card.whoop{transform:translateX(72px) scale(1.05);}
+    .collide.colliding .cc-card.oura{transform:translateX(-72px) scale(1.05);}
+    .collide.colliding .cc-op{opacity:1;transform:scale(1.7);}
+    /* under anim, op shows during raw/colliding phase, hides when resolved */
+    html.anim .collide:not(.resolved) .cc-op{opacity:1;}
+    html.anim .collide:not(.resolved) .cc-card .cc-state{opacity:0;}
+    .cc-caption{position:relative;text-align:center;margin-top:22px;min-height:46px;}
+    .cc-caption .ccc{font-size:14.5px;color:var(--ash);line-height:1.6;margin:0;transition:opacity .5s;}
+    .cc-caption .ccc b{color:var(--bone);}
+    .cc-caption .ccc.raw{display:none;}
+    html.anim .cc-caption .ccc.done{position:absolute;left:0;right:0;top:0;}
+    html.anim #collide:not(.resolved) ~ .cc-caption .ccc.raw{display:block;opacity:1;}
+    html.anim #collide:not(.resolved) ~ .cc-caption .ccc.done{opacity:0;}
+
+    /* 2 · Equation Flip */
+    .flipwrap{margin:30px auto 0;max-width:330px;height:160px;perspective:1200px;cursor:pointer;outline:none;}
+    .flipcard{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .8s var(--circadian);will-change:transform;}
+    .flipwrap:hover .flipcard,.flipwrap:focus-visible .flipcard,.flipwrap.flipped .flipcard{transform:rotateY(180deg);}
+    .flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid var(--hairline);border-radius:18px;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:22px;background:rgba(0,0,0,.28);box-shadow:0 30px 60px -34px rgba(0,0,0,.8),inset 0 1px 1px rgba(255,255,255,.04);}
+    .flip-face.back{transform:rotateY(180deg);background:linear-gradient(155deg,rgba(26,30,36,.9),rgba(0,0,0,.4));border-color:var(--jade-deep);}
+    .ff-lbl{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash);}
+    .ff-eq{font-family:var(--font-mono);font-size:clamp(20px,4.5vw,30px);color:var(--bone);}
+    .ff-res{font-family:var(--font-mono);font-size:62px;line-height:1;color:var(--jade);font-variant-numeric:tabular-nums;}
+    .ff-hint{font-family:var(--font-mono);font-size:11px;color:var(--ash);}
+    .flip-face.back .ff-hint{color:var(--jade-deep);}
+
+    /* 3 · Equalizing matrix */
+    html.anim table.dev tbody tr{opacity:0;transform:translateX(-46px);transition:opacity .5s ease,transform .6s var(--circadian);will-change:transform,opacity;}
+    html.anim table.dev tbody tr:nth-child(even){transform:translateX(46px);}
+    html.anim table.dev tbody tr.rin{opacity:1;transform:none;}
+    table.dev tbody tr{transition:background .25s;}
+    table.dev tbody tr:hover{background:rgba(127,183,158,.06);}
+    .tick{font-variant-numeric:tabular-nums;}
+
+    /* 4 · Scroll cascade + launch */
+    .step{transition:opacity .25s ease,transform .25s var(--circadian),border-color .3s,box-shadow .3s;will-change:transform,opacity;}
+    html.anim .step.lit{border-color:var(--jade-deep);box-shadow:0 22px 50px -30px rgba(0,0,0,.8);}
+    .launch{position:relative;height:54px;margin-top:14px;}
+    .launch .lboard{position:absolute;left:0;bottom:0;display:flex;align-items:flex-end;gap:5px;height:26px;opacity:.5;}
+    .launch .lboard i{width:14px;background:rgba(127,183,158,.22);border-radius:3px 3px 0 0;}
+    .launch .lboard i:nth-child(1){height:14px;} .launch .lboard i:nth-child(2){height:22px;} .launch .lboard i:nth-child(3){height:18px;}
+    .launch .lchip{position:absolute;left:24px;bottom:6px;font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:var(--void);background:var(--jade);border-radius:8px;padding:5px 10px;box-shadow:0 0 24px -6px var(--jade);}
+    html.anim .launch .lchip{opacity:0;transform:translateY(20px) scale(.85);}
+    html.anim .s4.launched .lchip{animation:launchUp 1s var(--circadian) forwards;}
+    @keyframes launchUp{0%{opacity:0;transform:translateY(20px) scale(.85);}55%{opacity:1;transform:translateY(-10px) scale(1.06);}100%{opacity:1;transform:translateY(-4px) scale(1);}}
+
+    /* seamless cross-page fade */
+    html.pf body{animation:pfIn .5s var(--circadian) both;}
+    body.pf-out{opacity:0;transition:opacity .26s ease;}
+    @keyframes pfIn{from{opacity:0;}to{opacity:1;}}
+    @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto;}*{animation:none!important;transition:none!important;}}
+  </style>
+</head>
+<body>
+<script>
+(function(){
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.documentElement.classList.add("pf");
+  addEventListener("pageshow", function(){ document.body && document.body.classList.remove("pf-out"); });
+  document.addEventListener("click", function(e){
+    var a = e.target.closest && e.target.closest("a"); if(!a) return;
+    var h = a.getAttribute("href") || "";
+    if (a.target === "_blank" || a.hasAttribute("download")) return;
+    if (/^(https?:|mailto:|tel:|#)/.test(h) || h === "") return;
+    if (/\.html(#.*)?$/.test(h)) { e.preventDefault(); document.body.classList.add("pf-out"); setTimeout(function(){ location.href = h; }, 240); }
+  });
+})();
+</script>
+<div class="canvas"></div>
+<div class="vignette"></div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M 78 22 A 40 40 0 1 0 79 23" stroke="#7FB79E" stroke-width="5" stroke-linecap="round"/><circle cx="50" cy="55" r="14" fill="#7FB79E"/><circle cx="78" cy="22" r="7" fill="#D7A25C"/></svg>
+      Oriya
+    </a>
+    <div class="nav-right">
+      <a href="index.html" class="nav-link">← Home</a>
+      <a href="competitors.html" class="nav-link">How we compare</a>
+      <a href="try.html" class="btn btn-primary">Get your score</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow">The Science · for Season 1 athletes</span>
+    <h1 class="display">One fair number, across every wearable.</h1>
+    <p class="lede">Oura reads Readiness. Whoop reads Recovery. Garmin rolls a Body Battery. Each is built on a different sensor, a different model, and a different validation standard — so the raw numbers were never comparable. Here's exactly how we make them comparable.</p>
+    <div class="credit">Grounded in peer-reviewed research · 12 devices supported</div>
+  </div>
+</section>
+
+<!-- THE PROBLEM -->
+<section class="blk">
+  <div class="wrap">
+    <div class="blk-head">
+      <span class="eyebrow">The problem</span>
+      <h2>A Whoop 83 isn't an Oura 83.</h2>
+      <p>Comparing scores from two different wearables directly is like comparing Celsius to Fahrenheit — same digit, completely different meaning. The numbers aren't built the same way: an independent review of 14 composite scores across 10 brands found they use undisclosed, inconsistently weighted formulas and are rarely validated. Even the raw inputs diverge — measuring the <em>same</em> heartbeats, HRV agreement ranged from near-perfect on one device to poor on another. Put these on a shared leaderboard untouched and the most generous algorithm wins, not the best recovery.</p>
+    </div>
+    <div class="collide" id="collide" data-anim>
+      <div class="cc-card whoop">
+        <span class="cc-dev">Whoop · Recovery</span>
+        <span class="cc-raw" data-from="83" data-to="75">75</span>
+        <span class="cc-state">↓ corrected −8</span>
+      </div>
+      <div class="cc-op">=?</div>
+      <div class="cc-card oura">
+        <span class="cc-dev">Oura · Readiness</span>
+        <span class="cc-raw" data-from="83" data-to="83">83</span>
+        <span class="cc-state">✓ stable · high validation</span>
+      </div>
+    </div>
+    <div class="cc-caption">
+      <p class="ccc raw">Two “83”s on different scales — that's noise, not a tie.</p>
+      <p class="ccc done">Normalized, it's an honest <b>8-point gap</b>. Now you're comparing recovery, not hardware.</p>
+    </div>
+  </div>
+</section>
+
+<!-- THE MODEL -->
+<section class="blk">
+  <div class="wrap">
+    <div class="blk-head">
+      <span class="eyebrow">The model</span>
+      <h2>A calibrated correction, per device.</h2>
+      <p>Every device's native score is converted to the Oriya Standard with a simple, transparent linear correction — a factor and an offset tuned for that specific sensor. Devices with weaker independent validation get a larger correction. The result is clamped to a 1–99 scale.</p>
+    </div>
+
+    <div class="formula">
+      <div class="eq">Oriya = round( <span class="var">native</span> × factor + offset )</div>
+      <div class="note">clamped to 1–99 · factor and offset are calibrated per device</div>
+    </div>
+
+    <div class="flipwrap" id="eqflip" tabindex="0" role="button" aria-label="Flip the card to reveal the Oriya Standard">
+      <div class="flipcard">
+        <div class="flip-face front">
+          <span class="ff-lbl">Whoop · Recovery 83</span>
+          <span class="ff-eq">83 × 0.92 − 1.0</span>
+          <span class="ff-hint">hover to reveal →</span>
+        </div>
+        <div class="flip-face back">
+          <span class="ff-lbl">Oriya Standard</span>
+          <span class="ff-res">75</span>
+          <span class="ff-hint">= 75.36, rounded</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tablewrap"><div class="scroll">
+      <table class="dev">
+        <thead>
+          <tr><th>Device</th><th>Native metric</th><th>Factor</th><th>Offset</th><th>Validation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Oura</td><td class="metric">Readiness</td><td><span class="tick" data-to="0.97" data-dec="2">0.97</span></td><td><span class="tick" data-to="2.5" data-dec="1" data-signed="1">+2.5</span></td><td><span class="val High">High</span></td></tr>
+          <tr><td>Whoop</td><td class="metric">Recovery %</td><td><span class="tick" data-to="0.92" data-dec="2">0.92</span></td><td><span class="tick" data-to="-1.0" data-dec="1" data-signed="1">−1.0</span></td><td><span class="val Med">Med</span></td></tr>
+          <tr><td>Garmin</td><td class="metric">Body Battery</td><td><span class="tick" data-to="0.95" data-dec="2">0.95</span></td><td><span class="tick" data-to="0.0" data-dec="1" data-signed="1">0.0</span></td><td><span class="val Med">Med</span></td></tr>
+          <tr><td>Apple Watch<span style="color:var(--amber-glow)">*</span></td><td class="metric">HRV + sleep (computed)</td><td><span class="tick" data-to="0.90" data-dec="2">0.90</span></td><td><span class="tick" data-to="1.0" data-dec="1" data-signed="1">+1.0</span></td><td><span class="val Med">Med</span></td></tr>
+          <tr><td>Samsung</td><td class="metric">Energy Score</td><td><span class="tick" data-to="0.88" data-dec="2">0.88</span></td><td><span class="tick" data-to="2.0" data-dec="1" data-signed="1">+2.0</span></td><td><span class="val Low">Low</span></td></tr>
+          <tr><td>Pixel Watch</td><td class="metric">Recovery</td><td><span class="tick" data-to="0.91" data-dec="2">0.91</span></td><td><span class="tick" data-to="1.5" data-dec="1" data-signed="1">+1.5</span></td><td><span class="val Low">Low</span></td></tr>
+          <tr><td>Ultrahuman</td><td class="metric">Movement Index</td><td><span class="tick" data-to="0.94" data-dec="2">0.94</span></td><td><span class="tick" data-to="1.0" data-dec="1" data-signed="1">+1.0</span></td><td><span class="val Med">Med</span></td></tr>
+          <tr><td>Athlytic</td><td class="metric">Recovery</td><td><span class="tick" data-to="0.96" data-dec="2">0.96</span></td><td><span class="tick" data-to="1.0" data-dec="1" data-signed="1">+1.0</span></td><td><span class="val Med">Med</span></td></tr>
+          <tr><td>Bevel</td><td class="metric">Recovery</td><td><span class="tick" data-to="0.95" data-dec="2">0.95</span></td><td><span class="tick" data-to="0.5" data-dec="1" data-signed="1">+0.5</span></td><td><span class="val Med">Med</span></td></tr>
+          <tr><td>Cora Health</td><td class="metric">Readiness</td><td><span class="tick" data-to="0.94" data-dec="2">0.94</span></td><td><span class="tick" data-to="1.0" data-dec="1" data-signed="1">+1.0</span></td><td><span class="val Med">Med</span></td></tr>
+          <tr><td>Gentler Streak</td><td class="metric">Readiness</td><td><span class="tick" data-to="0.97" data-dec="2">0.97</span></td><td><span class="tick" data-to="0.5" data-dec="1" data-signed="1">+0.5</span></td><td><span class="val Med">Med</span></td></tr>
+          <tr><td>Vora</td><td class="metric">Recovery</td><td><span class="tick" data-to="0.96" data-dec="2">0.96</span></td><td><span class="tick" data-to="0.5" data-dec="1" data-signed="1">+0.5</span></td><td><span class="val Med">Med</span></td></tr>
+        </tbody>
+      </table>
+    </div></div>
+    <p class="tnote"><span style="color:var(--amber-glow)">*</span>Apple Watch ships no native composite score — Oriya (like recovery apps such as Athlytic or Bevel) computes one from Apple Health's raw signals. <b style="color:var(--bone)">Two ways in:</b> devices <em>with</em> a native score (Oura, Whoop, Garmin, Samsung, Fitbit, Polar) are normalized with the factor + offset above; devices <em>without</em> one are computed from raw HRV, resting heart rate and sleep, so they arrive already on-scale. The factors here are Oriya's own calibration — illustrative single-screenshot approximations informed by the research below, <b style="color:var(--bone)">not published constants</b>. Connected directly via read-only API, the full model weights the underlying components rather than a single composite.</p>
+  </div>
+</section>
+
+<!-- THE FOUR STEPS -->
+<section class="blk">
+  <div class="wrap">
+    <div class="blk-head">
+      <span class="eyebrow">End to end</span>
+      <h2>What happens to your score.</h2>
+    </div>
+    <div class="steps">
+      <div class="step s1"><div class="n">01</div><h4>Read the raw score</h4><p>Pulled straight from your screenshot and OCR-verified against the device's own metric label, or read directly through a read-only connection.</p></div>
+      <div class="step s2"><div class="n">02</div><h4>Apply the device correction</h4><p>The calibrated factor and offset for your specific sensor translate the native score onto the shared scale.</p></div>
+      <div class="step s3"><div class="n">03</div><h4>Weight the full signal</h4><p>Connected directly, Oriya's own weighting blends sleep, recovery (HRV + resting HR) and activity — the same contributors the research finds in every brand's score — instead of trusting one opaque composite.</p></div>
+      <div class="step s4"><div class="n">04</div><h4>Post to the board</h4><p>Your normalized number joins the squad leaderboard — ranked against your own baseline, never a raw public score.</p>
+        <div class="launch">
+          <div class="lboard"><i></i><i></i><i></i></div>
+          <span class="lchip">75 ▲</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VALIDATION & SOURCE -->
+<section class="blk">
+  <div class="wrap">
+    <div class="blk-head">
+      <span class="eyebrow">Where it comes from</span>
+      <h2>Grounded in the research.</h2>
+      <p>The correction factors are informed by independent evaluations of how consumer wearables' composite recovery scores relate to each other and to the underlying physiology.</p>
+    </div>
+    <div class="source">
+      <p><b>1 · Composite scores aren't comparable.</b> Doherty C, Baldwin M, Lambe R, Burke D, Altini M. <em>"Readiness, recovery, and strain: an evaluation of composite health scores in consumer wearables."</em> Translational Exercise Biomedicine, 2025;2(2):128–144.<span class="cnote">14 scores across 10 brands. HRV (86%), resting HR (79%), activity and sleep are the common inputs — but weightings and formulas are undisclosed, and the scores are rarely validated against a reference.</span></p>
+      <p><b>2 · Devices measure the body differently.</b> Miller DJ, Sargent C, Roach GD. <em>"A Validation of Six Wearable Devices for Estimating Sleep, Heart Rate and Heart Rate Variability in Healthy Adults."</em> Sensors, 2022;22(16):6317.<span class="cnote">Measuring the same heartbeats, HRV agreement ran from excellent (ICC 0.99, ±4.7 ms on Whoop) to poor (ICC 0.24, ±33.1 ms on Garmin); sleep-stage accuracy spanned 50–65%.</span></p>
+      <p><b>3 · HRV metrics aren't interchangeable.</b> Shaffer F, Ginsberg JP. <em>"An Overview of Heart Rate Variability Metrics and Norms."</em> Frontiers in Public Health, 2017;5:258.<span class="cnote">RMSSD and SDNN are distinct measures (healthy SDNN ≈ 50 ms) — a value on one scale can't be read off as the other.</span></p>
+      <p><b>4 · Privacy by design.</b> U.S. Federal Trade Commission, <em>In re Flo Health, Inc.</em>, Docket No. C-4747 (final order, June 22, 2021).<span class="cnote">A health app that shared data without clear consent drew FTC enforcement — which is why Oriya defaults to affirmative opt-in and read-only access.</span></p>
+      <p><b>5 · Against orthosomnia.</b> Baron KG, Abbott S, Jao N, Manalo N, Mullen R. <em>"Orthosomnia: Are Some Patients Taking the Quantified Self Too Far?"</em> Journal of Clinical Sleep Medicine, 2017;13(2):351–354.<span class="cnote">Fixating on a tracker number can worsen the very thing it measures — so rank is against your own baseline, and a red morning is never a public failure.</span></p>
+    </div>
+    <div class="honesty">
+      <b>Honest about the limits.</b> The research above is candid that these scores are proprietary, inconsistently weighted, and seldom validated — which is exactly why comparing them raw fails, and why we publish our correction openly instead of hiding it. The Oriya Standard is built to be directionally useful for fair comparison, not diagnostically precise. It is a social context layer, not a medical device, and is no substitute for clinical assessment. And we won't weaponize it: rank is measured against your own baseline, so a hard night never becomes a public failure.
+    </div>
+  </div>
+</section>
+
+<!-- PRIVACY & TRUST -->
+<section class="blk">
+  <div class="wrap">
+    <div class="blk-head">
+      <span class="eyebrow">Your data</span>
+      <h2>Built private by default.</h2>
+      <p>The whole point is to share a number with people you choose — which only works if you stay in control of everything underneath it.</p>
+    </div>
+    <div class="trust">
+      <div class="tcard">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <h4>Read-only access</h4>
+        <p>When you connect a device, Oriya requests read-only scopes. We never get your account password, and we can't write or change anything in your wearable account.</p>
+      </div>
+      <div class="tcard">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>
+        <h4>Sharing is off by default</h4>
+        <p>Granular toggles control exactly what each squad or challenge sees. Nothing is shared until you turn it on, and you can export or delete your data at any time.</p>
+      </div>
+      <div class="tcard">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="8" r="3"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
+        <h4>Teams see aggregate only</h4>
+        <p>For workplace challenges, an admin only ever sees aggregate stats — and only when at least five people are participating, so no individual is ever singled out.</p>
+      </div>
+      <div class="tcard">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <h4>Never sold, never advertised</h4>
+        <p>Your recovery data is not a product. We don't sell it, we don't run ads against it, and we design data minimization in from the start.</p>
+        <span class="ref">Informed by FTC Docket C-4747 (Flo Health, 2021)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="endcta">
+  <div class="wrap">
+    <span class="eyebrow">Season 1 · SF &amp; NYC · invite-only</span>
+    <h2 class="display" style="margin-top:14px;">See where your number lands.</h2>
+    <div class="row">
+      <a href="try.html" class="btn btn-primary">Get your normalized score →</a>
+      <a href="index.html#join" class="btn btn-ghost">Join the beta</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-inner">
+      <span>© 2026 Oriya Inc. — Palo Alto, CA — No data sold. No advertising. Ever.</span>
+      <span><a href="index.html">Home</a> · <a href="competitors.html">Compare</a> · <a href="mailto:hello@oriya.app">hello@oriya.app</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (REDUCE) return;                       // motion off → CSS leaves everything visible & correct
+  document.documentElement.classList.add("anim");
+
+  function ease(t){ return 1 - Math.pow(1 - t, 3); }
+  function tween(el, from, to, dur, fmt){
+    var start = null;
+    function frame(ts){
+      if(!start) start = ts;
+      var p = Math.min((ts - start)/dur, 1);
+      el.textContent = fmt(from + (to - from)*ease(p));
+      if(p < 1) requestAnimationFrame(frame); else el.textContent = fmt(to);
+    }
+    requestAnimationFrame(frame);
+  }
+  function fmtInt(v){ return String(Math.round(v)); }
+  function fmtTick(dec, signed){
+    return function(v){
+      var s = Math.abs(v).toFixed(dec);
+      if(signed) return (v < -0.00001 ? "−" : "+") + s;
+      return (v < -0.00001 ? "−" : "") + s;
+    };
+  }
+
+  /* generic reveal-up on scroll */
+  var revEls = [].slice.call(document.querySelectorAll(".blk-head,.formula,.tnote,.flipwrap,.source,.honesty,.trust,.endcta .row,.cc-caption"));
+  revEls.forEach(function(el){ el.classList.add("reveal-up"); });
+  var revIO = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); revIO.unobserve(e.target); } });
+  }, { threshold:0.18 });
+  revEls.forEach(function(el){ revIO.observe(el); });
+
+  /* 1 · Combine & Collapse */
+  var collide = document.getElementById("collide");
+  if(collide){
+    var raws = [].slice.call(collide.querySelectorAll(".cc-raw"));
+    raws.forEach(function(n){ n.textContent = n.dataset.from; });
+    var cIO = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(!e.isIntersecting) return;
+        cIO.unobserve(e.target);
+        collide.classList.add("colliding");
+        setTimeout(function(){
+          collide.classList.remove("colliding");
+          collide.classList.add("resolved");
+          raws.forEach(function(n){ tween(n, +n.dataset.from, +n.dataset.to, 850, fmtInt); });
+        }, 720);
+      });
+    }, { threshold:0.45 });
+    cIO.observe(collide);
+  }
+
+  /* 2 · Equation Flip — auto-reveals once on scroll-in, then hover/click toggles */
+  var flip = document.getElementById("eqflip");
+  if(flip){
+    var fIO = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(!e.isIntersecting) return;
+        fIO.unobserve(e.target);
+        setTimeout(function(){ flip.classList.add("flipped"); }, 450);
+      });
+    }, { threshold:0.5 });
+    fIO.observe(flip);
+    flip.addEventListener("click", function(){ flip.classList.toggle("flipped"); });
+  }
+
+  /* 3 · Equalizing matrix — rows slide in alternating, numbers calibrate up; hover re-runs */
+  var tbl = document.querySelector("table.dev");
+  if(tbl){
+    var runTicks = function(scope){
+      scope.querySelectorAll(".tick").forEach(function(t){
+        tween(t, 0, parseFloat(t.dataset.to), 700, fmtTick(+t.dataset.dec, t.dataset.signed === "1"));
+      });
+    };
+    var rows = [].slice.call(tbl.querySelectorAll("tbody tr"));
+    var tIO = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(!e.isIntersecting) return;
+        tIO.unobserve(e.target);
+        rows.forEach(function(r, i){ setTimeout(function(){ r.classList.add("rin"); runTicks(r); }, i*70); });
+      });
+    }, { threshold:0.12 });
+    tIO.observe(tbl);
+    rows.forEach(function(r){
+      r.addEventListener("mouseenter", function(){ if(r.classList.contains("rin")) runTicks(r); });
+    });
+  }
+
+  /* 4 · Scroll cascade — steps light/dim by proximity to centre; step 04 launches */
+  var steps = [].slice.call(document.querySelectorAll(".steps .step"));
+  if(steps.length){
+    var ticking = false;
+    var cascade = function(){
+      ticking = false;
+      var vh = innerHeight, mid = vh*0.5;
+      steps.forEach(function(s){
+        var r = s.getBoundingClientRect();
+        var p = Math.max(0, 1 - Math.abs((r.top + r.height/2) - mid)/(vh*0.62));
+        s.style.opacity = (0.4 + p*0.6).toFixed(3);
+        s.style.transform = "translateY(" + ((1-p)*16).toFixed(1) + "px)";
+        s.classList.toggle("lit", p > 0.62);
+        if(s.classList.contains("s4") && p > 0.5) s.classList.add("launched");
+      });
+    };
+    addEventListener("scroll", function(){ if(!ticking){ ticking = true; requestAnimationFrame(cascade); } }, { passive:true });
+    addEventListener("resize", cascade, { passive:true });
+    cascade();
+  }
+})();
+</script>
+</body>
+</html>

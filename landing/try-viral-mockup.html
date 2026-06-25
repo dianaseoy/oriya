@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Oriya — Body Passport · social asset gallery</title>
+<style>
+  :root{
+    --void:#0a0c10; --ink:#0c0e12; --graphite:#16191F;
+    --bone:#ECEAE4; --ash:#8A8F98; --hair:rgba(236,234,228,.10);
+    --jade:#7FB79E; --jade-deep:#3E6F5E; --jade-glow:#9FD3BB;
+    --amber:#D7A25C; --amber-deep:#B5723C; --amber-glow:#F0C083;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:'Inter',ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    /* tier accents */
+    --t-bronze:#C8895A; --t-silver:#C7CDD6; --t-gold:#F0C083; --t-obsidian:#9FD3BB;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(900px 500px at 80% -10%, rgba(127,183,158,.08), transparent 60%),
+      radial-gradient(700px 400px at 0% 100%, rgba(215,162,92,.06), transparent 60%),
+      var(--void);
+    color:var(--bone);font-family:var(--sans);line-height:1.55;
+    -webkit-font-smoothing:antialiased;padding:48px 24px 110px}
+  .wrap{max-width:1000px;margin:0 auto}
+  .mono{font-family:var(--mono)}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--jade)}
+  h1{font-size:32px;line-height:1.15;font-weight:600;margin:10px 0 10px;letter-spacing:-.01em}
+  .lede{color:var(--ash);max-width:680px;font-size:16px}
+  .mockflag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--amber);border:1px dashed rgba(215,162,92,.5);border-radius:6px;padding:4px 9px;margin-bottom:20px}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:20px;font-size:12px;color:var(--ash);font-family:var(--mono)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .swatch{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+  /* ---------- persona block (the croppable social unit) ---------- */
+  .persona{margin-top:46px;padding-top:34px;border-top:1px solid var(--hair)}
+  .p-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+  .p-name{font-size:20px;font-weight:600;letter-spacing:-.01em}
+  .p-tag{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash)}
+  .p-tierchip{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    padding:3px 9px;border-radius:999px;border:1px solid var(--tc,var(--t-silver));color:var(--tc,var(--t-silver))}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:840px}
+  @media(max-width:760px){.pair{grid-template-columns:1fr;max-width:420px}}
+
+  /* ---------- card shell ---------- */
+  .bp{position:relative;aspect-ratio:1.586/1;border-radius:18px;overflow:hidden;
+    padding:5.4% 5.8%;display:flex;flex-direction:column;justify-content:space-between}
+  .bp .holo{position:absolute;inset:0;pointer-events:none}
+  .row{display:flex}
+  .between{justify-content:space-between}
+  .mini{font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--ash)}
+
+  /* FRONT — black metal */
+  .bp-front{background:linear-gradient(155deg,#16191F 0%,#0c0e12 100%);border:1px solid var(--hair);color:var(--bone);
+    box-shadow:0 30px 60px -30px rgba(0,0,0,.85), inset 0 0 0 1px rgba(236,234,228,.10), inset 0 1px 1px rgba(255,255,255,.05)}
+  .bp-front .holo{background:linear-gradient(115deg,transparent 28%,rgba(127,183,158,.10) 44%,rgba(215,162,92,.12) 56%,transparent 72%);mix-blend-mode:screen;opacity:.7}
+  .bp-front.tier-gold{box-shadow:0 30px 60px -30px rgba(0,0,0,.85), inset 0 0 0 1px rgba(240,192,131,.30), inset 0 1px 1px rgba(255,255,255,.06)}
+  .bp-front.tier-obsidian{box-shadow:0 30px 60px -30px rgba(0,0,0,.85), inset 0 0 0 1px rgba(159,211,187,.38), inset 0 1px 1px rgba(255,255,255,.08)}
+  .chipwrap{display:flex;flex-direction:column;align-items:center;gap:5px}
+  .chip{width:42px;height:30px;border-radius:6px;position:relative;background:linear-gradient(135deg,var(--amber-deep),var(--amber));
+    box-shadow:0 0 16px 1px rgba(215,162,92,.5), inset 0 1px 1px rgba(255,255,255,.4)}
+  .chip::after{content:"";position:absolute;inset:6px 11px;border:1px solid rgba(0,0,0,.28);border-radius:3px}
+  .tierwrap{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+  .tier{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;letter-spacing:.16em;
+    text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid var(--tc);color:var(--tc);background:rgba(0,0,0,.28);white-space:nowrap}
+  .tier .d{width:7px;height:7px;border-radius:50%;background:var(--tc);box-shadow:0 0 7px var(--tc)}
+  .name{font-family:var(--mono);font-size:18px;letter-spacing:.13em;text-transform:uppercase;color:var(--bone);
+    text-shadow:0 1px 0 rgba(255,255,255,.14),0 -1px 0 rgba(0,0,0,.45)}
+  .klabel{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ash);margin-top:4px}
+  .ig{font-family:var(--mono);font-size:10px;color:var(--jade);margin-top:5px;display:flex;align-items:center;gap:5px}
+  .score{font-family:var(--mono);font-size:56px;line-height:.9;font-variant-numeric:tabular-nums;color:var(--bone);
+    text-shadow:0 1px 0 rgba(255,255,255,.14),0 -1px 0 rgba(0,0,0,.45)}
+  .norm{font-family:var(--mono);font-size:13px;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .norm .raw{color:rgba(236,234,228,.85)} .norm .ar{color:var(--ash)} .norm .or{color:var(--jade);font-weight:600}
+  .fine{font-size:8.5px;color:var(--ash);line-height:1.3;max-width:62%}
+  .serial{font-family:var(--mono);font-size:8px;letter-spacing:.12em;color:rgba(138,143,152,.7);text-align:right;white-space:nowrap}
+
+  /* BACK — brushed silver, dark ink */
+  .bp-back{background:linear-gradient(135deg,#cfd3d9 0%,#eceef1 20%,#b8bcc4 46%,#dee1e6 70%,#c3c7ce 100%);
+    border:1px solid rgba(20,23,28,.18);color:#14171c;
+    box-shadow:0 30px 60px -30px rgba(0,0,0,.85), inset 0 0 0 1px rgba(255,255,255,.5), inset 0 1px 1px rgba(255,255,255,.7)}
+  .bp-back .holo{opacity:.5;background:repeating-linear-gradient(96deg,rgba(255,255,255,.10) 0 1px,transparent 1px 3px)}
+  .backgrid{display:flex;gap:14px;height:100%;position:relative;z-index:1}
+  .idcol{width:43%;display:flex;flex-direction:column;justify-content:space-between}
+  .rightcol{flex:1;display:flex;flex-direction:column;justify-content:space-between;min-width:0}
+  .bk{font-family:var(--mono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:#4a5059}
+  .bk .pv{color:#8a8f98}
+  .bv{font-size:13px;font-weight:600;line-height:1.2;margin-top:1px}
+  .bv.flag{display:flex;align-items:center;gap:5px}
+  .bnote{font-size:8px;color:#4a5059;margin-top:2px;line-height:1.25}
+  .stamps{display:flex;gap:6px;justify-content:flex-end;margin-top:5px}
+  .stamp{width:40px;height:40px;border-radius:999px;border:1.5px solid rgba(20,23,28,.5);color:rgba(20,23,28,.78);
+    box-shadow:inset 0 0 0 1px rgba(20,23,28,.16);display:flex;align-items:center;justify-content:center;text-align:center;
+    transform:rotate(-8deg);font-family:var(--mono);font-size:6.5px;line-height:1.05;padding:0 3px}
+  .stamp.locked{border-style:dashed;border-color:rgba(20,23,28,.3);color:rgba(20,23,28,.4);box-shadow:none;opacity:.6;transform:rotate(5deg)}
+  .badges{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+  .badge{height:30px;min-width:54px;border-radius:6px;border:1.5px solid rgba(20,23,28,.5);color:rgba(20,23,28,.82);
+    box-shadow:inset 0 0 0 1px rgba(20,23,28,.16);display:flex;align-items:center;justify-content:center;text-align:center;
+    transform:rotate(-3deg);font-family:var(--mono);font-size:7px;font-weight:600;line-height:1.05;padding:0 6px}
+  .badge.locked{border-style:dashed;border-color:rgba(20,23,28,.3);color:rgba(20,23,28,.4);box-shadow:none;opacity:.5}
+  .ledger{display:flex;justify-content:space-between;align-items:flex-end}
+  .earn{font-family:var(--mono);font-size:18px;font-weight:700;line-height:1;margin-top:2px;color:#8a5a1e}
+  .earn span{font-size:8px;color:#4a5059}
+  .vault{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#2a1a08;font-size:14px;font-weight:700;
+    background:linear-gradient(135deg,#B5723C,#F0C083);border:1px solid rgba(20,23,28,.28);
+    box-shadow:0 2px 6px rgba(0,0,0,.3),inset 0 1px 1px rgba(255,255,255,.55)}
+  .vault.locked{opacity:.4}
+
+  /* ---------- caption ---------- */
+  .cap{margin-top:18px;max-width:840px;border:1px solid var(--hair);border-radius:14px;background:rgba(26,30,36,.5);padding:16px 18px}
+  .cap .ttl{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--jade);margin-bottom:8px}
+  .cap p{font-size:14px;color:var(--bone);line-height:1.55}
+  .cap .meta{font-family:var(--mono);font-size:11px;color:var(--ash);margin-top:9px}
+
+  /* ---------- ICP-mapped app screens (live board / prize squad / recruiter) ---------- */
+  .screens{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;max-width:940px;margin:22px 0 0}
+  @media(max-width:760px){.screens{grid-template-columns:1fr;max-width:420px}}
+  .screen{background:linear-gradient(180deg,#16191F,#0c0e12);border:1px solid var(--hair);border-radius:22px;
+    padding:18px 16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 30px 60px -30px rgba(0,0,0,.85)}
+  .scr-seg{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+  .scr-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .scr-title{font-size:15px;font-weight:600;line-height:1.2}
+  .scr-live{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--jade);display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+  .scr-live .dot{width:6px;height:6px;border-radius:50%;background:var(--jade);box-shadow:0 0 7px var(--jade)}
+  .scr-teams{display:flex;gap:6px;flex-wrap:wrap}
+  .teamchip{font-family:var(--mono);font-size:9.5px;padding:4px 9px;border-radius:999px;border:1px solid var(--hair);color:var(--bone)}
+  .scr-prize{display:flex;gap:16px;padding:11px 13px;border-radius:12px;border:1px solid rgba(215,162,92,.3);background:rgba(215,162,92,.06)}
+  .scr-prize .n{font-family:var(--mono);font-size:17px;color:var(--amber-glow);font-weight:700;line-height:1}
+  .scr-prize .l{font-family:var(--mono);font-size:8.5px;color:var(--ash);text-transform:uppercase;letter-spacing:.1em;margin-top:3px}
+  .lbrow{display:grid;grid-template-columns:18px 1fr auto auto;gap:9px;align-items:center;font-size:12.5px;padding:6px 9px;border-radius:9px}
+  .lbrow .rk{font-family:var(--mono);color:var(--ash);font-size:11px}
+  .lbrow .tm{font-family:var(--mono);font-size:10px;color:var(--ash)}
+  .lbrow .sc{font-family:var(--mono);color:var(--bone)}
+  .lbrow.you{background:linear-gradient(90deg,rgba(127,183,158,.16),transparent);border:1px solid rgba(127,183,158,.4)}
+  .lbrow.you .nm{color:var(--jade);font-weight:600}
+  .scr-cta{font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--amber);border-top:1px solid var(--hair);padding-top:10px}
+  .scr-stat{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11.5px;color:var(--ash);padding:2px 0}
+  .scr-stat b{color:var(--jade);font-weight:600}
+  /* ---------- VIDEO MOCKUPS (ad loop · walkthrough · best-of) ---------- */
+  .vid{margin-top:34px}
+  .vid-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+  .vid-kind{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);
+    border:1px solid rgba(215,162,92,.4);border-radius:5px;padding:3px 8px}
+  .vid-title{font-size:18px;font-weight:600;letter-spacing:-.01em}
+  .vid-run{font-family:var(--mono);font-size:11px;color:var(--ash)}
+  .player{position:relative;margin:16px 0;border-radius:18px;overflow:hidden;border:1px solid var(--hair);
+    background:#06070a;box-shadow:0 30px 60px -30px rgba(0,0,0,.85)}
+  .player.wide{aspect-ratio:16/9;max-width:760px}
+  .player.vert{aspect-ratio:9/16;max-width:300px}
+  .player .scrim{position:absolute;inset:0;pointer-events:none;z-index:15;
+    background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.05) 50%,transparent 58%)}
+  .player .reclbl{position:absolute;top:12px;left:14px;z-index:20;font-family:var(--mono);font-size:9px;letter-spacing:.12em;
+    color:var(--jade);display:inline-flex;align-items:center;gap:6px}
+  .player .reclbl .d{width:7px;height:7px;border-radius:50%;background:#C8736B;animation:recblink 1.2s steps(1) infinite}
+  @keyframes recblink{0%,50%{opacity:1}51%,100%{opacity:.25}}
+  .player .progress{position:absolute;bottom:0;left:0;height:3px;background:var(--jade);z-index:20;width:0}
+  .frame{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:8% 9%;opacity:0;gap:14px}
+  .frame .big{font-size:clamp(20px,3.4vw,30px);font-weight:600;line-height:1.18;letter-spacing:-.01em}
+  .frame .sm{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash)}
+  .frame .jade{color:var(--jade-glow)} .frame .amber{color:var(--amber-glow)}
+  .frame .raws{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .frame .raw{font-family:var(--mono);font-size:12px;border:1px solid var(--hair);border-radius:999px;padding:5px 11px;color:var(--ash)}
+  .frame .raw b{color:var(--bone)}
+  .frame .idxcard{padding:16px 26px;border-radius:16px;background:linear-gradient(155deg,#16191F,#0c0e12);
+    border:1px solid rgba(127,183,158,.35);box-shadow:inset 0 0 0 1px rgba(127,183,158,.16)}
+  .frame .idxcard .n{font-family:var(--mono);font-size:46px;color:var(--jade-glow);font-variant-numeric:tabular-nums;line-height:1}
+  .frame .idxcard .l{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--ash);margin-top:6px}
+  .frame .pills{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+  .frame .pill{font-family:var(--mono);font-size:10px;border:1px solid var(--hair);border-radius:999px;padding:5px 11px;color:var(--bone)}
+  .frame .lb{width:100%;max-width:320px}
+  .frame .lbrowv{display:grid;grid-template-columns:22px 1fr auto;gap:9px;align-items:center;font-size:12.5px;padding:6px 11px;border-radius:8px;
+    font-family:var(--mono);border-bottom:1px solid var(--hair)}
+  .frame .lbrowv.you{background:linear-gradient(90deg,rgba(127,183,158,.16),transparent);border:1px solid rgba(127,183,158,.4)}
+  .frame .lbrowv.you .nm{color:var(--jade);font-weight:600}
+  .frame .lbrowv .rk{color:var(--ash)}
+  .frame .formula{font-family:var(--mono);font-size:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+  .frame .tag{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;padding:4px 10px;border-radius:999px;
+    border:1px solid var(--t-obsidian);color:var(--t-obsidian)}
+  /* cycle keyframes */
+  @keyframes show5{0%{opacity:0}2%{opacity:1}18%{opacity:1}20.5%{opacity:0}100%{opacity:0}}
+  @keyframes show6{0%{opacity:0}1.6%{opacity:1}14.8%{opacity:1}16.6%{opacity:0}100%{opacity:0}}
+  @keyframes prog{from{width:0}to{width:100%}}
+  .ad .frame{animation:show5 15s infinite}
+  .ad .frame:nth-child(1){animation-delay:0s}.ad .frame:nth-child(2){animation-delay:3s}
+  .ad .frame:nth-child(3){animation-delay:6s}.ad .frame:nth-child(4){animation-delay:9s}
+  .ad .frame:nth-child(5){animation-delay:12s}
+  .ad .progress{animation:prog 15s linear infinite}
+  .walk .frame{animation:show6 18s infinite}
+  .walk .frame:nth-child(1){animation-delay:0s}.walk .frame:nth-child(2){animation-delay:3s}
+  .walk .frame:nth-child(3){animation-delay:6s}.walk .frame:nth-child(4){animation-delay:9s}
+  .walk .frame:nth-child(5){animation-delay:12s}.walk .frame:nth-child(6){animation-delay:15s}
+  .walk .progress{animation:prog 18s linear infinite}
+  .best .frame{animation:show5 15s infinite}
+  .best .frame:nth-child(1){animation-delay:0s}.best .frame:nth-child(2){animation-delay:3s}
+  .best .frame:nth-child(3){animation-delay:6s}.best .frame:nth-child(4){animation-delay:9s}
+  .best .frame:nth-child(5){animation-delay:12s}
+  .best .progress{animation:prog 15s linear infinite}
+  @media(prefers-reduced-motion:reduce){.frame{animation:none!important}.frame:nth-child(1){opacity:1}}
+  .vidnote{max-width:760px;border:1px solid var(--hair);border-radius:12px;background:rgba(26,30,36,.5);padding:14px 16px;margin-top:4px}
+  .vidnote .t{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--jade);margin-bottom:7px}
+  .vidnote ol{margin:0 0 0 18px;font-size:13px;line-height:1.7} .vidnote li{margin-bottom:2px}
+  .vidnote .meta{font-family:var(--mono);font-size:11px;color:var(--ash);margin-top:8px}
+  .vidnote code{font-family:var(--mono);color:var(--amber-glow);font-size:12px}
+
+  /* ---------- APP-SCREEN MOCKUPS (science · privacy · corporate · devices) ---------- */
+  .app{max-width:880px;margin:22px 0 0;border:1px solid var(--hair);border-radius:22px;overflow:hidden;
+    background:linear-gradient(180deg,#13161c,#0a0c10);box-shadow:0 30px 60px -30px rgba(0,0,0,.85)}
+  .app-nav{display:flex;align-items:center;gap:16px;padding:12px 18px;border-bottom:1px solid var(--hair);background:rgba(10,12,16,.6)}
+  .app-logo{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--bone);font-weight:600}
+  .app-tabs{display:flex;gap:13px;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ash);flex-wrap:wrap}
+  .app-tabs .on{color:var(--jade)}
+  .app-av{margin-left:auto;width:25px;height:25px;border-radius:50%;background:linear-gradient(135deg,#3E6F5E,#7FB79E);
+    display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:#0a0c10;font-weight:700}
+  .app-body{padding:19px 20px 22px}
+  .app-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber)}
+  .app-h{font-size:19px;font-weight:600;letter-spacing:-.01em;margin:6px 0 3px}
+  .app-sub{color:var(--ash);font-size:13px;max-width:580px}
+  .demo-banner{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;
+    color:var(--amber);border:1px dashed rgba(215,162,92,.5);border-radius:8px;padding:7px 11px;margin:14px 0;line-height:1.4}
+
+  /* toggles (privacy) */
+  .tgroup{margin-top:18px}
+  .tgroup-h{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--jade);margin-bottom:2px}
+  .tgroup-s{font-size:12px;color:var(--ash);margin-bottom:6px}
+  .trow{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-top:1px solid var(--hair)}
+  .trow .tt{flex:1;min-width:0}
+  .trow .tname{font-size:13px;color:var(--bone);display:flex;align-items:center;flex-wrap:wrap}
+  .trow .tdesc{font-size:11px;color:var(--ash);line-height:1.4;margin-top:2px}
+  .sw{width:38px;height:22px;border-radius:999px;position:relative;flex-shrink:0;margin-top:1px;border:1px solid var(--hair)}
+  .sw::after{content:"";position:absolute;top:2px;width:16px;height:16px;border-radius:50%}
+  .sw.on{background:rgba(127,183,158,.32);border-color:rgba(127,183,158,.5)}
+  .sw.on::after{right:2px;background:var(--jade-glow);box-shadow:0 0 8px var(--jade)}
+  .sw.off{background:rgba(138,143,152,.12)}
+  .sw.off::after{left:2px;background:var(--ash)}
+  .tflag{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:999px;margin-left:8px;
+    border:1px solid var(--hair);color:var(--ash);white-space:nowrap}
+  .tflag.optin{border-color:rgba(215,162,92,.5);color:var(--amber)}
+
+  /* normalization table */
+  .dtable{width:100%;border-collapse:collapse;margin-top:14px;font-size:12px}
+  .dtable th{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash);
+    text-align:left;padding:7px 9px;border-bottom:1px solid var(--hair)}
+  .dtable td{padding:8px 9px;border-bottom:1px solid var(--hair);vertical-align:top}
+  .dtable .dev{color:var(--bone);font-weight:600;white-space:nowrap}
+  .dtable .met{color:var(--ash);font-family:var(--mono);font-size:10px}
+  .dtable .fac{font-family:var(--mono);color:var(--jade);white-space:nowrap}
+  .vbadge{font-family:var(--mono);font-size:8px;letter-spacing:.06em;padding:2px 7px;border-radius:999px;white-space:nowrap}
+  .vbadge.high{border:1px solid rgba(127,183,158,.5);color:var(--jade-glow)}
+  .vbadge.med{border:1px solid var(--hair);color:var(--ash)}
+  .vbadge.low{border:1px solid rgba(200,115,107,.5);color:#D89890}
+
+  /* worked example callout */
+  .worked{margin-top:14px;border:1px solid rgba(127,183,158,.3);background:rgba(127,183,158,.06);border-radius:12px;padding:13px 15px}
+  .worked .ex{font-family:var(--mono);font-size:14px;color:var(--bone)}
+  .worked .ex b{color:var(--jade-glow)}
+  .worked .note{font-size:11.5px;color:var(--ash);margin-top:5px}
+
+  /* pipeline steps */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+  @media(max-width:680px){.steps{grid-template-columns:1fr 1fr}}
+  .step{border:1px solid var(--hair);border-radius:11px;padding:11px 12px}
+  .step .n{font-family:var(--mono);font-size:11px;color:var(--jade)}
+  .step .h{font-size:12px;color:var(--bone);margin:4px 0 3px;font-weight:600}
+  .step .d{font-size:11px;color:var(--ash);line-height:1.4}
+
+  /* corporate stat cards */
+  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:6px}
+  @media(max-width:680px){.statgrid{grid-template-columns:1fr 1fr}}
+  .statcard{border:1px solid var(--hair);border-radius:12px;padding:13px 14px;background:rgba(255,255,255,.015)}
+  .statcard .v{font-family:var(--mono);font-size:23px;color:var(--bone);line-height:1;font-variant-numeric:tabular-nums}
+  .statcard .v.jade{color:var(--jade-glow)}
+  .statcard .k{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash);margin-top:6px}
+  .statcard .sub{font-size:10px;color:var(--ash);margin-top:3px;line-height:1.3}
+
+  /* corporate rank rows */
+  .ranks{margin-top:14px}
+  .rank{display:grid;grid-template-columns:18px 1fr auto auto;gap:11px;align-items:center;padding:8px 10px;border-radius:9px;font-size:13px}
+  .rank:nth-child(odd){background:rgba(255,255,255,.015)}
+  .rank .rk{font-family:var(--mono);color:var(--ash);font-size:11px}
+  .rank .co{color:var(--bone)}
+  .rank .meta2{font-family:var(--mono);font-size:9px;color:var(--ash);display:block;margin-top:1px}
+  .rank .mv{font-family:var(--mono);font-size:10px;color:var(--jade)}
+  .rank .sc{font-family:var(--mono);color:var(--bone);font-size:15px}
+
+  /* device mix bars */
+  .mix{margin-top:13px;display:flex;flex-direction:column;gap:7px}
+  .mixrow{display:grid;grid-template-columns:62px 1fr 34px;gap:10px;align-items:center;font-family:var(--mono);font-size:11px;color:var(--ash)}
+  .mixbar{height:7px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}
+  .mixbar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--jade-deep),var(--jade))}
+
+  /* privacy floor / lock note */
+  .locknote{display:flex;gap:9px;align-items:flex-start;margin-top:14px;border:1px solid var(--hair);border-radius:11px;padding:11px 13px;
+    font-size:11.5px;color:var(--ash);line-height:1.5;background:rgba(255,255,255,.015)}
+  .locknote b{color:var(--bone)}
+
+  /* device connect cards */
+  .devgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  @media(max-width:680px){.devgrid{grid-template-columns:1fr}}
+  .devcard{border:1px solid var(--hair);border-radius:13px;padding:13px 14px;display:flex;flex-direction:column;gap:8px}
+  .devcard.live{border-color:rgba(127,183,158,.4);background:rgba(127,183,158,.05)}
+  .devcard .dh{display:flex;align-items:center;gap:9px}
+  .devcard .ic{font-size:17px}
+  .devcard .dn{font-size:13px;color:var(--bone);font-weight:600}
+  .devcard .ds{font-family:var(--mono);font-size:9px;color:var(--ash)}
+  .devcard .dprov{font-size:11px;color:var(--ash);line-height:1.4}
+  .devcard .feeds{display:flex;gap:5px;flex-wrap:wrap}
+  .feedchip{font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:999px;border:1px solid var(--hair);color:var(--ash)}
+  .devcard .act{margin-top:auto;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;padding:7px 0;text-align:center;border-radius:8px}
+  .devcard .act.on{color:var(--jade);border:1px solid rgba(127,183,158,.4)}
+  .devcard .act.off{color:var(--ash);border:1px solid var(--hair)}
+  .livedot{font-family:var(--mono);font-size:9px;color:var(--jade);display:inline-flex;align-items:center;gap:5px;margin-left:auto}
+  .livedot .d{width:6px;height:6px;border-radius:50%;background:var(--jade);box-shadow:0 0 7px var(--jade)}
+
+  /* provenance component bars */
+  .prov{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+  .provrow{display:grid;grid-template-columns:128px 1fr auto;gap:11px;align-items:center;font-size:12px}
+  .provrow .pl{color:var(--bone)}
+  .provrow .src{font-family:var(--mono);font-size:9px;color:var(--ash);justify-self:end}
+  .provrow .pbar{height:7px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}
+  .provrow .pbar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--jade-deep),var(--jade-glow))}
+
+  /* trust strip */
+  .trust{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .trustchip{font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:var(--ash);border:1px solid var(--hair);border-radius:999px;padding:5px 10px}
+
+  /* ============ PREMIUM REWRITE — interactive screens + motion v2 ============ */
+  /* SCIENCE · live correction calculator */
+  .calc{margin-top:16px;border:1px solid var(--hair);border-radius:16px;overflow:hidden;background:#06070a}
+  .calc-top{padding:13px 15px;border-bottom:1px solid var(--hair);background:rgba(127,183,158,.04)}
+  .calc-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--jade)}
+  .calc-pills{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+  .cpill{font-family:var(--mono);font-size:11px;color:var(--ash);border:1px solid var(--hair);border-radius:999px;
+    padding:6px 12px;cursor:pointer;user-select:none;transition:border-color .18s,color .18s,background .18s;background:transparent}
+  .cpill:hover{border-color:rgba(127,183,158,.4);color:var(--bone)}
+  .cpill.sel{color:#06070a;background:linear-gradient(135deg,var(--jade-deep),var(--jade-glow));border-color:transparent;font-weight:600;
+    box-shadow:0 0 16px -2px rgba(127,183,158,.5)}
+  .pipe{display:flex;align-items:stretch;gap:0;padding:0;font-family:var(--mono);flex-wrap:wrap}
+  .pseg{flex:1;min-width:130px;padding:15px 16px;border-right:1px solid var(--hair);display:flex;flex-direction:column;gap:5px;justify-content:center}
+  .pseg:last-child{border-right:none}
+  .pseg .pk{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash)}
+  .pseg .pv{font-size:20px;color:var(--bone);font-variant-numeric:tabular-nums;line-height:1;transition:color .2s}
+  .pseg.in .pv{color:rgba(236,234,228,.92)}
+  .pseg.op .pv{font-size:15px;color:var(--amber-glow)}
+  .pseg.out{background:rgba(127,183,158,.07)}
+  .pseg.out .pv{color:var(--jade-glow);font-size:24px;font-weight:700}
+  .pseg .arrow{position:absolute}
+  .calc.flash .pseg.out{animation:calcflash .5s ease}
+  @keyframes calcflash{0%{background:rgba(159,211,187,.22)}100%{background:rgba(127,183,158,.07)}}
+  .calc-foot{padding:10px 15px;border-top:1px solid var(--hair);font-size:10.5px;color:var(--ash);font-family:var(--mono);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .calc-foot .vt{display:inline-flex;gap:6px;align-items:center}
+
+  /* SCIENCE · data-card grid (replaces dense table) */
+  .dcardgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
+  @media(max-width:760px){.dcardgrid{grid-template-columns:1fr 1fr}}
+  @media(max-width:420px){.dcardgrid{grid-template-columns:1fr}}
+  .dcard{border:1px solid var(--hair);border-radius:11px;padding:11px 12px;background:rgba(255,255,255,.012);transition:border-color .18s}
+  .dcard:hover{border-color:rgba(127,183,158,.35)}
+  .dcard .dt{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+  .dcard .dvn{font-size:12.5px;color:var(--bone);font-weight:600}
+  .dcard .dvf{font-family:var(--mono);font-size:11px;color:var(--jade);white-space:nowrap}
+  .dcard .dvm{font-family:var(--mono);font-size:9px;color:var(--ash);margin-top:5px;line-height:1.35}
+  .dcard .dvv{margin-top:7px}
+
+  /* PRIVACY · split-panel zero-knowledge vault */
+  .vault-split{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:16px}
+  @media(max-width:680px){.vault-split{grid-template-columns:1fr}}
+  .vpanel{border:1px solid var(--hair);border-radius:14px;padding:15px 15px 16px;background:rgba(255,255,255,.012)}
+  .vpanel.corp{border-color:rgba(215,162,92,.22)}
+  .vpanel-h{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+  .vpanel.squad .vpanel-h{color:var(--jade)}
+  .vpanel.corp .vpanel-h{color:var(--amber)}
+  .vpanel-s{font-size:11px;color:var(--ash);margin:5px 0 11px;line-height:1.4}
+  .vledger{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--hair);font-size:12.5px}
+  .vledger .vl{flex:1;color:var(--bone)}
+  .ltag{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:5px;white-space:nowrap;cursor:pointer;user-select:none}
+  .ltag.vis{color:var(--jade-glow);border:1px solid rgba(127,183,158,.5);background:rgba(127,183,158,.08)}
+  .ltag.hid{color:#D89890;border:1px solid rgba(200,115,107,.5);background:rgba(200,115,107,.07)}
+  .ltag.lock{color:var(--ash);border:1px solid var(--hair);cursor:default}
+  .isolate{margin-top:13px;border:1px solid rgba(215,162,92,.25);border-radius:11px;padding:12px;background:rgba(215,162,92,.04);font-family:var(--mono)}
+  .iso-rows{display:flex;flex-direction:column;gap:4px;font-size:10px;color:var(--ash)}
+  .iso-rows .ir{display:flex;justify-content:space-between;padding:3px 7px;border-radius:5px;background:rgba(255,255,255,.02)}
+  .iso-rows .ir .enc{color:#D89890}
+  .iso-arrow{text-align:center;color:var(--amber);font-size:14px;margin:6px 0}
+  .iso-out{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:7px;border:1px solid rgba(127,183,158,.4);background:rgba(127,183,158,.07)}
+  .iso-out .ol{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash)}
+  .iso-out .ov{font-size:17px;color:var(--jade-glow);font-weight:700}
+
+  /* TEAMS · launch-crunch bracket + chat feed */
+  .crunch{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-top:6px}
+  @media(max-width:760px){.crunch{grid-template-columns:1fr}}
+  .bracket{border:1px solid var(--hair);border-radius:14px;padding:14px;background:rgba(255,255,255,.012)}
+  .matchup{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;padding:11px 8px;border-bottom:1px solid var(--hair)}
+  .matchup:last-child{border-bottom:none}
+  .mteam{display:flex;flex-direction:column;gap:2px}
+  .mteam.r{align-items:flex-end;text-align:right}
+  .mteam .mn{font-size:12.5px;color:var(--bone);font-weight:600}
+  .mteam .md{font-family:var(--mono);font-size:8.5px;color:var(--ash)}
+  .mteam .ms{font-family:var(--mono);font-size:20px;line-height:1;margin-top:3px;font-variant-numeric:tabular-nums}
+  .mteam.lead .ms{color:var(--jade-glow)} .mteam.trail .ms{color:var(--ash)}
+  .mvs{font-family:var(--mono);font-size:9px;color:var(--ash);text-align:center}
+  .mvs .gap{display:block;color:var(--amber);font-size:11px;margin-top:3px}
+  .warnbar{display:flex;gap:9px;align-items:flex-start;margin-top:13px;border:1px solid rgba(215,162,92,.4);border-radius:11px;
+    padding:11px 13px;background:rgba(215,162,92,.06);font-size:11.5px;color:var(--bone);line-height:1.45}
+  .warnbar b{color:var(--amber-glow)}
+  .chat{border:1px solid var(--hair);border-radius:14px;background:#06070a;display:flex;flex-direction:column;overflow:hidden}
+  .chat-top{padding:9px 13px;border-bottom:1px solid var(--hair);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash);display:flex;align-items:center;gap:7px}
+  .chat-top .gd{width:7px;height:7px;border-radius:2px;background:#5865F2}
+  .chat-body{padding:12px 13px;display:flex;flex-direction:column;gap:11px;font-size:12px;line-height:1.45}
+  .msg .mu{font-family:var(--mono);font-size:10px;display:flex;align-items:center;gap:7px;margin-bottom:2px}
+  .msg .mu .av{width:16px;height:16px;border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;color:#06070a;font-weight:700}
+  .msg .mu .nm{color:var(--bone);font-weight:600} .msg .mu .ts{color:var(--ash);font-size:9px;margin-left:auto}
+  .msg .mb{color:rgba(236,234,228,.82)}
+  .msg .mb code{color:var(--jade-glow);font-family:var(--mono);font-size:11px}
+  .msg.you .mb{color:var(--bone)}
+
+  /* DEVICES · hardware interoperability center */
+  .hwgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+  @media(max-width:760px){.hwgrid{grid-template-columns:1fr 1fr}}
+  @media(max-width:420px){.hwgrid{grid-template-columns:1fr}}
+  .hwtoken{position:relative;border:1px solid var(--hair);border-radius:13px;padding:13px 12px 12px;background:linear-gradient(160deg,#15181e,#0a0c10);
+    display:flex;flex-direction:column;gap:8px;overflow:hidden;transition:transform .18s,border-color .18s}
+  .hwtoken::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--hair)}
+  .hwtoken.online{border-color:rgba(127,183,158,.4)}
+  .hwtoken.online::before{background:linear-gradient(var(--jade-deep),var(--jade-glow));box-shadow:0 0 10px var(--jade)}
+  .hwtoken:hover{transform:translateY(-2px);border-color:rgba(127,183,158,.45)}
+  .hwtoken .hh{display:flex;align-items:center;gap:8px}
+  .hwtoken .hi{font-size:18px}
+  .hwtoken .hn{font-size:12.5px;color:var(--bone);font-weight:600}
+  .hwtoken .hs{font-family:var(--mono);font-size:8px;letter-spacing:.06em;color:var(--ash)}
+  .hwtoken .hstat{margin-left:auto;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:999px}
+  .hwtoken .hstat.on{color:var(--jade-glow);border:1px solid rgba(127,183,158,.5)}
+  .hwtoken .hstat.off{color:var(--ash);border:1px solid var(--hair)}
+  .hwtoken .hpins{display:flex;gap:4px;margin-top:2px}
+  .hwtoken .hpins i{flex:1;height:3px;border-radius:2px;background:rgba(138,143,152,.2)}
+  .hwtoken.online .hpins i{background:linear-gradient(90deg,var(--jade-deep),var(--jade))}
+  .hwtoken .hf{font-family:var(--mono);font-size:9px;color:var(--ash);line-height:1.5}
+  /* sensor breakdown */
+  .sensors{margin-top:14px;border:1px solid var(--hair);border-radius:13px;padding:14px;background:rgba(255,255,255,.012)}
+  .sensor{display:grid;grid-template-columns:160px 1fr auto;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--hair)}
+  .sensor:last-child{border-bottom:none}
+  @media(max-width:560px){.sensor{grid-template-columns:1fr auto}.sensor .sbar{grid-column:1/-1;order:3}}
+  .sensor .sl{font-size:12.5px;color:var(--bone)}
+  .sensor .sl small{display:block;font-family:var(--mono);font-size:9px;color:var(--ash);margin-top:2px}
+  .sensor .sbar{height:8px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}
+  .sensor .sbar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--jade-deep),var(--jade-glow))}
+  .sensor .sv{font-family:var(--mono);font-size:13px;color:var(--jade-glow);white-space:nowrap}
+
+  /* expandable interactive demo (de-sterilize) */
+  .demo-wrap{margin-top:16px;border:1px solid var(--hair);border-radius:14px;overflow:hidden;background:#06070a}
+  .demo-toggle{width:100%;display:flex;align-items:center;gap:11px;padding:13px 15px;cursor:pointer;background:rgba(127,183,158,.04);border:none;color:var(--bone);font-family:var(--sans);text-align:left}
+  .demo-toggle .play{width:30px;height:30px;border-radius:50%;border:1px solid rgba(127,183,158,.5);color:var(--jade-glow);
+    display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+  .demo-toggle .dl{flex:1}
+  .demo-toggle .dl b{font-size:13.5px;display:block} .demo-toggle .dl span{font-family:var(--mono);font-size:10px;color:var(--ash)}
+  .demo-toggle .chev{font-family:var(--mono);color:var(--ash);font-size:13px;transition:transform .25s}
+  .demo-wrap.open .demo-toggle .chev{transform:rotate(180deg)}
+  .demo-stage{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .demo-wrap.open .demo-stage{max-height:460px}
+  .demo-inner{position:relative;padding:18px;border-top:1px solid var(--hair);min-height:240px;display:flex;align-items:center;justify-content:center}
+  .demo-cursor{position:absolute;width:18px;height:18px;z-index:30;pointer-events:none;opacity:0;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,.6))}
+  .demo-wrap.open .demo-cursor{animation:cursorpath 9s ease-in-out infinite}
+  @keyframes cursorpath{
+    0%{opacity:0;left:50%;top:78%}8%{opacity:1}
+    24%{left:50%;top:46%}28%{transform:scale(.8)}30%{transform:scale(1)}
+    52%{left:30%;top:62%}56%{transform:scale(.8)}58%{transform:scale(1)}
+    80%{left:72%;top:58%}84%{transform:scale(.8)}86%{transform:scale(1)}
+    100%{opacity:.6;left:50%;top:78%}}
+
+  /* MOTION v2 — premium framing + new loop timings (bench=4 / slack=3) */
+  .player.lux{border:1px solid transparent;background:
+    linear-gradient(#06070a,#06070a) padding-box,
+    linear-gradient(135deg,rgba(236,234,228,.22),rgba(236,234,228,.02) 40%,rgba(127,183,158,.18) 75%,rgba(215,162,92,.14)) border-box}
+  .player.lux .scrim{background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.07) 48%,rgba(159,211,187,.05) 52%,transparent 62%);
+    animation:luxglare 6s ease-in-out infinite}
+  @keyframes luxglare{0%,100%{transform:translateX(-12%)}50%{transform:translateX(12%)}}
+  .frame .vwarn{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:#E0A39B;border:1px solid rgba(200,115,107,.5);
+    background:rgba(200,115,107,.08);border-radius:7px;padding:6px 11px;display:inline-flex;align-items:center;gap:7px}
+  .frame .vwarn .wd{width:6px;height:6px;border-radius:50%;background:#C8736B;animation:recblink 1s steps(1) infinite}
+  .frame .kicker{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--jade)}
+  .frame .protocol{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);
+    border:1px solid rgba(215,162,92,.4);border-radius:999px;padding:5px 13px}
+  /* mini slack feed inside a 16:9 frame */
+  .frame .feed{width:100%;max-width:560px;text-align:left;display:flex;flex-direction:column;gap:9px;font-family:var(--mono)}
+  .frame .fmsg{display:flex;gap:9px;align-items:flex-start}
+  .frame .fmsg .fav{width:18px;height:18px;border-radius:50%;flex-shrink:0;font-size:9px;display:flex;align-items:center;justify-content:center;color:#06070a;font-weight:700;margin-top:1px}
+  .frame .fmsg .ft{font-size:12px;line-height:1.45}
+  .frame .fmsg .ft .fn{color:var(--bone);font-weight:600;font-size:10.5px;margin-right:7px}
+  .frame .fmsg .ft .fx{color:rgba(236,234,228,.8)}
+  .frame .fmsg .ft .fx code{color:var(--jade-glow)}
+  .frame .fmsg.me .ft .fx{color:var(--jade-glow)}
+  /* OCR ingest mini-podium */
+  .frame .ingest{width:100%;max-width:440px;display:flex;flex-direction:column;gap:10px}
+  .frame .ocrbar{height:6px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+  .frame .ocrbar i{display:block;height:100%;width:40%;border-radius:999px;background:linear-gradient(90deg,var(--jade-deep),var(--jade-glow));
+    animation:ocrfill 2.4s ease-in-out infinite}
+  @keyframes ocrfill{0%{width:6%}70%{width:100%}100%{width:100%}}
+  /* 4-frame (bench) + 3-frame (slack) cycles */
+  @keyframes show4{0%{opacity:0}2.2%{opacity:1}22%{opacity:1}25%{opacity:0}100%{opacity:0}}
+  @keyframes show3{0%{opacity:0}2.5%{opacity:1}30%{opacity:1}33.5%{opacity:0}100%{opacity:0}}
+  .bench .frame{animation:show4 16s infinite}
+  .bench .frame:nth-child(1){animation-delay:0s}.bench .frame:nth-child(2){animation-delay:4s}
+  .bench .frame:nth-child(3){animation-delay:8s}.bench .frame:nth-child(4){animation-delay:12s}
+  .bench .progress{animation:prog 16s linear infinite}
+  .slack .frame{animation:show3 15s infinite}
+  .slack .frame:nth-child(1){animation-delay:0s}.slack .frame:nth-child(2){animation-delay:5s}.slack .frame:nth-child(3){animation-delay:10s}
+  .slack .progress{animation:prog 15s linear infinite}
+  /* card-flip reveal (passport) */
+  .flipcard{width:188px;aspect-ratio:1.586/1;perspective:900px}
+  .flipcard .fc-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;animation:fcflip 16s ease-in-out infinite}
+  @keyframes fcflip{0%,40%{transform:rotateY(0)}55%,90%{transform:rotateY(180deg)}100%{transform:rotateY(0)}}
+  .flipcard .fc-face{position:absolute;inset:0;border-radius:13px;backface-visibility:hidden;padding:11px 13px;display:flex;flex-direction:column;justify-content:space-between;text-align:left}
+  .flipcard .fc-front{background:linear-gradient(155deg,#16191F,#0c0e12);border:1px solid var(--hair);
+    box-shadow:0 18px 36px -20px rgba(0,0,0,.85),inset 0 0 0 1px rgba(159,211,187,.18)}
+  .flipcard .fc-back{background:linear-gradient(135deg,#cfd3d9,#b8bcc4);color:#14171c;transform:rotateY(180deg);border:1px solid rgba(20,23,28,.2)}
+  .flipcard .fcchip{width:26px;height:19px;border-radius:4px;background:linear-gradient(135deg,var(--amber-deep),var(--amber));box-shadow:0 0 10px rgba(215,162,92,.5)}
+  .flipcard .fcname{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--bone)}
+  .flipcard .fcscore{font-family:var(--mono);font-size:30px;line-height:.9;color:var(--bone);font-variant-numeric:tabular-nums}
+  .flipcard .fck{font-family:var(--mono);font-size:7px;letter-spacing:.12em;text-transform:uppercase;color:var(--ash)}
+  .flipcard .fcledger{font-family:var(--mono);font-size:13px;font-weight:700;color:#8a5a1e}
+  .flipcard .fcstamp{font-family:var(--mono);font-size:7px;border:1px solid rgba(20,23,28,.4);border-radius:4px;padding:2px 5px;color:rgba(20,23,28,.7);display:inline-block;transform:rotate(-4deg)}
+  @media(prefers-reduced-motion:reduce){.flipcard .fc-inner{animation:none}.player.lux .scrim{animation:none}.frame .ocrbar i{animation:none;width:100%}}
+  footer{border-top:1px solid var(--hair);margin-top:54px;padding-top:24px;color:var(--ash);font-size:13px;font-family:var(--mono);line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="mockflag">Static mockup · screenshot-ready · crop each .pair for the post</span>
+  <p class="eyebrow">Oriya · Body Passport — social asset gallery</p>
+  <h1>Five passports built to be screenshotted</h1>
+  <p class="lede">Drop-in profiles for LinkedIn / Substack. Each shows both faces — front (normalized score, device, tier, handle) and back (squad, physiological signature, stamps, earnings ledger). The card material levels up with <b style="color:var(--bone)">how much you compete and recruit</b>, never the recovery number — so a 66 and an 88 both flex. Captions underneath are written to copy straight into a post.</p>
+  <div class="legend">
+    <span><i class="swatch" style="background:var(--t-bronze)"></i> Bronze — generated a Passport</span>
+    <span><i class="swatch" style="background:var(--t-silver)"></i> Silver — on a live board</span>
+    <span><i class="swatch" style="background:var(--t-gold)"></i> Gold — in a prize squad</span>
+    <span><i class="swatch" style="background:var(--t-obsidian)"></i> Founding Athlete — multi-board / recruiter</span>
+  </div>
+
+  <!-- ============ PERSONA 1 — Diana · Founding Athlete ============ -->
+  <section class="persona">
+    <div class="p-head">
+      <span class="p-name">Diana Seo</span>
+      <span class="p-tag">Oura · 🇰🇷 KOR · Marina RC</span>
+      <span class="p-tierchip" style="--tc:var(--t-obsidian)">● Founding Athlete</span>
+    </div>
+    <div class="pair">
+      <div class="bp bp-front tier-obsidian" style="--tc:var(--t-obsidian)">
+        <div class="holo"></div>
+        <div class="row between">
+          <div class="chipwrap"><div class="chip"></div><span class="mini">BIO-ID</span></div>
+          <div class="tierwrap"><span class="tier"><span class="d"></span> Founding Athlete</span><span class="mini">Season 1 · Member</span></div>
+        </div>
+        <div class="row between" style="align-items:flex-end">
+          <div><div class="name">Diana Seo</div><div class="klabel">Oriya Standard · Recovery</div><div class="ig">⌾ @dianaseo</div></div>
+          <div class="score">82</div>
+        </div>
+        <div>
+          <div class="norm"><span class="raw">Oura 82</span><span class="ar">→</span><span class="or">82 Oriya</span></div>
+          <div class="row between" style="align-items:flex-end">
+            <span class="fine">your raw score, normalized · directionally useful, not diagnostically precise</span>
+            <span class="serial">OR · S1 · OU82X</span>
+          </div>
+        </div>
+      </div>
+      <div class="bp bp-back">
+        <div class="holo"></div>
+        <div class="backgrid">
+          <div class="idcol">
+            <div><div class="bk">Nationality</div><div class="bv flag">🇰🇷 KOR</div></div>
+            <div><div class="bk">Squad</div><div class="bv">Marina RC</div></div>
+            <div><div class="bk">Personality <span class="pv">· prov.</span></div><div class="bv">High-HRV Sustainer</div><div class="bnote">RMSSD parked at 90th pct · minimal day-to-day drift</div></div>
+          </div>
+          <div class="rightcol">
+            <div>
+              <div class="bk" style="text-align:right">Country Stamps</div>
+              <div class="stamps"><span class="stamp">KOR</span><span class="stamp">SEASON 1</span><span class="stamp">MARINA RC</span></div>
+            </div>
+            <div class="badges"><span class="badge">SUB-23:00</span><span class="badge">HRV 90TH PCT</span><span class="badge">PEAK-LOAD 85+</span></div>
+            <div class="ledger">
+              <div><div class="bk">Earnings Ledger <span class="pv">· demo</span></div><div class="earn">$200.00 <span>USD</span></div></div>
+              <div class="vault">✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">
+      <div class="ttl">Ready-to-post caption</div>
+      <p>Switched from a Whoop to an Oura mid-season and my number didn't move — 82 on the Oriya Standard either way. That's the whole point. Running Marina RC, squad's open 👇</p>
+      <div class="meta">Shows: hardware-portability flex · Founding Athlete tier · full ledger</div>
+    </div>
+  </section>
+
+  <!-- ============ PERSONA 2 — Marcus · Gold ============ -->
+  <section class="persona">
+    <div class="p-head">
+      <span class="p-name">Marcus Liu</span>
+      <span class="p-tag">Whoop · 🇺🇸 USA · Anthropic</span>
+      <span class="p-tierchip" style="--tc:var(--t-gold)">● Gold</span>
+    </div>
+    <div class="pair">
+      <div class="bp bp-front tier-gold" style="--tc:var(--t-gold)">
+        <div class="holo"></div>
+        <div class="row between">
+          <div class="chipwrap"><div class="chip"></div><span class="mini">BIO-ID</span></div>
+          <div class="tierwrap"><span class="tier"><span class="d"></span> Gold</span><span class="mini">Season 1 · Member</span></div>
+        </div>
+        <div class="row between" style="align-items:flex-end">
+          <div><div class="name">Marcus Liu</div><div class="klabel">Oriya Standard · Recovery</div><div class="ig">⌾ @marcusbuilds</div></div>
+          <div class="score">75</div>
+        </div>
+        <div>
+          <div class="norm"><span class="raw">Whoop 83</span><span class="ar">→</span><span class="or">75 Oriya</span></div>
+          <div class="row between" style="align-items:flex-end">
+            <span class="fine">your raw score, normalized · directionally useful, not diagnostically precise</span>
+            <span class="serial">OR · S1 · WH75X</span>
+          </div>
+        </div>
+      </div>
+      <div class="bp bp-back">
+        <div class="holo"></div>
+        <div class="backgrid">
+          <div class="idcol">
+            <div><div class="bk">Nationality</div><div class="bv flag">🇺🇸 USA</div></div>
+            <div><div class="bk">Squad</div><div class="bv">Anthropic</div></div>
+            <div><div class="bk">Personality <span class="pv">· prov.</span></div><div class="bv">Strain-Tolerant Workhorse</div><div class="bnote">Holds readiness under high chronic load</div></div>
+          </div>
+          <div class="rightcol">
+            <div>
+              <div class="bk" style="text-align:right">Country Stamps</div>
+              <div class="stamps"><span class="stamp">USA</span><span class="stamp">SEASON 1</span><span class="stamp">ANTHROPIC</span></div>
+            </div>
+            <div class="badges"><span class="badge">7-DAY ADHERENT</span><span class="badge">SUB-23:00</span><span class="badge locked">PEAK-LOAD 85+</span></div>
+            <div class="ledger">
+              <div><div class="bk">Earnings Ledger <span class="pv">· demo</span></div><div class="earn">$120.00 <span>USD</span></div></div>
+              <div class="vault">✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">
+      <div class="ttl">Ready-to-post caption</div>
+      <p>My Whoop says 83. Oriya normalizes it to 75 — and that's the honest number every other wearable gets compared against. No more arguing Oura-83 vs Whoop-83. Anthropic's on the board, pull up 👇</p>
+      <div class="meta">Shows: the normalization payoff (Post 1) · dept-rivalry squad · prize ledger</div>
+    </div>
+  </section>
+
+  <!-- ============ PERSONA 3 — Priya · Silver ============ -->
+  <section class="persona">
+    <div class="p-head">
+      <span class="p-name">Priya Sharma</span>
+      <span class="p-tag">Apple Watch · 🇬🇧 GBR · Stanford RC</span>
+      <span class="p-tierchip" style="--tc:var(--t-silver)">● Silver</span>
+    </div>
+    <div class="pair">
+      <div class="bp bp-front tier-silver" style="--tc:var(--t-silver)">
+        <div class="holo"></div>
+        <div class="row between">
+          <div class="chipwrap"><div class="chip"></div><span class="mini">BIO-ID</span></div>
+          <div class="tierwrap"><span class="tier"><span class="d"></span> Silver</span><span class="mini">Season 1 · Member</span></div>
+        </div>
+        <div class="row between" style="align-items:flex-end">
+          <div><div class="name">Priya Sharma</div><div class="klabel">Oriya Standard · Recovery</div><div class="ig">⌾ @priya.runs</div></div>
+          <div class="score">79</div>
+        </div>
+        <div>
+          <div class="norm"><span class="raw">Apple 87</span><span class="ar">→</span><span class="or">79 Oriya</span></div>
+          <div class="row between" style="align-items:flex-end">
+            <span class="fine">your raw score, normalized · directionally useful, not diagnostically precise</span>
+            <span class="serial">OR · S1 · AP79X</span>
+          </div>
+        </div>
+      </div>
+      <div class="bp bp-back">
+        <div class="holo"></div>
+        <div class="backgrid">
+          <div class="idcol">
+            <div><div class="bk">Nationality</div><div class="bv flag">🇬🇧 GBR</div></div>
+            <div><div class="bk">Squad</div><div class="bv">Stanford RC</div></div>
+            <div><div class="bk">Personality <span class="pv">· prov.</span></div><div class="bv">Phase-Advanced Operator</div><div class="bnote">Morning-loaded · melatonin onset ~21:00, HRV peaks pre-0700</div></div>
+          </div>
+          <div class="rightcol">
+            <div>
+              <div class="bk" style="text-align:right">Country Stamps</div>
+              <div class="stamps"><span class="stamp">GBR</span><span class="stamp">SEASON 1</span><span class="stamp">STANFORD</span></div>
+            </div>
+            <div class="badges"><span class="badge">SUB-23:00</span><span class="badge">HRV 90TH PCT</span><span class="badge locked">PEAK-LOAD 85+</span></div>
+            <div class="ledger">
+              <div><div class="bk">Earnings Ledger <span class="pv">· demo</span></div><div class="earn">$50.00 <span>USD</span></div></div>
+              <div class="vault">✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">
+      <div class="ttl">Ready-to-post caption</div>
+      <p>Apple Watch 87 → 79 normalized. Finally a recovery number I can actually put next to my Oura friends' without the "but they're not the same" argument. Stanford RC, come get it 👇</p>
+      <div class="meta">Shows: cross-device comparability · run-club squad · climbing tier</div>
+    </div>
+  </section>
+
+  <!-- ============ PERSONA 4 — Devin · Bronze (entry, no shame) ============ -->
+  <section class="persona">
+    <div class="p-head">
+      <span class="p-name">Devin Carter</span>
+      <span class="p-tag">Garmin · 🇺🇸 USA · Dawn Patrol RC</span>
+      <span class="p-tierchip" style="--tc:var(--t-bronze)">● Bronze</span>
+    </div>
+    <div class="pair">
+      <div class="bp bp-front tier-bronze" style="--tc:var(--t-bronze)">
+        <div class="holo"></div>
+        <div class="row between">
+          <div class="chipwrap"><div class="chip"></div><span class="mini">BIO-ID</span></div>
+          <div class="tierwrap"><span class="tier"><span class="d"></span> Bronze</span><span class="mini">Season 1 · Member</span></div>
+        </div>
+        <div class="row between" style="align-items:flex-end">
+          <div><div class="name">Devin Carter</div><div class="klabel">Oriya Standard · Recovery</div><div class="ig">⌾ @devcarter</div></div>
+          <div class="score">66</div>
+        </div>
+        <div>
+          <div class="norm"><span class="raw">Garmin 69</span><span class="ar">→</span><span class="or">66 Oriya</span></div>
+          <div class="row between" style="align-items:flex-end">
+            <span class="fine">your raw score, normalized · directionally useful, not diagnostically precise</span>
+            <span class="serial">OR · S1 · GA66X</span>
+          </div>
+        </div>
+      </div>
+      <div class="bp bp-back">
+        <div class="holo"></div>
+        <div class="backgrid">
+          <div class="idcol">
+            <div><div class="bk">Nationality</div><div class="bv flag">🇺🇸 USA</div></div>
+            <div><div class="bk">Squad</div><div class="bv">Dawn Patrol RC</div></div>
+            <div><div class="bk">Personality <span class="pv">· prov.</span></div><div class="bv">Slow-Wave Dominant</div><div class="bnote">Top-decile deep sleep · clears debt in one night</div></div>
+          </div>
+          <div class="rightcol">
+            <div>
+              <div class="bk" style="text-align:right">Country Stamps</div>
+              <div class="stamps"><span class="stamp">USA</span><span class="stamp">SEASON 1</span><span class="stamp locked">LOCKED</span></div>
+            </div>
+            <div class="badges"><span class="badge locked">SUB-23:00</span><span class="badge locked">7-DAY ADHERENT</span><span class="badge locked">HRV 90TH PCT</span></div>
+            <div class="ledger">
+              <div><div class="bk">Earnings Ledger <span class="pv">· demo</span></div><div class="earn">$0.00 <span>USD</span></div></div>
+              <div class="vault locked">✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">
+      <div class="ttl">Ready-to-post caption</div>
+      <p>66 today and I'm not mad about it — top-decile deep sleep, I clear my debt in one night. Just started Dawn Patrol RC. The board doesn't shame a red morning, it just wants you logging. Who's in 👇</p>
+      <div class="meta">Shows: anti-orthosomnia — entry tier flexes on signature, not score · vault locked = honest "$0 until you join a prize board"</div>
+    </div>
+  </section>
+
+  <!-- ============ PERSONA 5 — Wei · Founding Athlete ============ -->
+  <section class="persona">
+    <div class="p-head">
+      <span class="p-name">Wei Chen</span>
+      <span class="p-tag">Ultrahuman · 🇦🇺 AUS · YC Founders</span>
+      <span class="p-tierchip" style="--tc:var(--t-obsidian)">● Founding Athlete</span>
+    </div>
+    <div class="pair">
+      <div class="bp bp-front tier-obsidian" style="--tc:var(--t-obsidian)">
+        <div class="holo"></div>
+        <div class="row between">
+          <div class="chipwrap"><div class="chip"></div><span class="mini">BIO-ID</span></div>
+          <div class="tierwrap"><span class="tier"><span class="d"></span> Founding Athlete</span><span class="mini">Season 1 · Member</span></div>
+        </div>
+        <div class="row between" style="align-items:flex-end">
+          <div><div class="name">Wei Chen</div><div class="klabel">Oriya Standard · Recovery</div><div class="ig">⌾ @weichen</div></div>
+          <div class="score">88</div>
+        </div>
+        <div>
+          <div class="norm"><span class="raw">Ultrahuman 93</span><span class="ar">→</span><span class="or">88 Oriya</span></div>
+          <div class="row between" style="align-items:flex-end">
+            <span class="fine">your raw score, normalized · directionally useful, not diagnostically precise</span>
+            <span class="serial">OR · S1 · UL88X</span>
+          </div>
+        </div>
+      </div>
+      <div class="bp bp-back">
+        <div class="holo"></div>
+        <div class="backgrid">
+          <div class="idcol">
+            <div><div class="bk">Nationality</div><div class="bv flag">🇦🇺 AUS</div></div>
+            <div><div class="bk">Squad</div><div class="bv">YC Founders</div></div>
+            <div><div class="bk">Personality <span class="pv">· prov.</span></div><div class="bv">Parasympathetic Dominant</div><div class="bnote">Resting HR sub-50 · vagal tone runs hot</div></div>
+          </div>
+          <div class="rightcol">
+            <div>
+              <div class="bk" style="text-align:right">Country Stamps</div>
+              <div class="stamps"><span class="stamp">AUS</span><span class="stamp">SEASON 1</span><span class="stamp">YC</span></div>
+            </div>
+            <div class="badges"><span class="badge">HRV 90TH PCT</span><span class="badge">PEAK-LOAD 85+</span><span class="badge">7-DAY ADHERENT</span></div>
+            <div class="ledger">
+              <div><div class="bk">Earnings Ledger <span class="pv">· demo</span></div><div class="earn">$250.00 <span>USD</span></div></div>
+              <div class="vault">✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">
+      <div class="ttl">Ready-to-post caption</div>
+      <p>88 normalized off an Ultrahuman, resting HR sub-50. The YC Founders squad is stacked this season. Drop your screenshot, get your real number, and find out where you'd land 👇</p>
+      <div class="meta">Shows: top-tier recruiter · multi-board earnings · "find out where you'd land" hook</div>
+    </div>
+  </section>
+
+  <!-- ============ ICP-MAPPED SCREENS ============ -->
+  <section class="persona">
+    <div class="p-head">
+      <span class="p-name">Screens, mapped to who you're pitching</span>
+      <span class="p-tag">live board · prize squad · recruiter</span>
+    </div>
+    <p class="lede" style="margin-bottom:6px">Three product screens built to drop into the channel for a specific ICP segment — the rivalry, the prize, and the recruiter loop each sell themselves to a different person.</p>
+    <div class="screens">
+
+      <!-- Live board → S6 eng teams -->
+      <div class="screen">
+        <span class="scr-seg">For S6 · high-stakes eng teams</span>
+        <div class="scr-head"><span class="scr-title">Launch-Crunch Bracket</span><span class="scr-live"><span class="dot"></span> Live · 9d</span></div>
+        <div class="scr-teams"><span class="teamchip">Anthropic</span><span class="teamchip">OpenAI</span><span class="teamchip">Stripe</span></div>
+        <div>
+          <div class="lbrow"><span class="rk">🥇</span><span class="nm">riley.m <span class="tm">· Anthropic</span></span><span class="sc">91</span><span class="tm">🔥7</span></div>
+          <div class="lbrow"><span class="rk">🥈</span><span class="nm">casey.p <span class="tm">· Anthropic</span></span><span class="sc">87</span><span class="tm">🔥5</span></div>
+          <div class="lbrow"><span class="rk">🥉</span><span class="nm">blake.t <span class="tm">· OpenAI</span></span><span class="sc">86</span><span class="tm">🔥4</span></div>
+          <div class="lbrow you"><span class="rk">4</span><span class="nm">you <span class="tm">· Anthropic</span></span><span class="sc">79</span><span class="tm">🔥1</span></div>
+          <div class="lbrow"><span class="rk">5</span><span class="nm">sage.k <span class="tm">· OpenAI</span></span><span class="sc">78</span><span class="tm">🔥6</span></div>
+        </div>
+        <div class="scr-cta">You're 4 pts off OpenAI. A missed morning logs as a zero — get your reading in before 0900.</div>
+      </div>
+
+      <!-- Prize squad → S7 run clubs -->
+      <div class="screen">
+        <span class="scr-seg">For S7 · run clubs &amp; gyms</span>
+        <div class="scr-head"><span class="scr-title">Marina RC vs Stanford RC</span><span class="scr-live"><span class="dot"></span> Live · 4d</span></div>
+        <div class="scr-prize">
+          <div><div class="n">$500</div><div class="l">Prize pool</div></div>
+          <div><div class="n">38</div><div class="l">Athletes</div></div>
+          <div><div class="n">76</div><div class="l">Avg Oriya</div></div>
+        </div>
+        <div>
+          <div class="lbrow"><span class="rk">🥉</span><span class="nm">a.ruiz <span class="tm">· Marina</span></span><span class="sc">85</span><span class="tm">🔥7</span></div>
+          <div class="lbrow"><span class="rk">4</span><span class="nm">t.okafor <span class="tm">· Stanford</span></span><span class="sc">83</span><span class="tm">🔥5</span></div>
+          <div class="lbrow you"><span class="rk">5</span><span class="nm">you <span class="tm">· Marina</span></span><span class="sc">82</span><span class="tm">🔥4</span></div>
+        </div>
+        <div class="scr-cta">1 spot off the podium. Pull a Marina teammate in → lifts the squad average, not just your rank.</div>
+      </div>
+
+      <!-- Recruiter / multiboard → S5 / Founding Athlete -->
+      <div class="screen">
+        <span class="scr-seg">For S5 · the recruiter (Founding Athlete)</span>
+        <div class="scr-head"><span class="scr-title">Diana · Founding Athlete</span><span class="scr-live" style="color:var(--t-obsidian)"><span class="dot" style="background:var(--t-obsidian);box-shadow:0 0 7px var(--t-obsidian)"></span> Obsidian</span></div>
+        <div class="scr-teams"><span class="teamchip">Marina RC</span><span class="teamchip">Launch-Crunch</span><span class="teamchip">Founders×Ops</span></div>
+        <div>
+          <div class="scr-stat"><span>Boards active</span><b>3</b></div>
+          <div class="scr-stat"><span>Teammates pulled in</span><b>11</b></div>
+          <div class="scr-stat"><span>Squad avg lift since you joined</span><b>+6</b></div>
+          <div class="scr-stat"><span>Accrued earnings · demo</span><b>$200.00</b></div>
+        </div>
+        <div class="scr-cta">Every teammate you pull in lifts your average and your tier. Recruiting — not your score — is what makes the card go Obsidian.</div>
+      </div>
+
+    </div>
+    <div class="cap">
+      <div class="ttl">How to use these</div>
+      <p>Pair each screen with its segment's message (CRM.md M5/M6/M7) in the post or DM. The eng board goes in a tech thread, the prize squad goes to a run-club organizer, the recruiter view goes to anyone you want leveling up their squad. Crop each <span class="mono" style="color:var(--jade)">.screen</span> on its own for a clean asset.</p>
+      <div class="meta">Honesty: earnings tagged · demo · tier = engagement, not recovery score · no public who's-healthiest framing</div>
+    </div>
+  </section>
+
+  <!-- ============ MOTION ASSETS v2 ============ -->
+  <section class="persona">
+    <div class="p-head">
+      <span class="p-name">Motion assets — built to be screen-recorded</span>
+      <span class="p-tag">the 1911 benchmark · the crunch-time log</span>
+    </div>
+    <p class="lede" style="margin-bottom:6px">Two looping, hardware-accelerated storyboards — premium framing, JetBrains Mono, metallic hairline borders, live glare. Open this page and screen-record the <span class="mono" style="color:var(--jade)">.player</span> for an MP4/GIF, or use each as the exact shot list. Frame transitions emit <span class="mono" style="color:var(--amber)">[oriya:motion-event]</span> to the console for edit-sync.</p>
+
+    <!-- LOOP 1 — The 1911 Benchmark (9:16) -->
+    <div class="vid">
+      <div class="vid-head"><span class="vid-kind">Loop 01 · 9:16</span><span class="vid-title">The 1911 Benchmark</span><span class="vid-run">~16s · 4 frames · silent-first</span></div>
+      <div class="player vert lux bench" id="loop-bench" data-loop="bench">
+        <span class="reclbl"><span class="d"></span> REC</span><span class="scrim"></span>
+        <div class="frame" data-mf="cold-open"><div class="kicker">Autonomic Readiness · est. 2026</div><div class="big">In <span class="amber">1911</span>, golf gave every course one handicap.</div><div class="big" style="font-size:clamp(15px,2.4vw,21px);color:var(--ash)">Recovery still has none.</div></div>
+        <div class="frame" data-mf="variance"><div class="sm">three rings · three watches · three verdicts</div><div class="raws"><span class="raw">Oura <b>82</b></span><span class="raw">Whoop <b>83</b></span><span class="raw">Apple <b>87</b></span></div><div class="vwarn"><span class="wd"></span> Diagnostic variance · not interchangeable</div></div>
+        <div class="frame" data-mf="correction"><div class="kicker">the correction</div><div class="formula"><span style="color:rgba(236,234,228,.85)">Whoop 83</span><span style="color:var(--ash)">× 0.92 − 1.0 →</span><span class="jade" style="font-weight:700">75</span></div><div class="sm">one linear normalization · variance removed</div></div>
+        <div class="frame" data-mf="reveal">
+          <div class="kicker">your body passport</div>
+          <div class="flipcard"><div class="fc-inner">
+            <div class="fc-face fc-front"><div style="display:flex;justify-content:space-between"><div class="fcchip"></div><div class="fck" style="text-align:right">Founding<br>Athlete</div></div><div style="display:flex;justify-content:space-between;align-items:flex-end"><div><div class="fcname">M. Liu</div><div class="fck">Oriya Standard</div></div><div class="fcscore">75</div></div></div>
+            <div class="fc-face fc-back"><div style="display:flex;justify-content:space-between"><span class="fcstamp">USA</span><span class="fcstamp">SEASON 1</span></div><div style="display:flex;justify-content:space-between;align-items:flex-end"><div><div class="fck" style="color:#4a5059">Earnings · demo</div><div class="fcledger">$120.00</div></div><span class="fcstamp">ANTHROPIC</span></div></div>
+          </div></div>
+          <div class="protocol">Your ring · their watch · one score</div>
+        </div>
+        <div class="progress"></div>
+      </div>
+      <div class="vidnote">
+        <div class="t">Cut the 1911 benchmark</div>
+        <ol>
+          <li>Screen-record this <code>.player.vert</code> on a phone-width window — captions are burned in, so it works muted in-feed.</li>
+          <li>Hold frame 3 (the correction) ~0.5s longer than the loop — it's the proof beat. Add a low piano bed under frames 3–4 for lift.</li>
+          <li>Export 1080×1920, &lt;30s — same cut serves Reels, TikTok, Shorts, LinkedIn video.</li>
+        </ol>
+        <div class="meta">Hook = the universal-handicap reframe · 75 is illustrative; the linear math is real in try.html · console logs [oriya:motion-event] per frame</div>
+      </div>
+    </div>
+
+    <!-- LOOP 2 — The Crunch-Time Log (16:9) -->
+    <div class="vid">
+      <div class="vid-head"><span class="vid-kind">Loop 02 · 16:9</span><span class="vid-title">The Crunch-Time Log</span><span class="vid-run">~15s · 3 frames</span></div>
+      <div class="player wide lux slack" id="loop-slack" data-loop="slack">
+        <span class="reclbl"><span class="d"></span> REC</span><span class="scrim"></span>
+        <div class="frame" data-mf="banter"><div class="kicker" style="align-self:flex-start">#model-context · 02:14</div><div class="feed">
+          <div class="fmsg"><span class="fav" style="background:#7FB79E">R</span><div class="ft"><span class="fn">riley.m</span><span class="fx">our squad average is slipping to 79. my Whoop says 83 — why is Oriya pulling a <code>75</code>?</span></div></div>
+          <div class="fmsg"><span class="fav" style="background:#D7A25C">A</span><div class="ft"><span class="fn">alex.k</span><span class="fx">check the science disclosure. Whoop over-weights respiratory-rate noise under acute fatigue. Oriya normalizes the variance — it's the honest number.</span></div></div>
+        </div></div>
+        <div class="frame" data-mf="hook"><div class="feed">
+          <div class="fmsg me"><span class="fav" style="background:#9FD3BB">S</span><div class="ft"><span class="fn">sarah.p</span><span class="fx">we're <b style="color:var(--amber-glow)">4 points</b> off routing OpenAI on the board. log your readings before the <code>0900</code> cutoff — a missed morning drops the collective baseline.</span></div></div>
+        </div><div class="protocol" style="margin-top:14px">A missed log is a zero. The team carries it.</div></div>
+        <div class="frame" data-mf="ingest"><div class="kicker">live ingestion</div><div class="ingest">
+          <div class="sm">parsing screenshot → Whoop · Recovery 83</div>
+          <div class="ocrbar"><i></i></div>
+          <div class="lb">
+            <div class="lbrowv"><span class="rk">🥇</span><span class="nm">riley.m</span><span>83</span></div>
+            <div class="lbrowv"><span class="rk">🥈</span><span class="nm">alex.k</span><span>80</span></div>
+            <div class="lbrowv you"><span class="rk">3</span><span class="nm">you · just logged</span><span>75</span></div>
+          </div>
+        </div><div class="sm">screenshot → OCR → live squad podium · no manual entry</div></div>
+        <div class="progress"></div>
+      </div>
+      <div class="vidnote">
+        <div class="t">Record the real crunch-time log</div>
+        <ol>
+          <li>This is the social-proof cut — the product seen through a team mid-sprint, not a feature tour. Re-shoot with a real Slack/Discord export, then cut to the live OCR drop in try.html.</li>
+          <li>Keep the banter terse and technical; credibility is in the specifics (respiratory-rate noise, 0900 cutoff).</li>
+          <li>Export 1920×1080 — header asset for a LinkedIn post or the "why teams stick" deck slide.</li>
+        </ol>
+        <div class="meta">Departments are situational (model-context squad mid-launch), not flat logos · scores illustrative · [oriya:motion-event] per frame</div>
+      </div>
+    </div>
+
+    <div class="cap">
+      <div class="ttl">Why storyboards, not files</div>
+      <p>No renderer in this environment — so these are pure-CSS loops that play and record in any browser, and double as exact shot lists. Fastest shippable clip: screen-record the player. Best clip: use them as the script and record <span class="mono" style="color:var(--jade)">try.html</span> / <span class="mono" style="color:var(--jade)">index.html</span> live.</p>
+      <div class="meta">Reduced-motion users see frame 1 static · premium framing = metallic hairline border + live glare on <span class="mono">.player.lux</span></div>
+    </div>
+  </section>
+
+  <!-- ============ APP SCREENS v2 — premium interactive ============ -->
+  <section class="persona">
+    <div class="p-head">
+      <span class="p-name">App screens — the engine behind the index</span>
+      <span class="p-tag">science · privacy · teams · devices</span>
+    </div>
+    <p class="lede" style="margin-bottom:6px">Four interactive screens that answer a skeptic before they ask: <b style="color:var(--bone)">is the normalization real, who sees my data, who's winning, and where do the numbers come from.</b> Toggle the device pills and ledger tags — state changes log <span class="mono" style="color:var(--amber)">[oriya:event]</span>. Crop any <span class="mono" style="color:var(--jade)">.app</span> for a slide.</p>
+
+    <!-- SCREEN A · SCIENCE — live calculator + data-card grid -->
+    <div class="app">
+      <div class="app-nav"><span class="app-logo">Oriya</span><div class="app-tabs"><span>Dashboard</span><span>Leaderboard</span><span class="on">Science</span><span>Devices</span></div><span class="app-av">A</span></div>
+      <div class="app-body">
+        <span class="app-eyebrow">Universal Cross-Hardware Index</span>
+        <div class="app-h">The correction engine</div>
+        <div class="app-sub">A Whoop 83 and an Oura 83 are not the same measurement. Oriya applies a published per-device linear correction — anchored to the Doherty 2025 composite-score evaluation. Toggle a source:</div>
+
+        <div class="calc" id="sci-calc">
+          <div class="calc-top">
+            <div class="calc-lbl">▶ Source device</div>
+            <div class="calc-pills" id="calc-pills">
+              <span class="cpill sel" data-key="whoop">Whoop</span>
+              <span class="cpill" data-key="oura">Oura</span>
+              <span class="cpill" data-key="garmin">Garmin</span>
+              <span class="cpill" data-key="apple">Apple</span>
+              <span class="cpill" data-key="samsung">Samsung</span>
+              <span class="cpill" data-key="ultrahuman">Ultrahuman</span>
+            </div>
+          </div>
+          <div class="pipe">
+            <div class="pseg in"><span class="pk">Native</span><span class="pv" id="c-native">83</span><span class="pk" id="c-metric" style="color:var(--ash)">Recovery %</span></div>
+            <div class="pseg op"><span class="pk">Correction</span><span class="pv" id="c-corr">× 0.92 − 1.0</span><span class="pk" id="c-valid" style="color:var(--ash)">Validation · Med</span></div>
+            <div class="pseg out"><span class="pk">Oriya Standard</span><span class="pv" id="c-out">75</span><span class="pk" style="color:var(--ash)">cross-hardware</span></div>
+          </div>
+          <div class="calc-foot"><span class="vt">Lower validation → larger correction</span><span class="mono" id="c-string">83 × 0.92 − 1.0 = 75.36 → 75</span></div>
+        </div>
+
+        <div class="dcardgrid">
+          <div class="dcard"><div class="dt"><span class="dvn">Oura</span><span class="dvf">×0.97 +2.5</span></div><div class="dvm">Readiness · HRV · temp</div><div class="dvv"><span class="vbadge high">High</span></div></div>
+          <div class="dcard"><div class="dt"><span class="dvn">Whoop</span><span class="dvf">×0.92 −1.0</span></div><div class="dvm">Recovery % · runs ~7% hot</div><div class="dvv"><span class="vbadge med">Med</span></div></div>
+          <div class="dcard"><div class="dt"><span class="dvn">Garmin</span><span class="dvf">×0.95</span></div><div class="dvm">Body Battery · energy</div><div class="dvv"><span class="vbadge med">Med</span></div></div>
+          <div class="dcard"><div class="dt"><span class="dvn">Apple</span><span class="dvf">×0.90 +1.0</span></div><div class="dvm">Recovery rate · fewer inputs</div><div class="dvv"><span class="vbadge med">Med</span></div></div>
+          <div class="dcard"><div class="dt"><span class="dvn">Samsung</span><span class="dvf">×0.88 +2.0</span></div><div class="dvm">Energy Score · fewest inputs</div><div class="dvv"><span class="vbadge low">Low</span></div></div>
+          <div class="dcard"><div class="dt"><span class="dvn">Pixel</span><span class="dvf">×0.91 +1.5</span></div><div class="dvm">Recovery · limited validation</div><div class="dvv"><span class="vbadge low">Low</span></div></div>
+          <div class="dcard"><div class="dt"><span class="dvn">Ultrahuman</span><span class="dvf">×0.94 +1.0</span></div><div class="dvm">Movement Index · skin temp</div><div class="dvv"><span class="vbadge med">Med</span></div></div>
+          <div class="dcard"><div class="dt"><span class="dvn">Athlytic</span><span class="dvf">×0.96 +1.0</span></div><div class="dvm">Academic HRV on Apple HW</div><div class="dvv"><span class="vbadge med">Med</span></div></div>
+        </div>
+
+        <div class="locknote"><span>📄</span><span><b>Directionally useful, not diagnostically precise</b> — a social context layer, not a medical report. Source: Doherty C, Baldwin M, Lambe R, Burke D, <b>Altini M</b> — "Readiness, recovery, and strain: an evaluation of composite health scores in consumer wearables," <i>Translational Exercise Biomedicine</i>, Apr 2025.</span></div>
+      </div>
+    </div>
+
+    <!-- SCREEN B · PRIVACY — split-panel zero-knowledge vault -->
+    <div class="app">
+      <div class="app-nav"><span class="app-logo">Oriya</span><div class="app-tabs"><span>Dashboard</span><span>Teams</span><span class="on">Privacy</span><span>Devices</span></div><span class="app-av">A</span></div>
+      <div class="app-body">
+        <span class="app-eyebrow">Zero-Knowledge Vault</span>
+        <div class="app-h">Two walls, separately controlled</div>
+        <div class="app-sub">What your <b style="color:var(--jade)">squad</b> sees and what your <b style="color:var(--amber)">employer</b> sees are isolated systems. Sensitive sharing is off by default; corporate access is mathematically capped to aggregates. Tap a tag to flip it.</div>
+        <div class="vault-split">
+          <div class="vpanel squad">
+            <div class="vpanel-h">◆ Squad Challenges</div>
+            <div class="vpanel-s">What peers in your challenge can see about you.</div>
+            <div class="vledger"><span class="vl">Oriya score on board</span><span class="ltag vis" data-tog>● Visible</span></div>
+            <div class="vledger"><span class="vl">Streak count</span><span class="ltag vis" data-tog>● Visible</span></div>
+            <div class="vledger"><span class="vl">Wearable badge</span><span class="ltag vis" data-tog>● Visible</span></div>
+            <div class="vledger"><span class="vl">Raw component scores</span><span class="ltag hid" data-tog>● Hidden</span></div>
+          </div>
+          <div class="vpanel corp">
+            <div class="vpanel-h">▲ Corporate Vault</div>
+            <div class="vpanel-s">What HR can access — individual rows are isolated &amp; encrypted.</div>
+            <div class="vledger"><span class="vl">Your name → HR</span><span class="ltag lock">⛔ Never</span></div>
+            <div class="vledger"><span class="vl">Your individual score</span><span class="ltag hid" data-tog>● Opt-in off</span></div>
+            <div class="vledger"><span class="vl">Participation status</span><span class="ltag vis" data-tog>● Shared</span></div>
+            <div class="isolate">
+              <div class="iso-rows">
+                <div class="ir"><span>athlete_01</span><span class="enc">●●● encrypted</span></div>
+                <div class="ir"><span>athlete_02</span><span class="enc">●●● encrypted</span></div>
+                <div class="ir"><span>athlete_… ≥5</span><span class="enc">●●● encrypted</span></div>
+              </div>
+              <div class="iso-arrow">↓ aggregate only ↓</div>
+              <div class="iso-out"><span class="ol">HR admin sees</span><span class="ov">Squad avg 79</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="locknote"><span>🔒</span><span><b>No advertising. No data brokers.</b> Revenue is subscriptions + B2B licensing only. HR view is locked to a team average with ≥5 participants — defaults modeled on <b>FTC Docket C-4747</b> (Flo Health, 2021).</span></div>
+      </div>
+    </div>
+
+    <!-- SCREEN C · TEAMS — Launch-Crunch Bracket + chat feed -->
+    <div class="app">
+      <div class="app-nav"><span class="app-logo">Oriya</span><div class="app-tabs"><span class="on">Launch-Crunch Bracket</span><span>Teams</span><span>Reports</span></div><span class="livedot"><span class="d"></span> Live · hourly</span></div>
+      <div class="app-body">
+        <span class="app-eyebrow">Teams · head-to-head</span>
+        <div class="app-h">Launch-Crunch Bracket</div>
+        <div class="demo-banner"><span>◆</span> Demo dashboard · matchups + scores are illustrative sample data, not real Oriya traction</div>
+        <div class="crunch">
+          <div class="bracket">
+            <div class="matchup">
+              <div class="mteam lead"><span class="mn">OpenAI · Alignment</span><span class="md">6 ppl · SF</span><span class="ms">79</span></div>
+              <div class="mvs">vs<span class="gap">+4</span></div>
+              <div class="mteam r trail"><span class="mn">Anthropic · Model-Context</span><span class="md">8 ppl · SF</span><span class="ms">75</span></div>
+            </div>
+            <div class="matchup">
+              <div class="mteam lead"><span class="mn">Stripe · Payments</span><span class="md">10 ppl · SF</span><span class="ms">75</span></div>
+              <div class="mvs">vs<span class="gap">+3</span></div>
+              <div class="mteam r trail"><span class="mn">Notion · Core</span><span class="md">7 ppl · SF</span><span class="ms">72</span></div>
+            </div>
+            <div class="matchup">
+              <div class="mteam lead"><span class="mn">Figma · Multiplayer</span><span class="md">9 ppl · NYC</span><span class="ms">68</span></div>
+              <div class="mvs">vs<span class="gap">+3</span></div>
+              <div class="mteam r trail"><span class="mn">Google · Search Infra</span><span class="md">11 ppl · SF</span><span class="ms">65</span></div>
+            </div>
+            <div class="warnbar"><span>⚠️</span><span><b>Anthropic Model-Context</b> is 4 pts behind OpenAI Alignment. One missed morning log drops the collective baseline — cutoff 0900.</span></div>
+          </div>
+          <div class="chat">
+            <div class="chat-top"><span class="gd"></span> #model-context · live</div>
+            <div class="chat-body">
+              <div class="msg"><div class="mu"><span class="av" style="background:#7FB79E">R</span><span class="nm">riley.m</span><span class="ts">02:14</span></div><div class="mb">3 nights of sub-30 HRV, recovery's wrecked. squad avg slipping.</div></div>
+              <div class="msg"><div class="mu"><span class="av" style="background:#D7A25C">A</span><span class="nm">alex.k</span><span class="ts">02:16</span></div><div class="mb">chronic strain from the launch window. log it anyway — a zero hurts the baseline more than a 61 does.</div></div>
+              <div class="msg you"><div class="mu"><span class="av" style="background:#9FD3BB">S</span><span class="nm">sarah.p</span><span class="ts">02:18</span></div><div class="mb">4 pts off OpenAI. everyone drop your reading before <code>0900</code>. we close the gap together.</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="locknote"><span>🔒</span><span><b>Individual scores never appear here</b> — the bracket shows team aggregates with ≥5 participants. The chat models the rivalry loop that makes an eng lead want to share it internally.</span></div>
+      </div>
+    </div>
+
+    <!-- SCREEN D · DEVICES — Hardware Interoperability Center -->
+    <div class="app">
+      <div class="app-nav"><span class="app-logo">Oriya</span><div class="app-tabs"><span>Dashboard</span><span>Leaderboard</span><span class="on">Devices</span><span>Science</span></div><span class="app-av">A</span></div>
+      <div class="app-body">
+        <span class="app-eyebrow">Hardware Interoperability Center</span>
+        <div class="app-h">Every sensor, one pipeline</div>
+        <div class="app-sub">Each wearable slots in as a <b style="color:var(--bone)">read-only module</b>. Oriya never writes back. Connect more modules to earn the ✅ verified badge.</div>
+        <div class="trust"><span class="trustchip">AES-256 at rest</span><span class="trustchip">Read-only OAuth</span><span class="trustchip">Revoke anytime</span><span class="trustchip">SOC 2 Type II</span><span class="trustchip">15-min sync</span></div>
+        <div class="hwgrid">
+          <div class="hwtoken online"><div class="hh"><span class="hi">💍</span><div><div class="hn">Oura Ring</div><div class="hs">Gen 3 · 3 min ago</div></div><span class="hstat on">Online</span></div><div class="hpins"><i></i><i></i><i></i><i></i></div><div class="hf">HRV · skin temp · sleep stages · readiness</div></div>
+          <div class="hwtoken online"><div class="hh"><span class="hi">⌚</span><div><div class="hn">Whoop 4.0</div><div class="hs">Strap</div></div><span class="hstat on">Online</span></div><div class="hpins"><i></i><i></i><i></i><i></i></div><div class="hf">continuous HRV · strain · recovery %</div></div>
+          <div class="hwtoken"><div class="hh"><span class="hi">🟦</span><div><div class="hn">Garmin</div><div class="hs">Connect</div></div><span class="hstat off">Slot</span></div><div class="hpins"><i></i><i></i><i></i><i></i></div><div class="hf">Body Battery · VO2max · HRV status</div></div>
+          <div class="hwtoken"><div class="hh"><span class="hi">🍎</span><div><div class="hn">Apple Health</div><div class="hs">HealthKit</div></div><span class="hstat off">Slot</span></div><div class="hpins"><i></i><i></i><i></i><i></i></div><div class="hf">sleep · resting HR · HRV (Watch)</div></div>
+        </div>
+        <div class="sensors">
+          <div class="tgroup-h" style="margin-bottom:6px">Sensor breakdown — where today's composite originates</div>
+          <div class="sensor"><div class="sl">🌙 Deep Rest<small>verified via Oura Gen 3</small></div><div class="sbar"><i style="width:40%"></i></div><div class="sv">40%</div></div>
+          <div class="sensor"><div class="sl">⚡ Autonomic Resilience<small>verified via Whoop 4.0</small></div><div class="sbar"><i style="width:35%"></i></div><div class="sv">35%</div></div>
+          <div class="sensor"><div class="sl">🏃 Move Output<small>manual · connect Garmin to verify</small></div><div class="sbar"><i style="width:25%"></i></div><div class="sv">25%</div></div>
+        </div>
+        <div class="locknote"><span>🛡️</span><span><b>Read-only, scoped, revocable.</b> Tokens cover health metrics only, stored AES-256, revoked from this page anytime. Oriya never writes back, sells data, or shares it with your employer.</span></div>
+      </div>
+    </div>
+
+    <!-- Expandable interactive preview (de-sterilizes the cold first screen) -->
+    <div class="demo-wrap" id="demo-wrap">
+      <button class="demo-toggle" id="demo-toggle" aria-expanded="false">
+        <span class="play">▶</span>
+        <span class="dl"><b>See it work — 9-second guided tour</b><span>tap to expand · a cursor walks the drop → normalize → board flow</span></span>
+        <span class="chev">▾</span>
+      </button>
+      <div class="demo-stage">
+        <div class="demo-inner">
+          <svg class="demo-cursor" viewBox="0 0 24 24" fill="var(--bone)"><path d="M3 2l7 18 2.5-7L20 10z"/></svg>
+          <div class="frame" style="position:static;opacity:1;animation:none;gap:12px">
+            <div class="kicker">drop · normalize · land</div>
+            <div class="pills"><span class="pill">1 · drop screenshot</span><span class="pill">2 · OCR + correct</span><span class="pill">3 · join the board</span></div>
+            <div class="idxcard" style="padding:12px 22px"><div class="n" style="font-size:34px">75</div><div class="l">Oriya Standard · Body Passport</div></div>
+            <div class="sm">the same nine seconds a cold visitor sees on try.html — no sterile empty dropzone</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cap">
+      <div class="ttl">How to use these four</div>
+      <p><span class="mono" style="color:var(--jade)">Science</span> is your reply to "is the normalization real?" (toggle it live, pair with Post 1 / Post 7). <span class="mono" style="color:var(--jade)">Privacy</span> &amp; <span class="mono" style="color:var(--jade)">Devices</span> kill the trust objection before a corporate or run-club lead raises it. <span class="mono" style="color:var(--jade)">Teams</span> is the bracket an eng lead forwards to their squad. The guided-tour component above is the pattern for de-sterilizing try.html's first screen.</p>
+      <div class="meta">Honesty: Teams figures tagged · demo (illustrative, not real traction) · normalization factors + Doherty/Altini 2025 source are real · privacy defaults model FTC Docket C-4747 · interactions log [oriya:event]</div>
+    </div>
+  </section>
+
+  <footer>
+    Honesty rails held: projected money tagged <b style="color:var(--bone)">· demo</b>, physiological signature tagged <b style="color:var(--bone)">· prov.</b>, corporate dashboard figures tagged <b style="color:var(--bone)">· demo</b> (74% retention illustrative, not real traction), Bronze vault shown <b style="color:var(--bone)">locked at $0</b> until a prize board is joined.<br/>
+    Tier ladder = network engagement (squads · prize boards · teammates recruited), never the recovery number — anti-orthosomnia by design.<br/>
+    Ranking rationale + ROI model → content/VIRALITY-STRATEGY.md · live demo → try.html
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  // ---- telemetry shim ----
+  window.dataLayer = window.dataLayer || [];
+  function track(ev, props){ props = props || {}; window.dataLayer.push(Object.assign({event:ev}, props));
+    try{ console.log("[oriya:event]", ev, props); }catch(e){} }
+  function motion(loop, frame, i){ try{ console.log("[oriya:motion-event]", {loop:loop, frame:frame, index:i, t:Date.now()}); }catch(e){} }
+
+  // ---- SCIENCE · live correction calculator (real Oriya linear model) ----
+  var MODEL = {
+    whoop:     {tag:"Whoop",     metric:"Recovery %",     native:83, factor:0.92, offset:-1.0, validation:"Med"},
+    oura:      {tag:"Oura",      metric:"Readiness",      native:82, factor:0.97, offset:2.5,  validation:"High"},
+    garmin:    {tag:"Garmin",    metric:"Body Battery",   native:71, factor:0.95, offset:0.0,  validation:"Med"},
+    apple:     {tag:"Apple",     metric:"Recovery rate",  native:87, factor:0.90, offset:1.0,  validation:"Med"},
+    samsung:   {tag:"Samsung",   metric:"Energy Score",   native:80, factor:0.88, offset:2.0,  validation:"Low"},
+    ultrahuman:{tag:"Ultrahuman",metric:"Movement Index", native:93, factor:0.94, offset:1.0,  validation:"Med"}
+  };
+  function fmtOff(o){ return o===0 ? "" : (o<0 ? " − "+Math.abs(o).toFixed(1) : " + "+o.toFixed(1)); }
+  function toStandard(n,m){ return Math.max(1, Math.min(99, Math.round(n*m.factor + m.offset))); }
+  var calc = document.getElementById("sci-calc");
+  if(calc){
+    var pills = calc.querySelectorAll(".cpill");
+    function render(key){
+      var m = MODEL[key]; if(!m) return;
+      var raw = (m.native*m.factor + m.offset);
+      var out = toStandard(m.native, m);
+      document.getElementById("c-native").textContent = m.native;
+      document.getElementById("c-metric").textContent = m.metric;
+      document.getElementById("c-corr").textContent = "× "+m.factor.toFixed(2)+fmtOff(m.offset);
+      document.getElementById("c-valid").textContent = "Validation · "+m.validation;
+      document.getElementById("c-out").textContent = out;
+      document.getElementById("c-string").textContent = m.native+" × "+m.factor.toFixed(2)+fmtOff(m.offset)+" = "+raw.toFixed(2)+" → "+out;
+      calc.classList.remove("flash"); void calc.offsetWidth; calc.classList.add("flash");
+      track("science_device_toggled", {device:m.tag, native:m.native, oriya:out});
+    }
+    pills.forEach(function(p){
+      p.addEventListener("click", function(){
+        pills.forEach(function(x){ x.classList.remove("sel"); });
+        p.classList.add("sel");
+        render(p.getAttribute("data-key"));
+      });
+    });
+  }
+
+  // ---- PRIVACY · ledger-tag flip ----
+  document.querySelectorAll(".ltag[data-tog]").forEach(function(t){
+    t.addEventListener("click", function(){
+      var on = t.classList.contains("vis");
+      var label = (t.closest(".vledger").querySelector(".vl")||{}).textContent || "";
+      if(on){ t.classList.remove("vis"); t.classList.add("hid"); t.textContent = "● Hidden"; }
+      else  { t.classList.remove("hid"); t.classList.add("vis"); t.textContent = "● Visible"; }
+      track("privacy_toggle", {field:label.trim(), visible:!on});
+    });
+  });
+
+  // ---- DEVICES · slot a hardware module ----
+  document.querySelectorAll(".hwtoken").forEach(function(tk){
+    tk.addEventListener("click", function(){
+      var on = tk.classList.toggle("online");
+      var st = tk.querySelector(".hstat");
+      if(st){ st.textContent = on?"Online":"Slot"; st.className = "hstat "+(on?"on":"off"); }
+      track("device_slot_toggled", {device:(tk.querySelector(".hn")||{}).textContent, online:on});
+    });
+  });
+
+  // ---- DEMO · expandable guided tour ----
+  var dw = document.getElementById("demo-wrap"), dt = document.getElementById("demo-toggle");
+  if(dw && dt){
+    dt.addEventListener("click", function(){
+      var open = dw.classList.toggle("open");
+      dt.setAttribute("aria-expanded", open?"true":"false");
+      dt.querySelector(".play").textContent = open ? "❚❚" : "▶";
+      track("guided_tour_"+(open?"opened":"closed"), {surface:"try-viral-mockup"});
+    });
+  }
+
+  // ---- MOTION · emit frame transitions for the two loops ----
+  function driveLoop(id, frames, period){
+    var el = document.getElementById(id); if(!el) return;
+    if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches){ motion(id, frames[0], 0); return; }
+    var n = frames.length, step = period/n, idx = -1;
+    function tick(){ idx = (idx+1)%n; motion(el.getAttribute("data-loop"), frames[idx], idx); }
+    tick(); setInterval(tick, step);
+  }
+  driveLoop("loop-bench", ["cold-open","variance","correction","reveal"], 16000);
+  driveLoop("loop-slack", ["banter","hook","ingest"], 15000);
+})();
+</script>
+</body>
+</html>

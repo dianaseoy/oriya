@@ -318,22 +318,114 @@
     .dawn { text-align:center; }
     .dawn .orb-stage { margin:0 auto 50px; }
     .dawn h2 { margin:0 auto 14px; max-width:18ch; }
-    .email-form { display:flex; gap:10px; padding:6px; max-width:480px; margin:34px auto 0;
-      border-radius:16px; background:rgba(255,255,255,0.03); border:1px solid var(--hairline); backdrop-filter:blur(10px); }
-    .email-form input {
-      flex:1; min-width:0; border:none; background:transparent; color:var(--bone);
-      font-family:var(--font-mono); font-size:14px; padding:13px 16px; outline:none;
-    }
-    .email-form input::placeholder { color:var(--ash); }
-    .email-form .btn { white-space:nowrap; padding:13px 24px; flex-shrink:0; }
+    /* No card chrome — the Tally form's OWN background (set in the Tally
+       dashboard theme) fills the iframe. We must NOT force a background or
+       color-scheme on the iframe here, or it overrides the form's theme.
+       Visual styling lives entirely in the Tally form theme; see the comment
+       by TALLY_FORM_ID in the script. */
+    .tally-wrap { max-width:460px; margin:30px auto 0; min-height:148px; }
+    .tally-embed { width:100%; border:0; display:block; }
+    .tally-fallback { padding:24px 20px; text-align:center; font-family:var(--font-mono); font-size:12px; line-height:1.8; color:var(--ash); }
+    .tally-fallback code { color:var(--jade); }
     .form-note { font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--ash); margin-top:18px; }
-    .form-error { font-family:var(--font-mono); font-size:12px; color:var(--ember); margin-top:12px; display:none; }
     .compat { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:28px; }
     .compat span { font-family:var(--font-mono); font-size:11px; letter-spacing:0.08em; color:var(--ash); border:1px solid var(--hairline); border-radius:999px; padding:7px 14px; }
 
+    /* ============================================================
+       ACT 2.5 — LIVE SQUAD PROOF (it's already a competition → try.html)
+       ============================================================ */
+    .proof-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin:52px auto 0; max-width:940px; }
+    .proof-card { position:relative; border:1px solid var(--hairline); border-radius:16px; padding:22px; background:rgba(26,30,36,0.5); text-align:left; transition:border-color 0.3s, transform 0.45s var(--settle), box-shadow 0.4s; }
+    .proof-card:hover { border-color:var(--jade-deep); transform:translateY(-3px); box-shadow:0 24px 50px -28px rgba(0,0,0,0.8); }
+    .proof-live { display:inline-flex; align-items:center; gap:7px; font-family:var(--font-mono); font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--jade); }
+    .proof-live .dot { width:6px; height:6px; border-radius:50%; background:var(--jade); box-shadow:0 0 8px var(--jade); animation:opulse 2.4s ease infinite; }
+    .proof-card h4 { font-family:var(--font-sans); font-size:16px; margin:14px 0 7px; color:var(--bone); font-weight:600; line-height:1.25; }
+    .proof-card p { font-size:13px; color:var(--ash); line-height:1.55; }
+    .proof-meta { display:flex; justify-content:space-between; align-items:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--hairline); font-family:var(--font-mono); font-size:11.5px; }
+    .proof-meta .ppl { color:var(--jade); } .proof-meta .prize { color:var(--amber-glow); }
+    .proof-cta { display:flex; flex-direction:column; align-items:center; gap:14px; margin-top:46px; }
+    @media (max-width:760px){ .proof-grid { grid-template-columns:1fr; max-width:420px; } }
+
+    /* ---- Offer card (wraps the waitlist form so it stops floating) ---- */
+    .offer-card { max-width:540px; margin:36px auto 0; background:rgba(26,30,36,0.55); border:1px solid var(--hairline);
+      border-radius:22px; padding:30px 28px; text-align:left;
+      box-shadow:0 30px 70px -34px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.04); backdrop-filter:blur(7px); }
+    .offer-card .eyebrow { display:block; margin-bottom:16px; }
+    .offer-stack { display:flex; flex-direction:column; gap:16px; margin-bottom:6px; }
+    .offer-item { display:flex; gap:13px; align-items:flex-start; }
+    .offer-ic { color:var(--jade); font-size:12px; line-height:1.6; flex-shrink:0; margin-top:1px; }
+    .offer-item b { display:block; font-size:14.5px; color:var(--bone); font-weight:600; margin-bottom:2px; }
+    .offer-item span { display:block; font-size:13px; color:var(--ash); line-height:1.5; }
+    .offer-card .tally-wrap { margin:22px auto 0; padding-top:22px; border-top:1px solid var(--hairline); }
+    .offer-card .form-note { margin-top:14px; text-align:center; }
+
+    /* ============================================================
+       ACT 1.5 — HOW IT WORKS (the 3-step product flow)
+       ============================================================ */
+    .how-steps { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin:52px auto 0; max-width:960px; }
+    .how-step { position:relative; border:1px solid var(--hairline); border-radius:16px; padding:24px 22px; background:rgba(26,30,36,0.5); text-align:left; transition:border-color .3s, transform .45s var(--settle), box-shadow .4s; }
+    .how-step:hover { border-color:var(--jade-deep); transform:translateY(-3px); box-shadow:0 24px 50px -28px rgba(0,0,0,.8); }
+    .how-step:not(:last-child)::after { content:"→"; position:absolute; right:-13px; top:50%; transform:translateY(-50%); color:var(--jade-deep); font-size:16px; z-index:2; }
+    .how-step .hs-num { font-family:var(--font-mono); font-size:11px; letter-spacing:.16em; color:var(--jade); }
+    .how-step h4 { font-size:16px; font-weight:600; color:var(--bone); margin:12px 0 7px; line-height:1.25; }
+    .how-step p { font-size:13px; color:var(--ash); line-height:1.55; }
+    .hs-visual { margin-top:16px; border-top:1px solid var(--hairline); padding-top:16px; min-height:56px; display:flex; align-items:center; }
+    .hs-shot { display:flex; align-items:center; gap:11px; width:100%; }
+    .hs-shot .badge { width:34px; height:34px; border-radius:9px; background:linear-gradient(135deg,#B5723C,#D7A25C); flex-shrink:0; box-shadow:inset 0 1px 1px rgba(255,255,255,.18); }
+    .hs-shot .meta { display:flex; flex-direction:column; min-width:0; }
+    .hs-shot .meta b { font-size:13px; color:var(--bone); }
+    .hs-shot .meta span { font-family:var(--font-mono); font-size:11px; color:var(--ash); }
+    .hs-formula { font-family:var(--font-mono); font-size:13px; color:var(--bone); width:100%; line-height:1.5; }
+    .hs-formula .out { color:var(--jade); font-weight:700; }
+    .hs-formula .dim { color:var(--ash); }
+    .hs-row { display:flex; align-items:center; gap:10px; width:100%; font-family:var(--font-mono); font-size:12.5px; }
+    .hs-row .rk { color:var(--ash); }
+    .hs-row .nm { color:var(--jade); font-weight:600; flex:1; }
+    .hs-row .sc { color:var(--bone); }
+    .how-cta { display:flex; flex-direction:column; align-items:center; gap:14px; margin-top:40px; }
+
+    /* ============================================================
+       ACT 2.7 — THE SCIENCE (why the number is trustworthy)
+       ============================================================ */
+    .science-card { max-width:960px; margin:46px auto 0; border:1px solid var(--hairline); border-radius:22px; background:rgba(26,30,36,0.55);
+      box-shadow:0 30px 70px -34px rgba(0,0,0,.8), inset 0 1px 1px rgba(255,255,255,.04); overflow:hidden; backdrop-filter:blur(7px); }
+    .science-top { display:grid; grid-template-columns:1.1fr 0.9fr; }
+    .science-left { padding:34px 32px; border-right:1px solid var(--hairline); }
+    .science-left .eyebrow { display:block; margin-bottom:14px; }
+    .science-left h3 { font-family:var(--font-display); font-size:clamp(1.7rem,3.2vw,2.4rem); line-height:1.06; margin-bottom:14px; color:var(--bone); }
+    .science-left p { font-size:14px; color:var(--ash); line-height:1.6; }
+    .science-eq { margin:22px 0 4px; font-family:var(--font-mono); font-size:15px; color:var(--bone); padding:14px 16px; border:1px solid var(--hairline); border-radius:12px; background:rgba(0,0,0,.25); }
+    .science-eq .raw { color:var(--ash); } .science-eq .out { color:var(--jade); font-weight:700; }
+    .science-right { padding:28px 26px; }
+    .science-right .lbl { font-family:var(--font-mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--ash); margin-bottom:12px; display:block; }
+    .sci-table { width:100%; border-collapse:collapse; font-family:var(--font-mono); }
+    .sci-table th { font-size:9px; letter-spacing:.08em; text-transform:uppercase; color:var(--ash); text-align:right; padding:0 0 9px; font-weight:500; }
+    .sci-table th:first-child { text-align:left; }
+    .sci-table td { font-size:12px; color:var(--bone); text-align:right; padding:7px 0; border-top:1px solid rgba(42,47,56,.6); }
+    .sci-table td:first-child { text-align:left; color:var(--ash); }
+    .sci-table td .o { color:var(--jade); font-weight:700; }
+    .science-details { border-top:1px solid var(--hairline); }
+    .science-details > summary { list-style:none; cursor:pointer; padding:17px 32px; font-family:var(--font-mono); font-size:12px; letter-spacing:.04em; color:var(--jade); display:flex; align-items:center; gap:9px; transition:background .2s; }
+    .science-details > summary:hover { background:rgba(127,183,158,.05); }
+    .science-details > summary::-webkit-details-marker { display:none; }
+    .science-details > summary::before { content:"▸"; transition:transform .2s; display:inline-block; }
+    .science-details[open] > summary::before { transform:rotate(90deg); }
+    .science-body { padding:4px 32px 28px; display:grid; grid-template-columns:1fr 1fr; gap:22px 26px; }
+    .sci-step { font-size:13px; color:var(--ash); line-height:1.55; }
+    .sci-step b { display:block; color:var(--bone); font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; margin-bottom:5px; }
+    .sci-step b span { color:var(--jade); }
+    .sci-source { grid-column:1/-1; font-size:12px; color:var(--ash); line-height:1.55; padding-top:16px; border-top:1px solid var(--hairline); }
+    .sci-source b { color:var(--bone); } .sci-source em { color:var(--bone); font-style:italic; }
+    .science-cta { display:flex; gap:14px; flex-wrap:wrap; align-items:center; justify-content:center; margin-top:30px; }
+
+    /* ---- Trust strip (privacy reassurance near the form) ---- */
+    .trust-strip { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:32px auto 4px; max-width:600px; }
+    .trust-chip { display:inline-flex; align-items:center; gap:7px; font-family:var(--font-mono); font-size:11px; letter-spacing:.03em; color:var(--ash); border:1px solid var(--hairline); border-radius:999px; padding:8px 14px; }
+    .trust-chip svg { width:12px; height:12px; color:var(--jade); flex-shrink:0; }
+
     /* ---- Footer (hairline-quiet) ---- */
     .footer { border-top:1px solid var(--hairline); padding:70px 0 50px; }
-    .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:40px; }
+    .footer-grid { display:grid; grid-template-columns:1.8fr 1fr 1fr 1fr 1fr; gap:36px; }
     .footer .logo { margin-bottom:16px; }
     .footer-desc { color:var(--ash); font-size:13.5px; max-width:34ch; line-height:1.7; }
     .footer-col h5 { font-family:var(--font-mono); font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--ash); margin-bottom:16px; }
@@ -359,6 +451,8 @@
     .modal-success-icon svg { width:26px; height:26px; }
     .modal h3 { font-family:var(--font-display); font-size:32px; margin-bottom:10px; }
     .modal p { color:var(--ash); font-size:14px; margin-bottom:22px; }
+    .modal p strong { color:var(--bone); font-weight:600; }
+    .referral-explain { font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--jade); margin-bottom:13px; }
     .referral-link-box { display:flex; gap:8px; padding:6px; border:1px solid var(--hairline); border-radius:12px; margin-bottom:14px; }
     .referral-link { flex:1; min-width:0; font-family:var(--font-mono); font-size:12px; color:var(--bone); padding:10px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:left; }
     .referral-actions { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:22px; }
@@ -369,6 +463,25 @@
     .referral-tier { display:flex; flex-direction:column; padding:12px 14px; border:1px solid var(--hairline); border-radius:10px; }
     .referral-tier strong { font-family:var(--font-mono); font-size:13px; color:var(--jade); }
     .referral-tier span { font-size:12.5px; color:var(--ash); }
+
+    /* ---- Referral Liveboard (gamified recruiter loop in the waitlist modal) ---- */
+    .referral-board { margin:4px 0 18px; border:1px solid var(--hairline); border-radius:12px; overflow:hidden; text-align:left; }
+    .rb-head { display:flex; justify-content:space-between; align-items:center; padding:9px 12px; border-bottom:1px solid var(--hairline); }
+    .rb-head .t { font-family:var(--font-mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--bone); }
+    .rb-live { font-family:var(--font-mono); font-size:9px; letter-spacing:.12em; color:var(--jade); display:inline-flex; align-items:center; gap:5px; }
+    .rb-live .d { width:6px; height:6px; border-radius:50%; background:var(--jade); box-shadow:0 0 7px var(--jade); animation:opulse 2.4s ease infinite; }
+    .rb-row { display:grid; grid-template-columns:24px 1fr auto auto; gap:10px; align-items:center; padding:8px 12px; font-size:13px; border-bottom:1px solid rgba(42,47,56,.5); }
+    .rb-row:last-child { border-bottom:none; }
+    .rb-row .rk { font-family:var(--font-mono); color:var(--ash); font-size:11px; }
+    .rb-row .ct { font-family:var(--font-mono); color:var(--bone); }
+    .rb-row .bd { font-family:var(--font-mono); font-size:9px; padding:2px 7px; border-radius:999px; border:1px solid var(--hairline); color:var(--ash); white-space:nowrap; }
+    .rb-row .bd.founding { color:var(--amber-glow); border-color:rgba(240,192,131,.4); }
+    .rb-row.you { background:linear-gradient(90deg, rgba(127,183,158,.16), transparent); }
+    .rb-row.you .nm { color:var(--jade); font-weight:600; }
+    .rb-prog { padding:11px 12px; }
+    .rb-prog .lbl { font-family:var(--font-mono); font-size:10.5px; color:var(--ash); }
+    .rb-prog .bar { height:6px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; margin-top:7px; }
+    .rb-prog .fill { height:100%; background:linear-gradient(90deg, var(--jade), var(--jade-glow)); border-radius:999px; transition:width .6s var(--circadian); }
 
     /* ============================================================
        ORI CHATBOT  (preserved)
@@ -413,11 +526,21 @@
       .rank-row { grid-template-columns:auto 28px 1fr auto; gap:14px; }
       .rank-delta { display:none; }
     }
+    @media (max-width: 760px) {
+      .how-steps { grid-template-columns:1fr; max-width:420px; }
+      .how-step:not(:last-child)::after { content:"↓"; right:auto; left:50%; top:auto; bottom:-13px; transform:translateX(-50%); }
+      .science-top { grid-template-columns:1fr; }
+      .science-left { border-right:none; border-bottom:1px solid var(--hairline); }
+      .science-body { grid-template-columns:1fr; }
+      .science-left, .science-right { padding:26px 22px; }
+      .science-details > summary, .science-body { padding-left:22px; padding-right:22px; }
+    }
     @media (max-width: 560px) {
       .ori-fab .lbl { display:none; }
       .footer-grid { grid-template-columns:1fr 1fr; }
       .display-xl { font-size:clamp(2.8rem,13vw,4rem); }
       .normalizer { max-width:340px; }
+      .trust-chip { font-size:10px; padding:7px 11px; }
     }
 
     /* ============================================================
@@ -433,9 +556,30 @@
       .ticker-track { animation:none !important; }
       .hero h1 .line > span { transform:none !important; }
     }
+
+    /* ---- Seamless page transitions (progressive enhancement) ---- */
+    html.pf body { animation:pfIn 0.5s var(--circadian) both; }
+    body.pf-out { opacity:0; transition:opacity 0.26s ease; }
+    @keyframes pfIn { from { opacity:0; } to { opacity:1; } }
   </style>
 </head>
 <body>
+
+<!-- Seamless cross-page fade (progressive enhancement; skipped under reduced-motion) -->
+<script>
+(function(){
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.documentElement.classList.add("pf");
+  addEventListener("pageshow", function(){ document.body && document.body.classList.remove("pf-out"); });
+  document.addEventListener("click", function(e){
+    var a = e.target.closest && e.target.closest("a"); if(!a) return;
+    var h = a.getAttribute("href") || "";
+    if (a.target === "_blank" || a.hasAttribute("download")) return;
+    if (/^(https?:|mailto:|tel:|#)/.test(h) || h === "") return;
+    if (/\.html(#.*)?$/.test(h)) { e.preventDefault(); document.body.classList.add("pf-out"); setTimeout(function(){ location.href = h; }, 240); }
+  });
+})();
+</script>
 
 <!-- Global circadian canvas (night → dawn) -->
 <div class="canvas"></div>
@@ -458,13 +602,14 @@
       Oriya
     </a>
     <div class="nav-links">
-      <a href="#handicap" class="nav-link">The Handicap</a>
-      <a href="#squad" class="nav-link">Squads</a>
+      <a href="#how" class="nav-link">How it works</a>
+      <a href="#science" class="nav-link">The Science</a>
+      <a href="#proof" class="nav-link">Live boards</a>
       <a href="#passport" class="nav-link">Body Passport</a>
     </div>
     <div class="nav-right">
       <a href="#join" class="nav-link">Sign in</a>
-      <a href="#join" class="btn btn-primary" data-magnetic>Claim your Passport</a>
+      <a href="try.html" id="ctaNav" class="btn btn-primary" data-magnetic data-door="create">Create your Squad</a>
     </div>
   </div>
 </nav>
@@ -479,11 +624,12 @@
         <span class="line"><span>Their watch.</span></span>
         <span class="line"><span>One score.</span></span>
       </h1>
-      <p class="hero-sub lede">Oriya gives every wearable a handicap, so the whole squad competes fairly on how well you recover.</p>
+      <p class="hero-sub lede">An Oura 62 isn't a Whoop 62. Oriya hands every wearable a handicap and normalizes it onto one 0–100 index — so the whole squad finally competes on the same number.</p>
       <div class="hero-actions">
-        <a href="#join" class="btn btn-primary" data-magnetic>Claim your Passport</a>
-        <a href="#handicap" class="btn-ghost">See how the Handicap works ↓</a>
+        <a href="try.html" id="ctaPrimary" class="btn btn-primary" data-magnetic data-door="create">Create your Squad</a>
+        <a href="#join" id="ctaSecondary" class="btn-ghost" data-door="claim">or claim your Passport</a>
       </div>
+      <a href="#handicap" class="btn-ghost" style="display:inline-block;margin-top:14px;opacity:0.7;">See how the Handicap works ↓</a>
     </div>
     <div class="hero-orb-wrap">
       <div class="orb-stage" id="heroOrbStage">
@@ -496,13 +642,59 @@
   </div>
 </section>
 
+<!-- ACT 1.5 — HOW IT WORKS (3-step product flow) -->
+<section class="act" id="how">
+  <div class="wrap reveal">
+    <div class="act-head" style="margin:0 auto; text-align:center;">
+      <span class="eyebrow">How it works · about a minute</span>
+      <h2 class="display display-l">From screenshot<br>to leaderboard.</h2>
+      <p class="lede" style="margin:18px auto 0;">No new hardware. No manual entry. Drop the recovery screen you already get every morning — Oriya reads it, normalizes it, and puts you on a board with people on every other device.</p>
+    </div>
+
+    <div class="how-steps">
+      <div class="how-step">
+        <span class="hs-num">STEP 01</span>
+        <h4>Drop your morning screenshot</h4>
+        <p>Oura, Whoop, Garmin, Apple, Samsung — whatever you wear. We read the device and the score straight off the image.</p>
+        <div class="hs-visual">
+          <div class="hs-shot">
+            <span class="badge"></span>
+            <span class="meta"><b>Whoop · Recovery</b><span>83%</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="how-step">
+        <span class="hs-num">STEP 02</span>
+        <h4>We normalize it to one index</h4>
+        <p>Each device gets a calibrated handicap, so a Whoop 83 and an Oura 83 finally mean the same thing.</p>
+        <div class="hs-visual">
+          <div class="hs-formula"><span class="dim">83 × 0.92 − 1.0 →</span> <span class="out">75 Oriya</span></div>
+        </div>
+      </div>
+      <div class="how-step">
+        <span class="hs-num">STEP 03</span>
+        <h4>Land on a live board</h4>
+        <p>You drop straight into a squad leaderboard — ranked against your own baseline, never a raw public number.</p>
+        <div class="hs-visual">
+          <div class="hs-row"><span class="rk">#4</span><span class="nm">You</span><span class="sc">75 ▲</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="how-cta">
+      <a href="try.html" id="ctaHow" class="btn btn-primary" data-magnetic data-door="create">Try it with your screenshot →</a>
+      <a href="science.html" class="btn-ghost" style="opacity:0.8;">or read how we normalize ↓</a>
+    </div>
+  </div>
+</section>
+
 <!-- ACT 2 — THE BIOMETRIC HANDICAP -->
 <section class="act" id="handicap">
   <div class="wrap reveal">
     <div class="act-head" style="margin:0 auto; text-align:center;">
       <span class="eyebrow">The Biometric Handicap</span>
       <h2 class="display display-l">Four devices. Four scales.<br>One fair number.</h2>
-      <p class="lede" style="margin:18px auto 0;">Oura reads Readiness. Garmin rolls a Battery. Apple counts SDNN, Whoop counts RMSSD. Hover a device to see it normalize — then collapse all four into one.</p>
+      <p class="lede" style="margin:18px auto 0;">Oura scores Readiness, Whoop a Recovery %, Garmin a Body Battery — three different composites. Apple ships no recovery score at all, so Oriya computes one from your Apple Health signals. Hover a device to watch it normalize, then collapse all four into one — the same model behind <a href="#science" style="color:var(--jade);">the science</a>.</p>
     </div>
 
     <div class="normalizer" id="normalizer">
@@ -511,25 +703,25 @@
         <span class="chip-read">Readiness 82</span>
         <span class="chip-norm">→ ORIYA 82</span>
       </button>
-      <button class="chip" data-id="garmin" data-oriya="71" style="--x:208px; --y:0px;">
+      <button class="chip" data-id="garmin" data-oriya="67" style="--x:208px; --y:0px;">
         <span class="chip-dev">Garmin</span>
-        <span class="chip-read">Body Battery 64</span>
-        <span class="chip-norm">→ ORIYA 71</span>
+        <span class="chip-read">Body Battery 71</span>
+        <span class="chip-norm">→ ORIYA 67</span>
       </button>
-      <button class="chip" data-id="apple" data-oriya="68" style="--x:0px; --y:208px;">
+      <button class="chip" data-id="apple" data-oriya="79" style="--x:0px; --y:208px;">
         <span class="chip-dev">Apple Watch</span>
-        <span class="chip-read">SDNN 48 ms</span>
-        <span class="chip-norm">→ ORIYA 68</span>
+        <span class="chip-read">HRV · computed</span>
+        <span class="chip-norm">→ ORIYA 79</span>
       </button>
-      <button class="chip" data-id="whoop" data-oriya="74" style="--x:-208px; --y:0px;">
+      <button class="chip" data-id="whoop" data-oriya="75" style="--x:-208px; --y:0px;">
         <span class="chip-dev">WHOOP 5.0</span>
-        <span class="chip-read">RMSSD 57 %</span>
-        <span class="chip-norm">→ ORIYA 74</span>
+        <span class="chip-read">Recovery 83</span>
+        <span class="chip-norm">→ ORIYA 75</span>
       </button>
 
       <div class="orb-stage">
         <div class="orb norm-orb" id="normOrb">
-          <span class="orb-num" id="normScore">74</span>
+          <span class="orb-num" id="normScore">76</span>
           <span class="orb-cap">Oriya Index</span>
         </div>
       </div>
@@ -542,13 +734,102 @@
   </div>
 </section>
 
+<!-- ACT 2.7 — THE SCIENCE (credibility behind the number) -->
+<section class="act" id="science">
+  <div class="wrap reveal">
+    <div class="act-head" style="margin:0 auto; text-align:center;">
+      <span class="eyebrow">The science · grounded in research</span>
+      <h2 class="display display-l">A normalized number<br>you can actually trust.</h2>
+      <p class="lede" style="margin:18px auto 0;">Comparing a Whoop score to an Oura score directly is like mixing Celsius and Fahrenheit. Oriya applies a device-specific correction so every wearable lands on one honest 0–100 scale.</p>
+    </div>
+
+    <div class="science-card">
+      <div class="science-top">
+        <div class="science-left">
+          <span class="eyebrow">The worked example</span>
+          <h3>A Whoop 83 isn't<br>an Oura 83.</h3>
+          <p>Each device measures recovery differently and validates differently. We translate the raw score with a calibrated factor and offset — tuned per sensor — into the comparable Oriya Standard.</p>
+          <div class="science-eq"><span class="raw">Whoop 83 × 0.92 − 1.0</span> = <span class="out">75</span> Oriya</div>
+        </div>
+        <div class="science-right">
+          <span class="lbl">Native score → Oriya Standard</span>
+          <table class="sci-table">
+            <thead><tr><th>Device · native</th><th>Raw</th><th>Oriya</th></tr></thead>
+            <tbody>
+              <tr><td>Oura · Readiness</td><td>82</td><td><span class="o">82</span></td></tr>
+              <tr><td>Whoop · Recovery</td><td>83</td><td><span class="o">75</span></td></tr>
+              <tr><td>Garmin · Body Batt.</td><td>71</td><td><span class="o">67</span></td></tr>
+              <tr><td>Samsung · Energy</td><td>80</td><td><span class="o">72</span></td></tr>
+              <tr><td>Apple · HRV-derived<span style="color:var(--amber-glow)">*</span></td><td>—</td><td><span class="o">79</span></td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:11px;font-family:var(--font-mono);font-size:10px;line-height:1.5;color:var(--ash);">Oura 82 and Whoop 83 look like a tie — they aren't. <span style="color:var(--amber-glow)">*</span>Apple ships no native score; Oriya computes one from Apple Health (HRV, resting HR, sleep).</p>
+        </div>
+      </div>
+
+      <details class="science-details">
+        <summary>How we normalize — the four steps</summary>
+        <div class="science-body">
+          <div class="sci-step"><b>01 · Read the score</b>From your screenshot (OCR-verified) or a read-only connection. Devices with no native score — like Apple Watch — are computed from raw Apple Health signals instead.</div>
+          <div class="sci-step"><b>02 · Apply the <span>device correction</span></b>A factor + offset calibrated per sensor. Independent testing shows the same heartbeats yield very different HRV by device (ICC 0.99 on Whoop vs 0.24 on Garmin) — so each needs its own correction.</div>
+          <div class="sci-step"><b>03 · Weight the full signal</b>The full method blends the contributors the literature finds across these scores — HRV &amp; resting HR, sleep, and activity. The single-screenshot demo uses the linear factor only.</div>
+          <div class="sci-step"><b>04 · Post to the board</b>Now every device is on one scale — ranked against your own baseline, never a raw public number.</div>
+          <div class="sci-source"><b>The evidence.</b> Doherty &amp; Altini et al., <em>Translational Exercise Biomedicine</em> (2025) — composite scores use undisclosed, inconsistent formulas and are rarely validated; Miller et al., <em>Sensors</em> (2022) — device HRV &amp; sleep accuracy varies widely; Shaffer &amp; Ginsberg, <em>Frontiers in Public Health</em> (2017) — RMSSD and SDNN are different HRV metrics, not interchangeable. Full references on the <a href="science.html" style="color:var(--jade);">science page</a>. Directionally useful, not diagnostic — a social layer, not a medical report.</div>
+        </div>
+      </details>
+    </div>
+
+    <div class="science-cta">
+      <a href="try.html" class="btn btn-primary" data-magnetic data-door="create">Get your normalized score →</a>
+      <a href="science.html" class="btn-ghost" style="opacity:0.85;">Read the full method →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ACT 2.5 — LIVE SQUAD PROOF (it's already a competition) -->
+<section class="act" id="proof">
+  <div class="wrap reveal">
+    <div class="act-head" style="margin:0 auto; text-align:center;">
+      <span class="eyebrow">Already a competition · SF &amp; NYC</span>
+      <h2 class="display display-l">The morning score stopped<br>being a solo number.</h2>
+      <p class="lede" style="margin:18px auto 0;">Run clubs, founder crews and on-call eng teams are already on the board — every device normalized to the same index, so nobody's sandbagged by their hardware.</p>
+    </div>
+
+    <div class="proof-grid">
+      <div class="proof-card">
+        <span class="proof-live"><span class="dot"></span> Live</span>
+        <h4>Launch-Crunch Bracket</h4>
+        <p>Anthropic's red-team week vs OpenAI's alignment on-call vs Stripe's peak-traffic infra. Highest normalized readiness under load holds the lead.</p>
+        <div class="proof-meta"><span class="ppl">53 logging</span><span class="prize">$1,200 pool</span></div>
+      </div>
+      <div class="proof-card">
+        <span class="proof-live"><span class="dot"></span> Live</span>
+        <h4>Marina RC vs Stanford RC</h4>
+        <p>The Bay's oldest running rivalry, settled on a 7-day team recovery average instead of an argument about 10K splits.</p>
+        <div class="proof-meta"><span class="ppl">38 logging</span><span class="prize">$500 pool</span></div>
+      </div>
+      <div class="proof-card">
+        <span class="proof-live"><span class="dot"></span> Live</span>
+        <h4>Founders vs Operators</h4>
+        <p>Do founders recover better when they own the schedule, or are operators more disciplined? 71 athletes, five companies, 21 days.</p>
+        <div class="proof-meta"><span class="ppl">71 logging</span><span class="prize">$2,000 pool</span></div>
+      </div>
+    </div>
+
+    <div class="proof-cta">
+      <a href="try.html" id="ctaProof" class="btn btn-primary" data-magnetic data-door="create">See where you'd land →</a>
+      <span class="eyebrow" style="opacity:0.7;">Drop a screenshot · get your normalized number · pick a side</span>
+    </div>
+  </div>
+</section>
+
 <!-- ACT 3 — COMPETITIVE RECOVERY / THE SQUAD -->
 <section class="act" id="squad">
   <div class="wrap reveal">
     <div class="act-head" style="margin:0 auto; text-align:center;">
-      <span class="eyebrow">Competitive recovery</span>
-      <h2 class="display display-l">You're not chasing a number.<br>You're chasing yesterday's you.</h2>
-      <p class="lede" style="margin:18px auto 0;">Rank is measured against your own baseline — supportive, not a raw public number. The board never shames a red morning.</p>
+      <span class="eyebrow">Squads · bring your people</span>
+      <h2 class="display display-l">Recovery's better<br>as a team sport.</h2>
+      <p class="lede" style="margin:18px auto 0;">Bring your run club, your team, your training partners — whatever they wear. Rank is against your own baseline, never a raw public number, so the board pushes the whole group without shaming a single red morning.</p>
     </div>
 
     <div class="squad">
@@ -618,6 +899,9 @@
         <span class="eyebrow">The Body Passport</span>
         <h2 class="display display-l">Switch your ring for a watch.</h2>
         <p class="lede" style="margin:18px 0 0;">Keep your history, your rank, your people. A portable, normalized identity that survives switching — or abandoning — hardware. Tap a device: the source label swaps, the score and the squad stay put.</p>
+        <div style="margin-top:30px;">
+          <a href="try.html" id="ctaPassport" class="btn btn-primary" data-magnetic data-door="create">Claim your Body Passport →</a>
+        </div>
       </div>
     </div>
   </div>
@@ -645,14 +929,30 @@
         <span class="orb-cap">Readiness · dawn</span>
       </div>
     </div>
-    <span class="eyebrow">🏆 Sleep League · Season 1 · SF &amp; NYC</span>
+    <span class="eyebrow">🏆 Season 1 · SF &amp; NYC · invite-only</span>
     <h2 class="display display-l" style="margin-top:16px;">Tomorrow morning, don't check your score alone.</h2>
-    <form class="email-form" onsubmit="submitWaitlist(event)">
-      <input id="pilotEmail" type="email" placeholder="your@email.com" required aria-label="Email address">
-      <button class="btn btn-primary amber" type="submit" data-magnetic>Claim your Passport →</button>
-    </form>
-    <div class="form-error" id="waitlistError">Something went wrong. Please try again.</div>
-    <p class="form-note">Private beta · free · any wearable · no credit card</p>
+    <p class="lede" style="margin:18px auto 0;max-width:50ch;">Send the screenshots and the recovery problems you keep hitting. We read them, find your physiological signature, and match you into a local squad — with the challenges built around the one lever your recovery needs most.</p>
+
+    <div class="trust-strip">
+      <span class="trust-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Read-only access</span>
+      <span class="trust-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>Sharing off by default</span>
+      <span class="trust-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="8" r="3"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>Teams see aggregate only · min. 5</span>
+      <span class="trust-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Never sold · never advertised</span>
+    </div>
+
+    <div class="offer-card">
+      <span class="eyebrow">What you get in the beta</span>
+      <div class="offer-stack">
+        <div class="offer-item"><span class="offer-ic">◆</span><div><b>Your physiological signature, read from your own screenshots</b><span>Chronotype, HRV pattern, and the recovery lever you're leaving on the table — analyzed from the data you already have.</span></div></div>
+        <div class="offer-item"><span class="offer-ic">◆</span><div><b>A squad that's actually near you</b><span>Matched into a local SF / NYC crew that shares morning recoveries — the people you already train and work with, on one board.</span></div></div>
+        <div class="offer-item"><span class="offer-ic">◆</span><div><b>Challenges picked for your gap</b><span>We route you to the boards that target your weakest lever — not a generic feed you'll mute in a week.</span></div></div>
+      </div>
+      <div class="tally-wrap" id="tallyWrap">
+        <iframe id="tallyEmbed" class="tally-embed" width="100%" height="240" frameborder="0" title="Join the Oriya waitlist"></iframe>
+      </div>
+      <p class="form-note">Free · invite-only Season 1 · no credit card · your data is never sold</p>
+    </div>
+
     <div class="compat">
       <span>Apple Health</span><span>Oura</span><span>Garmin</span><span>Whoop</span><span>Samsung</span><span>+ more</span>
     </div>
@@ -672,14 +972,24 @@
       </div>
       <div class="footer-col">
         <h5>Product</h5>
-        <a href="#handicap">The Handicap</a>
+        <a href="#how">How it works</a>
+        <a href="science.html">The Science</a>
         <a href="#squad">Squads</a>
         <a href="#passport">Body Passport</a>
+        <a href="try.html" data-door="create">Create your Squad</a>
         <a href="#join">Join the beta</a>
       </div>
       <div class="footer-col">
+        <h5>Explore</h5>
+        <a href="science.html">The normalization method</a>
+        <a href="competitors.html">How we compare</a>
+        <a href="try.html" data-door="create">Build your Body Passport</a>
+        <a href="#proof">Live boards</a>
+      </div>
+      <div class="footer-col">
         <h5>Connect</h5>
-        <a href="https://oriya.substack.com/">Substack</a>
+        <a href="https://oriyaapp.substack.com/about" target="_blank" rel="noopener">Substack</a>
+        <a href="https://linkedin.com/company/oriyaai" target="_blank" rel="noopener">LinkedIn</a>
         <a href="mailto:hello@oriya.app">hello@oriya.app</a>
         <a href="mailto:team@oriya.app">team@oriya.app</a>
       </div>
@@ -705,8 +1015,8 @@
       <div class="modal-success-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
-      <h3>You're in.</h3>
-      <p>Share your link to jump the queue and earn founding-athlete perks before Season 1 locks.</p>
+      <h3>You're on the list.</h3>
+      <p>You're in line for Season 1 — but your spot can move. <strong>Every friend who joins with your link bumps you up the waitlist.</strong></p>
       <div class="referral-link-box">
         <div class="referral-link" id="referralLink"></div>
         <button class="btn btn-secondary" type="button" onclick="copyReferralLink(event)">Copy</button>
@@ -716,9 +1026,12 @@
         <button class="btn btn-secondary" type="button" onclick="shareReferral('whatsapp')">WhatsApp</button>
         <button class="btn btn-secondary" type="button" onclick="shareReferral('native')">Share</button>
       </div>
+      <div class="referral-explain">Refer friends → climb the liveboard → unlock exclusive access</div>
+      <div class="referral-board" id="referralBoard"></div>
       <div class="referral-tiers">
-        <div class="referral-tier"><strong>3 referrals</strong><span>First cohort access and priority invites.</span></div>
-        <div class="referral-tier"><strong>10 referrals</strong><span>Founding member status with extra perks.</span></div>
+        <div class="referral-tier"><strong>1 referral</strong><span>Skip the general queue — priority invite.</span></div>
+        <div class="referral-tier"><strong>3 referrals</strong><span>First-cohort access the day Season 1 opens.</span></div>
+        <div class="referral-tier"><strong>10 referrals</strong><span>Founding Athlete — exclusive status, perks &amp; badge.</span></div>
       </div>
     </div>
   </div>
@@ -741,6 +1054,19 @@
 </div>
 
 <script>
+  /* ========== Analytics shim (vendor-agnostic) ==========
+     Pushes named events to window.dataLayer and logs to console. A GA4 /
+     PostHog / Segment snippet can consume window.dataLayer later with no
+     change here. NOTE: device_connect_started / device_connect_completed are
+     intentionally fired from the Body Passport prototype (try.html), where the
+     mock device-connect actually happens — there is no OAuth flow on this page. */
+  window.dataLayer = window.dataLayer || [];
+  window.oriyaTrack = function (event, props) {
+    var payload = Object.assign({ event: event, ts: Date.now() }, props || {});
+    window.dataLayer.push(payload);
+    if (window.console) console.debug("[oriya:event]", event, payload);
+  };
+
   const REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ========== ACT 0 — preload: orb wakes ========== */
@@ -894,38 +1220,279 @@
   })();
 
   /* ============================================================
-     PRESERVED: Supabase waitlist + referral + modal
+     WAITLIST + REFERRALS via TALLY  (single source of truth)
+     The inline Tally form stores every signup. The inbound ?ref=
+     code is passed as a Tally hidden field, so each submission row
+     records who referred that signup. On submit, we still fire your
+     custom referral share-loop (generated code + modal).
+     ------------------------------------------------------------
+     ONE-TIME SETUP in your Tally form (tally.so):
+       1. Add an  Email  question.
+       2. Add a Hidden field with key:  ref      (the referrer's code)
+       3. Add a Hidden field with key:  source   (will arrive as "landing")
+       4. In Tally → form → Theme, match the dark palette. The embed now
+          honors this background (transparentBackground is NOT passed), so
+          set the background to your site color so they match exactly:
+             • Page / form background : #070809 (void) or #0E1014 (obsidian)
+             • Text color             : #ECEAE4  (bone)
+             • Question / label color : #ECEAE4
+             • Input background       : #1A1E24  (graphite) or transparent
+             • Input border / text    : #2A2F38 / #ECEAE4
+             • Button (primary) bg     : #D7A25C  (amber), text #070809
+             • Accent / focus          : #7FB79E  (jade)
+             • Font: a clean sans (Inter) to match the page.
+       5. Copy the form ID from its URL  (tally.so/r/XXXXXX)  into
+          TALLY_FORM_ID below.
      ============================================================ */
-  const SUPABASE_URL = "https://aorbjcfffzrsswywtzai.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvcmJqY2ZmZnpyc3N3eXd0emFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwMTYwODYsImV4cCI6MjA5MDU5MjA4Nn0.cJlTJLHXuH-IleX5tixAf3nUntmA9gIiLF147qPjANQ";
+  const TALLY_FORM_ID = "Bz69RK"; // tally.so/r/Bz69RK
 
-  async function supabaseInsert(table, data) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Prefer: "return=minimal" },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) {
-      const text = await res.text();
-      if (text.includes("duplicate") || text.includes("23505")) return { error: null };
-      throw new Error(text || res.statusText);
-    }
-    return { error: null };
+  function getInboundRef() {
+    try { return new URLSearchParams(location.search).get("ref") || ""; } catch { return ""; }
+  }
+  function getInboundSquad() {
+    try { return new URLSearchParams(location.search).get("squad") || ""; } catch { return ""; }
+  }
+  // Derive a human squad name from a referral code "<localpart>-<submissionId>".
+  function squadNameFromRef(ref) {
+    var label = String(ref || "").split("-")[0];
+    return label ? label.charAt(0).toUpperCase() + label.slice(1) : "";
   }
 
-  function generateReferralCode(email) {
-    const base = email.split("@")[0].toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-    const suffix = Math.random().toString(36).slice(2, 8);
-    return `${base || "oriya"}-${suffix}`;
+  /* ========== Hero CTA wiring: hierarchy, invite override & event tracking ==========
+     Default: primary = "Create your Squad" → try.html (door:create).
+     If the visitor arrived via an invite (?squad= or ?ref=), the primary
+     becomes "Join {name}'s Squad" → try.html (door:join), carrying the param
+     through. Secondary stays "or claim your Passport" → #join (door:claim). */
+  (function wireHeroCtas() {
+    var squad = getInboundSquad();
+    var ref = getInboundRef();
+    var invited = !!(squad || ref);
+    var name = squad || squadNameFromRef(ref) || "your friend";
+    var primaries = [
+      document.getElementById("ctaPrimary"),
+      document.getElementById("ctaNav"),
+      document.getElementById("ctaProof"),
+      document.getElementById("ctaPassport")
+    ].filter(Boolean);
+
+    primaries.forEach(function (el) {
+      if (invited) {
+        el.textContent = "Join " + name + (squad ? "" : "'s") + " Squad";
+        el.dataset.door = "join";
+        // carry the invite context into the prototype
+        var qs = new URLSearchParams();
+        if (squad) qs.set("squad", squad);
+        if (ref) qs.set("ref", ref);
+        el.setAttribute("href", "try.html?" + qs.toString());
+      }
+      el.addEventListener("click", function () {
+        var door = el.dataset.door || "create";
+        window.oriyaTrack("cta_click", { cta: door === "join" ? "join_squad" : "create_squad", location: el.id });
+        window.oriyaTrack("door_selected", { door: door, squad: invited ? name : null });
+      });
+    });
+
+    // Secondary "claim your Passport" links
+    Array.prototype.forEach.call(document.querySelectorAll('[data-door="claim"]'), function (el) {
+      el.addEventListener("click", function () {
+        window.oriyaTrack("cta_click", { cta: "claim_passport", location: el.id || "link" });
+        window.oriyaTrack("door_selected", { door: "claim" });
+      });
+    });
+  })();
+
+  // Load the inline Tally embed, injecting the inbound referrer as a hidden field.
+  (function loadTallyEmbed() {
+    const iframe = document.getElementById("tallyEmbed");
+    const wrap = document.getElementById("tallyWrap");
+    if (!iframe || !wrap) return;
+    if (!TALLY_FORM_ID || TALLY_FORM_ID === "REPLACE_WITH_YOUR_FORM_ID") {
+      wrap.innerHTML = '<div class="tally-fallback">Waitlist form not configured yet.<br>Set <code>TALLY_FORM_ID</code> in the page script to your Tally form ID.</div>';
+      return;
+    }
+    // NOTE: transparentBackground is intentionally OMITTED — passing it forces
+    // Tally to render see-through and discards the background color you set in
+    // the Tally dashboard. Without it, your dashboard theme (background + colors)
+    // is honored as-is.
+    const params = new URLSearchParams({ alignLeft: "1", hideTitle: "1", dynamicHeight: "1", source: "landing" });
+    const ref = getInboundRef();
+    if (ref) params.set("ref", ref);
+    const src = "https://tally.so/embed/" + TALLY_FORM_ID + "?" + params.toString();
+    iframe.dataset.tallySrc = src;
+    iframe.removeAttribute("loading"); // never defer the signup form
+    console.info("[oriya] Tally embed src:", src);
+
+    function activate() {
+      if (window.Tally && typeof window.Tally.loadEmbeds === "function") window.Tally.loadEmbeds();
+      // Guarantee the form actually loads even if embed.js is blocked or slow.
+      setTimeout(() => {
+        if (!iframe.getAttribute("src")) {
+          console.warn("[oriya] embed.js didn't wire the iframe — loading the form directly");
+          iframe.src = src;
+        }
+      }, 1500);
+    }
+
+    const SRC = "https://tally.so/widgets/embed.js";
+    if (window.Tally) {
+      activate();
+    } else {
+      let s = document.querySelector('script[src="' + SRC + '"]');
+      if (!s) { s = document.createElement("script"); s.src = SRC; document.body.appendChild(s); }
+      s.addEventListener("load", activate);
+      s.addEventListener("error", () => { console.warn("[oriya] embed.js failed to load — loading form directly"); iframe.src = src; });
+      setTimeout(activate, 900); // in case the script was already cached/loaded
+    }
+  })();
+
+  // DEBUG (temporary): log every event coming from the Tally iframe so we can
+  // see FormLoaded / FormSubmitted actually fire. Safe to remove once verified.
+  window.addEventListener("message", (e) => {
+    if (typeof e.origin === "string" && e.origin.indexOf("tally.so") === -1) return;
+    let d = e.data;
+    if (typeof d === "string") { try { d = JSON.parse(d); } catch { return; } }
+    if (d && d.event) console.info("[oriya] Tally event →", d.event);
+  });
+
+  // Pull the email out of Tally's FormSubmitted payload. Tally fields are
+  // { key, label, type, value }, but we stay defensive about value shape and
+  // fall back to scanning every field for an email pattern — so the code is
+  // never silently generated from an empty string again.
+  const EMAIL_RE = /[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/;
+  function fieldValue(f) {
+    // Tally has shipped two payload shapes: { value } and { answer: { value } }.
+    let v = f && (f.value ?? (f.answer && (f.answer.value ?? f.answer)));
+    if (v && typeof v === "object") v = v.value ?? v.email ?? v.text ?? v.label ?? "";
+    if (Array.isArray(v)) v = v.join(" ");
+    return v == null ? "" : String(v);
+  }
+  function extractEmail(payload) {
+    const fields = (payload && payload.fields) || [];
+    for (const f of fields) { // 1) by type / label
+      const type = String(f.type || "").toUpperCase();
+      const label = String(f.label || f.title || f.key || "").toLowerCase();
+      if (type.includes("EMAIL") || label.includes("email")) {
+        const v = fieldValue(f).trim();
+        if (EMAIL_RE.test(v)) return v;
+      }
+    }
+    for (const f of fields) { // 2) regex fallback across all values
+      const m = fieldValue(f).match(EMAIL_RE);
+      if (m) return m[0].trim();
+    }
+    return "";
+  }
+  // Tally's own unique ID for the just-created submission row. This is the
+  // anchor for referral tracking: it's guaranteed present in the payload and
+  // maps 1:1 to a row in the Tally dashboard. Tally has used a few key names.
+  function extractSubmissionId(payload) {
+    const p = payload || {};
+    const id = p.respondentId || p.responseId || p.submissionId || p.id || "";
+    return String(id).trim();
+  }
+
+  // When Tally confirms a submission, fire the referral share-loop (code + modal).
+  // IMPORTANT: this fires AFTER Tally has already saved the row (the form posts
+  // from inside the cross-origin iframe). Nothing here can block a submission.
+  // The whole body is guarded so a UI error can never even look like it did.
+  window.addEventListener("message", (e) => {
+    let data = e.data;
+    if (typeof data === "string") { try { data = JSON.parse(data); } catch { return; } }
+    if (!data || data.event !== "Tally.FormSubmitted") return;
+    try {
+      const email = extractEmail(data.payload);
+      const submissionId = extractSubmissionId(data.payload);
+      const code = generateReferralCode(email, submissionId);
+      console.info("[oriya] FormSubmitted — email:", email || "(none)", "| submissionId:", submissionId || "(none)", "| code:", code);
+      const referralData = { email, submissionId, code };
+      saveReferralStorage(referralData);
+      setReferralLink(code);
+      // A completed signup is a network node with its own invite link.
+      window.oriyaTrack("squad_created", { code, source: "waitlist" });
+      openWaitlistConfirmModal();
+    } catch (err) {
+      console.error("[oriya] post-submit referral UI error (the Tally row was still saved):", err);
+    }
+  });
+
+  // Fallback hash, only used if Tally ever fails to send a submission id.
+  function hashEmail(email) {
+    const s = (email || "").trim().toLowerCase();
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return (h >>> 0).toString(36);
+  }
+  // Referral code = <first-part-of-email>-<tally submission id>.
+  // The submission id IS Tally's own row identifier, so a `ref` value found on
+  // a later signup points straight back to the referrer's row in the dashboard
+  // — no hashing or reconstruction needed. The email prefix is just a
+  // human-readable label. If the id is somehow missing, fall back to the email
+  // hash so the code is still unique rather than collapsing to "oriya-...".
+  function generateReferralCode(email, submissionId) {
+    const base = ((email || "").split("@")[0] || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "oriya";
+    const id = String(submissionId || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "") || hashEmail(email);
+    return `${base}-${id}`;
   }
   function getReferralStorage() { try { return JSON.parse(localStorage.getItem("oriyaReferral") || "null"); } catch { return null; } }
   function saveReferralStorage(d) { localStorage.setItem("oriyaReferral", JSON.stringify(d)); }
   function getReferralLink(code) { return `${window.location.origin}${window.location.pathname}?ref=${code}`; }
   function setReferralLink(code) { const el = document.getElementById("referralLink"); if (el) el.textContent = getReferralLink(code); }
 
+  /* ========== Referral Liveboard ==========
+     Gamified recruiter loop: top Season-1 referrers + YOUR live position + progress to the
+     next tier (1 → priority, 3 → first cohort, 10 → Founding Athlete). Seed rows are illustrative
+     (same convention as the squad ranking/ticker); the YOU row is honest — it reads the real
+     referral count from storage (0 until a backend reports confirmed invites), never inflated. */
+  const RB_SEED = [
+    { n: "Maya R.", c: 14 }, { n: "Devin K.", c: 9 }, { n: "Priya S.", c: 6 },
+    { n: "Marcus L.", c: 3 }, { n: "Wei C.", c: 2 },
+  ];
+  function rbTier(c) {
+    if (c >= 10) return { l: "Founding Athlete", cls: "founding" };
+    if (c >= 3)  return { l: "First cohort", cls: "" };
+    if (c >= 1)  return { l: "Priority", cls: "" };
+    return { l: "—", cls: "" };
+  }
+  function rbNext(c) {
+    if (c >= 10) return null;
+    const target = c >= 3 ? 10 : c >= 1 ? 3 : 1;
+    const base = c >= 3 ? 3 : c >= 1 ? 1 : 0;
+    const label = target === 1 ? "priority invite" : target === 3 ? "first-cohort access" : "Founding Athlete status";
+    const pct = Math.max(0, Math.min(100, Math.round(((c - base) / (target - base)) * 100)));
+    return { need: target - c, label, pct };
+  }
+  function renderReferralBoard() {
+    const el = document.getElementById("referralBoard");
+    if (!el) return;
+    const me = getReferralStorage();
+    const myCount = (me && Number(me.referrals)) || 0;
+    const rows = RB_SEED.map(function (r) { return { n: r.n, c: r.c, you: false }; });
+    rows.push({ n: "You", c: myCount, you: true });
+    rows.sort(function (a, b) { return b.c - a.c; });
+    var medal = function (i) { return i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : (i + 1); };
+    var html = '<div class="rb-head"><span class="t">Season 1 · Referral Liveboard</span><span class="rb-live"><span class="d"></span> live</span></div>';
+    rows.forEach(function (r, i) {
+      var t = rbTier(r.c);
+      html += '<div class="rb-row ' + (r.you ? "you" : "") + '">'
+        + '<span class="rk">' + medal(i) + '</span>'
+        + '<span class="nm">' + (r.you ? "You" : r.n) + '</span>'
+        + '<span class="ct">' + r.c + '</span>'
+        + '<span class="bd ' + t.cls + '">' + t.l + '</span></div>';
+    });
+    var nt = rbNext(myCount);
+    if (nt) {
+      html += '<div class="rb-prog"><span class="lbl">' + nt.need + ' more ' + (nt.need === 1 ? "friend" : "friends")
+        + ' → ' + nt.label + '</span><div class="bar"><div class="fill" style="width:' + nt.pct + '%"></div></div></div>';
+    } else {
+      html += '<div class="rb-prog"><span class="lbl">🏆 Founding Athlete unlocked — top of the board.</span></div>';
+    }
+    el.innerHTML = html;
+  }
+
   function openWaitlistConfirmModal() {
     const m = document.getElementById("waitlistConfirmModal");
     m.classList.add("open"); m.setAttribute("aria-hidden", "false");
+    renderReferralBoard();
   }
   function closeWaitlistConfirmModal() {
     const m = document.getElementById("waitlistConfirmModal");
@@ -955,37 +1522,9 @@
     copyReferralLink();
   }
 
-  async function submitWaitlist(e) {
-    e.preventDefault();
-    const form = e.target;
-    const input = form.querySelector('input[type="email"]');
-    const email = input.value.trim();
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const errorEl = document.getElementById("waitlistError");
-    if (!email) return;
-    const original = submitBtn.textContent;
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Joining…";
-    if (errorEl) errorEl.style.display = "none";
-    try {
-      await supabaseInsert("waitlist", { email, type: "waitlist", created_at: new Date().toISOString() });
-      const referralData = { email, code: generateReferralCode(email) };
-      saveReferralStorage(referralData);
-      setReferralLink(referralData.code);
-      openWaitlistConfirmModal();
-      input.value = "";
-    } catch (err) {
-      console.error("Waitlist error:", err);
-      if (errorEl) { errorEl.textContent = "Something went wrong. Please try again."; errorEl.style.display = "block"; }
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = original;
-    }
-  }
-
   function focusSignup() {
+    window.oriyaTrack("door_selected", { door: "claim", location: "ori" });
     document.getElementById("join").scrollIntoView({ behavior: "smooth", block: "center" });
-    document.getElementById("pilotEmail").focus();
   }
 
   /* ============================================================

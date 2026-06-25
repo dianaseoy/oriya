@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oriya — Your Body Passport</title>
+  <meta name="description" content="Drop a recovery screenshot. We OCR-verify it, normalize it to the Oriya Standard, and drop you into live recovery challenges." />
+
+  <!-- No build step. UMD React + ReactDOM + Babel Standalone (plain text/babel).
+       Tesseract.js (OCR) and html-to-image (share PNG) are lazy-loaded on demand. -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            void: "#020617", ink: "#0c0e12", graphite: "#16191F",
+            bone: "#ECEAE4", ash: "#8A8F98",
+            jade: { DEFAULT: "#7FB79E", deep: "#3E6F5E", glow: "#9FD3BB" },
+            amber: { brand: "#D7A25C", deep: "#B5723C", glow: "#F0C083" },
+          },
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+          },
+          keyframes: {
+            "fade-up": { "0%": { opacity: 0, transform: "translateY(8px)" }, "100%": { opacity: 1, transform: "translateY(0)" } },
+            "pop-in": { "0%": { opacity: 0, transform: "scale(.96)" }, "100%": { opacity: 1, transform: "scale(1)" } },
+          },
+          animation: {
+            "fade-up": "fade-up .5s cubic-bezier(.2,.7,.2,1) both",
+            "pop-in": "pop-in .35s cubic-bezier(.2,.7,.2,1) both",
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
+
+  <style>
+    :root{
+      --void:#020617; --ink:#0c0e12; --graphite:#16191F;
+      --bone:#ECEAE4; --ash:#8A8F98; --hairline:rgba(236,234,228,.10);
+      --jade:#7FB79E; --jade-deep:#3E6F5E; --amber:#D7A25C; --amber-deep:#B5723C;
+      --font-mono:'JetBrains Mono',ui-monospace,monospace;
+    }
+    html, body { background:#020617; }
+    body { -webkit-font-smoothing:antialiased; }
+    .spin { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---- Credit-card Body Passport (mirrors landing .passport) ---- */
+    .passport-card{
+      position:relative; height:100%; width:100%; border-radius:20px;
+      background:linear-gradient(155deg,#16191F 0%,#0c0e12 100%);
+      border:1px solid var(--hairline); padding:22px;
+      display:flex; flex-direction:column; justify-content:space-between;
+      box-shadow:0 40px 80px -34px rgba(0,0,0,.85), inset 0 0 0 1px rgba(236,234,228,.10), inset 0 1px 1px rgba(255,255,255,.06);
+      overflow:hidden; color:var(--bone);
+    }
+    .passport-card::after{ content:""; position:absolute; top:-40%; left:-22%; width:80%; height:180%;
+      background:linear-gradient(90deg,transparent,rgba(236,234,228,.05),transparent);
+      transform:rotate(18deg); pointer-events:none; }
+    .pp-holo{ position:absolute; inset:0; border-radius:20px; pointer-events:none;
+      background:linear-gradient(115deg,transparent 28%,rgba(127,183,158,.10) 44%,rgba(215,162,92,.12) 56%,transparent 72%);
+      mix-blend-mode:screen; opacity:.75; }
+    .pp-chip{ width:42px; height:30px; border-radius:6px; position:relative;
+      background:linear-gradient(135deg,var(--amber-deep),var(--amber)); opacity:.92;
+      box-shadow:inset 0 1px 1px rgba(255,255,255,.35); }
+    .pp-chip::after{ content:""; position:absolute; inset:6px 11px; border:1px solid rgba(0,0,0,.28); border-radius:3px; }
+    .mono{ font-family:var(--font-mono); }
+    .tnum{ font-variant-numeric:tabular-nums; }
+    .emboss{ text-shadow:0 1px 0 rgba(255,255,255,.14), 0 -1px 0 rgba(0,0,0,.45); }
+    .pp-name-input{ background:transparent; border:0; outline:0; color:var(--bone);
+      font-family:var(--font-mono); letter-spacing:.14em; text-transform:uppercase; }
+    .pp-name-input::placeholder{ color:rgba(138,143,152,.6); }
+    .pp-dev{ font-family:var(--font-mono); font-size:11px; letter-spacing:.04em;
+      padding:6px 12px; border:1px solid var(--hairline); border-radius:999px; color:var(--ash);
+      transition:all .25s cubic-bezier(.2,.7,.2,1); cursor:pointer; }
+    .pp-dev:hover{ color:var(--bone); border-color:var(--jade-deep); }
+    .pp-dev.active{ color:var(--void); background:var(--jade); border-color:var(--jade); }
+    .flash{ color:var(--jade) !important; transition:color .45s; }
+
+    /* ---- dual-sided 3D flip ---- */
+    .pp-flip{ perspective:1900px; }
+    .pp-flip-inner{ position:relative; aspect-ratio:1.586/1; transform-style:preserve-3d;
+      transition:transform .82s cubic-bezier(.2,.85,.2,1); cursor:pointer; }
+    .pp-flip.flipped .pp-flip-inner{ transform:rotateY(180deg); }
+    .pp-face{ position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:20px; }
+    .pp-face.back{ transform:rotateY(180deg); }
+
+    /* ---- front: glowing chip + holographic member strip ---- */
+    .pp-chip-glow{ box-shadow:0 0 18px 2px rgba(215,162,92,.55), inset 0 1px 1px rgba(255,255,255,.4); }
+    .pp-strip{ background:linear-gradient(100deg,rgba(236,234,228,.06),rgba(127,183,158,.22),rgba(215,162,92,.30),rgba(236,234,228,.08));
+      border:1px solid rgba(236,234,228,.16); border-radius:5px; }
+
+    /* ---- back: brushed metal ---- */
+    .passport-card.back{
+      background:linear-gradient(135deg,#cfd3d9 0%,#eceef1 20%,#b8bcc4 46%,#dee1e6 70%,#c3c7ce 100%);
+      border:1px solid rgba(20,23,28,.18); color:#14171c;
+      box-shadow:0 40px 80px -34px rgba(0,0,0,.85), inset 0 0 0 1px rgba(255,255,255,.5), inset 0 1px 1px rgba(255,255,255,.7);
+    }
+    .pp-brushed{ position:absolute; inset:0; border-radius:20px; pointer-events:none; opacity:.55;
+      background:repeating-linear-gradient(96deg, rgba(255,255,255,.10) 0 1px, transparent 1px 3px); }
+
+    /* ---- stamps + badges + vault ---- */
+    .pp-stamp{ font-family:var(--font-mono); border:1.5px solid rgba(20,23,28,.5); color:rgba(20,23,28,.78);
+      border-radius:999px; box-shadow:inset 0 0 0 1px rgba(20,23,28,.16);
+      display:flex; align-items:center; justify-content:center; text-align:center; line-height:1; transform:rotate(-8deg); }
+    .pp-stamp.locked{ border-style:dashed; border-color:rgba(20,23,28,.3); color:rgba(20,23,28,.4); box-shadow:none; opacity:.6; transform:rotate(5deg); }
+    .pp-badge-stamp{ font-family:var(--font-mono); border:1.5px solid rgba(20,23,28,.5); border-radius:6px; color:rgba(20,23,28,.82);
+      box-shadow:inset 0 0 0 1px rgba(20,23,28,.16); display:flex; align-items:center; justify-content:center; text-align:center; line-height:1.05; transform:rotate(-3deg); }
+    .pp-badge-stamp.locked{ border-style:dashed; border-color:rgba(20,23,28,.3); color:rgba(20,23,28,.4); box-shadow:none; opacity:.5; }
+    .pp-vault-gold{ background:linear-gradient(135deg,#B5723C,#F0C083); border:1px solid rgba(20,23,28,.28); border-radius:7px;
+      box-shadow:0 2px 6px rgba(0,0,0,.3), inset 0 1px 1px rgba(255,255,255,.55); }
+    .holo-text{ background:linear-gradient(90deg,#9FD3BB,#F0C083,#9FD3BB); -webkit-background-clip:text; background-clip:text; color:transparent; }
+
+    /* ---- competitiveness tier ladder (engagement-based — never score-shame) ---- */
+    .pp-tier-badge{ display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono);
+      font-size:9px; letter-spacing:.16em; text-transform:uppercase; padding:4px 10px; border-radius:999px;
+      border:1px solid var(--tier,#C7CDD6); color:var(--tier,#C7CDD6); background:rgba(0,0,0,.28); white-space:nowrap; }
+    .pp-tier-dot{ width:7px; height:7px; border-radius:50%; background:var(--tier,#C7CDD6); box-shadow:0 0 7px var(--tier,#C7CDD6); }
+    .tier-bronze{ --tier:#C8895A; } .tier-silver{ --tier:#C7CDD6; } .tier-gold{ --tier:#F0C083; } .tier-obsidian{ --tier:#9FD3BB; }
+    /* apex tier gets a faint holographic edge on the card */
+    .pp-face.tier-obsidian{ box-shadow:0 40px 80px -34px rgba(0,0,0,.85), inset 0 0 0 1px rgba(159,211,187,.35), inset 0 1px 1px rgba(255,255,255,.08); }
+    .pp-face.tier-gold{ box-shadow:0 40px 80px -34px rgba(0,0,0,.85), inset 0 0 0 1px rgba(240,192,131,.28), inset 0 1px 1px rgba(255,255,255,.06); }
+
+    /* ---- guided preview tour (de-sterilizes the cold dropzone) ---- */
+    .tour{ overflow:hidden; max-height:0; transition:max-height .42s ease; }
+    .tour.open{ max-height:360px; }
+    .tour-stage{ position:relative; border:1px solid var(--hairline); border-radius:16px; background:#05070d;
+      padding:18px; margin-top:12px; min-height:214px; overflow:hidden; }
+    .tour-cursor{ position:absolute; width:20px; height:20px; z-index:20; pointer-events:none;
+      filter:drop-shadow(0 2px 3px rgba(0,0,0,.6)); animation:tourCursor 9s ease-in-out infinite; }
+    @keyframes tourCursor{
+      0%{left:50%;top:80%;opacity:0}6%{opacity:1}
+      18%{left:50%;top:32%}22%{transform:scale(.82)}26%{transform:scale(1)}
+      46%{left:50%;top:32%}
+      64%{left:34%;top:66%}68%{transform:scale(.82)}72%{transform:scale(1)}
+      92%{left:34%;top:66%}100%{left:50%;top:80%;opacity:.5} }
+    .tour-step{ position:absolute; inset:18px; display:flex; flex-direction:column; align-items:center;
+      justify-content:center; gap:10px; text-align:center; opacity:0; animation:tourStep 9s infinite; }
+    .tour-step:nth-of-type(1){ animation-delay:0s }
+    .tour-step:nth-of-type(2){ animation-delay:3s }
+    .tour-step:nth-of-type(3){ animation-delay:6s }
+    @keyframes tourStep{ 0%{opacity:0}3%{opacity:1}30%{opacity:1}34%{opacity:0}100%{opacity:0} }
+    .tour-drop{ width:78%; max-width:280px; border:2px dashed rgba(127,183,158,.5); border-radius:14px; padding:18px;
+      color:var(--jade); font-family:var(--font-mono); font-size:12px; background:rgba(127,183,158,.05); }
+    .tour-ocr{ width:70%; max-width:240px; height:6px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; }
+    .tour-ocr i{ display:block; height:100%; border-radius:999px;
+      background:linear-gradient(90deg,var(--jade-deep),var(--jade)); animation:tourOcr 3s ease-out infinite; }
+    @keyframes tourOcr{ 0%{width:8%}80%{width:100%}100%{width:100%} }
+    .tour-score{ font-family:var(--font-mono); font-size:42px; color:var(--jade); font-variant-numeric:tabular-nums; line-height:1; }
+    .tour-row{ width:80%; max-width:260px; display:grid; grid-template-columns:20px 1fr auto; gap:8px; padding:8px 11px;
+      border-radius:9px; border:1px solid rgba(127,183,158,.4); background:linear-gradient(90deg,rgba(127,183,158,.14),transparent);
+      font-family:var(--font-mono); font-size:13px; }
+    /* shared chrome + seamless cross-page fade */
+    .topnav{ position:sticky; top:0; z-index:50; backdrop-filter:blur(14px); background:rgba(2,6,23,.72); border-bottom:1px solid rgba(255,255,255,.08); }
+    .topnav-in{ max-width:48rem; margin:0 auto; height:54px; padding:0 1.25rem; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .topnav .brand{ display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:17px; color:var(--bone); }
+    .topnav .brand svg{ width:23px; height:23px; }
+    .topnav .lnks{ display:flex; align-items:center; gap:16px; font-size:13px; }
+    .topnav .lnks a{ color:var(--ash); transition:color .2s; }
+    .topnav .lnks a:hover{ color:var(--bone); }
+    .topnav .lnks a.cta{ background:var(--jade); color:var(--void); border-radius:999px; padding:8px 15px; font-weight:600; box-shadow:0 0 40px -12px rgba(127,183,158,.5); transition:transform .35s; }
+    .topnav .lnks a.cta:hover{ transform:translateY(-2px); color:var(--void); }
+    html.pf body{ animation:pfIn .5s ease both; }
+    body.pf-out{ opacity:0; transition:opacity .26s ease; }
+    @keyframes pfIn{ from{opacity:0} to{opacity:1} }
+    @media (max-width:520px){ .topnav .lnks a.sci{ display:none } }
+    @media (prefers-reduced-motion: reduce){
+      .tour-cursor,.tour-step,.tour-ocr i{ animation:none }
+      .tour-step:nth-of-type(1){ opacity:1 } .tour-step:nth-of-type(2),.tour-step:nth-of-type(3){ display:none }
+      html.pf body{ animation:none } }
+  </style>
+</head>
+<body class="bg-void text-bone font-sans">
+  <script>
+  (function(){
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    document.documentElement.classList.add("pf");
+    addEventListener("pageshow", function(){ document.body && document.body.classList.remove("pf-out"); });
+    document.addEventListener("click", function(e){
+      var a = e.target.closest && e.target.closest("a"); if(!a) return;
+      var h = a.getAttribute("href") || "";
+      if (a.target === "_blank" || a.hasAttribute("download")) return;
+      if (/^(https?:|mailto:|tel:|#)/.test(h) || h === "") return;
+      if (/\.html(#.*)?$/.test(h)) { e.preventDefault(); document.body.classList.add("pf-out"); setTimeout(function(){ location.href = h; }, 240); }
+    });
+  })();
+  </script>
+  <nav class="topnav">
+    <div class="topnav-in">
+      <a href="index.html" class="brand">
+        <svg viewBox="0 0 100 100" fill="none"><path d="M 78 22 A 40 40 0 1 0 79 23" stroke="#7FB79E" stroke-width="5" stroke-linecap="round"/><circle cx="50" cy="55" r="14" fill="#7FB79E"/><circle cx="78" cy="22" r="7" fill="#D7A25C"/></svg>
+        Oriya
+      </a>
+      <div class="lnks">
+        <a href="science.html" class="sci">The Science</a>
+        <a href="index.html#join" class="cta">Join the beta</a>
+      </div>
+    </div>
+  </nav>
+  <div id="root"></div>
+
+  <script type="text/babel" data-presets="react">
+    const { useState, useEffect, useRef, useCallback } = React;
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+    /* =================== analytics shim =================== */
+    window.dataLayer = window.dataLayer || [];
+    function track(event, props) {
+      const payload = Object.assign({ event, ts: Date.now() }, props || {});
+      window.dataLayer.push(payload);
+      if (window.console) console.debug("[oriya:event]", event, payload);
+    }
+    window.oriyaTrack = track;
+
+    /* =================== lazy CDN loader =================== */
+    const TESS_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+    const HTI_URL  = "https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js";
+    function loadScript(src) {
+      return new Promise((res, rej) => {
+        if (document.querySelector('script[data-lazy="' + src + '"]')) return res();
+        const s = document.createElement("script");
+        s.src = src; s.dataset.lazy = src;
+        s.onload = () => res(); s.onerror = () => rej(new Error("load " + src));
+        document.head.appendChild(s);
+      });
+    }
+
+    /* =================== inline SVG icons =================== */
+    function Svg(p){ return (
+      <svg xmlns="http://www.w3.org/2000/svg" className={p.className} viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{p.children}</svg>); }
+    const Upload     = (p)=><Svg className={p.className}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></Svg>;
+    const Activity   = (p)=><Svg className={p.className}><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></Svg>;
+    const Trophy     = (p)=><Svg className={p.className}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></Svg>;
+    const Users      = (p)=><Svg className={p.className}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></Svg>;
+    const Clock      = (p)=><Svg className={p.className}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></Svg>;
+    const Sparkles   = (p)=><Svg className={p.className}><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></Svg>;
+    const Copy       = (p)=><Svg className={p.className}><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></Svg>;
+    const Check      = (p)=><Svg className={p.className}><polyline points="20 6 9 17 4 12"/></Svg>;
+    const UserPlus   = (p)=><Svg className={p.className}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></Svg>;
+    const ChevronRight=(p)=><Svg className={p.className}><polyline points="9 18 15 12 9 6"/></Svg>;
+    const ArrowLeft  = (p)=><Svg className={p.className}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></Svg>;
+    const Flame      = (p)=><Svg className={p.className}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5Z"/></Svg>;
+    const Zap        = (p)=><Svg className={p.className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></Svg>;
+    const Share2     = (p)=><Svg className={p.className}><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></Svg>;
+    const X          = (p)=><Svg className={p.className}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></Svg>;
+    const Info       = (p)=><Svg className={p.className}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></Svg>;
+    const Instagram  = (p)=><Svg className={p.className}><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></Svg>;
+    const Star       = (p)=><Svg className={p.className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></Svg>;
+    const Plus       = (p)=><Svg className={p.className}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></Svg>;
+
+    /* =================== Oriya Standard normalization (real model) ===================
+       Source: oriya.app/science — linear per-device correction Oriya = native×factor + offset.
+       Lower device validation = larger correction. Worked example: Whoop 83 → 83×0.92−1.0 = 75. */
+    const DEVICE_MODEL = {
+      oura:       { tag:"Oura",          model:"Oura Ring 4",  metric:"Readiness",      factor:0.97, offset:2.5,  validation:"High", sample:82 },
+      whoop:      { tag:"Whoop",         model:"WHOOP 5.0",    metric:"Recovery %",     factor:0.92, offset:-1.0, validation:"Med",  sample:71 },
+      garmin:     { tag:"Garmin",        model:"Garmin Fenix", metric:"Body Battery",   factor:0.95, offset:0.0,  validation:"Med",  sample:78 },
+      apple:      { tag:"Apple Watch",   model:"Apple Watch",  metric:"Recovery rate",  factor:0.90, offset:1.0,  validation:"Med",  sample:65 },
+      samsung:    { tag:"Samsung",       model:"Galaxy Watch", metric:"Energy Score",   factor:0.88, offset:2.0,  validation:"Low",  sample:72 },
+      pixel:      { tag:"Pixel Watch",   model:"Pixel Watch",  metric:"Recovery",       factor:0.91, offset:1.5,  validation:"Low",  sample:70 },
+      athlytic:   { tag:"Athlytic",      model:"Athlytic",     metric:"Recovery",       factor:0.96, offset:1.0,  validation:"Med",  sample:74 },
+      bevel:      { tag:"Bevel",         model:"Bevel",        metric:"Recovery",       factor:0.95, offset:0.5,  validation:"Med",  sample:73 },
+      cora:       { tag:"Cora Health",   model:"Cora Health",  metric:"Readiness",      factor:0.94, offset:1.0,  validation:"Med",  sample:75 },
+      gentler:    { tag:"Gentler Streak",model:"Gentler Streak",metric:"Readiness",     factor:0.97, offset:0.5,  validation:"Med",  sample:76 },
+      ultrahuman: { tag:"Ultrahuman",    model:"Ultrahuman Ring",metric:"Movement Index",factor:0.94, offset:1.0, validation:"Med",  sample:74 },
+      vora:       { tag:"Vora",          model:"Vora",         metric:"Recovery",       factor:0.96, offset:0.5,  validation:"Med",  sample:73 },
+    };
+    const PRESET_KEYS = ["oura", "whoop", "garmin", "apple"];
+
+    function toOriyaStandard(raw, key) {
+      const m = DEVICE_MODEL[key]; if (!m) return raw;
+      return Math.max(1, Math.min(99, Math.round(raw * m.factor + m.offset)));
+    }
+    // Inverse: implied native for a device that produces a given Oriya Standard (for device-swap)
+    function nativeForOriya(oriya, key) {
+      const m = DEVICE_MODEL[key]; return Math.max(1, Math.min(100, Math.round((oriya - m.offset) / m.factor)));
+    }
+    function fmtOffset(o){ return o === 0 ? "" : (o > 0 ? " + " + o : " − " + Math.abs(o)); }
+    function slug(s){ return String(s||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"") || "athlete"; }
+
+    /* =================== identity layer (Body Passport back) =================== */
+    const NATIONS = [
+      { code:"USA", flag:"🇺🇸" }, { code:"GBR", flag:"🇬🇧" }, { code:"JPN", flag:"🇯🇵" },
+      { code:"DEU", flag:"🇩🇪" }, { code:"CAN", flag:"🇨🇦" }, { code:"AUS", flag:"🇦🇺" },
+      { code:"KOR", flag:"🇰🇷" }, { code:"FRA", flag:"🇫🇷" },
+    ];
+    // Provisional physiological signatures — biologically descriptive, flex-worthy at every readiness tier
+    // (no score-shame), assigned by a stable per-passport hash so they survive device-swap and name edits.
+    const PERSONALITIES = [
+      { type:"Phase-Advanced Operator",   note:"Morning-loaded · melatonin onset ~21:00, HRV peaks pre-0700" },
+      { type:"Delayed-Phase Engine",      note:"Night-loaded · ramps post-22:00, carries social-jetlag debt" },
+      { type:"High-HRV Sustainer",        note:"RMSSD parked at 90th pct · minimal day-to-day drift" },
+      { type:"Slow-Wave Dominant",        note:"Top-decile deep sleep · clears debt in one night" },
+      { type:"Acute-Load Responder",      note:"Fast between-session rebound · late load shows next-day" },
+      { type:"Variance Damper",           note:"Flattest RMSSD swing on the board · metronomic" },
+      { type:"Strain-Tolerant Workhorse", note:"Holds readiness under high chronic load" },
+      { type:"Parasympathetic Dominant",  note:"Resting HR sub-50 · vagal tone runs hot" },
+    ];
+    function pickPersona(deviceKey, native, oriya){ return (String(deviceKey).charCodeAt(0) + (native || 0) * 7 + oriya * 13) % PERSONALITIES.length; }
+    function personalityFor(p){ if (!p) return PERSONALITIES[0]; return PERSONALITIES[(p.personaIdx != null ? p.personaIdx : 0) % PERSONALITIES.length]; }
+    // gamified achievement badges — progress-to-unlock shown on the back of the card
+    // Hard-earned network proof, not "rewards" — protocol adherence + objective thresholds.
+    const ALL_BADGES = [
+      { id:"sleep10",  label:"Sub-23:00 Lights-Out · 7 nights", short:"SUB-23:00",      emoji:"🌙" },
+      { id:"warrior7", label:"7-Day Protocol Adherent",         short:"7-DAY ADHERENT", emoji:"🔥" },
+      { id:"hrvelite", label:"HRV Baseline · 90th pct",         short:"HRV 90TH PCT",   emoji:"❤️" },
+      { id:"peak85",   label:"Peak-Load 85+ Normalized",        short:"PEAK-LOAD 85+",  emoji:"⛰️" },
+    ];
+    function abbrev(s){ return String(s||"").replace(/[^A-Za-z0-9]/g,"").slice(0,3).toUpperCase() || "SQ"; }
+
+    /* =================== competitiveness tier ladder ===================
+       The card material levels up with NETWORK ENGAGEMENT — squads, prize boards,
+       teammates recruited — never the recovery number (anti-orthosomnia). You
+       climb by competing and pulling people in, which is exactly the loop we want. */
+    const TIERS = [
+      { id:"bronze",   name:"Bronze",           cls:"tier-bronze",   accent:"#C8895A" },
+      { id:"silver",   name:"Silver",           cls:"tier-silver",   accent:"#C7CDD6" },
+      { id:"gold",     name:"Gold",             cls:"tier-gold",     accent:"#F0C083" },
+      { id:"obsidian", name:"Founding Athlete", cls:"tier-obsidian", accent:"#9FD3BB", apex:true },
+    ];
+    function tierFor(s){
+      if (s.joinedCount >= 2 || s.teammates >= 3 || s.earnings >= 200) return TIERS[3];
+      if (s.hasSquad && s.earnings > 0) return TIERS[2];
+      if (s.hasSquad || s.joinedCount >= 1) return TIERS[1];
+      return TIERS[0];
+    }
+    function nextTierHint(s){
+      if (s.joinedCount >= 2 || s.teammates >= 3 || s.earnings >= 200) return null;
+      if (s.hasSquad && s.earnings > 0) return "Pull in 3 teammates or join another prize board → Founding Athlete";
+      if (s.hasSquad || s.joinedCount >= 1) return "Join a prize challenge → Gold";
+      return "Join or create a squad → Silver";
+    }
+
+    /* =================== OCR parsing =================== */
+    function detectDevice(text) {
+      const t = text.toLowerCase();
+      const tests = [
+        ["whoop", /\bwhoop\b|recovery\s*%|\bstrain\b/],
+        ["oura", /\boura\b|readiness/],
+        ["garmin", /\bgarmin\b|body\s*battery/],
+        ["samsung", /\bsamsung\b|energy\s*score/],
+        ["pixel", /\bpixel\b|fitbit/],
+        ["ultrahuman", /ultrahuman|movement\s*index/],
+        ["apple", /\bapple\b|vitals|cardio|\bhrv\b|\bsdnn\b|recovery\s*rate/],
+      ];
+      for (const [k, re] of tests) if (re.test(t)) return k;
+      return null;
+    }
+    function extractScore(text) {
+      const nums = (text.match(/\b\d{1,3}\b/g) || []).map(Number).filter((n) => n >= 1 && n <= 100);
+      if (!nums.length) return null;
+      const twoDig = nums.filter((n) => n >= 20);
+      return twoDig.length ? twoDig[0] : nums[0];
+    }
+    function extractName(text) {
+      const m = text.match(/(?:good\s+(?:morning|afternoon|evening)|hello|hey|hi)[,!\s]+([A-Z][a-z]{1,15})/);
+      return m ? m[1] : null;
+    }
+
+    /* =================== Challenge data (from oriya challenge app) =================== */
+    const BASE_RULES = [
+      "Log your recovery score every day — missed days count as 0",
+      "All device scores are normalized to the Oriya Standard (Oura 83 ≠ Whoop 83, but we make them comparable)",
+      "Team average is calculated from all active participants who logged that day",
+      "Prize distributed within 7 days of challenge end via the sponsor",
+    ];
+    const CHALLENGES = [
+      { id:"marina", emoji:"🏃", icon:Users, status:"LIVE", sponsor:"Lululemon SF",
+        title:"Marina Run Club vs Stanford Run Club", subtitle:"7-day avg recovery — who runs the Bay?",
+        days:4, prize:"$500", projectedPayout:50, payout:"Winner takes all — paid out as $50 gift cards per winning member",
+        participants:38, avg:76, joinTeam:"Marina RC", categories:["Run Club","Team Battle","SF"],
+        description:"The Bay's oldest rivalry. Marina hustles hills, Stanford clocks miles. 7 days of consistent recovery logging — highest 7-day team average wins. Log every day or you cost your team.",
+        leaderboard:[
+          {init:"JP",handle:"james.park",team:"Stanford",score:87,streak:"4d"},
+          {init:"SK",handle:"sarah_k",team:"Stanford",score:85,streak:"7d"},
+          {init:"HK",handle:"h.kim",team:"Marina RC",score:82,streak:"14d"},
+          {init:"TN",handle:"t.nguyen",team:"Marina RC",score:81,streak:"6d"},
+          {init:"RC",handle:"r.chen",team:"Stanford",score:79,streak:"3d"},
+          {init:"AP",handle:"a.patel",team:"Marina RC",score:76,streak:"5d"},
+          {init:"LJ",handle:"l.johnson",team:"Stanford",score:74,streak:"4d"},
+          {init:"MW",handle:"m.williams",team:"Marina RC",score:72,streak:"2d"},
+        ] },
+      { id:"ai", emoji:"🤖", icon:Zap, status:"LIVE", sponsor:"Whoop × Oriya",
+        title:"Launch-Crunch Bracket", subtitle:"Red-team week vs alignment on-call vs peak-traffic — who holds readiness under load",
+        feed:[
+          { who:"Riley M.", team:"Anthropic", text:"our 7-day team avg dropped to 79 after the red-team crunch. Whoop says my recovery is 74, Oriya normalized it to 68. explain the 6-point haircut." },
+          { who:"Alex K.",  team:"Anthropic", text:"Whoop over-weights respiratory-rate variance in its sleep-stage call. a Whoop 74 is a lower readiness tier than a 74 off an Oura — it's correcting, not sandbagging you." },
+          { who:"Sarah P.", team:"Anthropic", text:"we're 4 normalized points off OpenAI. anyone not logging is a zero today — get your morning reading in before 0900 or you cost the team." },
+          { who:"Jessica",  team:"Anthropic", text:"pulled lights-out to 22:30 for 3 nights, RMSSD up ~12ms, normalized 88 this morning. debt's clearing." },
+        ],
+        days:9, prize:"$1,200", projectedPayout:120, payout:"1st: $700 · 2nd: $350 · 3rd: $150 — split across participating team members",
+        participants:53, avg:79, joinTeam:"Anthropic", categories:["Corporate","Multi-team","Invite-only"],
+        description:"Three teams shipping under acute load, 14 days. Anthropic's model-context crew is mid red-teaming crunch. OpenAI's alignment on-call is eating 4-hour fragmented-REM nights. Stripe's infra team is bracing for peak-traffic. Highest normalized team readiness wins — sleep debt is the silent leader, and a missed morning logs as a zero.",
+        leaderboard:[
+          {init:"RM",handle:"riley.m",team:"Anthropic",score:91,streak:"7d"},
+          {init:"CP",handle:"casey.p",team:"Anthropic",score:87,streak:"5d"},
+          {init:"BT",handle:"blake.t",team:"OpenAI",score:86,streak:"4d"},
+          {init:"JK",handle:"jordan.k",team:"Stripe",score:84,streak:"5d"},
+          {init:"SK",handle:"sage.k",team:"OpenAI",score:83,streak:"6d"},
+          {init:"MT",handle:"mia.t",team:"Stripe",score:81,streak:"3d"},
+          {init:"DH",handle:"dana.h",team:"Anthropic",score:80,streak:"7d"},
+          {init:"RA",handle:"river.a",team:"OpenAI",score:79,streak:"4d"},
+        ] },
+      { id:"founders", emoji:"⚡", icon:Zap, status:"LIVE", sponsor:"Sequoia Capital",
+        title:"Founders vs Operators", subtitle:"YC / a16z founders vs corporate employees — 21 days",
+        days:14, prize:"$2,000", projectedPayout:200, payout:"Top company wins $2k. Winner distributes as team dinner or charity donation. Vote decided by team.",
+        participants:71, avg:72, joinTeam:"YC Founders", categories:["Founders","Corporate","Epic"],
+        description:"Do founders actually sleep better because they control their schedule? Or are operators more disciplined? The biggest cross-company challenge of the season. 5 teams, 71 athletes, 21 days.",
+        leaderboard:[
+          {init:"BG",handle:"b.gupta",team:"YC Founders",score:76,streak:"7d"},
+          {init:"RM",handle:"riley.m",team:"Anthropic",score:75,streak:"5d"},
+          {init:"JK",handle:"jordan.k",team:"Stripe",score:74,streak:"4d"},
+          {init:"PS",handle:"priya.s",team:"a16z",score:73,streak:"6d"},
+          {init:"DM",handle:"drew.m",team:"Notion",score:71,streak:"3d"},
+        ] },
+      { id:"devicewars", emoji:"⌚", icon:Sparkles, status:"SOON", startLabel:"Starts June 28", sponsor:null,
+        title:"Device Wars: Oura vs Whoop", subtitle:"Which wearable community recovers better?",
+        days:null, prize:null, payout:"Bragging rights settled on the leaderboard, not Twitter.",
+        participants:null, avg:null, joinTeam:"Oura", categories:["Devices","Open","Community"],
+        description:"The eternal debate: Oura or Whoop? This is settled on the leaderboard, not Twitter. Team avg over 14 days — scores normalized so your ring isn't at a disadvantage.",
+        leaderboard:[] },
+      { id:"vc", emoji:"🏦", icon:Trophy, status:"SOON", startLabel:"Starts July 1", sponsor:"Sequoia Capital × a16z",
+        title:"Sequoia vs a16z 30-Day", subtitle:"Monthly recovery marathon — portfolio health competition",
+        days:null, prize:"$3,000", projectedPayout:250, payout:"1st: $2,000 · 2nd: $1,000 — team split proportional to participation rate",
+        participants:null, avg:null, joinTeam:"Sequoia", categories:["VC","Founders","Monthly"],
+        description:"The Valley's biggest VC firms test their portfolio health. 30 days, any device, full normalization. Both firms are actively recruiting participants from their networks.",
+        leaderboard:[] },
+      { id:"oakland", emoji:"🌉", icon:Flame, status:"SOON", startLabel:"Starts July 5", sponsor:"Brooks Running",
+        title:"Oakland Run Crew vs Caltrain Runners", subtitle:"Weekend warriors — 3-week battle",
+        days:null, prize:"$400", projectedPayout:40, payout:"Winner takes all — gift cards distributed to active members",
+        participants:null, avg:null, joinTeam:"Oakland Run Crew", categories:["Run Club","East Bay","Peninsula"],
+        description:"Oakland's track crew against the South Bay commuter runners. Who brings the discipline outside of their usual routes? 3 weekends, highest team avg on Saturdays and Sundays wins.",
+        leaderboard:[] },
+    ];
+    // Each battle has sides the athlete must choose between (shows on their passport as their squad)
+    const CHALLENGE_TEAMS = {
+      marina:["Marina RC","Stanford"],
+      ai:["Anthropic","OpenAI","Stripe"],
+      founders:["Founders","Operators"],
+      devicewars:["Oura","Whoop"],
+      vc:["Sequoia","a16z"],
+      oakland:["Oakland Run Crew","Caltrain Runners"],
+    };
+    CHALLENGES.forEach((c) => { c.teams = CHALLENGE_TEAMS[c.id] || [c.joinTeam]; });
+    const SQUAD_EMOJIS = ["🏃","🔥","🌅","💪","🧗","🚴","🏆","⚡","🌙","🌊"];
+
+    const FRIEND_POOL = [
+      { name:"Maya R.", score:79 }, { name:"Devin K.", score:66 }, { name:"Priya S.", score:84 },
+      { name:"Marcus L.", score:72 }, { name:"Wei C.", score:88 }, { name:"Jordan T.", score:70 },
+    ];
+    function initials(name){ return String(name||"YOU").split(/[\s.@_]+/).filter(Boolean).map(w=>w[0]).join("").slice(0,2).toUpperCase() || "YOU"; }
+
+    /* =============================== Guided preview tour =============================== */
+    function PreviewTour() {
+      const [open, setOpen] = useState(false);
+      const toggle = () => { const n = !open; setOpen(n); track(n ? "guided_tour_opened" : "guided_tour_closed", { surface:"try.hook" }); };
+      return (
+        <div className="mt-5">
+          <button onClick={toggle} aria-expanded={open}
+            className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 hover:border-jade/50 transition-all text-left">
+            <span className="w-8 h-8 rounded-full border border-jade/50 text-jade flex items-center justify-center text-xs shrink-0">{open ? "❚❚" : "▶"}</span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-sm text-bone font-medium">See it work — 9-second guided tour</span>
+              <span className="block text-[11px] text-ash font-mono">a cursor walks the drop → normalize → board flow</span>
+            </span>
+            <span className={"text-ash font-mono text-xs transition-transform " + (open ? "rotate-180" : "")}>▾</span>
+          </button>
+          <div className={"tour " + (open ? "open" : "")}>
+            <div className="tour-stage">
+              <svg className="tour-cursor" viewBox="0 0 24 24" fill="#ECEAE4"><path d="M3 2l7 18 2.5-7L20 10z"/></svg>
+              <div className="tour-step">
+                <div className="text-[10px] uppercase tracking-[0.18em] text-jade font-mono">step 1 · drop</div>
+                <div className="tour-drop">⤓ drop any recovery screenshot</div>
+                <div className="text-[11px] text-ash font-mono">Oura · Whoop · Garmin · Apple — we read it for you</div>
+              </div>
+              <div className="tour-step">
+                <div className="text-[10px] uppercase tracking-[0.18em] text-jade font-mono">step 2 · normalize</div>
+                <div className="font-mono text-sm text-ash">Whoop 83 × 0.92 − 1.0 →</div>
+                <div className="tour-score">75</div>
+                <div className="tour-ocr"><i/></div>
+              </div>
+              <div className="tour-step">
+                <div className="text-[10px] uppercase tracking-[0.18em] text-jade font-mono">step 3 · land on the board</div>
+                <div className="tour-row"><span className="text-ash">4</span><span className="text-jade">you</span><span className="text-bone">75</span></div>
+                <div className="text-[11px] text-ash">instantly ranked — the "you're #4" moment</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    /* =============================== Hook view =============================== */
+    function Hook({ onPreset, onScreenshot }) {
+      const [dragging, setDragging] = useState(false);
+      const fileRef = useRef(null);
+      const readFile = (file) => {
+        if (!file) return;
+        const r = new FileReader();
+        r.onload = () => onScreenshot(r.result);
+        r.readAsDataURL(file);
+      };
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center px-5 py-16 bg-void">
+          <div className="w-full max-w-xl animate-fade-up">
+            <div className="flex items-center justify-center gap-2 mb-5">
+              <Sparkles className="w-4 h-4 text-jade" />
+              <span className="text-xs uppercase tracking-[0.22em] text-ash font-mono">Oriya · Body Passport</span>
+            </div>
+            <h1 className="text-3xl sm:text-[2.6rem] leading-[1.05] font-semibold text-center tracking-tight">
+              Switch your ring for a watch.<br/>
+              <span className="text-jade">Keep your score.</span>
+            </h1>
+            <p className="text-center text-ash mt-4 mb-9 text-sm sm:text-base max-w-md mx-auto">
+              An Oura 62 isn't a Whoop 62. Drop a screenshot — we OCR it, normalize it to the
+              <span className="text-bone"> Oriya Standard</span>, and put you on a board where the numbers finally compare.
+            </p>
+
+            <div
+              onClick={() => fileRef.current && fileRef.current.click()}
+              onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={(e) => { e.preventDefault(); setDragging(false); readFile(e.dataTransfer.files[0]); }}
+              className={"cursor-pointer rounded-2xl border-2 border-dashed p-10 sm:p-12 text-center transition-all " +
+                (dragging ? "border-jade bg-jade/5 scale-[1.01]" : "border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04]")}
+            >
+              <div className="mx-auto w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4">
+                <Upload className="w-5 h-5 text-jade" />
+              </div>
+              <p className="text-bone font-medium">Drop your recovery screenshot</p>
+              <p className="text-ash text-xs mt-1">Oura · Whoop · Garmin · Apple · Samsung · any app — we read it for you</p>
+              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => readFile(e.target.files[0])} />
+            </div>
+
+            <PreviewTour />
+
+            <div className="flex items-center gap-3 my-6">
+              <div className="h-px flex-1 bg-white/10" />
+              <span className="text-xs text-ash font-mono">or quick-test a device</span>
+              <div className="h-px flex-1 bg-white/10" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              {PRESET_KEYS.map((k) => {
+                const m = DEVICE_MODEL[k];
+                return (
+                  <button key={k}
+                    onClick={() => onPreset(k, m.sample)}
+                    className="group flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-left hover:border-jade/60 hover:bg-white/[0.06] transition-all">
+                    <span className="text-sm font-medium text-bone">{m.tag} <span className="text-ash font-mono text-xs">{m.metric}</span></span>
+                    <ChevronRight className="w-4 h-4 text-ash/60 group-hover:text-jade transition-colors" />
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-center text-[11px] text-ash/70 mt-6 font-mono">Demo · sample data · nothing is uploaded or stored</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* =============================== Normalizing view (OCR or preset) =============================== */
+    function Normalizing({ pending, onDone }) {
+      const [progress, setProgress] = useState(0);
+      const [msg, setMsg] = useState("Warming up…");
+      useEffect(() => {
+        let cancelled = false;
+        (async () => {
+          if (pending.type === "preset") {
+            const m = DEVICE_MODEL[pending.deviceKey];
+            const steps = ["Reading your " + m.tag + " score…", "Applying " + m.tag + " correction (×" + m.factor + ")…", "Computing Oriya Standard…"];
+            for (let i = 0; i < steps.length; i++) { if (cancelled) return; setMsg(steps[i]); setProgress((i + 1) / steps.length * 0.92); await wait(440); }
+            if (cancelled) return; setProgress(1);
+            onDone({ deviceKey: pending.deviceKey, native: pending.native, name: null, confident: true });
+            return;
+          }
+          // screenshot → OCR
+          try {
+            setMsg("Loading reader…");
+            await loadScript(TESS_URL);
+            if (cancelled) return;
+            setMsg("Reading your screenshot…"); setProgress(0.12);
+            const { data } = await window.Tesseract.recognize(pending.dataUrl, "eng", {
+              logger: (mm) => { if (mm.status === "recognizing text" && !cancelled) setProgress(0.12 + mm.progress * 0.72); },
+            });
+            if (cancelled) return;
+            const text = (data && data.text) || "";
+            const deviceKey = detectDevice(text);
+            const native = extractScore(text);
+            const name = extractName(text);
+            track("ocr_result", { device: deviceKey, rawScore: native, nameFound: !!name });
+            if (deviceKey && native != null) {
+              const m = DEVICE_MODEL[deviceKey];
+              setMsg("Applying " + m.tag + " correction (×" + m.factor + ")…"); setProgress(0.94); await wait(520);
+              if (cancelled) return; setProgress(1);
+              onDone({ deviceKey, native, name, confident: true });
+            } else {
+              track("ocr_fallback", { device: deviceKey, rawScore: native });
+              onDone({ deviceKey: deviceKey || null, native: native || null, name: name || null, confident: false });
+            }
+          } catch (e) {
+            if (cancelled) return;
+            track("ocr_fallback", { error: String(e && e.message || e) });
+            onDone({ deviceKey: null, native: null, name: null, confident: false });
+          }
+        })();
+        return () => { cancelled = true; };
+      }, []);
+
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center px-5 bg-void">
+          {pending.type === "screenshot" && (
+            <img src={pending.dataUrl} alt="" className="w-24 h-24 object-cover rounded-xl border border-white/10 mb-6 opacity-80" />
+          )}
+          <div className="relative mb-7">
+            <div className="w-20 h-20 rounded-full border-2 border-white/10 border-t-jade spin" />
+            <Activity className="w-7 h-7 text-jade absolute inset-0 m-auto" />
+          </div>
+          <div className="font-mono text-sm text-bone/90 h-6 text-center px-4">{msg}</div>
+          <div className="mt-5 w-56 h-1.5 rounded-full bg-white/10 overflow-hidden">
+            <div className="h-full bg-jade transition-all duration-300" style={{ width: Math.round(progress * 100) + "%" }} />
+          </div>
+          <p className="text-xs text-ash/70 mt-6 font-mono">{pending.type === "screenshot" ? "OCR-verifying your recovery score" : "Normalizing to the Oriya Standard"}</p>
+        </div>
+      );
+    }
+
+    /* =============================== Manual confirm fallback =============================== */
+    function Confirm({ prefill, onConfirm, onBack }) {
+      const [key, setKey] = useState(prefill && prefill.deviceKey || "oura");
+      const [score, setScore] = useState(prefill && prefill.native != null ? String(prefill.native) : "");
+      const [name, setName] = useState(prefill && prefill.name || "");
+      const n = Number(score);
+      const valid = score !== "" && n >= 1 && n <= 100;
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center px-5 py-16 bg-void">
+          <div className="w-full max-w-md animate-fade-up">
+            <button onClick={onBack} className="inline-flex items-center gap-1.5 text-xs text-ash hover:text-bone font-mono mb-6">
+              <ArrowLeft className="w-3.5 h-3.5" /> back
+            </button>
+            <h2 className="text-2xl font-semibold tracking-tight">Confirm your reading</h2>
+            <p className="text-ash text-sm mt-2 mb-6">We couldn't fully read the screenshot. Pick your device and enter your score — we'll normalize it to the Oriya Standard.</p>
+
+            <label className="block text-[11px] uppercase tracking-wider font-mono text-ash mb-2">Device</label>
+            <div className="flex flex-wrap gap-2 mb-6">
+              {Object.keys(DEVICE_MODEL).map((k) => (
+                <button key={k} onClick={() => setKey(k)}
+                  className={"px-3 py-1.5 rounded-full text-xs font-mono border transition-all " +
+                    (k === key ? "bg-jade text-void border-jade" : "border-white/10 text-ash hover:text-bone hover:border-jade/50")}>
+                  {DEVICE_MODEL[k].tag}
+                </button>
+              ))}
+            </div>
+
+            <label className="block text-[11px] uppercase tracking-wider font-mono text-ash mb-2">{DEVICE_MODEL[key].metric} score (0–100)</label>
+            <input type="number" min="1" max="100" value={score} onChange={(e) => setScore(e.target.value)} placeholder="e.g. 83"
+              className="w-full rounded-xl bg-white/[0.04] border border-white/10 px-4 py-3 text-bone font-mono outline-none focus:border-jade mb-5" />
+
+            <label className="block text-[11px] uppercase tracking-wider font-mono text-ash mb-2">Name on your passport (optional)</label>
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="@yourhandle"
+              className="w-full rounded-xl bg-white/[0.04] border border-white/10 px-4 py-3 text-bone outline-none focus:border-jade mb-7" />
+
+            {valid && (
+              <p className="text-xs font-mono text-jade mb-4">
+                {n} × {DEVICE_MODEL[key].factor}{fmtOffset(DEVICE_MODEL[key].offset)} = {toOriyaStandard(n, key)} Oriya Standard
+              </p>
+            )}
+            <button disabled={!valid} onClick={() => onConfirm({ deviceKey: key, native: n, name })}
+              className={"w-full rounded-full py-3.5 font-semibold transition " +
+                (valid ? "bg-jade text-void hover:brightness-110" : "bg-white/10 text-ash cursor-not-allowed")}>
+              Generate my Body Passport
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    /* =============================== Body Passport card =============================== */
+    function PassportCard({ passport, cardRef, onSwap, onSetName, social, personality, badges, countryStamps, earnings, onCycleNation, tier }) {
+      const [flash, setFlash] = useState(false);
+      const [flipped, setFlipped] = useState(false);
+      const m = DEVICE_MODEL[passport.deviceKey];
+      const serial = "OR · S1 · " + passport.deviceKey.slice(0, 2).toUpperCase() + String(passport.oriya).padStart(2, "0") + "X";
+      const swap = (k) => { if (k === passport.deviceKey) return; onSwap(k); setFlash(true); setTimeout(() => setFlash(false), 480); };
+      const nat = NATIONS.find((n) => n.code === passport.nationality) || NATIONS[0];
+      const stop = (e) => e.stopPropagation();
+      const toggleFlip = () => { const next = !flipped; setFlipped(next); track("passport_flipped", { side: next ? "back" : "front" }); };
+
+      return (
+        <div>
+          <div className={"pp-flip animate-pop-in" + (flipped ? " flipped" : "")}>
+            <div className="pp-flip-inner" onClick={toggleFlip}>
+
+              {/* ============ FRONT — black metal status card (this face is exported to PNG) ============ */}
+              <div ref={cardRef} className={"pp-face passport-card " + (tier ? tier.cls : "")}>
+                <div className="pp-holo" />
+                <div className="flex items-start justify-between">
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="pp-chip pp-chip-glow" />
+                    <span className="mono text-[8px] tracking-[0.2em] text-ash">BIO-ID</span>
+                  </div>
+                  <div className="flex flex-col items-end gap-1.5">
+                    {tier && <span className={"pp-tier-badge " + tier.cls}><span className="pp-tier-dot" /> {tier.name}</span>}
+                    <span className="mono text-[8px] tracking-[0.22em] text-ash">SEASON 1 · MEMBER</span>
+                  </div>
+                </div>
+
+                <div className="flex items-end justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <input className="pp-name-input emboss text-[19px] w-full" value={passport.name}
+                      onClick={stop} onMouseDown={stop}
+                      onChange={(e) => onSetName(e.target.value)} placeholder="YOUR NAME" maxLength={20} spellCheck={false} />
+                    <div className="mono text-[9px] tracking-[0.16em] uppercase text-ash mt-1">Oriya Standard · Recovery</div>
+                    {social && <div className="flex items-center gap-1 mt-1 text-[10px] text-jade font-mono"><Instagram className="w-3 h-3" /> @{social}</div>}
+                  </div>
+                  <div className="mono tnum text-[58px] leading-none text-bone emboss">{passport.oriya}</div>
+                </div>
+
+                <div>
+                  <div className={"mono text-[13px] tracking-[0.01em] mb-1.5 flex items-center gap-2 " + (flash ? "flash" : "")}>
+                    <span className="text-bone/85">{m.tag} {passport.native}</span>
+                    <span className="text-ash">→</span>
+                    <span className="text-jade font-semibold">{passport.oriya} Oriya</span>
+                  </div>
+                  <div className="flex items-end justify-between gap-2">
+                    <div className="text-[8.5px] text-ash leading-tight max-w-[62%]">
+                      your raw score, normalized · directionally useful, not diagnostically precise
+                    </div>
+                    <div className="mono text-[8px] tracking-[0.12em] text-ash/70 text-right whitespace-nowrap">{serial}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ============ BACK — brushed-metal identity, stamps & earnings ledger ============ */}
+              <div className="pp-face back passport-card">
+                <div className="pp-brushed" />
+                <div className="flex gap-3 h-full">
+                  {/* identity column */}
+                  <div className="flex flex-col justify-between" style={{ width: "42%" }}>
+                    <div>
+                      <div className="mono text-[8px] tracking-[0.16em]" style={{ color: "#4a5059" }}>NATIONALITY</div>
+                      <button onClick={(e) => { stop(e); onCycleNation(); }} className="flex items-center gap-1.5 mt-0.5">
+                        <span className="text-[15px] leading-none">{nat.flag}</span>
+                        <span className="mono text-[13px] font-semibold">{nat.code}</span>
+                      </button>
+                    </div>
+                    <div>
+                      <div className="mono text-[8px] tracking-[0.16em]" style={{ color: "#4a5059" }}>SQUAD</div>
+                      <div className="text-[13px] font-semibold leading-tight">{passport.squad || "—"}</div>
+                    </div>
+                    <div>
+                      <div className="mono text-[8px] tracking-[0.16em]" style={{ color: "#4a5059" }}>PERSONALITY <span style={{ color: "#8a8f98" }}>· prov.</span></div>
+                      <div className="text-[12px] font-semibold leading-tight">{personality.type}</div>
+                      <div className="text-[8px] mt-0.5" style={{ color: "#4a5059" }}>{personality.note}</div>
+                    </div>
+                  </div>
+
+                  {/* stamps + ledger column */}
+                  <div className="flex-1 flex flex-col justify-between min-w-0">
+                    <div>
+                      <div className="mono text-[8px] tracking-[0.16em] text-right" style={{ color: "#4a5059" }}>COUNTRY STAMPS</div>
+                      <div className="flex gap-1.5 justify-end mt-1">
+                        {countryStamps.map((s, i) => (
+                          <div key={i} className={"pp-stamp " + (s.locked ? "locked" : "")} style={{ width: "40px", height: "40px" }}>
+                            <span className="text-[6.5px] leading-tight px-0.5">{s.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex gap-1.5 justify-end flex-wrap">
+                      {ALL_BADGES.slice(0, 3).map((b) => {
+                        const on = !!badges[b.id];
+                        return (
+                          <div key={b.id} title={b.label} className={"pp-badge-stamp " + (on ? "" : "locked")} style={{ width: "54px", height: "30px" }}>
+                            <span className="text-[7px] font-semibold leading-tight px-1">{b.short}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="flex items-end justify-between gap-2">
+                      <div>
+                        <div className="mono text-[8px] tracking-[0.13em]" style={{ color: "#4a5059" }}>EARNINGS LEDGER <span style={{ color: "#8a8f98" }}>· demo</span></div>
+                        <div className="mono text-[18px] font-bold leading-none mt-0.5" style={{ color: "#8a5a1e" }}>${earnings.toFixed(2)} <span className="text-[8px]" style={{ color: "#4a5059" }}>USD</span></div>
+                      </div>
+                      <div title={earnings > 0 ? "Verified vault" : "Join a prize challenge to unlock"}
+                        className={"pp-vault-gold w-7 h-7 flex items-center justify-center " + (earnings > 0 ? "" : "opacity-40")}>
+                        <span style={{ color: "#2a1a08" }}><Check className="w-3.5 h-3.5" /></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* device swap pills + normalization breakdown */}
+          <div className="mt-4 flex flex-wrap gap-2 justify-center">
+            {PRESET_KEYS.map((k) => (
+              <button key={k} className={"pp-dev " + (k === passport.deviceKey ? "active" : "")} onClick={() => swap(k)}>
+                {DEVICE_MODEL[k].tag}
+              </button>
+            ))}
+          </div>
+          <p className="text-center text-[11px] font-mono text-ash mt-3">
+            {passport.native} {m.metric} ({m.tag}) → {passport.native}×{m.factor}{fmtOffset(m.offset)} = <span className="text-jade">{passport.oriya} Oriya</span>
+            <span className="text-ash/50"> · tap card to flip ⟳</span>
+          </p>
+        </div>
+      );
+    }
+
+    /* =============================== "How we normalize" disclosure =============================== */
+    function NormalizeExplainer() {
+      const [open, setOpen] = useState(false);
+      return (
+        <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden">
+          <button onClick={() => setOpen((o) => !o)} className="w-full flex items-center justify-between px-4 py-3 text-left">
+            <span className="inline-flex items-center gap-2 text-sm text-bone"><Info className="w-4 h-4 text-jade" /> How we normalize your score</span>
+            <span className="text-ash font-mono text-xs">{open ? "–" : "+"}</span>
+          </button>
+          {open && (
+            <div className="px-4 pb-5 pt-1 text-sm text-ash space-y-4 animate-fade-up">
+              <p className="text-bone/90">A Whoop 83 and an Oura 83 are not the same thing — comparing them directly is like mixing Celsius and Fahrenheit. So we standardize.</p>
+              <ol className="space-y-1.5 list-decimal list-inside">
+                <li><span className="text-bone">Collect the raw score</span> — submitted via screenshot, OCR-verified.</li>
+                <li><span className="text-bone">Apply a device-specific correction factor</span> — from cross-device validation studies (lower validation = larger correction).</li>
+                <li><span className="text-bone">Apply the formula</span> — full methodology weights Sleep 40% + Recovery 35% + Activity 25%. From a single screenshot we apply the device's linear factor.</li>
+                <li><span className="text-bone">Post to the leaderboard</span> — now comparable across every device, apples to apples.</li>
+              </ol>
+              <div className="rounded-lg border border-white/10 overflow-hidden">
+                <table className="w-full text-xs font-mono">
+                  <thead className="text-ash"><tr className="border-b border-white/10">
+                    <th className="text-left px-3 py-2">Device</th><th className="text-left px-3 py-2">Native</th>
+                    <th className="text-left px-3 py-2">Factor</th><th className="text-left px-3 py-2">Validation</th></tr></thead>
+                  <tbody>
+                    {PRESET_KEYS.concat(["samsung","pixel"]).map((k) => { const m = DEVICE_MODEL[k]; return (
+                      <tr key={k} className="border-b border-white/5">
+                        <td className="px-3 py-1.5 text-bone">{m.tag}</td><td className="px-3 py-1.5">{m.metric}</td>
+                        <td className="px-3 py-1.5 text-jade">×{m.factor}{fmtOffset(m.offset)}</td>
+                        <td className="px-3 py-1.5">{m.validation}</td></tr> ); })}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-xs text-ash">+ Athlytic, Bevel, Cora Health, Gentler Streak, Ultrahuman & Vora supported.</p>
+              <p className="text-xs font-mono text-bone/80">Example · Whoop 83 → 83 × 0.92 + (−1.0) = 75.36 → <span className="text-jade">75 Oriya Standard</span></p>
+              <p className="text-[11px] text-ash leading-relaxed">Source: Doherty C, Baldwin M, Lambe R, Burke D, Altini M — "Readiness, recovery, and strain: an evaluation of composite health scores in consumer wearables," <span className="italic">Translational Exercise Biomedicine</span>, Apr 2025. Directionally useful, not diagnostically precise — a social context layer, not a medical report.</p>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    /* =============================== Challenge card =============================== */
+    function ChallengeCard({ c, joined, onOpen }) {
+      const Icon = c.icon;
+      return (
+        <button onClick={() => onOpen(c)}
+          className="text-left rounded-xl border border-white/10 bg-white/[0.025] p-4 hover:border-jade/40 hover:bg-white/[0.05] transition-all flex flex-col">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-lg leading-none">{c.emoji}</span>
+              {c.status === "LIVE"
+                ? <span className="text-[10px] uppercase tracking-wider font-mono text-jade inline-flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-jade animate-pulse" /> Live</span>
+                : <span className="text-[10px] uppercase tracking-wider font-mono text-ash">{c.startLabel}</span>}
+            </div>
+            {c.createdByYou ? <span className="text-[10px] font-mono text-amber-glow inline-flex items-center gap-1"><Star className="w-3 h-3" /> Yours</span>
+              : joined ? <span className="text-[10px] font-mono text-jade">JOINED ✓</span>
+              : c.days != null ? <span className="inline-flex items-center gap-1 text-[11px] text-ash font-mono"><Clock className="w-3 h-3" /> {c.days}d</span> : null}
+          </div>
+          <h3 className="mt-3 text-sm font-semibold text-bone leading-snug">{c.title}</h3>
+          <p className="mt-1 text-xs text-ash leading-relaxed">{c.subtitle}</p>
+          <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
+            <span className="inline-flex items-center gap-1.5 text-xs text-jade">
+              <Users className="w-3.5 h-3.5" /> {c.participants != null ? c.participants + " joined" : "Opening soon"}
+            </span>
+            {c.prize ? <span className="inline-flex items-center gap-1 text-[11px] text-amber-glow/90 font-mono"><Trophy className="w-3 h-3" /> {c.prize}</span>
+              : c.sponsor ? <span className="text-[11px] text-amber-glow/80 font-mono">{c.sponsor}</span> : null}
+          </div>
+        </button>
+      );
+    }
+
+    /* =============================== Department live feed (raw squad chat) =============================== */
+    const TEAM_COLORS = { Anthropic:"#D7A25C", OpenAI:"#7FB79E", Stripe:"#9FD3BB", "Marina RC":"#9FD3BB", Stanford:"#D7A25C" };
+    function LiveFeed({ feed }) {
+      const [n, setN] = useState(Math.min(2, feed.length));
+      const [typing, setTyping] = useState(false);
+      useEffect(() => {
+        if (n >= feed.length) { setTyping(false); return; }
+        setTyping(true);
+        const t = setTimeout(() => { setTyping(false); setN((x) => x + 1); }, 2000);
+        return () => clearTimeout(t);
+      }, [n, feed.length]);
+      const shown = feed.slice(0, n);
+      return (
+        <div className="mt-7">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-bone uppercase tracking-wider font-mono">#recovery-squad</h3>
+            <span className="text-[10px] uppercase tracking-wider font-mono text-jade inline-flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-jade animate-pulse" /> live</span>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-black/40 p-3.5 space-y-3">
+            {shown.map((msg, i) => {
+              const col = TEAM_COLORS[msg.team] || "#8A8F98";
+              return (
+                <div key={i} className="flex gap-2.5 animate-fade-up">
+                  <span className="w-7 h-7 rounded-md flex items-center justify-center text-[10px] font-semibold shrink-0 mono" style={{ background: col + "22", color: col }}>{initials(msg.who)}</span>
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-mono"><span style={{ color: col }}>{msg.who}</span> <span className="text-ash/50">· {msg.team}</span></div>
+                    <div className="text-[13px] text-bone/90 leading-snug">{msg.text}</div>
+                  </div>
+                </div>
+              );
+            })}
+            {typing && (
+              <div className="flex items-center gap-2 text-ash text-[11px] pl-9 font-mono animate-fade-up">
+                <span className="inline-flex gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-ash/60 animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-ash/60 animate-pulse" style={{ animationDelay: ".2s" }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-ash/60 animate-pulse" style={{ animationDelay: ".4s" }} />
+                </span>
+                someone is typing…
+              </div>
+            )}
+          </div>
+          <p className="text-[10px] text-ash/60 font-mono mt-2">Raw squad feed · unfiltered. The room argues normalized tiers, not raw scores.</p>
+        </div>
+      );
+    }
+
+    /* =============================== Challenge detail =============================== */
+    function ChallengeDetail({ c, joined, joinedTeam, me, onJoin, onClose, onShare }) {
+      const multi = c.teams && c.teams.length > 1;
+      const [team, setTeam] = useState(multi ? null : (c.teams ? c.teams[0] : c.joinTeam));
+      const myTeam = joined ? (joinedTeam || c.joinTeam) : team;
+      const board = c.leaderboard.slice();
+      if (joined && me && !board.some((r) => r.you)) board.push({ you: true, init: initials(me.name), handle: me.name || "you", team: myTeam, score: me.oriya, streak: "1d" });
+      board.sort((a, b) => b.score - a.score);
+      const myRank = joined ? board.findIndex((r) => r.you) + 1 : null;
+      const previewRank = board.filter((r) => r.score > me.oriya).length + 1;
+      const medal = (i) => i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : (i + 1);
+      return (
+        <div className="fixed inset-0 z-50 bg-void/95 backdrop-blur-sm overflow-y-auto">
+          <div className="max-w-2xl mx-auto px-5 py-8 pb-32">
+            <button onClick={onClose} className="inline-flex items-center gap-1.5 text-xs text-ash hover:text-bone font-mono mb-6">
+              <ArrowLeft className="w-3.5 h-3.5" /> Back to Challenges
+            </button>
+
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-3xl">{c.emoji}</span>
+              {c.status === "LIVE"
+                ? <span className="text-[10px] uppercase tracking-wider font-mono text-jade inline-flex items-center gap-1.5 rounded-full border border-jade/40 px-2.5 py-1"><span className="w-1.5 h-1.5 rounded-full bg-jade animate-pulse" /> Live</span>
+                : <span className="text-[10px] uppercase tracking-wider font-mono text-ash rounded-full border border-white/15 px-2.5 py-1">{c.startLabel}</span>}
+            </div>
+            {c.sponsor && <p className="text-[11px] font-mono text-amber-glow/90 mb-2">Sponsored by {c.sponsor}</p>}
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">{c.title}</h2>
+            <p className="text-ash mt-2">{c.subtitle}</p>
+
+            <div className="grid grid-cols-3 gap-3 mt-6">
+              {c.prize && <div className="rounded-xl border border-amber-brand/25 bg-amber-brand/[0.06] p-3">
+                <div className="text-[10px] uppercase tracking-wider font-mono text-amber-glow/80">Prize pool</div>
+                <div className="text-lg font-semibold text-amber-glow">{c.prize}</div></div>}
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                <div className="text-[10px] uppercase tracking-wider font-mono text-ash">Participants</div>
+                <div className="text-lg font-semibold text-bone">{c.participants != null ? c.participants : "—"}</div></div>
+              {c.days != null
+                ? <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3"><div className="text-[10px] uppercase tracking-wider font-mono text-ash">Days left</div><div className="text-lg font-semibold text-bone">{c.days}</div></div>
+                : <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3"><div className="text-[10px] uppercase tracking-wider font-mono text-ash">Avg score</div><div className="text-lg font-semibold text-bone">{c.avg != null ? c.avg : "—"}</div></div>}
+            </div>
+            {c.payout && <p className="text-xs text-ash mt-3 font-mono">{c.payout}</p>}
+            <p className="text-sm text-bone/80 leading-relaxed mt-5">{c.description}</p>
+
+            {joined && (
+              <div className="mt-5 rounded-xl border border-jade/40 bg-jade/[0.08] p-4 animate-fade-up">
+                <p className="text-sm text-bone">You're in. <span className="text-jade font-semibold">Ranked #{myRank}</span> with an Oriya Standard of <span className="text-jade font-semibold">{me.oriya}</span> on <span className="text-bone">{myTeam}</span>.</p>
+                <button onClick={onShare} className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-jade hover:text-jade-glow">
+                  <Share2 className="w-4 h-4" /> Share your Passport — pull a teammate onto the board before tomorrow's sync
+                </button>
+              </div>
+            )}
+
+            {!joined && (
+              <div className="mt-6 animate-fade-up">
+                <h3 className="text-sm font-semibold text-bone uppercase tracking-wider mb-1">{multi ? "Pick your side" : "Your team"}</h3>
+                <p className="text-xs text-ash mb-3">Your normalized {me.oriya} drops onto this board and gets stamped on your Passport. Pick the side you'll actually defend.</p>
+                <div className="flex flex-wrap gap-2">
+                  {c.teams.map((t) => (
+                    <button key={t} onClick={() => setTeam(t)}
+                      className={"px-4 py-2 rounded-full text-sm font-medium border transition-all " + (t === team ? "bg-jade text-void border-jade" : "border-white/15 text-bone hover:border-jade/60")}>
+                      {t}
+                    </button>
+                  ))}
+                </div>
+                {team && <p className="mt-3 text-xs font-mono text-jade">You'll enter {team} around #{previewRank} of {board.length + 1}.</p>}
+              </div>
+            )}
+
+            {c.leaderboard.length > 0 && (
+              <div className="mt-7">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-bone uppercase tracking-wider">Live Leaderboard</h3>
+                  <span className="text-[11px] font-mono text-ash">Updated hourly</span>
+                </div>
+                <div className="rounded-xl border border-white/10 overflow-hidden">
+                  {board.map((r, i) => (
+                    <div key={i} className={"flex items-center gap-3 px-3 py-2.5 text-sm border-b border-white/5 last:border-0 " + (r.you ? "bg-jade/[0.10]" : i % 2 ? "bg-white/[0.015]" : "")}>
+                      <span className="w-7 text-center font-mono text-ash">{medal(i)}</span>
+                      <span className={"w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-semibold " + (r.you ? "bg-jade text-void" : "bg-white/8 text-bone")}>{r.init}</span>
+                      <span className={"flex-1 min-w-0 truncate " + (r.you ? "text-jade font-semibold" : "text-bone")}>{r.you ? (me.name || "you") + " (you)" : r.handle}</span>
+                      <span className="text-xs text-ash font-mono hidden sm:block w-24 truncate">{r.team}</span>
+                      <span className="font-mono tnum text-bone w-8 text-right">{r.score}</span>
+                      <span className="text-[11px] text-ash font-mono w-10 text-right">🔥 {r.streak}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {c.feed && c.feed.length > 0 && <LiveFeed feed={c.feed} />}
+
+            <div className="mt-7">
+              <h3 className="text-sm font-semibold text-bone uppercase tracking-wider mb-3">Rules & How it Works</h3>
+              <ul className="space-y-2">
+                {BASE_RULES.concat([c.payout]).filter(Boolean).map((r, i) => (
+                  <li key={i} className="flex gap-2.5 text-sm text-ash"><Check className="w-4 h-4 text-jade shrink-0 mt-0.5" /><span>{r}</span></li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="mt-7 flex flex-wrap gap-2">
+              {c.categories.map((cat) => (
+                <span key={cat} className="text-[11px] font-mono text-ash rounded-full border border-white/10 px-3 py-1">{cat}</span>
+              ))}
+            </div>
+
+            <div className="mt-8 rounded-xl border border-white/10 bg-white/[0.02] p-5">
+              <p className="text-sm text-bone font-medium">Want to run one for your team?</p>
+              <p className="text-xs text-ash mt-1">We run the normalization, scoring, and payout. You bring the crew and the pool.</p>
+              <p className="text-xs font-mono mt-3"><a href="mailto:team@oriya.app" className="text-jade">team@oriya.app</a> <span className="text-ash">·</span> <a href="mailto:hello@oriya.app" className="text-jade">hello@oriya.app</a></p>
+            </div>
+          </div>
+
+          {/* sticky JOIN — the primary action */}
+          {!joined && (
+            <div className="fixed bottom-0 inset-x-0 z-50 border-t border-white/10 bg-void/90 backdrop-blur-xl">
+              <div className="max-w-2xl mx-auto px-5 py-4">
+                <button onClick={() => team && onJoin(c, team)} disabled={!team}
+                  className={"w-full rounded-full py-3.5 font-semibold transition inline-flex items-center justify-center gap-2 " + (team ? "bg-jade text-void hover:brightness-110 shadow-[0_0_50px_-12px_rgba(127,183,158,0.7)]" : "bg-white/10 text-ash cursor-not-allowed")}>
+                  <UserPlus className="w-4 h-4" /> {!team ? "Pick your team above" : c.status === "LIVE" ? "Join " + team : "Notify me — " + team}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    /* =============================== Dashboard =============================== */
+    function Dashboard({ passport, setPassport }) {
+      const [selected, setSelected] = useState(null);
+      const [joined, setJoined] = useState({});
+      const [userSquads, setUserSquads] = useState([]);
+      const [teammates, setTeammates] = useState([]);
+      const [toast, setToast] = useState("");
+      const [showSim, setShowSim] = useState(false);
+      const [creating, setCreating] = useState(false);
+      const [squadName, setSquadName] = useState("");
+      const [squadEmoji, setSquadEmoji] = useState(SQUAD_EMOJIS[0]);
+      const [igHandle, setIgHandle] = useState("");
+      const [igOpen, setIgOpen] = useState(false);
+      const [igInput, setIgInput] = useState("");
+      const cardRef = useRef(null);
+
+      const flashToast = (msg) => { setToast(msg); window.clearTimeout(flashToast._t); flashToast._t = window.setTimeout(() => setToast(""), 2600); };
+
+      const swapDevice = (k) => setPassport((p) => ({ ...p, deviceKey: k, native: nativeForOriya(p.oriya, k) }));
+      const setName = (v) => setPassport((p) => ({ ...p, name: v }));
+      const cycleNation = () => setPassport((p) => {
+        const i = NATIONS.findIndex((n) => n.code === p.nationality);
+        return { ...p, nationality: NATIONS[(i + 1) % NATIONS.length].code };
+      });
+
+      /* ---- derived Body Passport identity (back of card) ---- */
+      const hasSquad = !!passport.squad;
+      const personality = personalityFor(passport);
+      const badges = {};
+      if (passport.oriya >= 78) badges.hrvelite = true;
+      if (passport.oriya >= 85) badges.peak85 = true;
+      if (hasSquad) { badges.warrior7 = true; badges.sleep10 = true; }
+      const allChallengeList = userSquads.concat(CHALLENGES);
+      const joinedChallenges = Object.keys(joined).map((id) => allChallengeList.find((c) => c && c.id === id)).filter(Boolean);
+      const earnings = joinedChallenges.reduce((s, c) => s + (c.projectedPayout || 0), 0);
+      const natObj = NATIONS.find((n) => n.code === passport.nationality) || NATIONS[0];
+      const countryStamps = [{ label: natObj.code }, { label: "SEASON 1" }];
+      joinedChallenges.slice(0, 1).forEach((c) => countryStamps.push({ label: (joined[c.id] || c.joinTeam) }));
+      if (countryStamps.length < 3) countryStamps.push({ label: "LOCKED", locked: true });
+
+      /* ---- "where you'd land" — the status payoff BEFORE commitment (Mom Test: lead with the rank, not after) ---- */
+      const hotChallenge = CHALLENGES.find((c) => c.status === "LIVE" && c.leaderboard && c.leaderboard.length > 0);
+      const hotPreviewRank = hotChallenge ? hotChallenge.leaderboard.filter((r) => r.score > passport.oriya).length + 1 : null;
+      const hotField = hotChallenge ? hotChallenge.leaderboard.length + 1 : null;
+      const alreadyJoinedHot = hotChallenge ? !!joined[hotChallenge.id] : false;
+
+      /* ---- competitiveness tier — climbs with engagement, not the recovery number ---- */
+      const tierState = { hasSquad, joinedCount: joinedChallenges.length, earnings, teammates: teammates.length };
+      const tier = tierFor(tierState);
+      const tierHint = nextTierHint(tierState);
+      // LIVE clusters first — a board with people on it, never an empty marketplace for user #1
+      const sortedChallenges = CHALLENGES.slice().sort((a, b) => (a.status === "LIVE" ? 0 : 1) - (b.status === "LIVE" ? 0 : 1));
+
+      const shareUrl = "https://oriya.app/?ref=" + slug(passport.name) + "-" + passport.oriya + (passport.squad ? "&squad=" + encodeURIComponent(passport.squad) : "");
+      const caption = (passport.squad ? "Running " + passport.squad + " on Oriya. " : "") + "My readiness normalizes to " + passport.oriya + " on the Oriya Standard — same number on any wearable (" + DEVICE_MODEL[passport.deviceKey].tag + ")." + (igHandle ? " @" + igHandle : "") + " Squad's open, pull up 👇";
+
+      const sharePassport = async () => {
+        try {
+          await loadScript(HTI_URL);
+          const dataUrl = await window.htmlToImage.toPng(cardRef.current, { pixelRatio: 2, backgroundColor: "#0c0e12" });
+          const blob = await (await fetch(dataUrl)).blob();
+          const file = new File([blob], "oriya-passport.png", { type: "image/png" });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], text: caption, url: shareUrl });
+            track("passport_shared", { method: "image" });
+            return;
+          }
+          const a = document.createElement("a"); a.href = dataUrl; a.download = "oriya-passport.png"; a.click();
+          try { await navigator.clipboard.writeText(shareUrl); } catch (e) {}
+          track("passport_shared", { method: "image" });
+          flashToast("Passport saved — link copied to share!");
+        } catch (e) {
+          try { await navigator.clipboard.writeText(shareUrl); } catch (e2) {}
+          track("passport_shared", { method: "link" });
+          flashToast("Invite link copied to clipboard!");
+        }
+      };
+
+      const joinChallenge = (c, team) => {
+        const t = team || c.joinTeam;
+        setJoined((j) => ({ ...j, [c.id]: t }));
+        setPassport((p) => ({ ...p, squad: t }));
+        track("door_selected", { door: "join" });
+        track("squad_joined", { challenge: c.id, team: t });
+        if (c.projectedPayout) track("ledger_unlocked", { challenge: c.id, amount: c.projectedPayout });
+        setShowSim(true);
+        flashToast("You joined " + t + " — you're on the board!");
+      };
+
+      const createNamedSquad = () => {
+        const name = squadName.trim();
+        if (!name) return;
+        const sq = {
+          id: "sq_" + Date.now(), emoji: squadEmoji, icon: Users, status: "LIVE", sponsor: null,
+          title: name, subtitle: "Your squad · pull your crew in", days: null, prize: null,
+          payout: "Invite friends — your team average climbs as they join.",
+          participants: 1, avg: passport.oriya, joinTeam: name, teams: [name], createdByYou: true,
+          categories: ["Your Squad", "Open", "Founder"],
+          description: "You started " + name + ". Share your Body Passport to bring your people in — every friend who joins lifts your team average.",
+          leaderboard: [{ you: true, init: initials(passport.name), handle: passport.name || "you", team: name, score: passport.oriya, streak: "1d" }],
+        };
+        setUserSquads((s) => [sq, ...s]);
+        setJoined((j) => ({ ...j, [sq.id]: name }));
+        setPassport((p) => ({ ...p, squad: name }));
+        track("door_selected", { door: "create" });
+        track("squad_created", { source: "try_mvp", name });
+        setCreating(false); setSquadName(""); setShowSim(true);
+        flashToast("Squad created — " + name + " is on your Passport!");
+      };
+
+      const connectInstagram = () => {
+        const h = igInput.replace(/^@+/, "").trim();
+        if (!h) return;
+        setIgHandle(h); setIgOpen(false); setIgInput("");
+        setPassport((p) => ({ ...p, name: p.name || h }));
+        track("social_connected", { platform: "instagram", handle: h });
+        flashToast("Instagram connected — @" + h);
+      };
+
+      const simulateFriend = () => {
+        const f = FRIEND_POOL[teammates.length % FRIEND_POOL.length];
+        const key = Date.now() + "-" + teammates.length;
+        setTeammates((t) => [...t, { ...f, key }]);
+        const sqTitle = userSquads.length ? userSquads[0].title : (passport.squad || "your squad");
+        setUserSquads((list) => list.length ? list.map((sq, i) => i === 0
+          ? { ...sq, participants: sq.participants + 1, avg: Math.round((sq.avg * sq.participants + f.score) / (sq.participants + 1)),
+              leaderboard: [...sq.leaderboard, { init: initials(f.name), handle: slug(f.name), team: sq.joinTeam, score: f.score, streak: "1d" }] }
+          : sq) : list);
+        const sq0 = userSquads[0];
+        const newAvg = sq0 ? Math.round((sq0.avg * sq0.participants + f.score) / (sq0.participants + 1)) : null;
+        track("invite_accepted", { teammate: f.name });
+        flashToast(newAvg != null
+          ? f.name + " logged a " + f.score + " — " + sqTitle + " avg → " + newAvg
+          : f.name + " joined " + sqTitle + "!");
+      };
+
+      return (
+        <div className="min-h-screen bg-void pb-28">
+          <div className="max-w-3xl mx-auto px-5 pt-8">
+            <div className="flex items-center justify-between mb-6">
+              <a href="index.html" className="inline-flex items-center gap-1.5 text-xs text-ash hover:text-bone font-mono"><ArrowLeft className="w-3.5 h-3.5" /> oriya.app</a>
+              <span className="text-xs font-mono text-ash">Body Passport · SF Bay</span>
+            </div>
+
+            <div className="max-w-md mx-auto">
+              <PassportCard passport={passport} cardRef={cardRef} onSwap={swapDevice} onSetName={setName} social={igHandle}
+                personality={personality} badges={badges} countryStamps={countryStamps} earnings={earnings} onCycleNation={cycleNation} tier={tier} />
+              {tierHint && (
+                <div className="mt-3 flex items-center justify-center gap-2 text-[11px] font-mono animate-fade-up">
+                  <span className="inline-flex items-center gap-1.5" style={{ color: tier.accent }}><span className="w-2 h-2 rounded-full" style={{ background: tier.accent, boxShadow: "0 0 7px " + tier.accent }} /> {tier.name}</span>
+                  <span className="text-ash/40">·</span>
+                  <span className="text-ash">{tierHint}</span>
+                </div>
+              )}
+              <div className="mt-4 flex gap-2">
+                <button onClick={sharePassport} className="flex-1 rounded-full bg-jade py-3 font-semibold text-void hover:brightness-110 transition inline-flex items-center justify-center gap-2 shadow-[0_0_40px_-14px_rgba(127,183,158,0.8)]">
+                  <Share2 className="w-4 h-4" /> Share my Passport
+                </button>
+                {igHandle
+                  ? <span className="rounded-full border border-jade/40 bg-jade/[0.08] px-4 py-3 text-sm text-jade inline-flex items-center gap-2"><Instagram className="w-4 h-4" /> @{igHandle}</span>
+                  : <button onClick={() => setIgOpen((o) => !o)} className="rounded-full border border-white/12 bg-white/[0.03] px-4 py-3 text-sm text-bone hover:bg-white/[0.07] transition inline-flex items-center gap-2"><Instagram className="w-4 h-4" /> Connect</button>}
+              </div>
+              {igOpen && !igHandle && (
+                <div className="mt-2 flex gap-2 animate-fade-up">
+                  <input value={igInput} onChange={(e) => setIgInput(e.target.value)} placeholder="@yourhandle"
+                    onKeyDown={(e) => { if (e.key === "Enter") connectInstagram(); }}
+                    className="flex-1 rounded-full bg-white/[0.04] border border-white/10 px-4 py-2.5 text-sm text-bone outline-none focus:border-jade" />
+                  <button onClick={connectInstagram} className="rounded-full bg-jade px-4 py-2.5 text-sm font-semibold text-void">Link</button>
+                </div>
+              )}
+              <p className="text-center text-[11px] text-ash mt-2 font-mono">Post your Passport — your crew drops their own screenshot and lands on your board</p>
+
+              {/* WHERE YOU'D LAND — surface the rank payoff before the user commits a side */}
+              {hotChallenge && !alreadyJoinedHot && (
+                <button onClick={() => { setSelected(hotChallenge); track("rank_preview_clicked", { challenge: hotChallenge.id, rank: hotPreviewRank }); }}
+                  className="mt-5 w-full text-left rounded-2xl border border-amber-brand/30 bg-gradient-to-br from-amber-brand/[0.10] to-transparent p-4 hover:border-amber-brand/60 transition group animate-fade-up">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-[10px] uppercase tracking-wider font-mono text-amber-glow/80 mb-1">Where you'd land right now</div>
+                      <div className="text-bone text-sm leading-snug">
+                        Your Oriya <span className="font-mono text-amber-glow font-semibold">{passport.oriya}</span> drops in around
+                        <span className="font-mono text-amber-glow font-semibold"> #{hotPreviewRank}</span> of {hotField} in <span className="font-semibold">{hotChallenge.title}</span>.
+                      </div>
+                      <div className="text-xs text-ash mt-1">{hotChallenge.participants} already logging · {hotChallenge.sponsor}</div>
+                    </div>
+                    <span className="shrink-0 inline-flex items-center gap-1 text-xs font-semibold text-amber-glow group-hover:translate-x-0.5 transition-transform">Drop in <ChevronRight className="w-4 h-4" /></span>
+                  </div>
+                </button>
+              )}
+
+              <NormalizeExplainer />
+            </div>
+
+            {/* live teammates strip */}
+            <div className="mt-8 flex items-center gap-3">
+              <span className="text-xs text-ash font-mono shrink-0">Your squad</span>
+              <div className="flex items-center -space-x-2">
+                <div className="w-8 h-8 rounded-full bg-jade/20 border-2 border-void ring-1 ring-jade/50 flex items-center justify-center text-[10px] font-semibold text-jade">{initials(passport.name)}</div>
+                {teammates.map((t) => (
+                  <div key={t.key} title={t.name + " · " + t.score} className="w-8 h-8 rounded-full bg-white/8 border-2 border-void flex items-center justify-center text-[10px] font-semibold text-bone animate-pop-in">{initials(t.name)}</div>
+                ))}
+                {teammates.length === 0 && <span className="pl-3 text-xs text-ash">{passport.squad ? "pull your crew in →" : "join a squad below →"}</span>}
+              </div>
+            </div>
+
+            {/* CREATE YOUR SQUAD — the #1 priority move */}
+            <div className="mt-9 rounded-2xl border border-jade/40 bg-jade/[0.06] p-5 relative overflow-hidden">
+              <div className="absolute -top-12 -right-10 w-40 h-40 rounded-full bg-jade/10 blur-3xl pointer-events-none" />
+              <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-mono text-amber-glow mb-2"><Star className="w-3 h-3" /> Start here · the move</span>
+              <h2 className="text-lg font-semibold text-bone">Create your own Squad</h2>
+              <p className="text-sm text-ash mt-1 mb-4">Name it, stamp it on your Passport, and drag your training partners in. Every one who logs lifts your team average — an empty squad is a dead squad.</p>
+
+              {!creating && (
+                <button onClick={() => setCreating(true)} className="rounded-full bg-jade px-5 py-2.5 text-sm font-semibold text-void hover:brightness-110 transition inline-flex items-center gap-2">
+                  <Plus className="w-4 h-4" /> {userSquads.length ? "Create another squad" : "Create your Squad"}
+                </button>
+              )}
+              {creating && (
+                <div className="animate-fade-up">
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    {SQUAD_EMOJIS.map((e) => (
+                      <button key={e} onClick={() => setSquadEmoji(e)} className={"w-9 h-9 rounded-lg text-lg flex items-center justify-center border transition " + (e === squadEmoji ? "border-jade bg-jade/10" : "border-white/10 hover:border-white/25")}>{e}</button>
+                    ))}
+                  </div>
+                  <input value={squadName} onChange={(e) => setSquadName(e.target.value)} maxLength={28}
+                    onKeyDown={(e) => { if (e.key === "Enter") createNamedSquad(); }}
+                    placeholder="Name your squad — e.g. Dawn Patrol RC"
+                    className="w-full rounded-full bg-white/[0.05] border border-white/10 px-4 py-2.5 text-sm text-bone outline-none focus:border-jade" />
+                  <button onClick={createNamedSquad} disabled={!squadName.trim()}
+                    className={"mt-3 w-full rounded-full py-2.5 text-sm font-semibold transition " + (squadName.trim() ? "bg-jade text-void hover:brightness-110" : "bg-white/10 text-ash cursor-not-allowed")}>
+                    Create &amp; stamp my Passport
+                  </button>
+                </div>
+              )}
+              {userSquads.length > 0 && !creating && (
+                <p className="mt-3 text-xs font-mono text-jade">Your squad <span className="text-bone">{userSquads[0].title}</span> is live below ↓ — share your Passport to grow it.</p>
+              )}
+            </div>
+
+            <div className="mt-8 mb-1 flex items-center gap-2">
+              <Flame className="w-4 h-4 text-amber-glow" />
+              <h2 className="text-sm font-semibold text-bone uppercase tracking-wider">Live challenges near you</h2>
+            </div>
+            <p className="text-xs text-ash mb-4">Live boards first — real people already logging. Pick a side and your Oriya Standard drops straight onto the leaderboard.</p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {userSquads.map((c) => <ChallengeCard key={c.id} c={c} joined={true} onOpen={setSelected} />)}
+              {sortedChallenges.map((c) => <ChallengeCard key={c.id} c={c} joined={!!joined[c.id]} onOpen={setSelected} />)}
+            </div>
+
+            {showSim && (
+              <button onClick={simulateFriend} className="mt-6 w-full rounded-xl border border-dashed border-jade/40 bg-jade/5 py-3 text-sm font-medium text-jade hover:bg-jade/10 transition inline-flex items-center justify-center gap-2 animate-fade-up">
+                <UserPlus className="w-4 h-4" /> Pull in a teammate — watch the average move <span className="text-jade/60 font-mono text-xs">(demo)</span>
+              </button>
+            )}
+          </div>
+
+          {selected && (
+            <ChallengeDetail c={selected} joined={!!joined[selected.id]} joinedTeam={joined[selected.id]} me={passport}
+              onJoin={(c, team) => joinChallenge(c, team)} onClose={() => setSelected(null)} onShare={sharePassport} />
+          )}
+
+          {toast && (
+            <div className="fixed bottom-6 inset-x-0 z-[60] flex justify-center px-5 animate-fade-up pointer-events-none">
+              <div className="rounded-full border border-jade/40 bg-graphite px-4 py-2.5 text-sm text-bone shadow-xl inline-flex items-center gap-2">
+                <Check className="w-4 h-4 text-jade" /> {toast}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    /* =============================== App =============================== */
+    function App() {
+      const [view, setView] = useState("hook"); // hook | normalizing | confirm | dashboard
+      const [pending, setPending] = useState(null);
+      const [prefill, setPrefill] = useState(null);
+      const [passport, setPassport] = useState(null);
+
+      useEffect(() => {
+        try {
+          const p = new URLSearchParams(location.search);
+          if (p.get("ref") || p.get("squad")) track("door_selected", { door: "join", squad: p.get("squad") || null, ref: p.get("ref") || null });
+        } catch (e) {}
+      }, []);
+
+      const startPreset = (deviceKey, native) => { track("device_connect_started", { method: "preset", device: DEVICE_MODEL[deviceKey].tag }); setPending({ type: "preset", deviceKey, native }); setView("normalizing"); };
+      const startScreenshot = (dataUrl) => { track("device_connect_started", { method: "screenshot" }); setPending({ type: "screenshot", dataUrl }); setView("normalizing"); };
+
+      const finalize = (deviceKey, native, name, via) => {
+        const m = DEVICE_MODEL[deviceKey];
+        const oriya = toOriyaStandard(native, deviceKey);
+        track("device_connect_completed", { device: m.tag, via: via || "auto" });
+        track("passport_generated", { device: m.tag, native, oriya });
+        setPassport({ deviceKey, native, oriya, name: name || "", squad: null, nationality: "USA", personaIdx: pickPersona(deviceKey, native, oriya) });
+        setView("dashboard");
+      };
+      const handleResolved = (r) => { if (!r.confident) { setPrefill(r); setView("confirm"); return; } finalize(r.deviceKey, r.native, r.name); };
+
+      if (view === "hook") return <Hook onPreset={startPreset} onScreenshot={startScreenshot} />;
+      if (view === "normalizing") return <Normalizing pending={pending} onDone={handleResolved} />;
+      if (view === "confirm") return <Confirm prefill={prefill} onConfirm={(d) => finalize(d.deviceKey, d.native, d.name, "manual")} onBack={() => setView("hook")} />;
+      return <Dashboard passport={passport} setPassport={setPassport} />;
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>

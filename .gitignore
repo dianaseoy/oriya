@@ -1,0 +1,8 @@
+# OS / editor cruft
+.DS_Store
+
+# Local agent + tooling state (not for the public site)
+.claude/
+
+# Internal growth-ops content (drafts, outreach, strategy) — not deployed
+content/

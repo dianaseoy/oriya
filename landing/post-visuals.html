@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Oriya — The Long Game · paired visuals for every essay</title>
+<style>
+  :root{
+    --void:#0a0c10; --ink:#0c0e12; --graphite:#16191F;
+    --bone:#ECEAE4; --ash:#8A8F98; --hair:rgba(236,234,228,.10);
+    --jade:#7FB79E; --jade-deep:#3E6F5E; --jade-glow:#9FD3BB;
+    --amber:#D7A25C; --amber-deep:#B5723C; --amber-glow:#F0C083;
+    --red:#C8736B;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:'Inter',ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(900px 500px at 80% -10%, rgba(127,183,158,.08), transparent 60%),
+      radial-gradient(700px 400px at 0% 100%, rgba(215,162,92,.06), transparent 60%),
+      var(--void);
+    color:var(--bone);font-family:var(--sans);line-height:1.55;
+    -webkit-font-smoothing:antialiased;padding:48px 24px 120px}
+  .wrap{max-width:1000px;margin:0 auto}
+  .mono{font-family:var(--mono)}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--jade)}
+  h1{font-size:32px;line-height:1.15;font-weight:600;margin:10px 0 10px;letter-spacing:-.01em}
+  .lede{color:var(--ash);max-width:700px;font-size:16px}
+  .mockflag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--amber);border:1px dashed rgba(215,162,92,.5);border-radius:6px;padding:4px 9px;margin-bottom:20px}
+
+  /* ----- per-essay block ----- */
+  .essay{margin-top:52px;padding-top:34px;border-top:1px solid var(--hair)}
+  .e-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .e-num{font-family:var(--mono);font-size:12px;color:var(--amber);letter-spacing:.12em}
+  .e-title{font-size:21px;font-weight:600;letter-spacing:-.01em}
+  .e-belief{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ash)}
+  .stage{margin:18px 0;position:relative;aspect-ratio:16/9;max-width:760px;border-radius:18px;overflow:hidden;
+    background:linear-gradient(165deg,#16191F,#0a0c10);border:1px solid var(--hair);
+    box-shadow:0 30px 60px -30px rgba(0,0,0,.85), inset 0 1px 1px rgba(255,255,255,.04);
+    display:flex;align-items:center;justify-content:center;padding:30px}
+  .stage .sheen{position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.04) 50%,transparent 60%)}
+  .vbadge{position:absolute;top:12px;left:14px;font-family:var(--mono);font-size:9px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ash);border:1px solid var(--hair);border-radius:5px;padding:3px 8px;z-index:9}
+  .howto{max-width:760px;border:1px solid var(--hair);border-radius:12px;background:rgba(26,30,36,.5);padding:14px 16px;margin-top:6px}
+  .howto .t{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--jade);margin-bottom:6px}
+  .howto p{font-size:13.5px;color:var(--bone)} .howto .meta{font-family:var(--mono);font-size:11px;color:var(--ash);margin-top:7px}
+  .howto code{font-family:var(--mono);color:var(--amber-glow);font-size:12px}
+
+  /* ============ V1 — incompatible 62s ============ */
+  .v62{display:flex;gap:14px;align-items:flex-end;justify-content:center;width:100%}
+  .v62 .card{flex:1;max-width:140px;text-align:center}
+  .v62 .scalelbl{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash);margin-bottom:7px;height:22px}
+  .v62 .track{height:120px;border-radius:8px;border:1px solid var(--hair);position:relative;background:rgba(255,255,255,.02);overflow:hidden}
+  .v62 .fill{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,var(--jade-deep),var(--jade));opacity:.55}
+  .v62 .marker{position:absolute;left:0;right:0;height:2px;background:var(--amber);box-shadow:0 0 8px var(--amber)}
+  .v62 .marker::after{content:"62";position:absolute;right:4px;top:-15px;font-family:var(--mono);font-size:12px;color:var(--amber-glow)}
+  .v62 .dev{font-family:var(--mono);font-size:11px;color:var(--bone);margin-top:8px}
+  .v62 .real{font-family:var(--mono);font-size:9px;color:var(--ash);margin-top:2px}
+  .v62 .f-oura  {height:62%; animation:f1 6s ease-in-out infinite}
+  .v62 .f-whoop {height:88%; animation:f2 6s ease-in-out infinite}
+  .v62 .f-garmin{height:40%; animation:f3 6s ease-in-out infinite}
+  .v62 .f-apple {height:30%; animation:f4 6s ease-in-out infinite}
+  .v62 .m-oura{bottom:62%} .v62 .m-whoop{bottom:88%} .v62 .m-garmin{bottom:40%} .v62 .m-apple{bottom:30%}
+  @keyframes f1{0%,100%{height:62%}50%{height:66%}} @keyframes f2{0%,100%{height:88%}50%{height:84%}}
+  @keyframes f3{0%,100%{height:40%}50%{height:46%}} @keyframes f4{0%,100%{height:30%}50%{height:36%}}
+  .v62cap{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-family:var(--mono);font-size:11px;color:var(--ash)}
+
+  /* ============ V2 — the $5 morning tax meter ============ */
+  .tax{width:100%;max-width:560px}
+  .tax .meter{font-family:var(--mono);font-size:46px;color:var(--amber-glow);text-align:center;font-variant-numeric:tabular-nums;
+    text-shadow:0 0 24px rgba(240,192,131,.4)}
+  .tax .sub{text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash);margin-top:4px}
+  .tax .brands{display:flex;justify-content:center;gap:10px;margin-top:22px;flex-wrap:wrap}
+  .tax .b{font-family:var(--mono);font-size:11px;border:1px solid var(--hair);border-radius:999px;padding:6px 13px;color:var(--bone);position:relative}
+  .tax .b::after{content:"↑ tribute";position:absolute;left:50%;top:-14px;transform:translateX(-50%);font-size:8px;color:var(--amber);opacity:0;animation:pay 4s ease-in-out infinite}
+  .tax .b:nth-child(2)::after{animation-delay:1s} .tax .b:nth-child(3)::after{animation-delay:2s} .tax .b:nth-child(4)::after{animation-delay:3s}
+  @keyframes pay{0%,80%,100%{opacity:0;transform:translateX(-50%) translateY(0)}10%,40%{opacity:1;transform:translateX(-50%) translateY(-4px)}}
+  .tax .count{animation:tick 6s steps(1) infinite}
+  @keyframes tick{0%{}100%{}}
+
+  /* ============ V3 — private language / walled garden ============ */
+  .wall{display:flex;gap:16px;width:100%;max-width:640px;justify-content:center}
+  .silo{flex:1;max-width:150px;border:1px solid var(--hair);border-radius:12px;padding:14px 10px;text-align:center;background:rgba(255,255,255,.02);position:relative}
+  .silo .lock{font-size:18px;color:var(--amber);margin-bottom:8px}
+  .silo .dev{font-family:var(--mono);font-size:11px;color:var(--bone)}
+  .silo .cipher{font-family:var(--mono);font-size:9px;color:var(--ash);margin-top:8px;letter-spacing:.04em;line-height:1.5;
+    filter:blur(.4px);animation:scramble 5s steps(8) infinite}
+  @keyframes scramble{0%{opacity:.4}50%{opacity:.75}100%{opacity:.4}}
+  .silo::after{content:"";position:absolute;inset:0;border-radius:12px;box-shadow:inset 0 0 0 1px rgba(215,162,92,.18)}
+
+  /* ============ V4 — solo → team sport ============ */
+  .team{width:100%;max-width:560px}
+  .team .solo{display:flex;align-items:center;gap:10px;justify-content:center;color:var(--ash);font-family:var(--mono);font-size:12px}
+  .team .dotme{width:12px;height:12px;border-radius:50%;background:var(--ash)}
+  .team .board{margin-top:18px;border:1px solid var(--hair);border-radius:12px;overflow:hidden}
+  .team .lr{display:grid;grid-template-columns:24px 1fr auto;gap:10px;align-items:center;padding:8px 12px;font-size:13px;
+    border-bottom:1px solid var(--hair);opacity:0;transform:translateX(-8px);animation:joinrow .6s forwards}
+  .team .lr:nth-child(1){animation-delay:.3s} .team .lr:nth-child(2){animation-delay:.9s}
+  .team .lr:nth-child(3){animation-delay:1.5s} .team .lr:nth-child(4){animation-delay:2.1s}
+  .team .lr.you{background:linear-gradient(90deg,rgba(127,183,158,.16),transparent)}
+  .team .lr .rk{font-family:var(--mono);color:var(--ash);font-size:12px}
+  .team .lr .nm{font-family:var(--mono);font-size:12px} .team .lr.you .nm{color:var(--jade);font-weight:600}
+  .team .lr .sc{font-family:var(--mono);color:var(--bone)}
+  @keyframes joinrow{to{opacity:1;transform:translateX(0)}}
+
+  /* ============ V5 — status symbol swap ============ */
+  .status{display:flex;gap:18px;align-items:center;justify-content:center;width:100%;flex-wrap:wrap}
+  .status .old{font-family:var(--mono);font-size:13px;color:var(--ash);text-align:center;line-height:2.1}
+  .status .old s{opacity:.55}
+  .status .arrow{font-size:22px;color:var(--amber)}
+  .status .flex{text-align:center;padding:18px 26px;border-radius:16px;border:1px solid rgba(127,183,158,.4);
+    background:radial-gradient(120px 80px at 50% 0%,rgba(127,183,158,.14),transparent);animation:glowpulse 4s ease-in-out infinite}
+  @keyframes glowpulse{0%,100%{box-shadow:0 0 0 rgba(127,183,158,0)}50%{box-shadow:0 0 30px rgba(127,183,158,.25)}}
+  .status .flex .n{font-family:var(--mono);font-size:42px;color:var(--jade-glow);font-variant-numeric:tabular-nums}
+  .status .flex .l{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ash);margin-top:4px}
+
+  /* ============ V6 — orthosomnia anxiety loop ============ */
+  .anx{width:100%;max-width:520px;text-align:center}
+  .anx .phone{display:inline-block;border:1px solid var(--hair);border-radius:22px;padding:26px 34px;background:rgba(255,255,255,.02);position:relative}
+  .anx .score{font-family:var(--mono);font-size:60px;font-variant-numeric:tabular-nums;color:var(--red);animation:refresh 5s ease-in-out infinite}
+  .anx .lbl{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ash);margin-top:4px}
+  .anx .hr{margin-top:14px;height:18px;display:flex;align-items:center;justify-content:center;gap:3px}
+  .anx .hr i{width:3px;background:var(--red);border-radius:2px;animation:spike 1.1s ease-in-out infinite}
+  .anx .hr i:nth-child(odd){animation-delay:.2s} .anx .hr i:nth-child(3n){animation-delay:.45s}
+  @keyframes spike{0%,100%{height:4px;opacity:.4}50%{height:18px;opacity:1}}
+  @keyframes refresh{0%,100%{opacity:1}45%{opacity:.25}55%{opacity:1}}
+  .anx .resolve{margin-top:16px;font-family:var(--mono);font-size:12px;color:var(--jade);animation:fadein 5s ease-in-out infinite}
+  @keyframes fadein{0%,60%{opacity:0}80%,100%{opacity:1}}
+
+  /* ============ V7 — the biometric handicap reveal ============ */
+  .handi{width:100%;max-width:640px}
+  .handi .raws{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .handi .raw{font-family:var(--mono);font-size:12px;border:1px solid var(--hair);border-radius:999px;padding:6px 13px;color:var(--ash)}
+  .handi .raw b{color:var(--bone)}
+  .handi .merge{text-align:center;margin:16px 0;font-size:20px;color:var(--amber);animation:down 3s ease-in-out infinite}
+  @keyframes down{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(4px);opacity:1}}
+  .handi .one{margin:0 auto;text-align:center;width:230px;padding:20px;border-radius:18px;
+    background:linear-gradient(155deg,#16191F,#0c0e12);border:1px solid rgba(127,183,158,.35);
+    box-shadow:0 30px 60px -30px rgba(0,0,0,.85), inset 0 0 0 1px rgba(127,183,158,.18)}
+  .handi .one .idx{font-family:var(--mono);font-size:54px;color:var(--jade-glow);font-variant-numeric:tabular-nums}
+  .handi .one .l{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--ash);margin-top:4px}
+  .handi .golf{text-align:center;font-family:var(--mono);font-size:10px;color:var(--ash);margin-top:14px;letter-spacing:.06em}
+
+  footer{border-top:1px solid var(--hair);margin-top:64px;padding-top:24px;color:var(--ash);font-size:13px;font-family:var(--mono);line-height:1.85}
+
+  /* ---- mobile ---- */
+  @media(max-width:600px){
+    body{padding:28px 14px 80px}
+    h1{font-size:25px}
+    .stage{aspect-ratio:auto;min-height:280px;padding:18px}
+    .howto{padding:12px 13px}
+    .v62{gap:8px} .v62 .card{max-width:none}
+    .wall{gap:9px} .silo{padding:11px 7px}
+    .handi .raws{gap:7px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="mockflag">Animated mockups · loop for screen-record · screenshot any frame for a static asset</span>
+  <p class="eyebrow">The Long Game — paired visuals</p>
+  <h1>One visual built for every essay</h1>
+  <p class="lede">Each Substack/LinkedIn essay in the spine now ships with a matched visual — a looping CSS animation you can screen-record into an MP4/GIF, or freeze-frame into a still. They carry the essay's <b style="color:var(--bone)">one belief</b>, never a product pitch (Posts 1–6 stay in the withhold; Post 7 is the reveal). Capture notes sit under each.</p>
+
+  <!-- ===================== POST 1 ===================== -->
+  <section class="essay">
+    <div class="e-head"><span class="e-num">P1</span><span class="e-title">An Oura 62 Is Not a Whoop 62</span></div>
+    <div class="e-belief">Belief · recovery scores are mathematically incompatible</div>
+    <div class="stage">
+      <span class="vbadge">V1 · the four 62s</span><span class="sheen"></span>
+      <div class="v62">
+        <div class="card"><div class="scalelbl">Population<br>percentile</div><div class="track"><div class="fill f-oura"></div><div class="marker m-oura"></div></div><div class="dev">Oura 62</div><div class="real">Readiness</div></div>
+        <div class="card"><div class="scalelbl">% of YOUR<br>baseline</div><div class="track"><div class="fill f-whoop"></div><div class="marker m-whoop"></div></div><div class="dev">Whoop 62</div><div class="real">Recovery %</div></div>
+        <div class="card"><div class="scalelbl">Fuel<br>gauge</div><div class="track"><div class="fill f-garmin"></div><div class="marker m-garmin"></div></div><div class="dev">Garmin 62</div><div class="real">Body Battery</div></div>
+        <div class="card"><div class="scalelbl">Raw ms<br>reading</div><div class="track"><div class="fill f-apple"></div><div class="marker m-apple"></div></div><div class="dev">Apple 62</div><div class="real">SDNN</div></div>
+      </div>
+      <div class="v62cap">same number · four different physiological claims</div>
+    </div>
+    <div class="howto">
+      <div class="t">How to use it</div>
+      <p>The four "62" markers sit at four different heights — the whole argument in one frame. Lead the LinkedIn post with the still; use the loop as the Substack header GIF.</p>
+      <div class="meta">Capture: screen-record the <code>.stage</code> ~6s for the loop, or screenshot for the still · Pairs with: Post 1 essay + Reel R1/R2</div>
+    </div>
+  </section>
+
+  <!-- ===================== POST 2 ===================== -->
+  <section class="essay">
+    <div class="e-head"><span class="e-num">P2</span><span class="e-title">The $5 Morning Ritual Nobody Asked For</span></div>
+    <div class="e-belief">Belief · you are the unpaid integration layer</div>
+    <div class="stage">
+      <span class="vbadge">V2 · the integration tax</span><span class="sheen"></span>
+      <div class="tax">
+        <div class="meter">⏱ 6 min</div>
+        <div class="sub">spent every morning reconciling four apps</div>
+        <div class="brands"><span class="b">Oura</span><span class="b">Whoop</span><span class="b">Garmin</span><span class="b">Apple</span></div>
+        <div class="sub" style="margin-top:22px;color:var(--amber)">you do the integration. for free. forever.</div>
+      </div>
+    </div>
+    <div class="howto">
+      <div class="t">How to use it</div>
+      <p>Each brand emits a little "↑ tribute" — you're the labor moving data between walled gardens. The reframe ("you're the unpaid ETL job") is the shareable line; the visual makes it visceral.</p>
+      <div class="meta">Capture: ~4s loop catches all four tribute pulses · Pairs with: Post 2</div>
+    </div>
+  </section>
+
+  <!-- ===================== POST 3 ===================== -->
+  <section class="essay">
+    <div class="e-head"><span class="e-num">P3</span><span class="e-title">Your Wearable Is Measuring You in a Private Language</span></div>
+    <div class="e-belief">Belief · walled gardens / lock-in is by design</div>
+    <div class="stage">
+      <span class="vbadge">V3 · four locked dialects</span><span class="sheen"></span>
+      <div class="wall">
+        <div class="silo"><div class="lock">🔒</div><div class="dev">Oura</div><div class="cipher">rdns:0x3e<br>w:sleep.40<br>∂temp··</div></div>
+        <div class="silo"><div class="lock">🔒</div><div class="dev">Whoop</div><div class="cipher">rcv:%base<br>rmssd→<br>nadir··</div></div>
+        <div class="silo"><div class="lock">🔒</div><div class="dev">Garmin</div><div class="cipher">bb:drain<br>charge±<br>stress··</div></div>
+        <div class="silo"><div class="lock">🔒</div><div class="dev">Apple</div><div class="cipher">sdnn:ms<br>1min··<br>paced··</div></div>
+      </div>
+    </div>
+    <div class="howto">
+      <div class="t">How to use it</div>
+      <p>Four sealed dialects, none readable by the next — the "private language" made literal. The scrambling cipher text reads as data you can't decode. Strong standalone LinkedIn carousel cover.</p>
+      <div class="meta">Capture: still works best here; loop optional · Pairs with: Post 3 + Reel R5/R8 (interoperability)</div>
+    </div>
+  </section>
+
+  <!-- ===================== POST 4 ===================== -->
+  <section class="essay">
+    <div class="e-head"><span class="e-num">P4</span><span class="e-title">Recovery Is Becoming a Team Sport</span></div>
+    <div class="e-belief">Belief · individual optimization → social / communal</div>
+    <div class="stage">
+      <span class="vbadge">V4 · solo → squad</span><span class="sheen"></span>
+      <div class="team">
+        <div class="solo"><span class="dotme"></span> the morning check used to be one person, alone</div>
+        <div class="board">
+          <div class="lr"><span class="rk">🥇</span><span class="nm">maya · ring</span><span class="sc">84</span></div>
+          <div class="lr"><span class="rk">🥈</span><span class="nm">devin · strap</span><span class="sc">81</span></div>
+          <div class="lr you"><span class="rk">🥉</span><span class="nm">you · watch</span><span class="sc">79</span></div>
+          <div class="lr"><span class="rk">4</span><span class="nm">priya · ring</span><span class="sc">77</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="howto">
+      <div class="t">How to use it</div>
+      <p>One grey solo dot resolves into a four-person board (mixed devices, one score column) — the exact shift the essay names. The rows animate in, so the loop literally "becomes" a team.</p>
+      <div class="meta">Capture: ~3s loop shows all four rows joining · Pairs with: Post 4 (P2 phase opener)</div>
+    </div>
+  </section>
+
+  <!-- ===================== POST 5 ===================== -->
+  <section class="essay">
+    <div class="e-head"><span class="e-num">P5</span><span class="e-title">Why the Next Status Symbol Is Preparedness</span></div>
+    <div class="e-belief">Belief · status shifts from the grind to provable readiness</div>
+    <div class="stage">
+      <span class="vbadge">V5 · the new flex</span><span class="sheen"></span>
+      <div class="status">
+        <div class="old"><s>the watch</s><br><s>the car</s><br><s>the 4am grind post</s></div>
+        <div class="arrow">→</div>
+        <div class="flex"><div class="n">84</div><div class="l">Recovered · ready to perform</div></div>
+      </div>
+    </div>
+    <div class="howto">
+      <div class="t">How to use it</div>
+      <p>Old status markers struck through; the glowing readiness badge becomes the flex. The pulsing glow draws the eye to "preparedness as the new luxury." Great Thursday opinion-post visual.</p>
+      <div class="meta">Capture: ~4s loop for the glow pulse · Pairs with: Post 5</div>
+    </div>
+  </section>
+
+  <!-- ===================== POST 6 ===================== -->
+  <section class="essay">
+    <div class="e-head"><span class="e-num">P6</span><span class="e-title">The Hidden Psychology of Wearable Anxiety</span></div>
+    <div class="e-belief">Belief · orthosomnia — the score can hurt you</div>
+    <div class="stage">
+      <span class="vbadge">V6 · the anxious refresh</span><span class="sheen"></span>
+      <div class="anx">
+        <div class="phone">
+          <div class="score">48</div>
+          <div class="lbl">Recovery · "bad" morning</div>
+          <div class="hr"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="resolve">— a board that never shames a red morning —</div>
+        </div>
+      </div>
+    </div>
+    <div class="howto">
+      <div class="t">How to use it</div>
+      <p>A low score the user keeps anxiously re-reading, heart rate spiking — then the resolve line fades in. This is the highest-empathy visual in the set; it names a feeling people can't articulate. Anti-orthosomnia rail held: no score-shaming, the resolve is the point.</p>
+      <div class="meta">Capture: full ~5s loop (anxiety → resolve) · Pairs with: Post 6 (sets up the Week-3 74%-retention story)</div>
+    </div>
+  </section>
+
+  <!-- ===================== POST 7 — REVEAL ===================== -->
+  <section class="essay">
+    <div class="e-head"><span class="e-num">P7</span><span class="e-title">The Biometric Handicap <span style="color:var(--amber)">· REVEAL</span></span></div>
+    <div class="e-belief">Belief · Oriya is the inevitable conclusion</div>
+    <div class="stage">
+      <span class="vbadge">V7 · raw scores → one index</span><span class="sheen"></span>
+      <div class="handi">
+        <div class="raws"><span class="raw">Oura <b>82</b></span><span class="raw">Whoop <b>83</b></span><span class="raw">Garmin <b>69</b></span><span class="raw">Apple <b>87</b></span></div>
+        <div class="merge">↓ the handicap ↓</div>
+        <div class="one"><div class="idx">75</div><div class="l">One Oriya Index</div></div>
+        <div class="golf">golf gave every player a handicap in 1911 · recovery just got one</div>
+      </div>
+    </div>
+    <div class="howto">
+      <div class="t">How to use it</div>
+      <p>The only product visual in the set — four incompatible raw scores normalize down into one Oriya Index, anchored by the golf-handicap line (your strongest pitch-room reframe). This is the launch asset: pin it, run it as the Reel cover, and lead the Post-7 reveal with it.</p>
+      <div class="meta">Capture: ~3s loop on the "↓ the handicap ↓" merge · Pairs with: Post 7 + the launch post · honesty: index shown is illustrative, normalization math is real (try.html)</div>
+    </div>
+  </section>
+
+  <footer>
+    All visuals are <b style="color:var(--bone)">CSS animations</b> — no real video here. To ship an MP4/GIF: open this file, screen-record the <code>.stage</code> block (QuickTime / built-in recorder), or screenshot a frame for a still.<br/>
+    Posts 1–6 hold the withhold spine (no product); only V7 names Oriya — matches the reveal discipline in CALENDAR.md §A.<br/>
+    Demo videos + ad loop → try-viral-mockup.html · essay drafts → content/post-01…07.md
+  </footer>
+
+</div>
+</body>
+</html>
