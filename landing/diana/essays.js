@@ -14,6 +14,36 @@
   var ESSAYS = [
     // ---- 2026 · Current signal --------------------------------------------
     {
+      slug:"ai-growth-loop-leaks", era:"current", period:"2026-07", category:"Growth", pinned:true, status:"live",
+      title:"Your AI Product Sells Itself. The Growth Loop Still Leaks.",
+      dek:"The demo converts, the chart climbs for a month, then it flattens — and the team keeps fixing the product, which is the one part already working. Here's the teardown I run instead.",
+      body:[
+        "The tell of an AI company with a growth problem is that everyone who tries the product loves it. The demo is magic, the launch tweet does numbers, the chart goes up and to the right for a month. Then it flattens — and because nobody can say exactly why, the team does the intuitive thing and pours more work into the product. Which is usually the one part that was already working.",
+        "When the product is easy — and in 2026 the product is easy — growth stops being a function of how good the thing is and becomes a function of how well it compounds.",
+        {t:"quote", text:"A feature anyone can clone doesn't have a moat. A loop that gets cheaper to run every month does."},
+        "So when I'm handed an AI company's growth, I don't start with the product. I draw the loop, and I find where it leaks. Most teams draw their business as a funnel — pour traffic in the top, count revenue at the bottom. The ones that compound are a loop: every new user should lower the cost of acquiring the next one. Drawn that way, the leaks show up somewhere surprising — almost never at the top.",
+        {t:"svg", cap:"The growth loop, not the funnel. Acquisition is the one stage the hype cycle subsidizes, so it's rarely the problem. The money leaks out of the middle four — and AI products leak them in a signature order.",
+          svg:"<svg viewBox=\"0 60 680 196\" role=\"img\" aria-label=\"The growth loop — acquire, activate, retain, monetize, refer, closing back to acquire — with four leaks marked above the middle stages\"><defs><marker id=\"gah\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L6,3 L0,6 Z\" fill=\"#57554e\"/></marker><marker id=\"gac\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L6,3 L0,6 Z\" fill=\"#b9542d\"/></marker></defs><g font-family=\"JetBrains Mono, monospace\"><rect x=\"20\" y=\"115\" width=\"110\" height=\"46\" rx=\"9\" fill=\"#ffffff\" stroke=\"#e2ded6\" stroke-width=\"1.2\"/><rect x=\"150\" y=\"115\" width=\"110\" height=\"46\" rx=\"9\" fill=\"#ffffff\" stroke=\"#e2ded6\" stroke-width=\"1.2\"/><rect x=\"280\" y=\"115\" width=\"110\" height=\"46\" rx=\"9\" fill=\"#ffffff\" stroke=\"#e2ded6\" stroke-width=\"1.2\"/><rect x=\"410\" y=\"115\" width=\"110\" height=\"46\" rx=\"9\" fill=\"#ffffff\" stroke=\"#e2ded6\" stroke-width=\"1.2\"/><rect x=\"540\" y=\"115\" width=\"110\" height=\"46\" rx=\"9\" fill=\"#ffffff\" stroke=\"#e2ded6\" stroke-width=\"1.2\"/><g font-size=\"13\" fill=\"#1c1b19\" text-anchor=\"middle\"><text x=\"75\" y=\"143\">Acquire</text><text x=\"205\" y=\"143\">Activate</text><text x=\"335\" y=\"143\">Retain</text><text x=\"465\" y=\"143\">Monetize</text><text x=\"595\" y=\"143\">Refer</text></g><g stroke=\"#57554e\" stroke-width=\"1.4\" fill=\"none\"><path d=\"M132 138 L146 138\" marker-end=\"url(#gah)\"/><path d=\"M262 138 L276 138\" marker-end=\"url(#gah)\"/><path d=\"M392 138 L406 138\" marker-end=\"url(#gah)\"/><path d=\"M522 138 L536 138\" marker-end=\"url(#gah)\"/><path d=\"M595 161 C 595 248, 75 248, 75 165\" marker-end=\"url(#gah)\"/></g><g text-anchor=\"middle\"><text x=\"335\" y=\"190\" fill=\"#b9542d\" font-size=\"10\" letter-spacing=\"1.5\">THE LOOP</text><text x=\"335\" y=\"206\" fill=\"#97958b\" font-size=\"11\">every new user should lower the cost of the next</text></g><g stroke=\"#b9542d\" stroke-width=\"1.4\" fill=\"none\"><path d=\"M205 113 L205 99\" marker-end=\"url(#gac)\"/><path d=\"M335 113 L335 99\" marker-end=\"url(#gac)\"/><path d=\"M465 113 L465 99\" marker-end=\"url(#gac)\"/><path d=\"M595 113 L595 99\" marker-end=\"url(#gac)\"/></g><g font-size=\"10\" fill=\"#b9542d\" text-anchor=\"middle\"><text x=\"205\" y=\"90\">activation cliff</text><text x=\"335\" y=\"90\">novelty fades</text><text x=\"465\" y=\"90\">margin bleed</text><text x=\"595\" y=\"90\">CAC won't bend</text></g><text x=\"75\" y=\"90\" font-size=\"10\" fill=\"#97958b\" text-anchor=\"middle\">hype fills this</text></g></svg>"},
+        "Four leaks, and they compound downward — a leak early starves every stage after it. Here's each one, what it looks like on the dashboard, and where to actually look.",
+        "Activation — the demo converts, the product doesn't. Someone signs up because the launch was incredible, hits the empty state, never reaches the single action that makes the value land, and quietly leaves. On the dashboard it reads as great signups and a retention curve that craters in week one. It's the most common leak and the most fixable: you're usually one honest metric — time to first real value — away from seeing it.",
+        "Retention — the second-week silence. The harder one. The product worked once but didn't earn a place in the routine, and AI products are unusually exposed here, because novelty does the first week's work for free and then wears off. There's one chart that settles it, and most teams don't look at it long enough.",
+        {t:"svg", cap:"A healthy product's retention curve decays and then flattens — a floor of people for whom it became a habit. The hype curve decays to zero. If you can't see the floor, you don't have a business yet; you have a launch. Most AI dashboards report week-one retention and stop looking exactly where the answer is.",
+          svg:"<svg viewBox=\"0 0 620 285\" role=\"img\" aria-label=\"Two retention curves by cohort: a healthy curve that decays then flattens to a floor, versus a hype curve that decays to zero\"><g font-family=\"JetBrains Mono, monospace\"><text x=\"60\" y=\"32\" fill=\"#b9542d\" font-size=\"10\" letter-spacing=\"0.5\">retention by cohort</text><line x1=\"60\" y1=\"44\" x2=\"60\" y2=\"240\" stroke=\"#d9d3c9\"/><line x1=\"60\" y1=\"240\" x2=\"586\" y2=\"240\" stroke=\"#d9d3c9\"/><line x1=\"120\" y1=\"48\" x2=\"120\" y2=\"240\" stroke=\"#e2ded6\" stroke-dasharray=\"2 4\"/><g fill=\"#97958b\" font-size=\"9\"><text x=\"54\" y=\"56\" text-anchor=\"end\">100%</text><text x=\"54\" y=\"243\" text-anchor=\"end\">0</text><text x=\"124\" y=\"58\">wk 1</text><text x=\"584\" y=\"257\" text-anchor=\"end\">weeks →</text></g><path d=\"M60 66 C 130 150, 182 196, 262 205 S 462 210, 578 207\" fill=\"none\" stroke=\"#b9542d\" stroke-width=\"2\"/><circle cx=\"578\" cy=\"207\" r=\"3\" fill=\"#b9542d\"/><path d=\"M60 66 C 130 176, 214 226, 322 236 S 520 240, 578 240\" fill=\"none\" stroke=\"#8f8d83\" stroke-width=\"1.8\" stroke-dasharray=\"5 4\"/><g font-size=\"11\" text-anchor=\"middle\"><text x=\"486\" y=\"190\" fill=\"#b9542d\">flattens = a loop</text><text x=\"250\" y=\"214\" fill=\"#8f8d83\">decays = a launch</text></g></g></svg>"},
+        "Monetization — the value is real and daily, and you're still not capturing it. Usually because price is pinned to seats when the value is in usage, or to usage when the inference bill scales faster than the plan does. This is the quiet one: ARR climbs, gross margin bleeds, and the growth you're buying costs more than it returns. When the model you depend on doubles in price, what happens to the number you just booked? If you can't answer fast, that's the leak.",
+        "Distribution — the loop never closes. Users love it and don't spread it, so every new user costs full price and CAC never bends. The fix isn't a referral program bolted onto the side; it's finding the artifact the product already produces that wants to be shared, and putting it in the path. Loom didn't grow because it asked you to invite people. It grew because the thing you made was the invitation.",
+        {t:"table", cols:["The leak — how it shows up","The move"], label:"the four leaks · symptom → move",
+          rows:[
+            ["Activation — great signups, week-1 cliff","Instrument time-to-first-value; delete every step before the aha."],
+            ["Retention — flat MAU, churn “within range”","Find the habit; make the second session inevitable, not optional."],
+            ["Monetization — ARR up, gross margin down","Price the value — usage, outcomes — not the software, seats."],
+            ["Distribution — CAC won't bend","Put the share inside the product's own output."]
+          ],
+          cap:"None of this needs a new dashboard. It needs someone to draw the loop honestly and point at the leak."},
+        "And there's a fifth leak nobody in San Francisco draws, because the whole loop above quietly assumes a user who looks like the person who built it. Try to grow the same product in Lagos, Jakarta, or São Paulo and every stage re-leaks at once: activation assumes a payment method that isn't there, retention assumes a data plan that doesn't cost a day's wage, referral assumes a network that's on a different app entirely. That's the growth most teams can't do — and it's the one I take out of experience rather than a framework, because I've had to run the loop in those markets, not just diagram it.",
+        "The teardown is the same every time. The product sells itself — leave it alone. Draw the loop, find the leak, and fix the part that isn't the demo. That's the whole job, and it's the part that compounds."
+      ]
+    },
+    {
       slug:"meta-layer-money", era:"current", period:"2026-07", category:"Deal flow", status:"live",
       title:"The Meta-Layer Is Where the Money Went",
       dek:"As models commoditize, the durable businesses sit one layer up — the router, the scoreboard, the hub. And the GTM incumbents are being repriced in real time.",
@@ -43,7 +73,7 @@
       ]
     },
     {
-      slug:"gtm-split-breaking", era:"current", period:"2026-06", category:"Playbook", pinned:true, status:"live",
+      slug:"gtm-split-breaking", era:"current", period:"2026-06", category:"Growth", pinned:true, status:"live",
       title:"The 30/30/40 Rule Is Breaking",
       dek:"The old startup playbook split spend across marketing, sales, and product in a predictable arc. AI-native companies are tearing up the ratio — and the best ones barely have a sales line.",
       body:[
@@ -163,7 +193,7 @@
       ]
     },
     {
-      slug:"nairobi-network-effects", era:"current", period:"2026-01", category:"Field notes", status:"live",
+      slug:"nairobi-network-effects", era:"current", period:"2026-01", category:"Growth", status:"live",
       title:"What Nairobi Taught Me About Network Effects",
       dek:"The Sand Hill growth playbook doesn't survive first contact with 80% mobile-money penetration and a phone shared by three people.",
       body:[
@@ -260,7 +290,7 @@
       ]
     },
     {
-      slug:"cold-start-in-colombo", era:"2025h2", period:"2025-07", category:"Field notes", status:"live",
+      slug:"cold-start-in-colombo", era:"2025h2", period:"2025-07", category:"Growth", status:"live",
       title:"Cold Start in Colombo",
       dek:"Andrew Chen's cold-start framework is one of the best in growth. It doesn't account for geography.",
       body:[

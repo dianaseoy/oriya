@@ -89,6 +89,18 @@
     .tool-name{font-size:16px;font-weight:600;letter-spacing:-0.01em;color:var(--text)}
     .tool-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent-line);background:var(--accent-dim);border-radius:5px;padding:2px 7px}
     .tool-verdict{font-size:14px;color:var(--text-2);margin-top:6px;line-height:1.55;max-width:68ch}
+    /* referral / "tools I back" — honest endorsements; hrefs are placeholders for real partner links */
+    .grp-note{font-size:13.5px;color:var(--text-2);line-height:1.62;max-width:72ch;margin:-4px 0 16px}
+    .grp-note b{color:var(--text);font-weight:500}
+    .ref{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 11px;padding:13px 14px;border-radius:10px;border:1px solid transparent;transition:all .2s var(--ease)}
+    .ref:hover{background:var(--panel);border-color:var(--line)}
+    .ref-name{font-size:16px;font-weight:600;letter-spacing:-0.01em;color:var(--text)}
+    .ref-perk{font-family:var(--mono);font-size:9.5px;letter-spacing:0.09em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent-line);background:var(--accent-dim);border-radius:5px;padding:2px 7px}
+    .ref-link{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--accent);white-space:nowrap}
+    .ref-link .arr{display:inline-block;transition:transform .2s var(--ease)}
+    .ref:hover .ref-link .arr{transform:translate(2px,-2px)}
+    .ref-why{flex:1 1 100%;font-size:14px;color:var(--text-2);line-height:1.55;max-width:70ch;margin-top:2px}
+    .ref-disc{font-family:var(--mono);font-size:10.5px;color:var(--text-3);margin-top:14px;letter-spacing:0.02em;line-height:1.5}
 
     .hacks{counter-reset:h;display:flex;flex-direction:column;gap:2px}
     .hack{display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:baseline;padding:11px 12px;border-radius:9px;transition:background .2s var(--ease)}
@@ -284,7 +296,19 @@
       </section>
 
       <section class="grp">
-        <div class="grp-head"><span class="grp-key">02</span><span class="grp-label">Productivity · SaaS hacks</span><span class="grp-rule"></span></div>
+        <div class="grp-head"><span class="grp-key">02</span><span class="grp-label">Growth · the loop</span><span class="grp-rule"></span></div>
+        <p class="grp-note">The other half of the stack — not how I build the product, but how I see what's working and move the number. Roughly in loop order: <b>measure, experiment, reach, keep, expand</b>.</p>
+        <div class="tool"><div class="tool-top"><span class="tool-name">PostHog</span><span class="tool-tag">analytics · replay · flags</span></div><div class="tool-verdict">Where I start on day one. Product analytics, session replay, and feature flags in one place — I can watch what a user actually does instead of what a dashboard rounds them into. Open-source, generous free tier, ships fast.</div></div>
+        <div class="tool"><div class="tool-top"><span class="tool-name">Amplitude</span><span class="tool-tag">behavioral depth</span></div><div class="tool-verdict">When the questions outgrow PostHog — cohorts, funnels, and retention curves the whole org will trust. What I reach for once activation is the number everyone's arguing about.</div></div>
+        <div class="tool"><div class="tool-top"><span class="tool-name">Statsig</span><span class="tool-tag">experimentation</span></div><div class="tool-verdict">Ship, measure, decide — the loop that separates operators from opinion-havers. Feature gates and experiments in one system; it's what the serious AI teams run, and for the right reason.</div></div>
+        <div class="tool"><div class="tool-top"><span class="tool-name">Clay</span><span class="tool-tag">GTM data · outbound</span></div><div class="tool-verdict">The unfair advantage in outbound right now. Enrich, score, and personalize at the row level, then let it run — it turns a flat list into a growth motion without a ten-person SDR floor.</div></div>
+        <div class="tool"><div class="tool-top"><span class="tool-name">Customer.io</span><span class="tool-tag">lifecycle</span></div><div class="tool-verdict">Behavioral messaging that fires on what a user did, not what day it is. Where onboarding and retention stop being a newsletter and start being a system.</div></div>
+        <div class="tool"><div class="tool-top"><span class="tool-name">Attio</span><span class="tool-tag">CRM · pipeline</span></div><div class="tool-verdict">The CRM that finally reads like software built this decade. Data-model-first and fast enough to shape around your actual motion, instead of forcing you into Salesforce's.</div></div>
+        <div class="tool"><div class="tool-top"><span class="tool-name">Hightouch</span><span class="tool-tag">reverse-ETL</span></div><div class="tool-verdict">The quiet unlock: the warehouse becomes the source of truth and every downstream tool gets the same clean data. Activation without the spaghetti of point-to-point integrations.</div></div>
+      </section>
+
+      <section class="grp">
+        <div class="grp-head"><span class="grp-key">03</span><span class="grp-label">Productivity · SaaS hacks</span><span class="grp-rule"></span></div>
         <div class="hacks">
           <div class="hack"><p><b>Build the throwaway first.</b> A 30-minute prototype kills more bad ideas than a three-hour debate.</p></div>
           <div class="hack"><p><b>Prompts are infrastructure.</b> Version them, reuse them, treat the good ones like code — not clever one-offs.</p></div>
@@ -295,7 +319,7 @@
       </section>
 
       <section class="grp">
-        <div class="grp-head"><span class="grp-key">03</span><span class="grp-label">Migrations · the switch</span><span class="grp-rule"></span></div>
+        <div class="grp-head"><span class="grp-key">04</span><span class="grp-label">Migrations · the switch</span><span class="grp-rule"></span></div>
         <div class="tool"><div class="tool-top"><span class="tool-name">Namecheap → Cloudflare</span><span class="tool-tag">dns · edge</span></div><div class="tool-verdict">Left the domains at Namecheap out of inertia until a record change took hours to propagate instead of seconds. Cloudflare runs the fastest anycast resolver on the internet, registers domains at wholesale cost with zero upsells, and hands you a WAF, unmetered DDoS mitigation, and edge caching on the free tier. The pitch that finally moved me wasn't a feature — it was that I stopped thinking about DNS entirely.</div></div>
         <div class="tool"><div class="tool-top"><span class="tool-name">Netlify / raw AWS → Vercel</span><span class="tool-tag">deploy</span></div><div class="tool-verdict">Netlify was the gateway drug; raw AWS was the tax I paid to feel serious. Vercel won on one mechanic: a preview URL per branch turns “show me” from a meeting into a link. Framework-defined infrastructure means I stopped hand-writing the deploy, and because every build is immutable and promotion is just an alias swap, rollback is instant — no rebuild, no downtime.</div></div>
         <div class="tool"><div class="tool-top"><span class="tool-name">Postgres read-replica → Snowflake</span><span class="tool-tag">analytics</span></div><div class="tool-verdict">Analytics rode a groaning Postgres read-replica until the dashboards started timing out and every heavy query threatened prod. Snowflake's unlock is boring and total: storage and compute are decoupled, so a brutal backfill spins up its own warehouse, never touches the app, and you pay for the seconds it runs and switch it off. Separation of concerns, billed by the second.</div></div>
@@ -303,7 +327,27 @@
       </section>
 
       <section class="grp">
-        <div class="grp-head"><span class="grp-key">04</span><span class="grp-label">Stack insights</span><span class="grp-rule"></span></div>
+        <div class="grp-head"><span class="grp-key">05</span><span class="grp-label">Tools I back · referral</span><span class="grp-rule"></span></div>
+        <p class="grp-note">The stack behind the teams I back — the tools I actually reach for in the trenches with a company, and the AI ones I'd stake my name on. Where I have a partner link, <b>my readers get a discount or an extended trial</b>. I keep the list honest by only naming what I use or would recommend without one.</p>
+        <!-- warm — tools I already use & have written up; replace href="#" with real referral/partner links -->
+        <div class="ref"><span class="ref-name">Vercel</span><span class="ref-perk">extended trial</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">The deploy layer I moved my own stack to. Preview URL per branch, instant rollback, zero infra babysitting — the reason “show me” becomes a link, not a meeting.</div></div>
+        <div class="ref"><span class="ref-name">Replit</span><span class="ref-perk">free credits</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">Where an idea earns its keep before it earns a repo. Zero to a running app in one tab — the fastest way I know to kill a bad idea in thirty minutes.</div></div>
+        <div class="ref"><span class="ref-name">Modal</span><span class="ref-perk">free credits</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">Serverless GPUs the way the word was meant. Decorate a Python function, pay for the ninety seconds it runs, nothing idles — the end of the surprise $400 bill.</div></div>
+        <div class="ref"><span class="ref-name">Claude</span><span class="ref-perk">free trial</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">My primary pair on real codebases. The model isn't the moat — knowing what to ask is — and this is the one I trust to hold the architecture while I review every diff.</div></div>
+        <!-- tier 1 — AI startups I'd back / advise; replace href="#" with real referral/partner links -->
+        <div class="ref"><span class="ref-name">Lovable</span><span class="ref-perk">discount</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">AI that ships a real front end from a sentence. What I hand a non-technical founder who needs a working product in front of users this week, not next quarter.</div></div>
+        <div class="ref"><span class="ref-name">Fyxer</span><span class="ref-perk">free trial</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">An AI exec assistant that clears the inbox and drafts in your voice. The first one I've kept past the trial — it buys back the hour founders pretend they don't lose to email.</div></div>
+        <div class="ref"><span class="ref-name">Decagon</span><span class="ref-perk">demo + discount</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">AI customer support that resolves instead of deflecting — the rare support layer that moves the metric the right way: resolution up, headcount flat.</div></div>
+        <div class="ref"><span class="ref-name">Scribe</span><span class="ref-perk">free plan</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">Turns any process you run into a step-by-step doc automatically. The fastest way I've found to get tribal knowledge out of one head and into the team.</div></div>
+        <div class="ref"><span class="ref-name">Fireworks</span><span class="ref-perk">free credits</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">Fast, cheap inference for teams shipping on open models — where the inference bill stops outrunning the product, the exact math that decides whether an AI feature survives.</div></div>
+        <div class="ref"><span class="ref-name">Render</span><span class="ref-perk">free tier</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">The boring, reliable place to run the backend so you don't hand-roll infra. Heroku's ease without the ceiling — I reach for it when the app just needs to run.</div></div>
+        <div class="ref"><span class="ref-name">ElevenLabs</span><span class="ref-perk">free credits</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">The voice layer for anything that talks — agents, media, localization. The one I'd bet on for going multilingual into markets your current product can't yet speak to.</div></div>
+        <div class="ref"><span class="ref-name">Runway</span><span class="ref-perk">free credits</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">Generative video a real creative team will actually use — where the cost of a moving image drops far enough to change what a small team can ship.</div></div>
+        <p class="ref-disc">Some links above are affiliate or referral links — they cost you nothing extra, often less. I only list tools I use, or would recommend without one.</p>
+      </section>
+
+      <section class="grp">
+        <div class="grp-head"><span class="grp-key">06</span><span class="grp-label">Stack insights</span><span class="grp-rule"></span></div>
         <div class="insights">
           <div class="insight">The bottleneck moved from writing code to specifying intent. Taste and judgment are the scarce inputs now.</div>
           <div class="insight">Most “AI products” are a system prompt in a trench coat. Defensibility lives in the data loop and the distribution — not the model call.</div>
