@@ -153,7 +153,7 @@
     .row:hover .mk{color:var(--accent);transform:translateX(2px)}
     .row-main{min-width:0}
     .row-title{font-size:16.5px;font-weight:600;letter-spacing:-0.012em;color:var(--text);display:inline-block;transform-origin:left center;transition:transform .28s var(--spring),color .2s var(--ease)}
-    .row:hover .row-title{color:var(--accent);transform:translateX(3px) scale(1.022)}
+    .row:hover .row-title{color:var(--accent);transform:translateX(3px)}
     @media(prefers-reduced-motion:reduce){.row:hover .row-title{transform:none}}
     .row-pin{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent-line);border-radius:5px;padding:1px 6px;margin-left:8px;vertical-align:middle}
     .row-dek{font-size:12.5px;color:var(--text-3);margin-top:4px;line-height:1.5}
@@ -178,6 +178,8 @@
     .card-h{font-size:16px;font-weight:600;letter-spacing:-0.01em}
     .card-h .glyph{color:var(--accent)}
     .card-p{font-size:13px;color:var(--text-2);margin-top:5px;line-height:1.55}
+    /* serif pull-line — the block+font "altitude change" from the quote cards, adapted to a left-border so it doesn't box-in-box inside the card */
+    .card-thesis{font-family:var(--serif);font-size:19px;line-height:1.36;color:var(--text);letter-spacing:0.01em;margin:15px 0 5px;padding-left:15px;border-left:2px solid var(--accent-line)}
     .card-cta{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12px;color:var(--accent);border:1px solid var(--accent-line);background:var(--accent-dim);border-radius:9px;padding:9px 15px;white-space:nowrap;transition:all .2s var(--ease)}
     .card-cta:hover{box-shadow:0 6px 20px rgba(185,84,45,0.18);transform:translateY(-1px)}
     .creds{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:16px;font-family:var(--mono);font-size:11.5px;color:var(--text-2)}
@@ -320,19 +322,20 @@
               <div class="card-k">Currently building</div>
               <div class="card-h"><span class="glyph">◇</span> Oriya</div>
               <p class="card-p">I grew up between three countries and as many healthcare systems, none of which agreed with each other. Then I did the thing everyone recommends and bought the wearables — and ended up with five dashboards, four scores, and no read on what any of them actually wanted from me. A bad number could quietly cost me a morning. That's the problem I build against.</p>
-              <p class="card-p">Oriya normalizes Oura, Garmin, Whoop, and Apple onto one fair 0–100 recovery index and hands a squad a single number to compete on — how well you recovered, not whose device runs generous. Private beta in SF &amp; NYC; the long arc is health data you own.</p>
+              <p class="card-thesis">One fair 0–100 recovery score to compete on — how well you recovered, not whose device runs generous.</p>
+              <p class="card-p">Oriya normalizes Oura, Garmin, Whoop, and Apple onto that single index. Private beta in SF &amp; NYC; the long arc is health data you own.</p>
             </div>
             <a class="card-cta" href="https://oriya.app" target="_blank" rel="noopener">Visit Oriya <span>↗</span></a>
           </div>
         </div>
 
         <div class="author-bio">
-          <p>Diana has been building — and selling — things since she was fifteen: e-commerce, simultaneous interpreting for government events and investor demos, albums of her own classical compositions. She grew up between <b>Guangzhou, Cairo, and Seoul</b> — inside two of the fastest-changing economies on earth — watching, up close, who got to participate in that growth and who was quietly routed around it. That question has shaped everything she's built since.</p>
-          <p>She earned three business degrees on three continents — a continent a year at USC, Bocconi, and HKUST — and then turned down the institutional version of the story, return offers from JPMorgan, Bloomberg, and Bain, to build instead.</p>
-          <p>In the years since, she's worked both sides of the table: an early hand on growth and product across a run of hard fintech and web3 companies — <a href="https://vegaxholdings.com/" target="_blank" rel="noopener">VegaX Holdings</a>, <a href="https://solanapay.com" target="_blank" rel="noopener">Solana Pay</a>, <a href="https://bifi.finance/" target="_blank" rel="noopener">Bifrost and BiFi</a>, <a href="https://demether.io/" target="_blank" rel="noopener">Demether</a>, <a href="https://tashi.network/" target="_blank" rel="noopener">Tashi</a> — and inside venture itself, at <a href="https://nest.vc/" target="_blank" rel="noopener">Nest VC</a> across Hong Kong and Singapore, sourcing deals for other partners along the way. She's scaled startups from seed to Series B, and backs founders building where most funds don't look — Accra, Lagos, Vilnius, Bali.</p>
-          <p>She's now bringing that instinct, and the product-and-UX edge it's built, to the opening moves of AI.</p>
+          <p>Diana has been building — and selling — things since she was fifteen: e-commerce, simultaneous interpreting for government events and investor demos, albums of her own classical compositions. She grew up between <b>Guangzhou, Cairo, and Seoul</b> — inside two of the fastest-changing economies on earth — watching who got to participate in that growth and who was quietly routed around it. That question has shaped everything she's built since.</p>
+          <p>She studied across USC, Bocconi, and HKUST, and passed on the offers that came with them — from JPMorgan, Bloomberg, and Bain — to build instead. She's worked both sides of the table since: an early hand on growth and product across a run of hard fintech and web3 companies — <a href="https://vegaxholdings.com/" target="_blank" rel="noopener">VegaX Holdings</a>, <a href="https://solanapay.com" target="_blank" rel="noopener">Solana Pay</a>, <a href="https://bifi.finance/" target="_blank" rel="noopener">Bifrost and BiFi</a>, <a href="https://demether.io/" target="_blank" rel="noopener">Demether</a>, <a href="https://tashi.network/" target="_blank" rel="noopener">Tashi</a> — and inside venture at <a href="https://nest.vc/" target="_blank" rel="noopener">Nest VC</a> across Hong Kong and Singapore.</p>
+          <p>She's scaled startups from seed to Series B, and backs founders building where most funds don't look — Accra, Lagos, Vilnius, Bali.</p>
         </div>
 
+        <!-- HIDDEN until real attributions land — exact quotes preserved; swap placeholder names in q-by and un-comment this block.
         <div class="main-title" style="margin-top:40px">On working together</div>
         <div class="quotes">
           <figure class="quote-card">
@@ -348,6 +351,7 @@
             <figcaption class="q-by">Amara O. · CEO, Fintech — Lagos</figcaption>
           </figure>
         </div>
+        -->
       </section>
 
       <!-- reach-out coda — quiet, own voice; problems she reaches for, not a service menu -->
@@ -461,7 +465,7 @@
       var rows = items.map(function(e){
         return '<a class="feat-row" href="essay.html?id='+encodeURIComponent(e.slug)+'"><span class="feat-rt">'+esc(e.title)+'</span><span class="feat-rd">'+esc(e.dek)+'</span></a>';
       }).join("");
-      featWrap.innerHTML = '<div class="feat-head"><span class="feat-title">If you only read four</span><span class="feat-sub">of the forty</span></div><div class="feat-list">'+rows+'</div>';
+      featWrap.innerHTML = '<div class="feat-head"><span class="feat-title">If you only read four</span></div><div class="feat-list">'+rows+'</div>';
     }
 
     renderFeatured();
