@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Oriya — Your Body Passport</title>
-  <meta name="description" content="Drop a recovery screenshot. We OCR-verify it, normalize it to the Oriya Standard, and drop you into live recovery challenges." />
+  <meta name="description" content="Drop a recovery screenshot. We OCR-verify it, normalize it to the Oriya Index, and drop you into live recovery challenges." />
 
   <!-- No build step. UMD React + ReactDOM + Babel Standalone (plain text/babel).
        Tesseract.js (OCR) and html-to-image (share PNG) are lazy-loaded on demand. -->
@@ -22,14 +22,17 @@
           fontFamily: {
             sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
             mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+            display: ['"Instrument Serif"', 'ui-serif', 'Georgia', 'serif'],
           },
           keyframes: {
             "fade-up": { "0%": { opacity: 0, transform: "translateY(8px)" }, "100%": { opacity: 1, transform: "translateY(0)" } },
             "pop-in": { "0%": { opacity: 0, transform: "scale(.96)" }, "100%": { opacity: 1, transform: "scale(1)" } },
+            "sheet-up": { "0%": { opacity: 0, transform: "translateY(24px)" }, "100%": { opacity: 1, transform: "translateY(0)" } },
           },
           animation: {
             "fade-up": "fade-up .5s cubic-bezier(.2,.7,.2,1) both",
             "pop-in": "pop-in .35s cubic-bezier(.2,.7,.2,1) both",
+            "sheet-up": "sheet-up .34s cubic-bezier(.2,.7,.2,1) both",
           },
         },
       },
@@ -37,7 +40,7 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
@@ -52,6 +55,9 @@
     }
     html, body { background:#020617; }
     body { -webkit-font-smoothing:antialiased; }
+    /* serif display — mirrors landing index.html for cross-page cohesion */
+    .display{ font-family:'Instrument Serif',ui-serif,Georgia,serif; font-weight:400; letter-spacing:-0.005em; }
+    .display em{ font-style:italic; }
     .spin { animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -137,7 +143,7 @@
     .tour-stage{ position:relative; border:1px solid var(--hairline); border-radius:16px; background:#05070d;
       padding:18px; margin-top:12px; min-height:214px; overflow:hidden; }
     .tour-cursor{ position:absolute; width:20px; height:20px; z-index:20; pointer-events:none;
-      filter:drop-shadow(0 2px 3px rgba(0,0,0,.6)); animation:tourCursor 9s ease-in-out infinite; }
+      filter:drop-shadow(0 2px 3px rgba(0,0,0,.6)); animation:tourCursor 7.5s ease-in-out infinite; }
     @keyframes tourCursor{
       0%{left:50%;top:80%;opacity:0}6%{opacity:1}
       18%{left:50%;top:32%}22%{transform:scale(.82)}26%{transform:scale(1)}
@@ -145,18 +151,22 @@
       64%{left:34%;top:66%}68%{transform:scale(.82)}72%{transform:scale(1)}
       92%{left:34%;top:66%}100%{left:50%;top:80%;opacity:.5} }
     .tour-step{ position:absolute; inset:18px; display:flex; flex-direction:column; align-items:center;
-      justify-content:center; gap:10px; text-align:center; opacity:0; animation:tourStep 9s infinite; }
+      justify-content:center; gap:9px; text-align:center; opacity:0; animation:tourStep 7.5s infinite; }
     .tour-step:nth-of-type(1){ animation-delay:0s }
-    .tour-step:nth-of-type(2){ animation-delay:3s }
-    .tour-step:nth-of-type(3){ animation-delay:6s }
+    .tour-step:nth-of-type(2){ animation-delay:2.5s }
+    .tour-step:nth-of-type(3){ animation-delay:5s }
     @keyframes tourStep{ 0%{opacity:0}3%{opacity:1}30%{opacity:1}34%{opacity:0}100%{opacity:0} }
     .tour-drop{ width:78%; max-width:280px; border:2px dashed rgba(127,183,158,.5); border-radius:14px; padding:18px;
       color:var(--jade); font-family:var(--font-mono); font-size:12px; background:rgba(127,183,158,.05); }
     .tour-ocr{ width:70%; max-width:240px; height:6px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; }
     .tour-ocr i{ display:block; height:100%; border-radius:999px;
-      background:linear-gradient(90deg,var(--jade-deep),var(--jade)); animation:tourOcr 3s ease-out infinite; }
+      background:linear-gradient(90deg,var(--jade-deep),var(--jade)); animation:tourOcr 2.5s ease-out infinite; }
     @keyframes tourOcr{ 0%{width:8%}80%{width:100%}100%{width:100%} }
-    .tour-score{ font-family:var(--font-mono); font-size:42px; color:var(--jade); font-variant-numeric:tabular-nums; line-height:1; }
+    .tour-flip{ display:flex; align-items:baseline; gap:10px; }
+    .tour-raw{ font-family:var(--font-mono); font-size:22px; color:var(--ash); position:relative; }
+    .tour-raw::after{ content:""; position:absolute; left:-2px; right:-2px; top:52%; height:2px; background:var(--amber); border-radius:2px; }
+    .tour-arrow{ color:var(--jade); font-size:18px; }
+    .tour-score{ font-family:var(--font-mono); font-size:52px; font-weight:600; color:var(--jade); font-variant-numeric:tabular-nums; line-height:1; }
     .tour-row{ width:80%; max-width:260px; display:grid; grid-template-columns:20px 1fr auto; gap:8px; padding:8px 11px;
       border-radius:9px; border:1px solid rgba(127,183,158,.4); background:linear-gradient(90deg,rgba(127,183,158,.14),transparent);
       font-family:var(--font-mono); font-size:13px; }
@@ -173,11 +183,32 @@
     html.pf body{ animation:pfIn .5s ease both; }
     body.pf-out{ opacity:0; transition:opacity .26s ease; }
     @keyframes pfIn{ from{opacity:0} to{opacity:1} }
-    @media (max-width:520px){ .topnav .lnks a.sci{ display:none } }
+    @media (max-width:520px){
+      .topnav .lnks a.sci{ display:none }
+      .topnav .lnks{ gap:12px }
+      /* comfortable tap target for the device-swap pills on touch */
+      .pp-dev{ padding:9px 15px; font-size:12px }
+    }
     @media (prefers-reduced-motion: reduce){
       .tour-cursor,.tour-step,.tour-ocr i{ animation:none }
       .tour-step:nth-of-type(1){ opacity:1 } .tour-step:nth-of-type(2),.tour-step:nth-of-type(3){ display:none }
       html.pf body{ animation:none } }
+    /* ---- boot skeleton (shown while Babel compiles; React replaces it on mount) ---- */
+    .boot{ min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:24px; }
+    .boot-card{ width:300px; max-width:80vw; aspect-ratio:1.586/1; border-radius:20px; border:1px solid var(--hairline);
+      background:linear-gradient(155deg,#16191F,#0c0e12); box-shadow:0 40px 80px -34px rgba(0,0,0,.85); position:relative; overflow:hidden; }
+    .boot-card::after{ content:""; position:absolute; inset:0; transform:translateX(-100%);
+      background:linear-gradient(90deg,transparent,rgba(236,234,228,.09),transparent); animation:bootSheen 1.15s infinite; }
+    @keyframes bootSheen{ to{ transform:translateX(100%); } }
+    .boot-t{ font-family:var(--font-mono); font-size:12px; letter-spacing:.05em; color:var(--ash); }
+    .boot-dot{ display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--jade); margin-right:8px;
+      box-shadow:0 0 8px var(--jade); animation:bootPulse 1s infinite; vertical-align:middle; }
+    @keyframes bootPulse{ 0%,100%{opacity:.35} 50%{opacity:1} }
+    @media (prefers-reduced-motion: reduce){ .boot-card::after,.boot-dot{ animation:none } }
+    /* pulsed default preset on the hook */
+    .qt-pulse{ animation:qtPulse 2.4s ease-in-out infinite; }
+    @keyframes qtPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(127,183,158,0); } 50%{ box-shadow:0 0 22px -5px rgba(127,183,158,.5); } }
+    @media (prefers-reduced-motion: reduce){ .qt-pulse{ animation:none } }
   </style>
 </head>
 <body class="bg-void text-bone font-sans">
@@ -203,21 +234,46 @@
       </a>
       <div class="lnks">
         <a href="science.html" class="sci">The Science</a>
-        <a href="index.html#join" class="cta">Join the beta</a>
+        <a href="#privacy" class="sci" onclick="window.dispatchEvent(new CustomEvent('oriya:privacy'));return false;">Privacy</a>
+        <a href="index.html#join" class="cta">Join Season 1</a>
       </div>
     </div>
   </nav>
-  <div id="root"></div>
+  <div id="root"><div class="boot"><div class="boot-card"></div><div class="boot-t"><span class="boot-dot"></span>Warming up your Body Passport…</div></div></div>
 
   <script type="text/babel" data-presets="react">
     const { useState, useEffect, useRef, useCallback } = React;
     const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+    /* =================== trial store (localStorage) ===================
+       Where does a trial go today? Nowhere durable — it lived in memory and
+       vanished on refresh. Now: the generated passport + a capped event log
+       persist to this browser's localStorage (so a trial survives reload and
+       can be resumed), and, IF a collector endpoint is configured via
+       window.ORIYA_INGEST_URL, each event is also beaconed there for real
+       server-side storage. No endpoint set = nothing leaves the device. */
+    const TRIAL_KEY = "oriya:trial";
+    const EVENTS_KEY = "oriya:events";
+    function readJSON(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; } }
+    function writeJSON(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+    function saveTrial(patch) {
+      const cur = readJSON(TRIAL_KEY, null) || { startedAt: Date.now() };
+      const next = Object.assign(cur, patch, { updatedAt: Date.now() });
+      writeJSON(TRIAL_KEY, next);
+      return next;
+    }
+    function loadTrial() { return readJSON(TRIAL_KEY, null); }
+    function clearTrial() { try { localStorage.removeItem(TRIAL_KEY); } catch (e) {} }
 
     /* =================== analytics shim =================== */
     window.dataLayer = window.dataLayer || [];
     function track(event, props) {
       const payload = Object.assign({ event, ts: Date.now() }, props || {});
       window.dataLayer.push(payload);
+      // Durable local event log (capped ring buffer) — inspectable for the trial.
+      try { const buf = readJSON(EVENTS_KEY, []); buf.push(payload); while (buf.length > 200) buf.shift(); writeJSON(EVENTS_KEY, buf); } catch (e) {}
+      // Optional real collection: set window.ORIYA_INGEST_URL to a collector URL to persist server-side.
+      try { if (window.ORIYA_INGEST_URL && navigator.sendBeacon) navigator.sendBeacon(window.ORIYA_INGEST_URL, JSON.stringify(payload)); } catch (e) {}
       if (window.console) console.debug("[oriya:event]", event, payload);
     }
     window.oriyaTrack = track;
@@ -259,10 +315,11 @@
     const Star       = (p)=><Svg className={p.className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></Svg>;
     const Plus       = (p)=><Svg className={p.className}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></Svg>;
 
-    /* =================== Oriya Standard normalization (real model) ===================
+    /* =================== Oriya Index normalization (real model) ===================
        Source: oriya.app/science — linear per-device correction Oriya = native×factor + offset.
        Lower device validation = larger correction. Worked example: Whoop 83 → 83×0.92−1.0 = 75. */
     const DEVICE_MODEL = {
+      strava:     { tag:"Strava",        model:"Strava",       metric:"Training load",  factor:0.94, offset:1.5,  validation:"Med",  sample:76 },
       oura:       { tag:"Oura",          model:"Oura Ring 4",  metric:"Readiness",      factor:0.97, offset:2.5,  validation:"High", sample:82 },
       whoop:      { tag:"Whoop",         model:"WHOOP 5.0",    metric:"Recovery %",     factor:0.92, offset:-1.0, validation:"Med",  sample:71 },
       garmin:     { tag:"Garmin",        model:"Garmin Fenix", metric:"Body Battery",   factor:0.95, offset:0.0,  validation:"Med",  sample:78 },
@@ -278,11 +335,23 @@
     };
     const PRESET_KEYS = ["oura", "whoop", "garmin", "apple"];
 
+    /* The "main ones" for the tap-to-connect sync flow (mobile-first path, an
+       alternative to the screenshot dropzone). Each connection here is a
+       SIMULATED read-only sync for preview — live OAuth is gated to beta and
+       needs the backend token-exchange described in the integration spec. */
+    const CONNECT = [
+      { key:"strava", scope:"activities + resting HR",  kind:"Training load → provisional readiness" },
+      { key:"oura",   scope:"Readiness + HRV",          kind:"Recovery" },
+      { key:"whoop",  scope:"Recovery % + strain",      kind:"Recovery" },
+      { key:"garmin", scope:"Body Battery + sleep",     kind:"Recovery" },
+      { key:"apple",  scope:"HRV + sleep + resting HR",  kind:"Recovery" },
+    ];
+
     function toOriyaStandard(raw, key) {
       const m = DEVICE_MODEL[key]; if (!m) return raw;
       return Math.max(1, Math.min(99, Math.round(raw * m.factor + m.offset)));
     }
-    // Inverse: implied native for a device that produces a given Oriya Standard (for device-swap)
+    // Inverse: implied native for a device that produces a given Oriya Index (for device-swap)
     function nativeForOriya(oriya, key) {
       const m = DEVICE_MODEL[key]; return Math.max(1, Math.min(100, Math.round((oriya - m.offset) / m.factor)));
     }
@@ -371,7 +440,7 @@
     /* =================== Challenge data (from oriya challenge app) =================== */
     const BASE_RULES = [
       "Log your recovery score every day — missed days count as 0",
-      "All device scores are normalized to the Oriya Standard (Oura 83 ≠ Whoop 83, but we make them comparable)",
+      "All device scores are normalized to the Oriya Index (Oura 83 ≠ Whoop 83, but we make them comparable)",
       "Team average is calculated from all active participants who logged that day",
       "Prize distributed within 7 days of challenge end via the sponsor",
     ];
@@ -454,6 +523,34 @@
     };
     CHALLENGES.forEach((c) => { c.teams = CHALLENGE_TEAMS[c.id] || [c.joinTeam]; });
     const SQUAD_EMOJIS = ["🏃","🔥","🌅","💪","🧗","🚴","🏆","⚡","🌙","🌊"];
+    // leaderboard baseline + device inference for board rows (illustrative demo data)
+    const PAR = 71;                                   // your board baseline — matches the app's Par
+    const DEV_POOL = ["Oura", "Whoop", "Garmin", "Apple"];
+    const hashStr = (s) => { let h = 0; for (let i = 0; i < (s || "").length; i++) { h = ((h << 5) - h + s.charCodeAt(i)) | 0; } return h; };
+
+    // quick-start crew types — makes it obvious anyone can build their own group
+    const SQUAD_TYPES = [
+      { emoji:"🏃", label:"Run club", hint:"weekend crew", ph:"Name it — e.g. Dawn Patrol RC" },
+      { emoji:"🏆", label:"Your team", hint:"gym / studio", ph:"Name it — e.g. Marina Masters" },
+      { emoji:"🤝", label:"Training partners", hint:"you + them", ph:"Name it — e.g. 5AM Club" },
+    ];
+
+    // Voice of the market — REAL research (public posts + discovery interviews), NOT Oriya reviews.
+    // Honesty gate: keep attributions verbatim; these describe the PROBLEM, never claim happy users.
+    const MARKET_VOICES = [
+      { tag:"r/whoop", meta:"1.2K upvotes · Mar 2026",
+        quote:"I'm on a Whoop team with my training partner. He's on Garmin. We literally can't compare a single number — the whole social layer breaks the second someone shows up with a different device.",
+        fix:"So Oriya normalizes every device to one score. Ring, watch, band — same board." },
+      { tag:"r/ouraring", meta:"847 upvotes · Feb 2026",
+        quote:"I wear an Oura and a Garmin and they never agree on my readiness. I spend 15 minutes every morning reconciling two numbers instead of just deciding whether to train.",
+        fix:"So Oriya gives one number in ten seconds. Train or back off — decided." },
+    ];
+    const MARKET_SIGNAL = [
+      { role:"VP People", org:"200-person SF fintech", meta:"discovery interview · Apr 2026",
+        quote:"We pay $40K a year for a wellness platform. Eight percent of the team still opens it after month one. I can't justify renewing." },
+      { role:"Head of Benefits", org:"500-person tech co", meta:"discovery interview · Mar 2026",
+        quote:"Our biometric data is incredible — HRV, sleep stages, strain, everything. And none of it changes what anyone does on Monday morning." },
+    ];
 
     const FRIEND_POOL = [
       { name:"Maya R.", score:79 }, { name:"Devin K.", score:66 }, { name:"Priya S.", score:84 },
@@ -471,8 +568,8 @@
             className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 hover:border-jade/50 transition-all text-left">
             <span className="w-8 h-8 rounded-full border border-jade/50 text-jade flex items-center justify-center text-xs shrink-0">{open ? "❚❚" : "▶"}</span>
             <span className="flex-1 min-w-0">
-              <span className="block text-sm text-bone font-medium">See it work — 9-second guided tour</span>
-              <span className="block text-[11px] text-ash font-mono">a cursor walks the drop → normalize → board flow</span>
+              <span className="block text-sm text-bone font-medium">See it work — 7-second tour</span>
+              <span className="block text-[11px] text-ash font-mono">drop → handicap → you're on the board</span>
             </span>
             <span className={"text-ash font-mono text-xs transition-transform " + (open ? "rotate-180" : "")}>▾</span>
           </button>
@@ -481,18 +578,18 @@
               <svg className="tour-cursor" viewBox="0 0 24 24" fill="#ECEAE4"><path d="M3 2l7 18 2.5-7L20 10z"/></svg>
               <div className="tour-step">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-jade font-mono">step 1 · drop</div>
-                <div className="tour-drop">⤓ drop any recovery screenshot</div>
-                <div className="text-[11px] text-ash font-mono">Oura · Whoop · Garmin · Apple — we read it for you</div>
+                <div className="tour-drop">⤓ drop the screenshot you already get</div>
+                <div className="text-[11px] text-ash font-mono">Oura · Whoop · Garmin · Apple — read for you</div>
               </div>
               <div className="tour-step">
-                <div className="text-[10px] uppercase tracking-[0.18em] text-jade font-mono">step 2 · normalize</div>
-                <div className="font-mono text-sm text-ash">Whoop 83 × 0.92 − 1.0 →</div>
-                <div className="tour-score">75</div>
+                <div className="text-[10px] uppercase tracking-[0.18em] text-jade font-mono">step 2 · the handicap</div>
+                <div className="tour-flip"><span className="tour-raw">83</span><span className="tour-arrow">→</span><span className="tour-score">75</span></div>
                 <div className="tour-ocr"><i/></div>
+                <div className="text-[10px] text-ash font-mono">Whoop 83 × 0.92 − 1.0 · one number, any device</div>
               </div>
               <div className="tour-step">
-                <div className="text-[10px] uppercase tracking-[0.18em] text-jade font-mono">step 3 · land on the board</div>
-                <div className="tour-row"><span className="text-ash">4</span><span className="text-jade">you</span><span className="text-bone">75</span></div>
+                <div className="text-[10px] uppercase tracking-[0.18em] text-jade font-mono">step 3 · you're on the board</div>
+                <div className="tour-row"><span className="text-ash">#4</span><span className="text-jade">you</span><span className="text-bone">75</span></div>
                 <div className="text-[11px] text-ash">instantly ranked — the "you're #4" moment</div>
               </div>
             </div>
@@ -501,8 +598,59 @@
       );
     }
 
+    /* =============================== Connect sheet (tap-to-sync) ===============================
+       Mobile-first alternative to the screenshot dropzone: a simulated read-only
+       OAuth handshake that pulls a recovery/readiness number and hands it to the
+       normalize flow. Clearly labeled as a preview simulation — the live version
+       is gated behind the backend token-exchange (see integration spec). */
+    const BRAND = { strava:"#FC4C02", oura:"#8B7BF0", whoop:"#12E29A", garmin:"#0B7CC1", apple:"#C7CAD0" };
+    function ConnectSheet({ deviceKey, onConnected, onClose }) {
+      const m = DEVICE_MODEL[deviceKey];
+      const c = CONNECT.find((x) => x.key === deviceKey) || { scope: m.metric, kind: "Recovery" };
+      const brand = BRAND[deviceKey] || "#7FB79E";
+      const [stage, setStage] = useState("prompt"); // prompt | connecting | pulling
+      const authorize = () => {
+        track("device_connect_authorized", { device: m.tag, method: "sync_demo" });
+        setStage("connecting");
+        setTimeout(() => setStage("pulling"), 950);
+        setTimeout(() => onConnected(m.sample), 2150);
+      };
+      return (
+        <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-label={"Connect " + m.tag}>
+          <div className="absolute inset-0 bg-void/80 backdrop-blur-sm" onClick={stage === "prompt" ? onClose : undefined} />
+          <div className="relative w-full sm:max-w-sm bg-[#0a0d14] border border-white/10 rounded-t-3xl sm:rounded-3xl p-6 pb-8 animate-sheet-up">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-lg text-void shrink-0" style={{ background: brand }}>{m.tag[0]}</div>
+              <div className="min-w-0">
+                <div className="text-bone font-semibold leading-tight truncate">{m.tag}</div>
+                <div className="text-[11px] text-ash font-mono">Read-only · demo sync</div>
+              </div>
+              {stage === "prompt" && <button onClick={onClose} aria-label="Close" className="ml-auto text-ash hover:text-bone text-lg leading-none p-2 -m-2 shrink-0">✕</button>}
+            </div>
+            {stage === "prompt" ? (
+              <React.Fragment>
+                <p className="text-sm text-bone/90 mb-2">Oriya will read, one-way:</p>
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 mb-4">
+                  <div className="text-sm text-bone">{c.scope}</div>
+                  <div className="text-[11px] text-ash font-mono mt-0.5">{c.kind} · never posts, never writes back</div>
+                </div>
+                <button onClick={authorize} className="w-full rounded-xl py-3.5 font-semibold text-void active:scale-[.99] transition" style={{ background: brand }}>Authorize read-only access</button>
+                <p className="text-center text-[11px] text-ash/70 mt-3 font-mono leading-relaxed">Simulated for preview — no live account is connected. Live sync is in private beta.</p>
+              </React.Fragment>
+            ) : (
+              <div className="py-7 text-center">
+                <div className="mx-auto w-10 h-10 rounded-full border-2 border-white/10 border-t-jade animate-spin mb-4" />
+                <div className="text-sm text-bone">{stage === "pulling" ? "Reading your latest " + c.kind.toLowerCase() + "…" : "Connecting to " + m.tag + "…"}</div>
+                <div className="text-[11px] text-ash font-mono mt-2">{stage === "pulling" ? "Normalizing to the Oriya Index" : c.scope}</div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
     /* =============================== Hook view =============================== */
-    function Hook({ onPreset, onScreenshot }) {
+    function Hook({ onPreset, onScreenshot, onConnect, resume, onResume }) {
       const [dragging, setDragging] = useState(false);
       const fileRef = useRef(null);
       const readFile = (file) => {
@@ -518,53 +666,79 @@
               <Sparkles className="w-4 h-4 text-jade" />
               <span className="text-xs uppercase tracking-[0.22em] text-ash font-mono">Oriya · Body Passport</span>
             </div>
-            <h1 className="text-3xl sm:text-[2.6rem] leading-[1.05] font-semibold text-center tracking-tight">
+            <h1 className="display text-[2.9rem] sm:text-[3.6rem] leading-[1.02] text-center tracking-tight text-bone">
               Switch your ring for a watch.<br/>
-              <span className="text-jade">Keep your score.</span>
+              <span className="text-jade italic">Keep your score.</span>
             </h1>
-            <p className="text-center text-ash mt-4 mb-9 text-sm sm:text-base max-w-md mx-auto">
-              An Oura 62 isn't a Whoop 62. Drop a screenshot — we OCR it, normalize it to the
-              <span className="text-bone"> Oriya Standard</span>, and put you on a board where the numbers finally compare.
+            <p className="text-center text-ash mt-4 mb-5 text-sm sm:text-base max-w-md mx-auto">
+              An Oura 62 isn't a Whoop 62. Connect a device or drop a screenshot — we normalize it to the
+              <span className="text-bone"> Oriya Index</span> and put you on a board where the numbers finally compare.
             </p>
+
+            <div className="flex items-center gap-2.5 max-w-md mx-auto mb-7 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2.5">
+              <span className="font-mono text-[9px] uppercase tracking-wider text-jade border border-jade/30 rounded-full px-2 py-0.5 shrink-0">r/whoop</span>
+              <span className="text-[12px] text-ash leading-snug min-w-0 truncate">"…we can't compare a single number across devices." <span className="text-ash/50">1.2K upvotes</span></span>
+            </div>
+
+            {/* Primary path (mobile-first): tap to connect a device read-only */}
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-px flex-1 bg-white/10" />
+              <span className="text-xs text-ash font-mono">connect read-only — pick your device</span>
+              <div className="h-px flex-1 bg-white/10" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {CONNECT.map((item, i) => {
+                const m = DEVICE_MODEL[item.key];
+                const brand = BRAND[item.key];
+                return (
+                  <button key={item.key}
+                    onClick={() => onConnect(item.key)}
+                    className={"group relative flex items-center gap-3 rounded-xl border bg-white/[0.03] px-4 py-3 text-left transition-all min-h-[58px] " + (i === 0 ? "border-jade/50 qt-pulse hover:border-jade" : "border-white/10 hover:border-jade/60 hover:bg-white/[0.06]")}>
+                    {i === 0 && <span className="absolute -top-2 left-3 font-mono text-[8px] uppercase tracking-wider text-void bg-jade rounded-full px-1.5 py-0.5">try me</span>}
+                    <span className="w-8 h-8 rounded-lg flex items-center justify-center text-void font-bold text-sm shrink-0" style={{ background: brand }}>{m.tag[0]}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-medium text-bone truncate">{m.tag}</span>
+                      <span className="block text-[10.5px] text-ash font-mono truncate">{item.scope}</span>
+                    </span>
+                    <ChevronRight className={"w-4 h-4 shrink-0 transition-colors " + (i === 0 ? "text-jade" : "text-ash/60 group-hover:text-jade")} />
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-center text-[11px] text-ash/70 mt-3 font-mono leading-relaxed">Read-only · simulated preview · saved to this browser, never sent to a server</p>
+
+            <div className="flex items-center gap-3 my-6">
+              <div className="h-px flex-1 bg-white/10" />
+              <span className="text-xs text-ash font-mono">or drop a screenshot</span>
+              <div className="h-px flex-1 bg-white/10" />
+            </div>
 
             <div
               onClick={() => fileRef.current && fileRef.current.click()}
               onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
               onDragLeave={() => setDragging(false)}
               onDrop={(e) => { e.preventDefault(); setDragging(false); readFile(e.dataTransfer.files[0]); }}
-              className={"cursor-pointer rounded-2xl border-2 border-dashed p-10 sm:p-12 text-center transition-all " +
+              className={"cursor-pointer rounded-2xl border-2 border-dashed p-8 sm:p-10 text-center transition-all " +
                 (dragging ? "border-jade bg-jade/5 scale-[1.01]" : "border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04]")}
             >
               <div className="mx-auto w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4">
                 <Upload className="w-5 h-5 text-jade" />
               </div>
               <p className="text-bone font-medium">Drop your recovery screenshot</p>
-              <p className="text-ash text-xs mt-1">Oura · Whoop · Garmin · Apple · Samsung · any app — we read it for you</p>
+              <p className="text-ash text-xs mt-1">Samsung · Pixel · any app we don't sync yet — we read it for you</p>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => readFile(e.target.files[0])} />
             </div>
 
             <PreviewTour />
 
-            <div className="flex items-center gap-3 my-6">
-              <div className="h-px flex-1 bg-white/10" />
-              <span className="text-xs text-ash font-mono">or quick-test a device</span>
-              <div className="h-px flex-1 bg-white/10" />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              {PRESET_KEYS.map((k) => {
-                const m = DEVICE_MODEL[k];
-                return (
-                  <button key={k}
-                    onClick={() => onPreset(k, m.sample)}
-                    className="group flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-left hover:border-jade/60 hover:bg-white/[0.06] transition-all">
-                    <span className="text-sm font-medium text-bone">{m.tag} <span className="text-ash font-mono text-xs">{m.metric}</span></span>
-                    <ChevronRight className="w-4 h-4 text-ash/60 group-hover:text-jade transition-colors" />
-                  </button>
-                );
-              })}
-            </div>
-            <p className="text-center text-[11px] text-ash/70 mt-6 font-mono">Demo · sample data · nothing is uploaded or stored</p>
+            {resume && (
+              <button onClick={onResume}
+                className="mt-6 w-full rounded-xl border border-dashed border-amber-brand/40 bg-amber-brand/[0.05] py-3 text-sm font-medium text-amber-brand hover:bg-amber-brand/10 transition inline-flex items-center justify-center gap-2">
+                ↻ Resume your saved Body Passport
+                {resume.oriya != null && <span className="font-mono text-xs text-ash">· Index {resume.oriya}</span>}
+              </button>
+            )}
+            <p className="text-center text-[11px] text-ash/70 mt-6 font-mono">Demo · sample data · your trial is saved locally, not sold or shared</p>
           </div>
         </div>
       );
@@ -579,7 +753,7 @@
         (async () => {
           if (pending.type === "preset") {
             const m = DEVICE_MODEL[pending.deviceKey];
-            const steps = ["Reading your " + m.tag + " score…", "Applying " + m.tag + " correction (×" + m.factor + ")…", "Computing Oriya Standard…"];
+            const steps = ["Reading your " + m.tag + " score…", "Applying " + m.tag + " correction (×" + m.factor + ")…", "Computing Oriya Index…"];
             for (let i = 0; i < steps.length; i++) { if (cancelled) return; setMsg(steps[i]); setProgress((i + 1) / steps.length * 0.92); await wait(440); }
             if (cancelled) return; setProgress(1);
             onDone({ deviceKey: pending.deviceKey, native: pending.native, name: null, confident: true });
@@ -631,7 +805,7 @@
           <div className="mt-5 w-56 h-1.5 rounded-full bg-white/10 overflow-hidden">
             <div className="h-full bg-jade transition-all duration-300" style={{ width: Math.round(progress * 100) + "%" }} />
           </div>
-          <p className="text-xs text-ash/70 mt-6 font-mono">{pending.type === "screenshot" ? "OCR-verifying your recovery score" : "Normalizing to the Oriya Standard"}</p>
+          <p className="text-xs text-ash/70 mt-6 font-mono">{pending.type === "screenshot" ? "OCR-verifying your recovery score" : "Normalizing to the Oriya Index"}</p>
         </div>
       );
     }
@@ -650,7 +824,7 @@
               <ArrowLeft className="w-3.5 h-3.5" /> back
             </button>
             <h2 className="text-2xl font-semibold tracking-tight">Confirm your reading</h2>
-            <p className="text-ash text-sm mt-2 mb-6">We couldn't fully read the screenshot. Pick your device and enter your score — we'll normalize it to the Oriya Standard.</p>
+            <p className="text-ash text-sm mt-2 mb-6">We couldn't fully read the screenshot. Pick your device and enter your score — we'll normalize it to the Oriya Index.</p>
 
             <label className="block text-[11px] uppercase tracking-wider font-mono text-ash mb-2">Device</label>
             <div className="flex flex-wrap gap-2 mb-6">
@@ -673,7 +847,7 @@
 
             {valid && (
               <p className="text-xs font-mono text-jade mb-4">
-                {n} × {DEVICE_MODEL[key].factor}{fmtOffset(DEVICE_MODEL[key].offset)} = {toOriyaStandard(n, key)} Oriya Standard
+                {n} × {DEVICE_MODEL[key].factor}{fmtOffset(DEVICE_MODEL[key].offset)} = {toOriyaStandard(n, key)} Oriya Index
               </p>
             )}
             <button disabled={!valid} onClick={() => onConfirm({ deviceKey: key, native: n, name })}
@@ -721,7 +895,7 @@
                     <input className="pp-name-input emboss text-[19px] w-full" value={passport.name}
                       onClick={stop} onMouseDown={stop}
                       onChange={(e) => onSetName(e.target.value)} placeholder="YOUR NAME" maxLength={20} spellCheck={false} />
-                    <div className="mono text-[9px] tracking-[0.16em] uppercase text-ash mt-1">Oriya Standard · Recovery</div>
+                    <div className="mono text-[9px] tracking-[0.16em] uppercase text-ash mt-1">Oriya Index · Recovery</div>
                     {social && <div className="flex items-center gap-1 mt-1 text-[10px] text-jade font-mono"><Instagram className="w-3 h-3" /> @{social}</div>}
                   </div>
                   <div className="mono tnum text-[58px] leading-none text-bone emboss">{passport.oriya}</div>
@@ -854,7 +1028,7 @@
                 </table>
               </div>
               <p className="text-xs text-ash">+ Athlytic, Bevel, Cora Health, Gentler Streak, Ultrahuman & Vora supported.</p>
-              <p className="text-xs font-mono text-bone/80">Example · Whoop 83 → 83 × 0.92 + (−1.0) = 75.36 → <span className="text-jade">75 Oriya Standard</span></p>
+              <p className="text-xs font-mono text-bone/80">Example · Whoop 83 → 83 × 0.92 + (−1.0) = 75.36 → <span className="text-jade">75 Oriya Index</span></p>
               <p className="text-[11px] text-ash leading-relaxed">Source: Doherty C, Baldwin M, Lambe R, Burke D, Altini M — "Readiness, recovery, and strain: an evaluation of composite health scores in consumer wearables," <span className="italic">Translational Exercise Biomedicine</span>, Apr 2025. Directionally useful, not diagnostically precise — a social context layer, not a medical report.</p>
             </div>
           )}
@@ -983,7 +1157,7 @@
 
             {joined && (
               <div className="mt-5 rounded-xl border border-jade/40 bg-jade/[0.08] p-4 animate-fade-up">
-                <p className="text-sm text-bone">You're in. <span className="text-jade font-semibold">Ranked #{myRank}</span> with an Oriya Standard of <span className="text-jade font-semibold">{me.oriya}</span> on <span className="text-bone">{myTeam}</span>.</p>
+                <p className="text-sm text-bone">You're in. <span className="text-jade font-semibold">Ranked #{myRank}</span> with an Oriya Index of <span className="text-jade font-semibold">{me.oriya}</span> on <span className="text-bone">{myTeam}</span>.</p>
                 <button onClick={onShare} className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-jade hover:text-jade-glow">
                   <Share2 className="w-4 h-4" /> Share your Passport — pull a teammate onto the board before tomorrow's sync
                 </button>
@@ -1013,17 +1187,31 @@
                   <span className="text-[11px] font-mono text-ash">Updated hourly</span>
                 </div>
                 <div className="rounded-xl border border-white/10 overflow-hidden">
-                  {board.map((r, i) => (
-                    <div key={i} className={"flex items-center gap-3 px-3 py-2.5 text-sm border-b border-white/5 last:border-0 " + (r.you ? "bg-jade/[0.10]" : i % 2 ? "bg-white/[0.015]" : "")}>
-                      <span className="w-7 text-center font-mono text-ash">{medal(i)}</span>
-                      <span className={"w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-semibold " + (r.you ? "bg-jade text-void" : "bg-white/8 text-bone")}>{r.init}</span>
-                      <span className={"flex-1 min-w-0 truncate " + (r.you ? "text-jade font-semibold" : "text-bone")}>{r.you ? (me.name || "you") + " (you)" : r.handle}</span>
-                      <span className="text-xs text-ash font-mono hidden sm:block w-24 truncate">{r.team}</span>
-                      <span className="font-mono tnum text-bone w-8 text-right">{r.score}</span>
-                      <span className="text-[11px] text-ash font-mono w-10 text-right">🔥 {r.streak}</span>
+                  {board.map((r, i) => {
+                    const dev = r.you ? DEVICE_MODEL[me.deviceKey].tag : (r.dev || DEV_POOL[Math.abs(hashStr(r.handle || r.init)) % DEV_POOL.length]);
+                    const dpar = r.score - PAR;
+                    return (
+                    <div key={i} className={"flex items-center gap-3 px-3 py-2.5 border-b border-white/5 last:border-0 " + (r.you ? "bg-jade/[0.10]" : i % 2 ? "bg-white/[0.015]" : "")}>
+                      <span className="w-6 text-center font-mono text-ash text-sm shrink-0">{medal(i)}</span>
+                      <span className={"w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-semibold shrink-0 " + (r.you ? "bg-jade text-void" : "bg-white/8 text-bone")}>{r.init}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className={"truncate text-sm leading-tight " + (r.you ? "text-jade font-semibold" : "text-bone")}>{r.you ? (me.name || "you") + " (you)" : r.handle}</div>
+                        <div className="flex items-center gap-1.5 mt-0.5 font-mono text-[10px] text-ash truncate">
+                          <span className="text-jade/80 truncate max-w-[6.5rem]">{r.team}</span>
+                          <span className="text-ash/40">·</span>
+                          <span className="shrink-0">{dev}</span>
+                          <span className="text-ash/40">·</span>
+                          <span className="shrink-0">🔥{r.streak}</span>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <div className="font-mono tnum text-bone text-base leading-none">{r.score}</div>
+                        <div className={"font-mono text-[10px] mt-1 " + (dpar >= 0 ? "text-jade" : "text-amber-brand")}>{dpar >= 0 ? "+" : ""}{dpar} vs par</div>
+                      </div>
                     </div>
-                  ))}
+                  );})}
                 </div>
+                <p className="mt-2 text-[10px] text-ash/60 font-mono">Par 71 · your board baseline. A red morning logged still beats a forgotten green one.</p>
               </div>
             )}
 
@@ -1066,6 +1254,110 @@
       );
     }
 
+    /* =============================== What a week unlocks — personality taxonomy + badges (moved from landing) =============================== */
+    function WeekUnlocks({ passport, badges }) {
+      const mine = personalityFor(passport);
+      return (
+        <section className="mt-16 sm:mt-24">
+          <div className="text-center max-w-xl mx-auto">
+            <span className="text-[11px] uppercase tracking-[0.22em] text-jade font-mono">What a week unlocks</span>
+            <h2 className="display text-[2.1rem] sm:text-4xl text-bone leading-[1.05] mt-3">Upload for a week.<br/><span className="italic text-jade">Your Passport fills in.</span></h2>
+            <p className="text-sm text-ash mt-3 max-w-md mx-auto leading-relaxed">Your recovery archetype emerges from ~7 days of your <em>own</em> trend — a read on your pattern, never a ranking of you against anyone else. Badges are earned, not given.</p>
+          </div>
+
+          <div className="mt-9">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-3">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-ash">Recovery personalities</span>
+              <span className="font-mono text-[10px] text-jade">· you're a {mine.type}</span>
+            </div>
+            <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+              {PERSONALITIES.map((p) => {
+                const you = p.type === mine.type;
+                return (
+                  <div key={p.type} className={"rounded-xl border p-3.5 transition " + (you ? "border-jade/60 bg-jade/[0.08]" : "border-white/10 bg-white/[0.02] opacity-60 hover:opacity-100")}>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className={"text-sm font-semibold leading-tight " + (you ? "text-jade" : "text-bone/80")}>{p.type}</span>
+                      {you && <span className="font-mono text-[9px] uppercase tracking-wider text-void bg-jade rounded-full px-1.5 py-0.5 shrink-0">You</span>}
+                    </div>
+                    <p className="text-[11px] text-ash mt-1.5 leading-snug">{p.note}</p>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="mt-2.5 text-[10px] text-ash/60 font-mono">Illustrative · provisional · assigned from your own 7-day trend, not a leaderboard of people.</p>
+          </div>
+
+          <div className="mt-9">
+            <span className="font-mono text-[11px] uppercase tracking-wider text-ash">Badges to earn</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-3">
+              {ALL_BADGES.map((b) => {
+                const earned = !!(badges && badges[b.id]);
+                return (
+                  <div key={b.id} className={"rounded-2xl border p-4 text-center flex flex-col items-center gap-1.5 " + (earned ? "border-jade/50 bg-jade/[0.06]" : "border-dashed border-white/12 bg-white/[0.02]")}>
+                    <span className={"text-2xl " + (earned ? "" : "grayscale opacity-40")}>{b.emoji}</span>
+                    <span className={"font-mono text-[10px] tracking-wide " + (earned ? "text-bone" : "text-ash")}>{b.short}</span>
+                    <span className="text-[9px] text-ash/70 leading-tight">{b.label}</span>
+                    <span className={"font-mono text-[8px] uppercase tracking-wider mt-0.5 " + (earned ? "text-jade" : "text-ash/50")}>{earned ? "✓ earned" : "locked"}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <p className="mt-6 text-center text-[11px] text-ash/70 font-mono max-w-lg mx-auto leading-relaxed">Boards, brackets and prize squads are real features. Figures here are sample demo data — built in the open, pre-launch.</p>
+        </section>
+      );
+    }
+
+    /* =============================== Voice of the market (honest problem proof, not testimonials) =============================== */
+    function MarketVoices() {
+      return (
+        <section className="relative mt-16 sm:mt-24">
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[38rem] max-w-full h-[34rem] rounded-full bg-jade/[0.05] blur-3xl pointer-events-none" />
+          <div className="relative text-center max-w-xl mx-auto">
+            <span className="text-[11px] uppercase tracking-[0.22em] text-jade font-mono">Voice of the market</span>
+            <h2 className="display text-[2.3rem] sm:text-5xl text-bone leading-[1.03] mt-3">No two devices agree.<br/><span className="italic text-jade">That's not yours to solve every morning.</span></h2>
+            <p className="text-sm text-ash mt-4 max-w-md mx-auto leading-relaxed">Real market research — public posts and discovery interviews. Oriya is pre-launch and founder-built; these are the problems we heard, not product reviews.</p>
+          </div>
+
+          <div className="relative grid gap-5 sm:grid-cols-2 mt-10">
+            {MARKET_VOICES.map((v, i) => (
+              <figure key={i} style={{ animationDelay: (i * 90) + "ms" }}
+                className="group relative rounded-2xl border border-white/10 bg-graphite/60 p-6 sm:p-7 hover:border-jade/40 hover:bg-white/[0.04] transition-all animate-fade-up overflow-hidden">
+                <span aria-hidden="true" className="display absolute -top-8 left-1 text-[7rem] leading-none text-jade/10 select-none pointer-events-none">&ldquo;</span>
+                <blockquote className="display text-xl sm:text-[1.6rem] text-bone/90 leading-snug relative z-10">{v.quote}</blockquote>
+                <figcaption className="mt-5 pt-4 border-t border-white/10 flex flex-wrap items-center gap-2.5 font-mono text-[11px]">
+                  <span className="rounded-full px-2.5 py-0.5 border uppercase tracking-wider text-jade border-jade/30 bg-jade/[0.06]">{v.tag}</span>
+                  <span className="text-ash">{v.meta}</span>
+                </figcaption>
+                <p className="relative z-10 mt-4 text-[13px] text-jade/90 leading-snug"><span className="text-jade/60">→ </span>{v.fix}</p>
+              </figure>
+            ))}
+          </div>
+
+          {/* market signal — the company-side pain (secondary tier, different ICP) */}
+          <div className="relative mt-6 grid gap-3 sm:grid-cols-2">
+            {MARKET_SIGNAL.map((v, i) => (
+              <figure key={i} style={{ animationDelay: (180 + i * 90) + "ms" }}
+                className="rounded-2xl border border-amber-brand/20 bg-amber-brand/[0.03] p-5 animate-fade-up">
+                <blockquote className="text-sm text-bone/85 leading-relaxed">&ldquo;{v.quote}&rdquo;</blockquote>
+                <figcaption className="mt-3 flex flex-wrap items-center gap-2 font-mono text-[10px]">
+                  <span className="rounded-full px-2 py-0.5 border uppercase tracking-wider text-amber-brand border-amber-brand/30 bg-amber-brand/[0.05]">Interview</span>
+                  <span className="text-ash">{v.role} · {v.org} · {v.meta}</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+
+          <p className="relative mt-7 text-center text-[11px] text-ash/70 font-mono max-w-lg mx-auto leading-relaxed">
+            Built in the open by a solo founder. Quotes are real market research — we have no users or partnerships to cite yet. <a href="index.html#join" className="text-jade hover:underline">Be an early one ↗</a>
+          </p>
+          <p className="relative mt-3 text-center text-[11px] font-mono">
+            <button onClick={() => window.dispatchEvent(new CustomEvent("oriya:privacy"))} className="text-ash/70 hover:text-jade underline decoration-dotted underline-offset-2">How your data is walled off — the zero-knowledge vault →</button>
+          </p>
+        </section>
+      );
+    }
+
     /* =============================== Dashboard =============================== */
     function Dashboard({ passport, setPassport }) {
       const [selected, setSelected] = useState(null);
@@ -1077,6 +1369,8 @@
       const [creating, setCreating] = useState(false);
       const [squadName, setSquadName] = useState("");
       const [squadEmoji, setSquadEmoji] = useState(SQUAD_EMOJIS[0]);
+      const [squadPh, setSquadPh] = useState("Name your squad — e.g. Dawn Patrol RC");
+      const startSquadType = (t) => { setSquadEmoji(t.emoji); setSquadPh(t.ph); setSquadName(""); setCreating(true); track("squad_type_picked", { type: t.label }); };
       const [igHandle, setIgHandle] = useState("");
       const [igOpen, setIgOpen] = useState(false);
       const [igInput, setIgInput] = useState("");
@@ -1120,7 +1414,7 @@
       const sortedChallenges = CHALLENGES.slice().sort((a, b) => (a.status === "LIVE" ? 0 : 1) - (b.status === "LIVE" ? 0 : 1));
 
       const shareUrl = "https://oriya.app/?ref=" + slug(passport.name) + "-" + passport.oriya + (passport.squad ? "&squad=" + encodeURIComponent(passport.squad) : "");
-      const caption = (passport.squad ? "Running " + passport.squad + " on Oriya. " : "") + "My readiness normalizes to " + passport.oriya + " on the Oriya Standard — same number on any wearable (" + DEVICE_MODEL[passport.deviceKey].tag + ")." + (igHandle ? " @" + igHandle : "") + " Squad's open, pull up 👇";
+      const caption = (passport.squad ? "Running " + passport.squad + " on Oriya. " : "") + "My readiness normalizes to " + passport.oriya + " on the Oriya Index — same number on any wearable (" + DEVICE_MODEL[passport.deviceKey].tag + ")." + (igHandle ? " @" + igHandle : "") + " Squad's open, pull up 👇";
 
       const sharePassport = async () => {
         try {
@@ -1259,57 +1553,76 @@
               <NormalizeExplainer />
             </div>
 
-            {/* live teammates strip */}
-            <div className="mt-8 flex items-center gap-3">
-              <span className="text-xs text-ash font-mono shrink-0">Your squad</span>
-              <div className="flex items-center -space-x-2">
-                <div className="w-8 h-8 rounded-full bg-jade/20 border-2 border-void ring-1 ring-jade/50 flex items-center justify-center text-[10px] font-semibold text-jade">{initials(passport.name)}</div>
-                {teammates.map((t) => (
-                  <div key={t.key} title={t.name + " · " + t.score} className="w-8 h-8 rounded-full bg-white/8 border-2 border-void flex items-center justify-center text-[10px] font-semibold text-bone animate-pop-in">{initials(t.name)}</div>
-                ))}
-                {teammates.length === 0 && <span className="pl-3 text-xs text-ash">{passport.squad ? "pull your crew in →" : "join a squad below →"}</span>}
+            {/* ============ RECOVERY'S BETTER AS A TEAM SPORT — build your own crew ============ */}
+            <div className="mt-12 relative rounded-3xl border border-jade/25 bg-gradient-to-br from-jade/[0.08] via-graphite/40 to-transparent p-6 sm:p-8 overflow-hidden">
+              <div className="absolute -top-16 -right-12 w-56 h-56 rounded-full bg-jade/10 blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-20 -left-12 w-56 h-56 rounded-full bg-amber-brand/[0.06] blur-3xl pointer-events-none" />
+
+              <span className="relative inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] font-mono text-jade mb-3"><Users className="w-3 h-3" /> Your squad · start here</span>
+              <h2 className="relative display text-[2.1rem] sm:text-[2.6rem] leading-[1.02] text-bone">Recovery's better<br/><span className="italic text-jade">as a team sport.</span></h2>
+              <p className="relative text-sm text-ash mt-3 max-w-md leading-relaxed">Bring your run club, your team, your training partners — whatever they wear. Rank is against your own baseline, never a raw public number, so the board pushes the whole group without shaming a single red morning.</p>
+
+              {/* live crew avatars */}
+              <div className="relative mt-6 flex items-center gap-3">
+                <div className="flex items-center -space-x-2">
+                  <div className="w-9 h-9 rounded-full bg-jade/20 border-2 border-void ring-1 ring-jade/50 flex items-center justify-center text-[11px] font-semibold text-jade">{initials(passport.name)}</div>
+                  {teammates.map((t) => (
+                    <div key={t.key} title={t.name + " · " + t.score} className="w-9 h-9 rounded-full bg-white/8 border-2 border-void flex items-center justify-center text-[10px] font-semibold text-bone animate-pop-in">{initials(t.name)}</div>
+                  ))}
+                  {teammates.length < 3 && <div className="w-9 h-9 rounded-full border-2 border-dashed border-white/15 flex items-center justify-center text-ash"><Plus className="w-3.5 h-3.5" /></div>}
+                </div>
+                <span className="text-xs text-ash">{passport.squad ? passport.squad + " · pull your crew in" : "an empty squad is a dead squad — start yours"}</span>
               </div>
-            </div>
 
-            {/* CREATE YOUR SQUAD — the #1 priority move */}
-            <div className="mt-9 rounded-2xl border border-jade/40 bg-jade/[0.06] p-5 relative overflow-hidden">
-              <div className="absolute -top-12 -right-10 w-40 h-40 rounded-full bg-jade/10 blur-3xl pointer-events-none" />
-              <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-mono text-amber-glow mb-2"><Star className="w-3 h-3" /> Start here · the move</span>
-              <h2 className="text-lg font-semibold text-bone">Create your own Squad</h2>
-              <p className="text-sm text-ash mt-1 mb-4">Name it, stamp it on your Passport, and drag your training partners in. Every one who logs lifts your team average — an empty squad is a dead squad.</p>
-
+              {/* team-type quick starts — anyone can build one */}
               {!creating && (
-                <button onClick={() => setCreating(true)} className="rounded-full bg-jade px-5 py-2.5 text-sm font-semibold text-void hover:brightness-110 transition inline-flex items-center gap-2">
-                  <Plus className="w-4 h-4" /> {userSquads.length ? "Create another squad" : "Create your Squad"}
-                </button>
+                <div className="relative mt-6">
+                  <div className="grid grid-cols-3 gap-2.5">
+                    {SQUAD_TYPES.map((t) => (
+                      <button key={t.label} onClick={() => startSquadType(t)}
+                        className="group rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-4 text-center hover:border-jade/60 hover:bg-jade/[0.06] transition-all">
+                        <div className="text-2xl mb-1.5 group-hover:scale-110 transition-transform">{t.emoji}</div>
+                        <div className="text-xs font-semibold text-bone leading-tight">{t.label}</div>
+                        <div className="text-[10px] text-ash mt-0.5">{t.hint}</div>
+                      </button>
+                    ))}
+                  </div>
+                  <button onClick={() => setCreating(true)}
+                    className="mt-3 w-full rounded-full bg-jade py-3 text-sm font-semibold text-void hover:brightness-110 transition inline-flex items-center justify-center gap-2 shadow-[0_0_40px_-14px_rgba(127,183,158,0.8)]">
+                    <Plus className="w-4 h-4" /> {userSquads.length ? "Start another squad" : "Build your squad"} <span className="font-mono text-[11px] text-void/70">· 30 sec</span>
+                  </button>
+                </div>
               )}
               {creating && (
-                <div className="animate-fade-up">
+                <div className="relative mt-6 animate-fade-up">
                   <div className="flex flex-wrap gap-1.5 mb-3">
                     {SQUAD_EMOJIS.map((e) => (
                       <button key={e} onClick={() => setSquadEmoji(e)} className={"w-9 h-9 rounded-lg text-lg flex items-center justify-center border transition " + (e === squadEmoji ? "border-jade bg-jade/10" : "border-white/10 hover:border-white/25")}>{e}</button>
                     ))}
                   </div>
-                  <input value={squadName} onChange={(e) => setSquadName(e.target.value)} maxLength={28}
+                  <input value={squadName} onChange={(e) => setSquadName(e.target.value)} maxLength={28} autoFocus
                     onKeyDown={(e) => { if (e.key === "Enter") createNamedSquad(); }}
-                    placeholder="Name your squad — e.g. Dawn Patrol RC"
+                    placeholder={squadPh}
                     className="w-full rounded-full bg-white/[0.05] border border-white/10 px-4 py-2.5 text-sm text-bone outline-none focus:border-jade" />
-                  <button onClick={createNamedSquad} disabled={!squadName.trim()}
-                    className={"mt-3 w-full rounded-full py-2.5 text-sm font-semibold transition " + (squadName.trim() ? "bg-jade text-void hover:brightness-110" : "bg-white/10 text-ash cursor-not-allowed")}>
-                    Create &amp; stamp my Passport
-                  </button>
+                  <div className="flex gap-2 mt-3">
+                    <button onClick={() => setCreating(false)} className="rounded-full px-4 py-2.5 text-sm text-ash hover:text-bone border border-white/10 transition">Cancel</button>
+                    <button onClick={createNamedSquad} disabled={!squadName.trim()}
+                      className={"flex-1 rounded-full py-2.5 text-sm font-semibold transition " + (squadName.trim() ? "bg-jade text-void hover:brightness-110" : "bg-white/10 text-ash cursor-not-allowed")}>
+                      Create &amp; stamp my Passport
+                    </button>
+                  </div>
                 </div>
               )}
               {userSquads.length > 0 && !creating && (
-                <p className="mt-3 text-xs font-mono text-jade">Your squad <span className="text-bone">{userSquads[0].title}</span> is live below ↓ — share your Passport to grow it.</p>
+                <p className="relative mt-3 text-xs font-mono text-jade">Your squad <span className="text-bone">{userSquads[0].title}</span> is live below ↓ — share your Passport to grow it.</p>
               )}
             </div>
 
-            <div className="mt-8 mb-1 flex items-center gap-2">
+            <div className="mt-10 mb-1 flex items-center gap-2">
               <Flame className="w-4 h-4 text-amber-glow" />
               <h2 className="text-sm font-semibold text-bone uppercase tracking-wider">Live challenges near you</h2>
             </div>
-            <p className="text-xs text-ash mb-4">Live boards first — real people already logging. Pick a side and your Oriya Standard drops straight onto the leaderboard.</p>
+            <p className="text-xs text-ash mb-4">Live boards first — real people already logging. Pick a side and your Oriya Index drops straight onto the leaderboard.</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {userSquads.map((c) => <ChallengeCard key={c.id} c={c} joined={true} onOpen={setSelected} />)}
@@ -1321,6 +1634,9 @@
                 <UserPlus className="w-4 h-4" /> Pull in a teammate — watch the average move <span className="text-jade/60 font-mono text-xs">(demo)</span>
               </button>
             )}
+
+            <WeekUnlocks passport={passport} badges={badges} />
+            <MarketVoices />
           </div>
 
           {selected && (
@@ -1339,12 +1655,82 @@
       );
     }
 
+    /* =============================== Privacy — zero-knowledge vault (full screen) =============================== */
+    function PrivacyVault({ onClose }) {
+      const [sq, setSq] = useState({ "Oriya Index on board": true, "Streak count": true, "Wearable badge": true, "Raw component scores": false });
+      const [cp, setCp] = useState({ "Your individual score": false, "Participation status": true });
+      const Tag = ({ on, onClick, labelOn, labelOff }) => (
+        <button onClick={onClick} className={"font-mono text-[10px] px-2.5 py-1 rounded-full border transition shrink-0 " + (on ? "text-jade border-jade/40 bg-jade/[0.08]" : "text-ash border-white/12 bg-white/[0.03]")}>{on ? labelOn : labelOff}</button>
+      );
+      return (
+        <div className="fixed inset-0 z-[70] bg-void/[0.97] backdrop-blur-sm overflow-y-auto animate-fade-up">
+          <div className="max-w-2xl mx-auto px-5 py-8 pb-24">
+            <button onClick={onClose} className="inline-flex items-center gap-1.5 text-xs text-ash hover:text-bone font-mono mb-6"><ArrowLeft className="w-3.5 h-3.5" /> Back</button>
+            <span className="text-[11px] uppercase tracking-[0.22em] text-jade font-mono">Zero-Knowledge Vault</span>
+            <h2 className="display text-[2.2rem] sm:text-4xl text-bone leading-[1.05] mt-2">Two walls,<br/><span className="italic text-jade">separately controlled.</span></h2>
+            <p className="text-sm text-ash mt-3 max-w-lg leading-relaxed">What your <b className="text-jade">squad</b> sees and what an <b className="text-amber-brand">employer</b> sees are isolated systems. Sensitive sharing is off by default; corporate access is mathematically capped to aggregates. Tap a tag to flip it.</p>
+
+            <div className="grid gap-4 sm:grid-cols-2 mt-7">
+              <div className="rounded-2xl border border-jade/25 bg-jade/[0.04] p-5">
+                <div className="font-mono text-xs text-jade mb-1">◆ Squad Challenges</div>
+                <p className="text-[11px] text-ash mb-3">What peers in your challenge can see about you.</p>
+                {Object.keys(sq).map((k) => (
+                  <div key={k} className="flex items-center justify-between gap-3 py-2 border-b border-white/5 last:border-0">
+                    <span className="text-sm text-bone/85">{k}</span>
+                    <Tag on={sq[k]} onClick={() => setSq((s) => ({ ...s, [k]: !s[k] }))} labelOn="● Visible" labelOff="● Hidden" />
+                  </div>
+                ))}
+              </div>
+              <div className="rounded-2xl border border-amber-brand/25 bg-amber-brand/[0.04] p-5">
+                <div className="font-mono text-xs text-amber-brand mb-1">▲ Corporate Vault</div>
+                <p className="text-[11px] text-ash mb-3">What HR could access — individual rows stay isolated &amp; encrypted.</p>
+                <div className="flex items-center justify-between gap-3 py-2 border-b border-white/5">
+                  <span className="text-sm text-bone/85">Your name → HR</span>
+                  <span className="font-mono text-[10px] px-2.5 py-1 rounded-full border text-ash border-white/12 shrink-0">⛔ Never</span>
+                </div>
+                <div className="flex items-center justify-between gap-3 py-2 border-b border-white/5">
+                  <span className="text-sm text-bone/85">Your individual score</span>
+                  <Tag on={cp["Your individual score"]} onClick={() => setCp((s) => ({ ...s, "Your individual score": !s["Your individual score"] }))} labelOn="● Opt-in on" labelOff="● Opt-in off" />
+                </div>
+                <div className="flex items-center justify-between gap-3 py-2">
+                  <span className="text-sm text-bone/85">Participation status</span>
+                  <Tag on={cp["Participation status"]} onClick={() => setCp((s) => ({ ...s, "Participation status": !s["Participation status"] }))} labelOn="● Shared" labelOff="● Hidden" />
+                </div>
+                <div className="mt-4 rounded-xl border border-white/8 bg-void/40 p-3">
+                  {["athlete_01", "athlete_02", "athlete_… ≥5"].map((a) => (
+                    <div key={a} className="flex items-center justify-between font-mono text-[10px] py-0.5"><span className="text-ash">{a}</span><span className="text-ash/50">●●● encrypted</span></div>
+                  ))}
+                  <div className="text-center font-mono text-[10px] text-ash/60 my-2">↓ aggregate only ↓</div>
+                  <div className="flex items-center justify-between rounded-lg bg-jade/[0.08] border border-jade/25 px-3 py-2"><span className="font-mono text-[10px] text-ash">HR admin sees</span><span className="font-mono text-sm text-jade">Squad avg 79</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-2">
+              {["AES-256 at rest", "Read-only OAuth", "Revoke anytime", "SOC 2 · targeted", "15-min sync"].map((t) => (
+                <span key={t} className="font-mono text-[10px] text-ash rounded-full border border-white/12 bg-white/[0.03] px-2.5 py-1">{t}</span>
+              ))}
+            </div>
+
+            <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.02] p-4 flex gap-3">
+              <span className="text-lg">🔒</span>
+              <p className="text-[12px] text-ash leading-relaxed"><b className="text-bone">No advertising. No data brokers.</b> The plan: revenue from subscriptions + B2B licensing only, and an HR view locked to a team average with ≥5 participants — privacy defaults modeled on <b className="text-bone">FTC Docket C-4747</b> (Flo Health, 2021).</p>
+            </div>
+            <p className="mt-3 text-[11px] text-ash/60 font-mono leading-relaxed">This is the privacy architecture we're building to. Oriya is pre-launch and founder-built; items marked "targeted" (e.g. SOC 2) are commitments on the roadmap, not audited certifications yet.</p>
+          </div>
+        </div>
+      );
+    }
+
     /* =============================== App =============================== */
     function App() {
       const [view, setView] = useState("hook"); // hook | normalizing | confirm | dashboard
       const [pending, setPending] = useState(null);
       const [prefill, setPrefill] = useState(null);
       const [passport, setPassport] = useState(null);
+      const [privacy, setPrivacy] = useState(false);
+      const [connectKey, setConnectKey] = useState(null);
+      const [resume, setResume] = useState(() => { const t = loadTrial(); return t && t.passport ? t.passport : null; });
 
       useEffect(() => {
         try {
@@ -1353,23 +1739,43 @@
         } catch (e) {}
       }, []);
 
-      const startPreset = (deviceKey, native) => { track("device_connect_started", { method: "preset", device: DEVICE_MODEL[deviceKey].tag }); setPending({ type: "preset", deviceKey, native }); setView("normalizing"); };
+      useEffect(() => {
+        const open = () => { setPrivacy(true); track("privacy_opened", {}); };
+        window.addEventListener("oriya:privacy", open);
+        if (location.hash === "#privacy") open();
+        return () => window.removeEventListener("oriya:privacy", open);
+      }, []);
+
+      const beginNormalize = (deviceKey, native) => { setPending({ type: "preset", deviceKey, native }); setView("normalizing"); };
       const startScreenshot = (dataUrl) => { track("device_connect_started", { method: "screenshot" }); setPending({ type: "screenshot", dataUrl }); setView("normalizing"); };
+      const startConnect = (key) => { track("device_connect_started", { method: "sync_demo", device: DEVICE_MODEL[key].tag }); setConnectKey(key); };
+      const onConnected = (native) => { const key = connectKey; setConnectKey(null); if (key) beginNormalize(key, native); };
+      const doResume = () => { track("trial_resumed", { oriya: resume && resume.oriya }); setPassport(resume); setView("dashboard"); };
 
       const finalize = (deviceKey, native, name, via) => {
         const m = DEVICE_MODEL[deviceKey];
         const oriya = toOriyaStandard(native, deviceKey);
         track("device_connect_completed", { device: m.tag, via: via || "auto" });
         track("passport_generated", { device: m.tag, native, oriya });
-        setPassport({ deviceKey, native, oriya, name: name || "", squad: null, nationality: "USA", personaIdx: pickPersona(deviceKey, native, oriya) });
+        const p = { deviceKey, native, oriya, name: name || "", squad: null, nationality: "USA", personaIdx: pickPersona(deviceKey, native, oriya) };
+        setPassport(p);
+        saveTrial({ passport: p, device: m.tag, native, oriya, via: via || "auto" }); // durable: survives reload, resumable
+        setResume(p);
         setView("dashboard");
       };
       const handleResolved = (r) => { if (!r.confident) { setPrefill(r); setView("confirm"); return; } finalize(r.deviceKey, r.native, r.name); };
 
-      if (view === "hook") return <Hook onPreset={startPreset} onScreenshot={startScreenshot} />;
-      if (view === "normalizing") return <Normalizing pending={pending} onDone={handleResolved} />;
-      if (view === "confirm") return <Confirm prefill={prefill} onConfirm={(d) => finalize(d.deviceKey, d.native, d.name, "manual")} onBack={() => setView("hook")} />;
-      return <Dashboard passport={passport} setPassport={setPassport} />;
+      const screen = view === "hook" ? <Hook onScreenshot={startScreenshot} onConnect={startConnect} resume={resume} onResume={doResume} />
+        : view === "normalizing" ? <Normalizing pending={pending} onDone={handleResolved} />
+        : view === "confirm" ? <Confirm prefill={prefill} onConfirm={(d) => finalize(d.deviceKey, d.native, d.name, "manual")} onBack={() => setView("hook")} />
+        : <Dashboard passport={passport} setPassport={setPassport} />;
+      return (
+        <React.Fragment>
+          {screen}
+          {connectKey && <ConnectSheet deviceKey={connectKey} onConnected={onConnected} onClose={() => setConnectKey(null)} />}
+          {privacy && <PrivacyVault onClose={() => setPrivacy(false)} />}
+        </React.Fragment>
+      );
     }
 
     ReactDOM.createRoot(document.getElementById("root")).render(<App />);

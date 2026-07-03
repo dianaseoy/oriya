@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Long Game — Oriya's newsletter on recovery, wearables & the morning number</title>
+  <meta name="description" content="Essays from Oriya on wearable anxiety, cross-device recovery, and why the morning score is becoming a team sport. Read a few, then subscribe free." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --void:#020617; --bone:#ECEAE4; --ash:#8A8F98; --hairline:rgba(236,234,228,.10);
+      --jade:#7FB79E; --jade-deep:#3E6F5E; --amber:#D7A25C; --amber-glow:#F0C083;
+      --font-display:"Instrument Serif", ui-serif, Georgia, serif;
+      --font-mono:"JetBrains Mono", ui-monospace, monospace;
+      --settle:cubic-bezier(0.22,0.61,0.36,1);
+    }
+    *{ box-sizing:border-box; margin:0; padding:0; }
+    html{ scroll-behavior:smooth; }
+    body{ background:var(--void); color:var(--bone); font-family:Inter, ui-sans-serif, system-ui, sans-serif;
+      -webkit-font-smoothing:antialiased; line-height:1.55; }
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ width:100%; max-width:1080px; margin:0 auto; padding:0 24px; }
+
+    /* nav */
+    .nav{ position:sticky; top:0; z-index:20; backdrop-filter:blur(12px);
+      background:rgba(2,6,23,.72); border-bottom:1px solid var(--hairline); }
+    .nav-inner{ display:flex; align-items:center; justify-content:space-between; height:64px; }
+    .logo{ display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-size:22px; }
+    .logo svg{ width:26px; height:26px; }
+    .nav-actions{ display:flex; align-items:center; gap:22px; }
+    .nav-link{ font-size:13.5px; color:var(--ash); transition:color .2s; }
+    .nav-link:hover{ color:var(--bone); }
+    .btn{ display:inline-flex; align-items:center; gap:8px; border-radius:10px; font-size:14px; font-weight:600;
+      padding:11px 18px; transition:transform .2s var(--settle), background .2s, border-color .2s; cursor:pointer; }
+    .btn-primary{ background:var(--jade); color:#04110b; border:1px solid var(--jade); }
+    .btn-primary:hover{ background:var(--amber-glow); border-color:var(--amber-glow); transform:translateY(-1px); }
+    .btn-ghost{ color:var(--ash); border:1px solid var(--hairline); background:transparent; }
+    .btn-ghost:hover{ color:var(--bone); border-color:rgba(236,234,228,.28); }
+
+    /* hero */
+    .hero{ padding:76px 0 40px; text-align:center; }
+    .eyebrow{ display:inline-block; font-family:var(--font-mono); font-size:11px; letter-spacing:.2em;
+      text-transform:uppercase; color:var(--jade); margin-bottom:22px; }
+    .hero h1{ font-family:var(--font-display); font-weight:400; font-size:clamp(2.6rem,6vw,4rem);
+      line-height:1.04; letter-spacing:-0.01em; }
+    .hero h1 em{ font-style:italic; color:var(--jade); }
+    .hero p{ max-width:600px; margin:22px auto 0; color:var(--ash); font-size:clamp(15px,2.2vw,17px); }
+
+    /* subscribe */
+    .subscribe{ max-width:560px; margin:34px auto 0; }
+    .sub-form{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+    .sub-form input{ flex:1 1 240px; min-width:0; padding:13px 16px; border-radius:10px; border:1px solid var(--hairline);
+      background:rgba(255,255,255,.03); color:var(--bone); font-size:14px; font-family:inherit; }
+    .sub-form input::placeholder{ color:var(--ash); }
+    .sub-form input:focus{ outline:none; border-color:rgba(127,183,158,.5); }
+    .sub-note{ margin-top:12px; font-family:var(--font-mono); font-size:11px; color:var(--ash); }
+    .sub-embed{ margin-top:18px; }
+    .sub-embed iframe{ width:100%; max-width:480px; height:88px; border:1px solid var(--hairline); border-radius:12px; background:#0a0d14; }
+
+    /* essays */
+    .essays{ padding:56px 0 24px; }
+    .essays h2{ font-family:var(--font-display); font-weight:400; font-size:2rem; margin-bottom:6px; }
+    .essays .sub{ color:var(--ash); font-size:14px; margin-bottom:30px; }
+    .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:18px; }
+    .card{ display:flex; flex-direction:column; gap:10px; padding:26px 24px; border:1px solid var(--hairline);
+      border-radius:18px; background:rgba(255,255,255,.02);
+      transition:border-color .3s var(--settle), transform .3s var(--settle), background .3s; }
+    .card:hover{ border-color:rgba(127,183,158,.45); transform:translateY(-3px); background:rgba(127,183,158,.05); }
+    .card .meta{ display:flex; align-items:center; gap:10px; font-family:var(--font-mono); font-size:10px;
+      letter-spacing:.08em; text-transform:uppercase; color:var(--ash); }
+    .card .meta .dot{ width:4px; height:4px; border-radius:50%; background:var(--jade); }
+    .card h3{ font-family:var(--font-display); font-weight:400; font-size:23px; line-height:1.14; color:var(--bone); }
+    .card p{ font-size:14px; color:var(--ash); line-height:1.55; }
+    .card .read{ margin-top:auto; padding-top:6px; font-family:var(--font-mono); font-size:12px; color:var(--amber); }
+
+    /* footer */
+    footer{ border-top:1px solid var(--hairline); margin-top:56px; padding:34px 0; }
+    .foot{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;
+      font-size:13px; color:var(--ash); }
+    .foot a{ color:var(--ash); }
+    .foot a:hover{ color:var(--bone); }
+
+    @media (max-width:560px){
+      .hero{ padding:52px 0 30px; }
+      .grid{ grid-template-columns:1fr; }
+      .nav-link.hide-sm{ display:none; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="wrap nav-inner">
+      <a class="logo" href="index.html" aria-label="Oriya home">
+        <svg viewBox="0 0 100 100" fill="none"><path d="M 78 22 A 40 40 0 1 0 79 23" stroke="#7FB79E" stroke-width="5" stroke-linecap="round"/><circle cx="50" cy="55" r="14" fill="#7FB79E"/><circle cx="78" cy="22" r="7" fill="#D7A25C"/></svg>
+        Oriya
+      </a>
+      <div class="nav-actions">
+        <a href="index.html" class="nav-link hide-sm">← Home</a>
+        <a href="science.html" class="nav-link hide-sm">The Science</a>
+        <a href="try.html" class="btn btn-primary">Build your Passport →</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="wrap">
+      <span class="eyebrow">The Long Game · Oriya's newsletter</span>
+      <h1>Essays on recovery,<br>wearables &amp; the <em>morning number.</em></h1>
+      <p>One piece a week on why your devices disagree, what the recovery score does to your head, and how rest becomes something you do with other people. The thinking Oriya is built on.</p>
+
+      <div class="subscribe">
+        <form class="sub-form" action="https://oriyaapp.substack.com/subscribe" method="get" target="_blank" rel="noopener">
+          <input type="email" name="email" placeholder="you@email.com" aria-label="Email address" autocomplete="email" />
+          <button type="submit" class="btn btn-primary">Subscribe free →</button>
+        </form>
+        <p class="sub-note">Free · one email a week · unsubscribe anytime</p>
+        <div class="sub-embed">
+          <iframe src="https://oriyaapp.substack.com/embed" title="Subscribe to The Long Game" loading="lazy" frameborder="0" scrolling="no"></iframe>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="essays">
+    <div class="wrap">
+      <h2>Recent essays</h2>
+      <p class="sub">Pulled from oriyaapp.substack.com — the full archive lives on Substack.</p>
+      <div class="grid">
+        <a class="card" href="https://oriyaapp.substack.com/p/the-hidden-psychology-of-wearable" target="_blank" rel="noopener">
+          <span class="meta"><span class="dot"></span>Jul 2, 2026</span>
+          <h3>The Hidden Psychology of Wearable Anxiety</h3>
+          <p>There's a word for being made sick by the device that was supposed to make you well.</p>
+          <span class="read">Read on Substack →</span>
+        </a>
+        <a class="card" href="https://oriyaapp.substack.com/p/why-the-next-status-symbol-is-preparedness" target="_blank" rel="noopener">
+          <span class="meta"><span class="dot"></span>Jun 29, 2026</span>
+          <h3>Why the Next Status Symbol Is Preparedness</h3>
+          <p>For twenty years we signaled status by how depleted we were. The signal is about to invert.</p>
+          <span class="read">Read on Substack →</span>
+        </a>
+        <a class="card" href="https://oriyaapp.substack.com/p/recovery-is-becoming-a-team-sport" target="_blank" rel="noopener">
+          <span class="meta"><span class="dot"></span>Jun 22, 2026</span>
+          <h3>Recovery Is Becoming a Team Sport</h3>
+          <p>We spent a decade treating recovery as a solo optimization problem. That era is ending.</p>
+          <span class="read">Read on Substack →</span>
+        </a>
+        <a class="card" href="https://oriyaapp.substack.com/p/your-wearable-is-measuring-you-in" target="_blank" rel="noopener">
+          <span class="meta"><span class="dot"></span>Jun 15, 2026</span>
+          <h3>Your Wearable Is Measuring You in a Private Language</h3>
+          <p>The reason your devices don't agree isn't that the problem is hard. It's that agreeing would cost them you.</p>
+          <span class="read">Read on Substack →</span>
+        </a>
+        <a class="card" href="https://oriyaapp.substack.com/p/the-5-morning-ritual-nobody-asked" target="_blank" rel="noopener">
+          <span class="meta"><span class="dot"></span>Jun 9, 2026</span>
+          <h3>The $5 Morning Ritual Nobody Asked For</h3>
+          <p>Every morning, millions of us do unpaid data-integration work for four companies.</p>
+          <span class="read">Read on Substack →</span>
+        </a>
+        <a class="card" href="https://oriyaapp.substack.com/p/an-oura-62-is-not-a-whoop-62" target="_blank" rel="noopener">
+          <span class="meta"><span class="dot"></span>Jun 2, 2026</span>
+          <h3>An Oura 62 Is Not a Whoop 62</h3>
+          <p>Everyone in your group chat is comparing recovery scores. Almost nobody realizes those scores are mathematically incompatible.</p>
+          <span class="read">Read on Substack →</span>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <span>© 2026 Oriya Inc. — The Long Game is published on <a href="https://oriyaapp.substack.com" target="_blank" rel="noopener">Substack</a>.</span>
+      <span><a href="index.html">← Back to oriya.app</a></span>
+    </div>
+  </footer>
+</body>
+</html>

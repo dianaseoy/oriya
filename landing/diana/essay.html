@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diana Seo — Essay</title>
+  <meta name="description" content="An essay by Diana Seo, founder of Oriya.">
+  <meta name="theme-color" content="#fbfbf9">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23fbfbf9'/%3E%3Ctext x='50' y='68' font-family='Georgia,serif' font-size='54' fill='%23b9542d' text-anchor='middle'%3EDS%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#fbfbf9;--bg-2:#f4f3ee;--panel:#ffffff;--line:rgba(28,27,25,0.12);--line-2:rgba(28,27,25,0.06);
+      --text:#1c1b19;--text-2:#57554e;--text-3:#97958b;
+      --accent:#b9542d;--accent-line:rgba(185,84,45,0.26);--accent-dim:rgba(185,84,45,0.09);
+      --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;--sans:"Inter",-apple-system,sans-serif;--serif:"Instrument Serif",Georgia,serif;
+      --ease:cubic-bezier(0.16,1,0.3,1);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{-webkit-font-smoothing:antialiased}
+    body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.7;font-size:16px;
+      background-image:radial-gradient(800px 460px at 50% -8%,rgba(185,84,45,0.05),transparent 60%);min-height:100vh;overflow-x:hidden}
+    a{color:inherit;text-decoration:none}
+    ::selection{background:var(--accent-dim);color:var(--text)}
+    .wrap{max-width:680px;margin:0 auto;padding:34px 24px 90px}
+    .page{opacity:0;transform:translateY(6px);transition:opacity .55s var(--ease),transform .55s var(--ease)}
+    .page.in{opacity:1;transform:none}
+    @media(prefers-reduced-motion:reduce){.page{opacity:1;transform:none;transition:none}}
+
+    .crumb{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;color:var(--text-3);margin-bottom:40px}
+    .crumb a{transition:color .2s var(--ease)}
+    .crumb a:hover{color:var(--accent)}
+    .crumb .sep{color:var(--text-3)}
+    .crumb .here{color:var(--text-2)}
+
+    .e-meta{display:flex;flex-wrap:wrap;gap:10px;font-family:var(--mono);font-size:11.5px;color:var(--text-3);margin-bottom:14px}
+    .e-meta .tag{color:var(--accent);border:1px solid var(--accent-line);background:var(--accent-dim);border-radius:6px;padding:2px 8px}
+    .e-meta .draft{border:1px solid var(--line);border-radius:6px;padding:2px 8px;color:var(--text-3)}
+    h1.e-title{font-family:var(--serif);font-weight:400;font-size:clamp(30px,5.4vw,46px);line-height:1.12;letter-spacing:0.005em;color:var(--text);margin-bottom:10px}
+    .e-dek{font-size:18px;color:var(--text-2);font-style:italic;font-family:var(--serif);margin-bottom:30px;padding-bottom:26px;border-bottom:1px solid var(--line)}
+
+    .e-body p{margin:0 0 20px;color:var(--text);font-size:16.5px}
+    .e-body p:first-child::first-letter{font-family:var(--serif);font-size:54px;float:left;line-height:.82;padding:4px 12px 0 0;color:var(--accent)}
+
+    .e-nav{margin-top:48px;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:14px}
+    .e-nav a{flex:1;border:1px solid var(--line);border-radius:11px;padding:14px 16px;transition:all .22s var(--ease);min-width:0}
+    .e-nav a:hover{border-color:var(--accent-line);background:var(--panel)}
+    .e-nav .dir{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:5px}
+    .e-nav .nt{font-size:13.5px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .e-nav a:hover .nt{color:var(--text)}
+    .e-nav .next{text-align:right}
+    .e-nav a.disabled{opacity:.32;pointer-events:none}
+
+    .back{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12px;color:var(--text-2);margin-top:34px;border:1px solid var(--line);border-radius:9px;padding:9px 14px;transition:all .2s var(--ease)}
+    .back:hover{border-color:var(--accent-line);color:var(--accent)}
+
+    .nf{text-align:center;padding:60px 0}
+    .nf h1{font-family:var(--serif);font-size:32px;margin-bottom:10px}
+    .nf p{color:var(--text-2);margin-bottom:22px}
+
+    /* cursor spotlight — cohesive with the ledger + /stack */
+    .spot{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .45s var(--ease);
+      background:radial-gradient(240px 240px at var(--mx,-999px) var(--my,-999px),rgba(185,84,45,0.07),transparent 68%)}
+    .spot.on{opacity:1}
+    @media(prefers-reduced-motion:reduce){.spot{display:none}}
+    .page{position:relative;z-index:1}
+
+    /* staggered block reveal on open — the on-brand alternative to a typewriter.
+       Generalized to every body block (paragraphs, pull-quotes, figures) so figures
+       join the same stagger. */
+    .e-body>*{opacity:0;transform:translateY(8px);transition:opacity .4s var(--ease),transform .4s var(--ease)}
+    .e-body>*.in{opacity:1;transform:none}
+    @media(prefers-reduced-motion:reduce){.e-body>*{opacity:1;transform:none;transition:none}}
+
+    /* ── typed figure system (evidence, not decoration): pull-quote · mono table · hand-built SVG ── */
+    .e-body .e-quote{margin:30px 0;padding:2px 0 2px 22px;border-left:2px solid var(--accent-line);
+      font-family:var(--serif);font-size:26px;line-height:1.3;letter-spacing:0.01em;color:var(--text)}
+    .e-body .e-quote cite{display:block;margin-top:11px;font-family:var(--mono);font-size:11px;font-style:normal;letter-spacing:0.04em;color:var(--text-3)}
+    .e-body .e-fig{margin:32px 0}
+    .e-body .e-fig svg{display:block;width:100%;height:auto}
+    .e-body .e-figlabel{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px}
+    .e-body .e-cap{font-family:var(--mono);font-size:11px;color:var(--text-3);margin-top:11px;line-height:1.55;max-width:60ch}
+    .e-body .e-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px;
+      border:1px solid var(--line);border-radius:10px;overflow:hidden}
+    .e-body .e-table th,.e-body .e-table td{padding:10px 14px;border-bottom:1px solid var(--line-2)}
+    .e-body .e-table tbody th{text-align:left;color:var(--text-2);font-weight:500}
+    .e-body .e-table tbody td{text-align:right;color:var(--text);font-weight:500}
+    .e-body .e-table tbody tr:last-child th,.e-body .e-table tbody tr:last-child td{border-bottom:0}
+    .e-body .e-table tbody tr:hover th,.e-body .e-table tbody tr:hover td{background:var(--panel)}
+    .e-body .e-table-cols thead th{text-align:left;color:var(--text-3);font-weight:500;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;border-bottom:1px solid var(--line)}
+    .e-body .e-table-cols tbody td{text-align:left;color:var(--text);font-weight:400;font-size:12px;line-height:1.5;vertical-align:top;width:50%}
+    .e-body .e-table-cols tbody td:first-child{color:var(--text-2);border-right:1px solid var(--line-2)}
+
+    /* keep-reading loop — related essays + cross-links into stack/reading */
+    .related{margin-top:46px;padding-top:26px;border-top:1px solid var(--line)}
+    .rel-head{font-family:var(--mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:12px}
+    .rel-list{display:flex;flex-direction:column;gap:2px;margin-bottom:16px}
+    .rel-row{display:grid;grid-template-columns:16px 1fr auto;gap:12px;align-items:baseline;padding:11px 10px;border-radius:9px;border:1px solid transparent;transition:all .2s var(--ease)}
+    .rel-row:hover{background:var(--panel);border-color:var(--line)}
+    .rel-row .rmk{font-family:var(--mono);color:var(--text-3);font-size:13px;transition:all .2s var(--ease)}
+    .rel-row:hover .rmk{color:var(--accent);transform:translateX(2px)}
+    .rel-row .rt{font-size:15px;font-weight:500;color:var(--text);min-width:0;display:inline-block;transform-origin:left center;transition:transform .28s var(--ease),color .2s var(--ease)}
+    .rel-row:hover .rt{color:var(--accent);transform:translateX(2px)}
+    .rel-row .rc{font-family:var(--mono);font-size:10.5px;color:var(--text-3);white-space:nowrap;justify-self:end}
+    .rel-cross{display:flex;flex-wrap:wrap;gap:10px}
+    .rel-cross a{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12px;color:var(--text-2);border:1px solid var(--line);border-radius:9px;padding:9px 13px;transition:all .2s var(--ease)}
+    .rel-cross a span{color:var(--text-3);transition:transform .2s var(--ease)}
+    .rel-cross a:hover{border-color:var(--accent-line);color:var(--accent);background:var(--accent-dim)}
+    .rel-cross a:hover span{transform:translateX(2px);color:var(--accent)}
+    @media(max-width:520px){.rel-row{grid-template-columns:16px 1fr}.rel-row .rc{grid-column:2;justify-self:start;margin-top:2px}}
+  </style>
+</head>
+<body>
+  <div class="spot" id="spot" aria-hidden="true"></div>
+  <div class="page" id="page"><div class="wrap" id="wrap"></div></div>
+  <script src="essays.js"></script>
+  <script>
+  (function(){
+    var ESSAYS = window.ESSAYS || [];
+    var ERAS = window.ERAS || [];
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
+    function q(name){ return new URLSearchParams(window.location.search).get(name); }
+
+    var wrap = document.getElementById("wrap");
+
+    /* pick up to 3 related essays: same category first, then same era, then anything */
+    function related(idx){
+      var e=ESSAYS[idx], out=[], seen={}; seen[idx]=1;
+      function add(pred){ for(var j=0;j<ESSAYS.length && out.length<3;j++){ if(!seen[j] && pred(ESSAYS[j])){ seen[j]=1; out.push(ESSAYS[j]); } } }
+      add(function(x){return x.category===e.category;});
+      add(function(x){return x.era===e.era;});
+      add(function(){return true;});
+      return out;
+    }
+    /* staggered block reveal — on-brand alternative to a typewriter (every body block) */
+    function reveal(){
+      var blocks = wrap.querySelectorAll(".e-body > *");
+      if(reduce){ blocks.forEach(function(p){ p.classList.add("in"); }); }
+      else { blocks.forEach(function(p,idx){ setTimeout(function(){ p.classList.add("in"); }, 80 + Math.min(idx*40,320)); }); }
+    }
+
+    /* body block renderer. A bare string stays a <p> (all existing essays untouched);
+       typed blocks add evidence-grade figures — pull-quote, mono table, hand-built SVG.
+       Gated to real-or-illustrative per the honesty bar; raw SVG is our own authored markup. */
+    function tableFig(b){
+      var label = b.label?'<div class="e-figlabel">'+esc(b.label)+'</div>':'';
+      var cap = b.cap?'<figcaption class="e-cap">'+esc(b.cap)+'</figcaption>':'';
+      if(b.cols){ // two-column contrast table (structure, e.g. optimizer vs operator)
+        var head="<thead><tr><th>"+esc(b.cols[0])+"</th><th>"+esc(b.cols[1])+"</th></tr></thead>";
+        var crows=(b.rows||[]).map(function(r){ return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td></tr>"; }).join("");
+        return '<figure class="e-fig">'+label+'<table class="e-table e-table-cols">'+head+'<tbody>'+crows+'</tbody></table>'+cap+'</figure>';
+      }
+      var rows = (b.rows||[]).map(function(r){
+        return "<tr><th scope=\"row\">"+esc(r[0])+"</th><td>"+esc(r[1])+"</td></tr>";
+      }).join("");
+      return '<figure class="e-fig">'+label+'<table class="e-table"><tbody>'+rows+'</tbody></table>'+cap+'</figure>';
+    }
+    function blockHtml(b){
+      if(typeof b==="string") return "<p>"+esc(b)+"</p>";
+      if(!b || !b.t) return "";
+      if(b.t==="p") return "<p>"+esc(b.text)+"</p>";
+      if(b.t==="quote") return '<blockquote class="e-quote">'+esc(b.text)+(b.by?'<cite>'+esc(b.by)+'</cite>':'')+'</blockquote>';
+      if(b.t==="table") return tableFig(b);
+      if(b.t==="svg") return '<figure class="e-fig">'+(b.svg||"")+(b.cap?'<figcaption class="e-cap">'+esc(b.cap)+'</figcaption>':'')+'</figure>';
+      return "";
+    }
+    var curIdx = -1;
+    function render(idx){
+      curIdx = idx;
+      var e = ESSAYS[idx];
+      var eraLabel = (ERAS.filter(function(x){return x.key===e.era;})[0]||{}).label || "Writing";
+      document.title = e.title + " — Diana Seo";
+      var prev = idx>0 ? ESSAYS[idx-1] : null;
+      var next = idx<ESSAYS.length-1 ? ESSAYS[idx+1] : null;
+      var bodyHtml = (e.body||[]).map(blockHtml).join("");
+      var relRows = related(idx).map(function(r){
+        return '<a class="rel-row" href="essay.html?id='+encodeURIComponent(r.slug)+'"><span class="rmk">›</span>'+
+          '<span class="rt">'+esc(r.title)+'</span><span class="rc">'+esc(r.category)+' · '+esc(r.period)+'</span></a>';
+      }).join("");
+
+      wrap.innerHTML =
+        '<nav class="crumb"><a href="index.html">Diana Seo</a><span class="sep">/</span><a href="index.html">Writing</a><span class="sep">/</span><span class="here">'+esc(eraLabel)+'</span></nav>'+
+        '<div class="e-meta"><span class="tag">'+esc(e.category)+'</span><span>'+esc(e.period)+'</span>'+(e.pinned?'<span class="draft">pinned</span>':'')+'<span class="draft">draft</span></div>'+
+        '<h1 class="e-title">'+esc(e.title)+'</h1>'+
+        '<p class="e-dek">'+esc(e.dek)+'</p>'+
+        '<div class="e-body">'+bodyHtml+'</div>'+
+        '<section class="related">'+
+          '<div class="rel-head">Keep reading</div>'+
+          '<div class="rel-list">'+relRows+'</div>'+
+          '<div class="rel-cross"><a href="stack.html">Stack — how I build <span>→</span></a><a href="reading.html">Reading — the canon <span>→</span></a></div>'+
+        '</section>'+
+        '<nav class="e-nav">'+
+          (prev?'<a href="essay.html?id='+encodeURIComponent(prev.slug)+'"><div class="dir">← Newer</div><div class="nt">'+esc(prev.title)+'</div></a>':'<a class="disabled"><div class="dir">← Newer</div><div class="nt">—</div></a>')+
+          (next?'<a class="next" href="essay.html?id='+encodeURIComponent(next.slug)+'"><div class="dir">Older →</div><div class="nt">'+esc(next.title)+'</div></a>':'<a class="next disabled"><div class="dir">Older →</div><div class="nt">—</div></a>')+
+        '</nav>'+
+        '<a class="back" href="index.html">← All writing</a>';
+      reveal();
+    }
+
+    var id = q("id");
+    var i = -1;
+    for(var k=0;k<ESSAYS.length;k++){ if(ESSAYS[k].slug===id){ i=k; break; } }
+
+    if(i<0){
+      document.title = "Not found — Diana Seo";
+      wrap.innerHTML = '<div class="nf"><h1>Essay not found</h1><p>That piece isn’t in the ledger.</p><a class="back" href="index.html">← All writing</a></div>';
+    } else {
+      render(i);
+      try{ history.replaceState({i:i},"","essay.html?id="+encodeURIComponent(ESSAYS[i].slug)); }catch(_){}
+
+      /* reload-free essay↔essay transition — mechanic approved, metaphor buried (Dawn+Sable):
+         a ~16px opacity-led nudge, interruptible (rapid clicks cancel-and-jump, never queue). */
+      var animGen=0, busy=false;
+      function idxOfSlug(s){ for(var j=0;j<ESSAYS.length;j++){ if(ESSAYS[j].slug===s) return j; } return -1; }
+      function swap(idx,push){
+        render(idx);
+        window.scrollTo(0,0);
+        if(push){ try{ history.pushState({i:idx},"","essay.html?id="+encodeURIComponent(ESSAYS[idx].slug)); }catch(_){} }
+      }
+      function navTo(idx,dir,push){
+        if(idx<0||idx>=ESSAYS.length||idx===curIdx) return;
+        if(reduce || busy){ animGen++; busy=false; wrap.style.transition="none"; wrap.style.opacity="1"; wrap.style.transform="none"; swap(idx,push); return; }
+        busy=true; var g=++animGen;
+        wrap.style.transition="opacity .19s var(--ease),transform .19s var(--ease)";
+        wrap.style.opacity="0"; wrap.style.transform="translateX("+(dir>0?-16:16)+"px)";
+        setTimeout(function(){
+          if(g!==animGen) return;
+          swap(idx,push);
+          wrap.style.transition="none";
+          wrap.style.opacity="0"; wrap.style.transform="translateX("+(dir>0?16:-16)+"px)";
+          requestAnimationFrame(function(){
+            if(g!==animGen) return;
+            wrap.style.transition="opacity .22s var(--ease),transform .22s var(--ease)";
+            wrap.style.opacity="1"; wrap.style.transform="none";
+            setTimeout(function(){ if(g===animGen) busy=false; },240);
+          });
+        },150);
+      }
+      wrap.addEventListener("click", function(ev){
+        if(ev.metaKey||ev.ctrlKey||ev.shiftKey||ev.altKey||ev.button!==0) return;
+        var a=ev.target.closest('a[href^="essay.html?id="]'); if(!a) return;
+        var slug=decodeURIComponent((a.getAttribute("href").split("?")[1]||"").replace(/^id=/,""));
+        var t=idxOfSlug(slug); if(t<0) return;
+        ev.preventDefault();
+        navTo(t, t>curIdx?1:-1, true);
+      });
+      window.addEventListener("popstate", function(){
+        var t=idxOfSlug(q("id")||""); if(t<0||t===curIdx) return;
+        navTo(t, t>curIdx?1:-1, false);
+      });
+    }
+
+    /* cursor spotlight */
+    var spot=document.getElementById("spot");
+    if(spot && !reduce){
+      var sraf=null,smx=0,smy=0;
+      window.addEventListener("pointermove",function(e){
+        smx=e.clientX; smy=e.clientY;
+        if(!sraf) sraf=requestAnimationFrame(function(){
+          spot.style.setProperty("--mx",smx+"px");
+          spot.style.setProperty("--my",smy+"px");
+          spot.classList.add("on"); sraf=null;
+        });
+      },{passive:true});
+      document.addEventListener("mouseleave",function(){ spot.classList.remove("on"); });
+    }
+
+    requestAnimationFrame(function(){ document.getElementById("page").classList.add("in"); });
+  })();
+  </script>
+</body>
+</html>

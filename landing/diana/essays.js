@@ -1,0 +1,696 @@
+/* ============================================================
+   Diana Seo — writing ledger (source of truth)
+   Real essays. Shared by index.html (ledger) and essay.html (reader).
+   ============================================================ */
+(function () {
+  var ERAS = [
+    { key: "current", label: "Current signal",        period: "2026" },
+    { key: "2025h2",  label: "DeFi + global lens",     period: "2025 · H2" },
+    { key: "2025h1",  label: "Big-thesis pieces",      period: "2025 · H1" },
+    { key: "2024",    label: "Foundation",             period: "2024" },
+    { key: "2023",    label: "Earliest takes",         period: "2023" }
+  ];
+
+  var ESSAYS = [
+    // ---- 2026 · Current signal --------------------------------------------
+    {
+      slug:"meta-layer-money", era:"current", period:"2026-07", category:"Deal flow", status:"live",
+      title:"The Meta-Layer Is Where the Money Went",
+      dek:"As models commoditize, the durable businesses sit one layer up — the router, the scoreboard, the hub. And the GTM incumbents are being repriced in real time.",
+      body:[
+        "The most valuable real estate in AI right now is not the model. It's the layer directly on top of it.",
+        "Everyone is watching the model fight — who has the best benchmark this month, whose context window is longest, which lab raised at the highest number. It's a great show. It's also, increasingly, not where the durable money is. The durable money is pooling one layer up, in the unglamorous infrastructure that exists precisely because no single model wins.",
+        "Start with the toll booth. OpenRouter does something almost unfairly simple: it sits between you and every model — OpenAI, Anthropic, Google, the open-weight ones — and routes each call to whichever is best or cheapest, through one interface. It takes about five percent on top of the inference that flows through it. That's the whole business. That five percent, charged on other people's tokens, was recently worth a $1.3 billion valuation on roughly $50 million of annualized revenue — up from about one million a year earlier. The more the model layer fragments, the more valuable the thing that routes across it becomes.",
+        {t:"table", label:"the meta-layer · reported valuations & ARR, mid-2026, not audited",
+          rows:[
+            ["OpenRouter · the router","$1.3B · ~$50M ARR"],
+            ["Hugging Face · the hub","~$7B · ~$130M ARR"],
+            ["LMArena · the scoreboard","$1.7B"],
+            ["Apollo · GTM","$1.6B · ~$150M ARR"],
+            ["Clari · RevOps","$2.6B · ~$158M ARR"]
+          ],
+          cap:"Reported, not audited — the pattern is the point: value is pooling one layer above the model, and in the GTM tools being rebuilt around it."},
+        "Then the scoreboard. When there are fifty credible models and a new one every week, the scarcest thing in the room is a neutral referee. LMArena — the crowd-voted leaderboard that came out of Berkeley — turned being that referee into a $1.7 billion valuation inside about a year of having a product. Artificial Analysis and LiveBench are playing versions of the same hand: independent measurement as a business, because every buyer and every lab needs a scorekeeper none of them controls. Trust, priced.",
+        "And the hub. Hugging Face, where the models and datasets actually live, raised into roughly a seven-billion-dollar valuation — not by winning the model race but by being the place all the runners get dressed.",
+        "And none of these numbers ran in a straight line — the ARR is just the part that survived. Hugging Face spent its first life as a chatbot app for bored teenagers before it became the place every model lives. LMArena was a Berkeley research project, a leaderboard nobody was trying to monetize, until being the one referee everyone trusted turned out to be worth $1.7 billion. The pattern is underneath all of it, and it's the one I keep relearning: the winning idea usually shows up second, after the first one fails — and the number you finally get to cite hides the year nobody would have funded.",
+        "Here's the pattern, and it's the same one I keep writing about: value accretes to whoever owns the layer the incumbents depend on but can't be. The router is worth more when no model wins. The scoreboard is worth more when nobody trusts the labs' own numbers. The hub is worth more the more models there are. All three are structurally short the thing everyone else is long — a single winner — which is exactly why they compound.",
+        "For investors, that reframes the trade. The picks-and-shovels of this era aren't GPUs anymore; they're the toll booth, the referee, and the hub — and they get better as the model layer gets messier. The catch, which OpenRouter's own founder has said out loud, is that a router quietly erodes its own reason to exist the day one model wins everything. So the underwriting question isn't “is this a good business” — obviously it is, at twenty-five to thirty-five times revenue — it's “how durable is the fragmentation it feeds on?” Price that, not the growth curve.",
+        "For builders, the lesson is concrete, and I've lived it: never wire your product to a single model. Build on the abstraction — route the cheap model to the grunt work, spend the expensive one once as a gatekeeper, and switch providers the week the leaderboard flips, because it will. Token optimization stopped being a nice-to-have and became a discipline with real margin attached. The scoreboard tells you what to use, the router lets you switch without a rewrite, the hub lets you ship. That's a stack — and most of it is other people's infrastructure.",
+        {t:"svg", cap:"For a builder, that is the whole job: take fifty models that change every week and hand your product one stable interface. For an investor, the read is the middle slab — the layer that does the simplifying is the layer that keeps the value.",
+          svg:"<svg viewBox=\"0 0 660 330\" role=\"img\" aria-label=\"An abstraction stack: many models and providers at the base, an abstraction layer in the middle where value pools, and one clean interface on top\"><line x1=\"290\" y1=\"300\" x2=\"290\" y2=\"58\" stroke=\"#d9d3c9\" stroke-width=\"1\" stroke-dasharray=\"2 4\"/><polygon points=\"290,212 438,258 290,304 142,258\" fill=\"#e8e4dc\"/><polygon points=\"142,258 290,304 290,320 142,274\" fill=\"#cfc8bc\"/><polygon points=\"290,304 438,258 438,274 290,320\" fill=\"#d8d2c8\"/><g fill=\"#8f8d83\"><circle cx=\"250\" cy=\"256\" r=\"4\"/><circle cx=\"300\" cy=\"248\" r=\"4\"/><circle cx=\"345\" cy=\"262\" r=\"4\"/><circle cx=\"225\" cy=\"270\" r=\"4\"/><circle cx=\"286\" cy=\"272\" r=\"4\"/><circle cx=\"330\" cy=\"276\" r=\"4\"/><circle cx=\"270\" cy=\"240\" r=\"4\"/><circle cx=\"362\" cy=\"250\" r=\"4\"/><circle cx=\"210\" cy=\"258\" r=\"4\"/></g><polygon points=\"290,136 398,170 290,204 182,170\" fill=\"#b9542d\"/><polygon points=\"182,170 290,204 290,222 182,188\" fill=\"#8a3d1f\"/><polygon points=\"290,204 398,170 398,188 290,222\" fill=\"#9c4423\"/><circle cx=\"290\" cy=\"170\" r=\"5\" fill=\"#fbe9e0\"/><polygon points=\"290,72 352,92 290,112 228,92\" fill=\"#ffffff\"/><polygon points=\"228,92 290,112 290,124 228,104\" fill=\"#e4dfd6\"/><polygon points=\"290,112 352,92 352,104 290,124\" fill=\"#eeeae2\"/><circle cx=\"290\" cy=\"92\" r=\"4\" fill=\"#b9542d\"/><g font-family=\"JetBrains Mono, monospace\" font-size=\"12\"><line x1=\"352\" y1=\"92\" x2=\"468\" y2=\"92\" stroke=\"#d9d3c9\"/><text x=\"476\" y=\"89\" fill=\"#57554e\">one interface</text><text x=\"476\" y=\"105\" fill=\"#97958b\" font-size=\"11\">what the builder ships</text><line x1=\"398\" y1=\"174\" x2=\"468\" y2=\"174\" stroke=\"#d9d3c9\"/><text x=\"476\" y=\"171\" fill=\"#b9542d\">the abstraction layer</text><text x=\"476\" y=\"187\" fill=\"#97958b\" font-size=\"11\">router · scoreboard · hub</text><line x1=\"438\" y1=\"260\" x2=\"468\" y2=\"260\" stroke=\"#d9d3c9\"/><text x=\"476\" y=\"257\" fill=\"#57554e\">50 models · providers</text><text x=\"476\" y=\"273\" fill=\"#97958b\" font-size=\"11\">raw, changing weekly</text></g></svg>"},
+        "Watch the other half of the board, because it's the tell for everyone else. The GTM and CRM incumbents are being repriced by the same force, in public. Apollo — months from running out of cash before it gave the product away and let it sell itself — rebuilt around AI and ran to $150 million in ARR at a $1.6 billion valuation; Clari, valued around $2.6 billion, just merged with Salesloft into a single revenue platform north of $450 million in ARR; Qualtrics went private near twelve billion and is quietly turning into an AI company. None of them sell seats anymore. They sell the outcome — pipeline, forecast, the answer — because AI made the outcome the thing you can actually charge for.",
+        "For users — for the operators and founders this is written for — the takeaway is a discipline, not a stock tip. The five percent you pay the router is a tax on optionality; know when it's worth paying and when to go direct. The scoreboard is free; use it before you commit a roadmap to a model. And when you buy a GTM tool now, you're buying an outcome with a margin structure underneath it — so ask the question I ask every founder: when the model you depend on doubles in price, what happens to the number you just paid for? The meta-layer is where the money went because it's where the leverage is. Stand there."
+      ]
+    },
+    {
+      slug:"gtm-split-breaking", era:"current", period:"2026-06", category:"Playbook", pinned:true, status:"live",
+      title:"The 30/30/40 Rule Is Breaking",
+      dek:"The old startup playbook split spend across marketing, sales, and product in a predictable arc. AI-native companies are tearing up the ratio — and the best ones barely have a sales line.",
+      body:[
+        "Every startup I came up around ran some version of the same budget split: roughly thirty percent to marketing, thirty to sales, forty to product. Nobody wrote it on a wall. Everybody drifted toward it anyway.",
+        "The exact numbers moved by stage. At seed you were mostly product — build the thing, put it in front of ten people, don't hire a sales team to sell something that doesn't exist yet. By Series A and B the ratio flipped hard the other way: the classic SaaS company spent forty, fifty, sometimes sixty cents of every revenue dollar on sales and marketing, because that was the price of distribution. You built a good product and then you paid, in ad budget and account executives, to carry it to a market that couldn't find you on its own.",
+        "That split wasn't arbitrary. It was a correct response to a real constraint: attention was expensive and buying decisions ran through humans. Marketing bought the attention. Sales converted it. Product made the thing worth converting. Three functions, three budgets, and a predictable arc from product-heavy to distribution-heavy as you scaled.",
+        {t:"table", cols:["classic (pre-AI)","AI-native (now)"],
+          rows:[
+            ["marketing ~30% — buy attention","distribution built into the product; the output is the ad"],
+            ["sales ~30% — humans convert pipeline","near-zero early; the aha closes in session one"],
+            ["product ~40% — build the thing","product is most of the company"],
+            ["scale by adding S&M headcount","scale by revenue per employee"]
+          ],
+          cap:"Directional, not a formula — the point is the default flipped: from paying to carry the product to market, to building a product that carries itself."},
+        "AI breaks this at the root, because it attacks the constraint the whole split was built around: distribution.",
+        "Start with marketing. The defining feature of the AI products that broke out is that the output is the advertisement. Every Midjourney image posted to a feed is a billboard the company didn't buy. Every ChatGPT screenshot is a demo. The product markets itself as a byproduct of being used — which means marketing stops being a line you buy and becomes a property you design into the thing itself.",
+        "Then sales. When the aha lands in the first session — you type a prompt, you get the thing — you don't need a human to walk a buyer through a six-week evaluation. The product closes itself, one user at a time, and those users tell other users. ChatGPT reached a hundred million people without a traditional sales motion. Midjourney reportedly did hundreds of millions in revenue with a few dozen people and no sales team at all. Cursor spread through engineering orgs because one developer showed another, not because a rep dialed in.",
+        "And product — the forty — stops being forty. It becomes most of the company, because AI also collapsed the cost of the things that used to sit outside product: support, content, ops, the first draft of everything. The people you'd once have hired to carry the product to market are the exact people the product no longer needs.",
+        "So the new split, for an AI-native company at the same early stage, looks less like 30/30/40 and more like this: product is the overwhelming majority; marketing is a small team designing distribution mechanics and community rather than buying attention; and classic outbound sales is close to zero until you deliberately move up-market. Sales doesn't die — it comes back at high ACV, in regulated buyers, in the places where a human still has to be accountable. But it is no longer the default first hire after product.",
+        "The honest caveat: this is a default, not a law. If you're selling six-figure contracts into hospitals, you still need sales, and you need it early. What changed isn't that go-to-market disappeared — it's that the burden of proof flipped. The old question was \"how much distribution can we buy?\" The new one is \"why doesn't this product distribute itself?\" — and if you can't answer that, more marketing spend won't save you.",
+        "You can see who hasn't updated. They're the teams still hiring against the old ratio — bolting a sales org onto a product that should have been self-serve, buying attention for an output that should have been the ad. They're running a playbook that was a correct answer to a constraint that no longer binds. That's not a marketing problem. It's a mispriced org chart — and the market takes a while to notice, but it notices."
+      ]
+    },
+    {
+      slug:"ai-bet-priced-wrong", era:"current", period:"2026-05", category:"Deal flow", status:"live",
+      title:"The AI Bet Everyone Is Pricing Wrong",
+      dek:"Deal flow still underwrites headcount as a proxy for capability. The real number — unit economics per shipped feature — is collapsing fastest for the teams nobody's funding.",
+      body:[
+        "Most AI investing in 2026 is still pricing the wrong number. It's pricing headcount.",
+        "Sit through enough pitches and you see the same reflex. Forty engineers reads as forty engineers of capability. A big round reads as a big moat. The org chart gets treated as the balance sheet — more people, more defensibility, more inevitability. It's a proxy that worked for fifteen years, and it is quietly becoming false.",
+        "Here's the number I actually watch: unit economics per shipped feature. Not revenue, not round size, not the logo wall. What did it cost — in dollars and in people — to put one working thing in front of a real user, and is that cost climbing or collapsing? For the teams doing it right, it's collapsing. And it's collapsing fastest not for the funded incumbents but for the lean ones nobody's writing a memo about.",
+        "I know the shape of this because I've lived it. I built the core of Oriya's normalizer — the thing that takes four wearables on four incompatible scales and lands them on one fair index — in a night, with a pipeline of AI tools and one human reviewing every diff. It's on my stack page, receipts and all. The point isn't that I'm fast. The point is that “a night and a stack” is now a legitimate unit of production, and most cap tables haven't repriced for it.",
+        "Look at the counter-evidence everyone already knows and files under exception. Midjourney: reportedly a few dozen people, hundreds of millions in revenue, no venture money at all. That is not a fluke. That is the mechanic. When the marginal cost of building drops and the model does the labor, revenue-per-employee stops being a vanity metric and becomes the whole thesis.",
+        {t:"table", label:"Midjourney · reported figures, not audited",
+          rows:[["raised","$0"],["team","~40 people"],["revenue","$200M+ (reported)"],["revenue / head","~$5M"]],
+          cap:"Reported, not audited — the point isn't the exact number, it's the ratio. No venture money, and revenue-per-head an order of magnitude past the funded norm."},
+        "So when a seed deck shows me a GPT wrapper with a moat slide drawn in Figma, I'm not looking at the moat slide. I'm looking at whether inference is a COGS line or an R&D line. If the business only works while someone else eats the token cost, that's not a margin — it's a countdown. Ask a founder how gross margin behaves when the model they depend on doubles in price, and you learn in about four seconds whether they've thought about the business or just the demo.",
+        "This changes what good AI leadership even looks like. The sharpest operators I know aren't managing a portfolio of headcount. They're managing a portfolio of models and evals — routing the cheap model to the grunt work, spending the expensive one once as a gatekeeper, treating the eval suite as the thing that actually ships or blocks the code. The org chart is becoming an orchestration graph. Leading well means knowing which node to spend money on, not how many nodes to hire.",
+        "The uncomfortable part, if you write checks: a lot of the safety in a big round is optical. Capital buys you the ability to hire your way around a problem, and hiring your way around a problem is precisely the muscle getting commoditized. The team that raised $40M and staffed up to prove it can be more fragile than the two people who never needed to — because the two optimized for the thing that's getting cheaper and the forty optimized for the thing that's getting expensive.",
+        "None of this means capital is dead. Distribution, trust, regulated wedges, real proprietary data loops — those still cost money and still compound. It means the proxy is broken. Headcount was always a lagging indicator of capability. Now the lag is long enough to lose money in.",
+        "I came up in DeFi, where I watched a lot of smart people underwrite the elegant protocol and miss the ugly product that actually got used. This rhymes. The prettiest thing in AI right now is the well-funded org chart. The valuable thing is the unit economics of a team small enough that it never shows up in your deal flow. Price that."
+      ]
+    },
+    {
+      slug:"defi-2018-loneliest-trade", era:"current", period:"2026-04", category:"DeFi", pinned:true, status:"live",
+      title:"DeFi in 2018 Was the Loneliest Trade",
+      dek:"In 2018, I was explaining Uniswap v1 to people who thought Ethereum was a company.",
+      body:[
+        "In 2018, I was explaining Uniswap v1 to people who thought Ethereum was a company.",
+        "That's not a humble brag. It's context. Being early in something genuinely new is not exciting — it's quiet, and then it's exhausting, and then the thing either works or it doesn't and you find out years later which one it was. I didn't know anyone else who was building in DeFi in 2018. I knew people building on Ethereum, which was different. DeFi as a concept — the idea that you could recreate financial primitives trustlessly, on-chain, composably — was a fringe hypothesis held by maybe a few hundred people globally.",
+        {t:"quote", text:"I was one of them."},
+        "What I remember most from that period isn't the technical challenge, though the technical challenge was real. Solidity was immature, the tooling was bad, the gas costs made most UX unworkable, and the liquidity bootstrapping problem had no solved playbook. What I remember is the product problem.",
+        "DeFi had a protocol problem masquerading as a product problem. Everyone was building protocols. Protocols are beautiful — elegant, trustless, composable. Protocols are also not products. A product is something a specific person uses to accomplish a specific thing. DeFi in 2018 had no products. It had protocols wrapped in interfaces that assumed you already understood the protocol.",
+        "I spent two years trying to build the product layer that the protocols needed. I got some of it right. I got a lot wrong. But the thing I learned, deeply, is this: the hardest problem in technology is not the technical problem. It's the transition from “this is technically possible” to “a real person, with real constraints, in a real context, will actually use this.” That gap is enormous. Most smart builders underestimate it by an order of magnitude.",
+        "DeFi eventually crossed that gap — but only after years, billions in TVL, multiple cycles of user pain, and the arrival of product people who weren't protocol-maximalists. The protocols that won were the ones that got product help, not the most technically sophisticated ones.",
+        "I think about this constantly now. AI is at the same place DeFi was in 2018. The protocols are extraordinary. The products are still largely terrible. The window to build the product layer is open, right now, for the people who know what a product actually is.",
+        "The loneliest trades become obvious in retrospect. The ones who survive to be obvious about them built through the quiet years when it wasn't."
+      ]
+    },
+    {
+      slug:"protocol-not-the-product", era:"current", period:"2026-03", category:"Thesis", status:"live",
+      title:"The Protocol Is Not the Product",
+      dek:"Users don't use infrastructure. They use products. Two waves, the same expensive mistake.",
+      body:[
+        "I've watched two technological waves now where the same mistake gets made at scale.",
+        "In DeFi: brilliant protocol designers who believed that sufficiently elegant infrastructure would attract users organically. In AI: brilliant model builders who believe that sufficiently capable models will find their own distribution. Both beliefs are wrong in the same way, for the same reason.",
+        {t:"quote", text:"Users don't use infrastructure. They use products."},
+        "This isn't a subtle point. It's a point that repeatedly fails to propagate because the people who build infrastructure are, by selection, people who understand infrastructure deeply enough to not need a product layer. They use the raw thing. They mistake their own comfort with the raw thing for proof that the raw thing is usable.",
+        "It is not usable. Not by most people. Not without significant translation work.",
+        "I spent years in DeFi specifically on this translation problem. What does a decentralized exchange look like to someone who has never held a private key? What does slippage tolerance mean to a user who isn't sure what slippage is? These are not questions that protocol designers want to answer — they feel like dumbing things down. But they're not dumbing down. They're finding the actual user.",
+        "The actual user, in both DeFi and AI, is not the builder. The actual user is the accountant who needs an outcome, not a tool. The logistics coordinator who needs a workflow, not a model. The founder who needs a decision, not a dashboard.",
+        "DeFi mostly failed to serve those people. The total addressable market for people who will run their own node and manage their own keys is small. DeFi optimized for that market and left the larger one untouched.",
+        "AI is at the same fork in the road, right now. You can see both paths clearly if you've walked the DeFi one. The infrastructure path is well-funded and well-staffed. The product path — the one where you do the translation work, find the actual user, deliver an actual outcome — is still underbuilt.",
+        "The companies that will define AI in five years are not the model companies. They're the product companies. And the people best positioned to build them are the ones who've made this mistake before, in a different domain, and came out on the other side knowing what “product” actually means.",
+        "That's a small group. I intend to be in it."
+      ]
+    },
+    {
+      slug:"services-are-software-now", era:"current", period:"2026-02", category:"AI", status:"live",
+      title:"Services Are Software Now",
+      dek:"For every $1 businesses spend on software, they spend ~$6 on the people. The services layer is next — and it's 6× bigger.",
+      body:[
+        "There's a number that doesn't show up in most AI pitch decks: six.",
+        "For every dollar businesses spend on software, they spend roughly six dollars on the people who do the work that software is supposed to support. Accountants, consultants, paralegals, recruiters, designers, analysts. The services economy isn't adjacent to the software economy — it dwarfs it.",
+        {t:"svg", cap:"Roughly 6× — the widely-cited ratio of what businesses spend on services labor versus software. That larger bar is the market AI is now pointed at.",
+          svg:"<svg viewBox=\"0 0 600 148\" role=\"img\" aria-label=\"For every $1 spent on software, about $6 is spent on services labor\"><text x=\"0\" y=\"41\" font-family=\"JetBrains Mono, monospace\" font-size=\"13\" fill=\"#57554e\">software</text><rect x=\"96\" y=\"26\" width=\"66\" height=\"24\" rx=\"4\" fill=\"#d9d6cd\"/><text x=\"172\" y=\"44\" font-family=\"JetBrains Mono, monospace\" font-size=\"13\" fill=\"#97958b\">$1</text><text x=\"0\" y=\"105\" font-family=\"JetBrains Mono, monospace\" font-size=\"13\" fill=\"#57554e\">services</text><rect x=\"96\" y=\"90\" width=\"396\" height=\"24\" rx=\"4\" fill=\"#b9542d\"/><text x=\"502\" y=\"108\" font-family=\"JetBrains Mono, monospace\" font-size=\"13\" fill=\"#b9542d\">~$6</text></svg>"},
+        "I think about this every morning.",
+        "The canonical AI bet is that software gets cheaper and more powerful. That's true and mostly already priced in. The non-canonical bet — the one I'm making — is that the services layer is next, and it's 6x bigger.",
+        "I saw a version of this dynamic play out in DeFi. The early narrative was about replacing financial software — trading platforms, settlement infrastructure, clearinghouses. But the actual disruption was at the services layer: the brokers, the market makers, the custodians, the compliance consultants. The software layer was a precondition, not the destination.",
+        "When Anthropic and OpenAI started expanding into enterprise services deals, people noticed and quickly moved on. I think that was the signal. The two most valuable AI companies in the world just pointed at the same category most founders are still ignoring.",
+        "Here's why founders avoid it: services feel hard to scale. They feel like consulting. The conventional wisdom is that you want a software business, not a services business, because software margins are better and services don't scale.",
+        "That was true. It's less true now.",
+        "What changes when AI handles most of the execution layer of a service isn't just the cost structure — it's the entire operating model. You can deliver an outcome at software-like margins while still calling it a service, because the customer doesn't care about the delivery mechanism. They care about the outcome.",
+        "Outcome pricing, not seat pricing. Delivery at scale, not headcount at scale.",
+        "I've been early to one wave of this before. The window to build the infrastructure for this one is narrow."
+      ]
+    },
+    {
+      slug:"600t-problem", era:"current", period:"2026-01", category:"Markets", status:"live",
+      title:"The $600T Problem Nobody Is Pitching",
+      dek:"Every AI pitch is about the $4T software market. Nobody's pitching the $60–100T of services underneath it.",
+      body:[
+        "I've sat through dozens of AI pitches in the past year. Almost all of them are about software.",
+        "Faster software. Cheaper software. Software that writes software. Software that replaces software engineers with fewer software engineers. It's a reasonable category — software is a $4 trillion market and growing.",
+        "But global services — what humans do for other humans in exchange for money — is somewhere around $60 to $100 trillion annually, depending on how you count. If you include informal services and the total labor market, the number gets much larger.",
+        {t:"table", label:"annual market size · order-of-magnitude, not audited",
+          rows:[["software","~$4T"],["global services","~$60–100T"]],
+          cap:"Approximate — even if global services is half this, it dwarfs the software market every AI pitch is chasing."},
+        "Nobody is pitching that.",
+        "I understand why. Services companies have historically bad multiples. They're “linear.” You can't 10x revenue without 10x headcount. VCs have pattern-matched on this for thirty years and the pattern is deeply baked in.",
+        "But the pattern was built on a world where the cost of AI execution was high, or AI didn't exist at all. The economics are changing. Fast.",
+        "A boutique consulting firm charges $300/hour for a human analyst to do work that a well-designed AI workflow can now do in minutes. The firm doesn't capture that delta — the first person who builds the workflow and sells the outcome at $150/hour does.",
+        "I watched an analogous moment in DeFi: the point at which the cost of market-making dropped so dramatically that the traditional fee structures became indefensible overnight. The firms that saw it coming built the AMMs. The ones who didn't became the liquidity.",
+        "I keep waiting for someone to build the obvious version of this in services at scale. In the meantime, I'm building the less obvious version — vertical, specific, outcome-priced.",
+        "The $600T number is probably wrong. It doesn't matter. Even if the services market is half that size, and AI captures only a small slice of it, we're talking about a category that makes the current AI software wave look like a rounding error.",
+        "The pitch isn't complicated. The execution is hard. That's usually a good sign."
+      ]
+    },
+    {
+      slug:"nairobi-network-effects", era:"current", period:"2026-01", category:"Field notes", status:"live",
+      title:"What Nairobi Taught Me About Network Effects",
+      dek:"The Sand Hill growth playbook doesn't survive first contact with 80% mobile-money penetration and a phone shared by three people.",
+      body:[
+        "The standard venture-backed playbook for network effects goes like this: seed a node, subsidize growth, build density, flip the network effect from negative to positive, then raise the Series A. It works in markets where the nodes are similar — same income, same connectivity, same trust infrastructure, same payment rails.",
+        {t:"quote", text:"Nairobi taught me the playbook is wrong."},
+        "I spent time working with early-stage Kenyan startups in 2021 and 2022 — some of the most technically sophisticated founders I've ever met, operating in conditions that would make most SF founders quit in the first month. Mobile money penetration over 80%. Informal sector employment over 70%. Average monthly income for target users one-twentieth of the assumed baseline in most growth models.",
+        "The growth playbook from Sand Hill Road doesn't survive first contact with those conditions. The cold start problem is different when your DAU is a market trader who uses their phone for three hours a day but shares it with two family members. The referral loop breaks down when trust is built on physical proximity and community membership, not reputation systems. The payment integration assumes bank accounts that most users don't have.",
+        "What I watched those founders do instead was remarkable, and almost none of it gets written about in Western startup media. They built for oral culture in a way that made M-Pesa look user-hostile by comparison. They leveraged church and mosque networks as distribution that would never show up in an acquisition funnel. They designed for intermittent connectivity three years before “offline-first” became a product category.",
+        "The network effects they built were slower and more durable than anything I'd seen in SF. When a network is built on community trust rather than digital identity, churn looks different. Retention looks different. The graph has different topology.",
+        "I came back from those trips convinced that most growth models are geography-biased in ways their builders don't recognize. The best growth insight I've ever gotten wasn't in a growth conference. It was watching a founder in Westlands explain why they deliberately slowed user acquisition for six weeks to let the social graph catch up with the product graph.",
+        "I've used that framework in every growth context since. It has never been wrong."
+      ]
+    },
+
+    // ---- 2025 · H2 --------------------------------------------------------
+    {
+      slug:"defi-ux-disaster-education", era:"2025h2", period:"2025-12", category:"Product", status:"live",
+      title:"DeFi's UX Disaster Was the Best Education in Product I Ever Got",
+      dek:"MetaMask's seed-phrase screen has probably cost DeFi more users than every scam and hack combined.",
+      body:[
+        "MetaMask's seed phrase screen has probably cost DeFi more users than every scam and hack combined.",
+        "That's not hyperbole. When I was building in DeFi from 2018 to 2024, the single biggest adoption barrier was not volatility, not gas fees, not regulatory uncertainty — it was the twelve-word mnemonic that every new user had to write on a piece of paper and store somewhere they wouldn't lose it. A significant fraction of people who wanted to use DeFi abandoned the onboarding flow at that screen. We had data on this. It was grim.",
+        "The people who designed that screen understood it as a security feature. It is a security feature. It's also a UX catastrophe, because it externalized to the user a burden that the system should have absorbed internally. “Your money, your keys, your responsibility” is a philosophical position. It's also a product position, and as a product position it serves about 2% of the potential market.",
+        "I spent two years specifically on this problem — trying to design onboarding flows that preserved the security properties of non-custodial wallets without requiring users to understand why those properties mattered. Most of the solutions involved tradeoffs that DeFi maximalists rejected on ideological grounds. Most of those maximalists were wrong.",
+        "Here's what I learned: every technology has a complexity budget. The complexity exists — it doesn't go away — but the question is who pays it. If the technology pays the complexity, the user has a smooth experience. If the user pays the complexity, the technology has a small, sophisticated user base.",
+        "DeFi chose to make the user pay, mostly. AI is at exactly this decision point right now. The complexity of model selection, prompt engineering, context management, and output validation is real. Somebody pays it. Most current AI products make the user pay — they surface the model, the parameters, the failure modes. The products that win will be the ones that absorb that complexity entirely and surface only the outcome.",
+        "The DeFi lesson, translated: the products that make users feel powerful without making them feel complicated win. Every time."
+      ]
+    },
+    {
+      slug:"what-i-got-wrong-about-timing", era:"2025h2", period:"2025-11", category:"Reflection", status:"live",
+      title:"What I Got Wrong About Timing",
+      dek:"I spent 2022 convinced I was too early. Being early and being wrong are not the same thing.",
+      body:[
+        "I spent most of 2022 and early 2023 convinced I was too early.",
+        "The AI tools weren't good enough. The enterprise buying cycle for AI-adjacent services was still confused — people wanted demos, not contracts. I kept building things, testing things, and putting them aside because the timing felt off.",
+        "I'd been through a version of this before. In 2018 and 2019, building in DeFi, I had the same feeling. The technology was real but the market wasn't ready. I responded the wrong way then, too — I kept pivoting, kept looking for the version of the idea that the market would receive immediately, rather than building through the timing gap toward the moment when the market would catch up.",
+        "The thing I got wrong both times: being early and being wrong are not the same thing.",
+        "I confused “the market isn't ready” with “my thesis is wrong.” Those are different problems with different solutions. One requires patience. The other requires a pivot. I kept reaching for the pivot when I should have been exercising the patience.",
+        "In practice, watching other people move fast while you're waiting is genuinely hard. You start reading their momentum as evidence that you're wrong. You mistake activity for validation.",
+        "I'm more calibrated about this now. A few things helped.",
+        "One: I started distinguishing between market timing (is the customer ready to buy?) and technology timing (does the tool exist to build what I want?). Those two clocks move independently. The technology clock accelerated dramatically in 2023–2024. The market clock is still catching up.",
+        "Two: I started treating “too early” as a feature when it came to recruiting. People who joined in 2023 had a specific kind of conviction that's rare. They didn't join because it was obvious. That's a better founding team than the one you get when you're the hot thing.",
+        "Three: I gave myself permission to be right on a long timeline. Not infinite. But long. If I'm right about AI and services, the payoff window is a decade, not a cycle.",
+        "I was early in DeFi in 2018. I survived being early. I'm early again. I've stopped minding."
+      ]
+    },
+    {
+      slug:"conviction-is-a-skill", era:"2025h2", period:"2025-10", category:"Operating", status:"live",
+      title:"Conviction Is a Skill",
+      dek:"Conviction isn't a personality trait. It's a skill — and enthusiasm is the counterfeit version.",
+      body:[
+        "Most people treat conviction as a personality trait. You either have it or you don't. You're a believer or you're not.",
+        "I think that's wrong. Conviction is a skill, and like most skills it can be built deliberately.",
+        "When I started building in DeFi in 2018, I had energy and enthusiasm. I called that conviction. But energy and enthusiasm are not conviction — they're just enthusiasm. They evaporate when things get hard, when the first no arrives, when the fourth no arrives, when you read a tweet from someone doing the thing you're doing but with better traction.",
+        "Conviction that comes from enthusiasm is the worst kind. It's load-bearing in good weather and collapses exactly when you need it.",
+        "Real conviction comes from having done the work. Specific work. Not “I believe in DeFi” or “AI is going to change everything” — those are priors, not convictions. Conviction is: I have talked to 60 customers in this specific vertical, I have mapped the unit economics three different ways, I understand why the two competitors who tried this failed, and I still think this is the right thing to build.",
+        "That conviction doesn't evaporate when someone is mean on Twitter. It's not shaken by a competitor announcement. It can be updated — new information that genuinely changes the picture should update it — but it's not fragile.",
+        "Building that kind of conviction takes time and it takes a specific kind of uncomfortable work: the kind where you're genuinely trying to disprove your own thesis, not confirm it.",
+        "I've been in markets — Nairobi, Colombo, Buenos Aires — where the feedback loops are so different from San Francisco that your priors break constantly. That's been the best conviction-building exercise I've found. When your assumptions don't survive cultural translation, what's left is the part that was always real.",
+        "Most founders don't do that work. They search for validation. Validation feels like conviction but it's actually the opposite — it means you haven't tested whether the foundation holds under pressure."
+      ]
+    },
+    {
+      slug:"web3-better-ai-founder", era:"2025h2", period:"2025-09", category:"AI", pinned:true, status:"live",
+      title:"Why Web3 Made Me a Better AI Founder",
+      dek:"Web3 wasn't a failed experiment. It was a six-year crash course in everything AI is about to get wrong.",
+      body:[
+        "The people who dismiss web3 as a failed experiment have learned the wrong lesson from it.",
+        "Web3 wasn't a failed experiment. It was a very expensive crash course in decentralized system design, token economics, cold-start bootstrapping, and the gap between technical elegance and product adoption. The lesson isn't that it didn't work. The lesson is in the specific ways it didn't work, which are directly applicable to what's happening in AI right now.",
+        "Here's what I carried out of six years building in DeFi.",
+        "First: liquidity and adoption are different problems. In DeFi, we called it the liquidity bootstrapping problem — how do you get a market to function before there's enough volume to make it worth using? Every DeFi protocol had to solve this. The solutions ranged from elegant (Uniswap's AMM) to grotesque (yield farming emissions that destroyed token value). The good solutions understood that liquidity and adoption compound differently and require different interventions.",
+        "AI companies have the same problem under different labels. You need enough customers to get good enough to get more customers — the cold start loop. The DeFi playbook here is actually more useful than the standard SaaS growth playbook.",
+        "Second: composability changes everything. In DeFi, the magical thing was that protocols could plug into each other. Aave's lending market could power Yearn's yield optimization. That composability created value that no individual protocol could have created alone. AI models are composable in the same structural way, and most of the interesting products haven't been built yet.",
+        "Third: the best products in DeFi were the ones that absorbed complexity on behalf of the user. MetaMask, for all its UX failures, was a bet that users would tolerate some friction to access the ecosystem. Coinbase's L2 was a bet that they wouldn't. Coinbase was right.",
+        "The same dynamic is playing out in AI. That's why web3 made me a better AI founder. Not the technology — the scar tissue."
+      ]
+    },
+    {
+      slug:"building-in-the-quiet", era:"2025h2", period:"2025-08", category:"Operating", status:"live",
+      title:"Building in the Quiet",
+      dek:"I went quiet for six months. By week eight I was moving faster than I had in a year.",
+      body:[
+        "I went quiet on social media for about six months earlier this year.",
+        "It wasn't a strategy. It was more that I looked up one day and realized I was spending two hours a day managing a narrative about a company that didn't exist yet. Every post was a small performance. Every engagement was a small tax on attention I needed elsewhere.",
+        "So I stopped.",
+        "What happened was interesting. The first two weeks felt like falling behind. I watched people announce things, get featured, accumulate followers, and felt the familiar pull to stay visible, stay relevant, keep the brand warm.",
+        "By week four I had stopped caring. By week eight I was moving faster than I had in months.",
+        "Here's what I think was happening. Public building has real benefits. You get signal, you get distribution, you meet people. But it also creates a subtle pressure to have things worth posting about. And “things worth posting about” and “things worth building” are not the same list.",
+        "I've seen this in every market I've operated in. The founders in Nairobi and Colombo who were building quietly and seriously were almost always further along than their public profiles suggested. The ones performing the startup lifestyle were almost always further behind. The correlation held across cultures and continents. Quiet and serious wins.",
+        "The quiet forced me to optimize for the second list. I talked to customers I would have otherwise emailed. I went deep on problems I would have otherwise summarized in a tweet. I had three conversations that changed how I think about our market, none of which would have happened if I'd been optimizing for content.",
+        "I'm not arguing against building in public. Some people do it well and it's genuinely useful for them. I'm arguing that the right amount of public building is personal, and most people default to more than is right for them because the incentive gradient points that way.",
+        "The quiet was productive. I came back to writing when I had something worth saying. This is that."
+      ]
+    },
+    {
+      slug:"cold-start-in-colombo", era:"2025h2", period:"2025-07", category:"Field notes", status:"live",
+      title:"Cold Start in Colombo",
+      dek:"Andrew Chen's cold-start framework is one of the best in growth. It doesn't account for geography.",
+      body:[
+        "Andrew Chen's cold start problem is one of the best frameworks in growth. The thesis: networked products have a minimum viable network below which they don't work at all, and the existential challenge is getting from zero to that minimum without running out of money or patience.",
+        "What the framework doesn't account for is geography.",
+        "I was in Colombo in 2021 when Sri Lanka's startup ecosystem was going through its own version of the cold start problem — not at the product level, but at the ecosystem level. The country had engineering talent, it had some capital, it had a growing diaspora with network access to global markets. What it didn't have was enough density for the startup network effect to kick in.",
+        "Watching that ecosystem work through its cold start was one of the most instructive experiences I've had. Because the tools that worked weren't the tools that work in San Francisco.",
+        "In SF, the cold start solution is largely media and community — TechCrunch articles, YC batches, Hacker News, Twitter. Credibility travels through those channels. In Colombo, credibility traveled through physical proximity, personal introduction, and track record within specific professional networks (particularly finance and law). A Twitter following meant almost nothing. A recommendation from a senior partner at a specific law firm opened doors that nothing else did.",
+        "The implication: the cold start problem has different solutions in different cultural contexts, and the Silicon Valley playbook — which is almost always the only playbook written about — is solving for one specific cultural context.",
+        "I've now watched ecosystems bootstrap themselves in Colombo, Kathmandu, Nairobi, Accra, and Buenos Aires. Each one had a different minimum viable network. Each one had different credibility mechanisms.",
+        "The most generalized version of the lesson: the cold start problem requires a theory of the specific community you're trying to start. Not a theory of communities in general. Specific. What does trust look like here? How does reputation travel here?",
+        "If you can answer those questions, the cold start problem is solvable everywhere."
+      ]
+    },
+    {
+      slug:"operator-advantage", era:"2025h2", period:"2025-06", category:"Operating", status:"live",
+      title:"The Operator Advantage",
+      dek:"Optimizers ask how to make a workflow faster. Operators ask what breaks when it changes.",
+      body:[
+        "There are two kinds of people building AI companies right now: optimizers and operators.",
+        "Optimizers see a workflow and ask: how do I make this faster, cheaper, more automated? That's a useful question. It produces good software tools. Sometimes it produces great companies.",
+        "Operators see a workflow and ask: who depends on this, what breaks when it changes, and how do I deliver an outcome without blowing up what's already working? That's a different question. It's harder to answer. It requires having been inside organizations, having broken things, having fixed things.",
+        "The optimizer advantage is speed. Fast iteration, fast shipping, fast pivots. Optimizers are overrepresented in early-stage AI right now and they're producing a lot of product.",
+        "The operator advantage is durability. Operators build things that survive contact with the real world because they've seen the real world. They know which customers are telling the truth and which are being polite. They know that enterprise deals take three times as long as the spreadsheet says.",
+        "I came up as an operator — in DeFi, in markets across Africa and Asia, in environments where the failure mode was not “we shipped too slowly” but “we built the wrong thing and committed to it.” That background shapes how I build now.",
+        "The market is overweight on optimizer-founders and underweight on operator-founders. That's partly selection: operators often have more to lose by starting something, so fewer of them do. It's also partly cultural: the startup world celebrates speed and iteration in a way that disadvantages the careful, deliberate, institutional knowledge that operators carry.",
+        "The AI tools that will have the most durable enterprise adoption are the ones built by people who understand what adoption actually requires — which is less about the technology and more about the humans on the other side of it.",
+        "Operators understand those humans. That's the advantage."
+      ]
+    },
+
+    // ---- 2025 · H1 --------------------------------------------------------
+    {
+      slug:"africa-is-a-methodology", era:"2025h1", period:"2025-05", category:"Thesis", pinned:true, status:"live",
+      title:"Africa Is Not a Market. It's a Methodology.",
+      dek:"The word that bothers me is “untapped.” I don't bring frameworks to Africa — I take them out.",
+      body:[
+        "The thing that bothers me about how most Western founders talk about Africa is the word “untapped.”",
+        "Untapped implies the market is sitting still, waiting to be found. It implies a passive resource rather than an active ecosystem. It also implies that the barrier is discovery — that you just need to look — rather than understanding, which is a different and harder problem.",
+        "I've worked with founders and operators across Nigeria, Kenya, Ghana, and Rwanda. These are not untapped markets. They're mature markets with sophisticated users, functioning competition, and deep institutional knowledge about what works in their specific contexts.",
+        "What I've actually found, across four years of working with and investing in African startups, is not an opportunity to bring something to Africa. It's a methodology I've brought back from Africa.",
+        "Nigerian founders are the best I've ever encountered at building in constrained payment infrastructure. The creative workarounds developed for USSD-based transactions and informal agent networks are genuinely sophisticated and directly applicable to any market where the payment layer isn't reliable.",
+        "Kenyan operators have a supply chain intuition that comes from managing logistics across variable road infrastructure, inconsistent last-mile delivery, and intermediary-heavy distribution. That intuition is more useful for building in rural Southeast Asia or parts of India than anything in the standard logistics playbook.",
+        "Ghanaian product teams are remarkable at community-led growth — building product features around social trust networks rather than individual user acquisition. That's not a workaround for a less sophisticated market. It's a more sophisticated growth model.",
+        {t:"quote", text:"I don't bring frameworks to Africa. I take them out."},
+        "The founders who are building globally relevant companies in the next decade will be the ones who stopped thinking of emerging markets as places to expand to and started thinking of them as places to learn from."
+      ]
+    },
+    {
+      slug:"why-i-left-good-career", era:"2025h1", period:"2025-04", category:"Reflection", status:"live",
+      title:"Why I Turned Down the Career That Was Already Mine",
+      dek:"I didn't walk away from something good. I walked away from something safe — three signed offers' worth of it.",
+      body:[
+        "People ask me about this more than almost anything else, and they almost always phrase it as if I left something. I didn't. I turned one down — three times over, in the same season.",
+        "By the end of university I was holding return offers from JPMorgan in London, Bloomberg in London, and Bain & Company in Korea. On paper the decision had been made for me. The smart, safe, parent-pleasing path was sitting right there, signed and waiting, in three different cities I could have happily lived in.",
+        "I remember the specific week I let the last one go. I was in Milan, where the little translation-and-startup agency I'd been running was barely covering rent, with maybe a few thousand euros to my name from that and from websites I built for companies on the side. Declining a salaried offer from a name everyone respects, in that exact financial position, did not feel brave. It felt closer to irresponsible. I did it anyway, and then sat with the nausea of having walked out on an offer my classmates were still grinding to get.",
+        "Here's what I understood even then, in a way I couldn't fully argue out loud. Those jobs were genuinely excellent — I'm not pretending otherwise. But each of them would have spent my most plastic years making me very good at a system someone else had designed. Slowly, the question would have shifted from “what should I build?” to “how do I get promoted inside this?” Those are different questions, and over a decade they produce different people.",
+        "It helped that I'd already seen the other end of the spectrum. By then I'd spent real time around founders in Nairobi, Colombo, and Buenos Aires building things that mattered enormously to the people who used them, with a fraction of the structural support a first-year analyst takes for granted. That contrast did something permanent to my sense of what “good enough conditions to build in” even means. If they could do it with what they had, the story where I take the safe seat first and build later quietly fell apart.",
+        "The honest core of it is less noble than the careers I declined would suggest. I wanted to be in rooms where the decisions I made were the decisions that actually got made. Said out loud that sounds arrogant, and maybe it is. But I think founders who are honest about wanting that have a better shot at building something real than the ones who narrate the whole thing as altruism.",
+        "And I won't pretend the cost was abstract. There were months afterward — still matching wire references off two banks' printouts, watching former classmates post their first analyst bonuses — when the offer I'd declined looked less like an escape and more like a mistake I'd made on purpose.",
+        "I turned it down to find out what I could build. I'm still finding out. That's still the reason."
+      ]
+    },
+    {
+      slug:"non-consensus-and-right", era:"2025h1", period:"2025-03", category:"Thesis", status:"live",
+      title:"Non-Consensus and Right",
+      dek:"Most AI founders build for a $50K/year user in SF. I'm interested in the $5K/year user in Colombo who needs the same outcome.",
+      body:[
+        "Peter Thiel says the only investment question that matters is: what do you believe that most people don't?",
+        "I've been sitting with a version of this question for eight years, since I started building in DeFi when most people thought crypto was going to zero. Not as an investor — as a builder. The question for a builder isn't just “what do I believe?” It's “what do I believe that most builders haven't tried yet, and why haven't they tried it?”",
+        "The answer is usually one of three things: they don't know what you know, they can't do what you can do, or they've decided the risk isn't worth it. Each of those produces a different kind of non-consensus opportunity.",
+        "In 2018, DeFi was non-consensus primarily because most people didn't know what smart contracts were. That information gap has closed. The edge in DeFi now is not knowing about smart contracts — it's product judgment about which applications will actually cross the adoption chasm.",
+        "In 2025, the non-consensus bets in AI are not about AI's existence or capability — they're about applications. Which specific workflow, in which specific vertical, for which specific user, delivered through which specific pricing model, becomes a durable business?",
+        "I've spent time in the field in a way that most AI founders haven't. Not just in San Francisco — in Colombo and Kathmandu and Nairobi and Lagos and ten other places. The non-consensus insight I've developed from that time isn't about AI technology. It's about where the services economy is most ready for AI intervention.",
+        "The highest-leverage application of AI in services isn't in the markets where services are already efficient. It's in the markets where services are inefficient because the human delivery mechanism is expensive or unavailable — which describes most of the world outside OECD countries.",
+        {t:"quote", text:"Most AI founders are building for a $50K/year user in San Francisco or New York. I'm interested in the $5K/year user in Colombo or Nairobi who needs the same outcome — legal advice, financial planning, technical support — and currently has none."},
+        "That's the non-consensus trade."
+      ]
+    },
+    {
+      slug:"reading-the-room-sf-2025", era:"2025h1", period:"2025-02", category:"Field notes", status:"live",
+      title:"Reading the Room: SF in 2025",
+      dek:"I've heard “SF is back” enough times to be suspicious. This year I think it's actually true — for one specific reason.",
+      body:[
+        "I've heard the SF is back narrative enough times that I've become suspicious of it.",
+        "Every year for the past five years, someone credible has written the piece. SF is back. The energy is different. You can feel it.",
+        "This year I think it's actually true, and here's the specific thing that changed my mind: the founders I'm meeting are less interested in being seen and more interested in building. That sounds small. It isn't.",
+        "There was a period — peak 2021 into 2022 — where a meaningful fraction of the startup ecosystem in SF felt like performance. People performed building. They performed raising. They performed the founder lifestyle. The city rewarded the performance.",
+        "What I'm seeing now is less of that. The people who stayed, or who came back, or who arrived for the first time, are here because they want to work on hard problems in proximity to other people working on hard problems.",
+        "I'll add one thing that rarely makes it into the SF is back takes: the diversity of what's being built has gotten better. The 2021 ecosystem was extremely concentrated in crypto and consumer. What I see now is more spread — defense tech, biotech, deep AI infrastructure, climate, B2B. People are working on things that will take a decade to matter.",
+        "I also see more founders who've been elsewhere — who've built in Southeast Asia, in East Africa, in Latin America — and who brought something back. They're not building SF-flavored products for SF-flavored users. They're building things that work everywhere, starting in SF because the capital density is here.",
+        "That's a good environment. Not easy. Good.",
+        "I'm bullish. Cautiously and for specific reasons, but bullish."
+      ]
+    },
+    {
+      slug:"infrastructure-trap", era:"2025h1", period:"2025-01", category:"Thesis", status:"live",
+      title:"The Infrastructure Trap",
+      dek:"A pattern I've watched twice: infrastructure arrives, beautifully funded, before the applications are ready to need it.",
+      body:[
+        "There's a pattern I've watched play out twice now in my career, and I think it's about to happen a third time.",
+        "In DeFi, the most funded projects were infrastructure. Layer-1s, Layer-2s, cross-chain bridges, oracle networks, indexers. The logic was sound: infrastructure is foundational, infrastructure has pricing power, infrastructure compounds. If you build the rails, you capture a percentage of everything that runs on them.",
+        "The problem: infrastructure is hard to build, takes longer than expected to become necessary, and the applications you thought would use it turn out to need something slightly different. The Ethereum bridge wars, the oracle wars, the L2 fragmentation — these weren't failures of technology. They were failures of product-market timing. The infrastructure arrived before the applications were ready to use it.",
+        "We are now in a directly analogous moment in AI.",
+        "The infrastructure layer — foundation models, vector databases, embedding pipelines, fine-tuning infrastructure, inference optimization — is consuming the majority of AI venture investment. The logic is the same: infrastructure is foundational, infrastructure has pricing power, infrastructure compounds.",
+        "The product layer is dramatically underfunded relative to where I think the economic value will eventually settle.",
+        "Here's the mechanism by which this happens: the people with the deepest conviction about an emerging technology are also the people most comfortable working at the infrastructure level. They self-select into infrastructure because it's the work they find most interesting. What they underestimate is time-to-necessary and application-specificity.",
+        "Most infrastructure doesn't become economically essential until the applications that depend on it have reached meaningful scale. The applications take longer than expected to scale. The infrastructure builders, well-funded and technically confident, keep building more infrastructure rather than acknowledging that the adoption constraint is at the application layer.",
+        "I'm building at the application layer. That's not the infrastructure play. It might be a more interesting one."
+      ]
+    },
+
+    // ---- 2024 · Foundation ------------------------------------------------
+    {
+      slug:"kpop-ip-work", era:"2024", period:"2024-12", category:"Product", status:"live",
+      title:"Everyone Thinks K-Pop Sells Music. It Sells a Relationship.",
+      dek:"I went in thinking I was doing entertainment deals. I came out understanding distribution better than any growth playbook later taught me.",
+      body:[
+        "Before crypto, before AI, I spent a stretch doing IP and licensing work adjacent to the K-pop industry. I took the work because it paid and because I had the languages for it. I stayed because it turned out to be one of the most rigorous product educations I’ve ever had — I just didn’t recognize it as one until years later.",
+        "The thing outsiders get wrong about K-pop is that they think the product is the music. It isn’t. The music is the distribution mechanism. The product is the relationship between an artist and a fan, manufactured and maintained at industrial scale with a precision most software companies never approach.",
+        "I watched teams instrument that relationship the way a growth team instruments a funnel — except they’d been doing it, profitably, for a decade before “growth” was a job title in tech. Randomized photocards that quietly turn one album into a set you have to chase. Fan-sign lotteries weighted by how many copies you bought. Comeback schedules timed so attention refills exactly as the last spike decays. None of it was accidental. All of it was designed, and the design was the asset.",
+        "My actual job was in the unglamorous layer underneath: who owns what. IP rights in that industry are a thicket — performance rights, likeness, composition, the rights that attach to a fan-made derivative versus an official one. Sorting through it taught me that in any business built on a creation, the question of who owns the upside is never a footnote. It’s the whole architecture, and the people who treat it as paperwork get quietly extracted from.",
+        "It also gave me an early, visceral feel for parasocial economics — value created by a relationship that one side experiences as personal and the other side operates as a system. I’m wary of the cynical version of that. But the mechanics are real, and you see them everywhere now: creator platforms, community-led crypto projects, the way the best founders build an audience. I’d watched the most sophisticated operators of it years before it arrived in my own industry.",
+        "I don’t want to overclaim. I was junior, I was on the margins of the deals, and a lot of what I “learned” I only understood in retrospect, after I’d seen the same patterns succeed or fail in startups. At the time it mostly felt like contracts and late nights.",
+        "But the core lesson held. I’d walked in thinking who-owns-what was the lawyer’s problem — something to tidy up after the real work was done. It turned out to be the real work. I’ve carried that into every company I’ve built since."
+      ]
+    },
+    {
+      slug:"one-two-year-window", era:"2024", period:"2024-11", category:"Thesis", status:"live",
+      title:"The 1–2 Year Window",
+      dek:"I caught one window, barely — and almost missed it by six months.",
+      body:[
+        "There's a window that opens at the beginning of every technology wave. It closes. The people who build during it get a structural advantage that's almost impossible to replicate after the window shuts.",
+        "I know this because I caught one, barely, and I almost missed it by six months.",
+        "In early 2018 I was trying to decide whether to go deep on DeFi. The technology was real but unproven. The market was tiny. Everyone I respected either hadn't heard of it or thought it was a niche curiosity. The conventional career advice was unanimous: don't bet your prime years on a fringe technology.",
+        "I went in anyway, six months later than I should have. I spent the next six years building in a space that went from fringe to hundreds of billions in TVL. The people who went in six months before me had a material advantage over me. The people who waited until 2020, when it was obviously working, had a material disadvantage. The window was roughly 2017 to 2019. If you were building serious DeFi products in that window, you learned things that couldn't be learned after.",
+        "I see the same window structure in AI services right now. The technology is clearly real. The market is early but undeniable. The conventional advice is still “wait for the dust to settle.” The people who wait for the dust to settle will be building in 2027 and 2028 into a market that has already been shaped by the people who built in 2025 and 2026.",
+        "The window is open. It will not stay open.",
+        "Here's the thing about timing that I've learned: the window feels uncertain from inside it. It only looks obvious from outside, in retrospect. The uncertainty is not evidence that the window doesn't exist. It's evidence that the window is open."
+      ]
+    },
+    {
+      slug:"anthropic-openai-expansion", era:"2024", period:"2024-10", category:"AI", status:"live",
+      title:"What Anthropic and OpenAI's Expansion Tells Us",
+      dek:"When the two most valuable AI companies expanded into services, everyone wrote about it for two weeks. I didn't move on.",
+      body:[
+        "When the two most valuable AI companies in the world both expanded into enterprise services in the same quarter, the startup world spent about two weeks writing about it and then moved on.",
+        "I didn't move on.",
+        "Anthropic and OpenAI are building model companies. Their core business is selling access to intelligence. When companies with that business model start expanding into services — into actually delivering outcomes for enterprise customers, using their own models — it tells you something specific: the model layer alone doesn't capture enough value.",
+        "I've watched this dynamic before. In 2020 and 2021, the leading DeFi protocols started launching their own products — not just infrastructure for others to build on, but interfaces, vaults, strategies. The reason was always the same: pure infrastructure doesn't capture the value it creates. The value accretes to whoever controls the last mile.",
+        "This is also just the history of enterprise technology repeating itself. Oracle didn't stay a database company; it built the applications and the sales force to sell the outcome. AWS didn't stay raw compute; it moved up the stack into managed services where the margin and the lock-in live. Foundation-model companies expanding into services isn't a mysterious contrarian signal — it's the same gravitational pull toward the application layer that every infrastructure business eventually feels.",
+        "In AI, the last mile is the service. The workflow. The outcome. The thing the customer is actually paying for.",
+        "Anthropic and OpenAI moving into services is not a threat to application-layer companies. It's a validation of the thesis that the application layer is where the money is. They're doing it with foundation model companies, which is not the optimal vehicle for it. The optimal vehicle is a company built from the ground up to deliver an outcome in a specific vertical, using AI as the delivery mechanism.",
+        "That's what I'm building. And when the most sophisticated players in the market validate your thesis by trying to enter it with the wrong kind of company, you're in a good position.",
+        "The expansion tells us: the services layer is where AI's economic value concentrates. The companies built specifically for that layer, rather than retrofitted into it, will win it."
+      ]
+    },
+    {
+      slug:"six-dollar-rule", era:"2024", period:"2024-09", category:"Markets", pinned:true, status:"live",
+      title:"The Six-Dollar Rule",
+      dek:"Every good thesis has a number at its center. Mine is six.",
+      body:[
+        "Every good investment thesis has a number at its center. Mine is six.",
+        "For every dollar businesses spend on software, they spend approximately six dollars on the humans who deliver the outcomes that software is supposed to enable. This isn't a new observation — McKinsey and Gartner have versions of it in their enterprise spending analyses — but its implications for AI have not been fully absorbed by the startup ecosystem.",
+        "The AI investment narrative has been overwhelmingly focused on the software dollar. How do you build a better model, a faster inference stack, a more efficient fine-tuning pipeline? These are real questions with real economic answers. The software dollar is real.",
+        {t:"quote", text:"The services dollar is six times bigger and almost nobody is building there."},
+        "I got interested in this ratio through DeFi. In traditional finance, the ratio between the infrastructure layer (exchanges, clearinghouses, settlement systems) and the services layer (advisors, traders, fund managers, analysts) is even more extreme than six to one. DeFi tried to disrupt the infrastructure layer. It largely succeeded. The services layer was largely untouched.",
+        "The same ratio applies in legal, in healthcare, in logistics, in HR, in marketing. Every large B2B category has a software spend and a services spend, and the services spend is reliably larger — often by a factor of five to ten.",
+        "The question I'm answering with my company: what happens to that services spend when AI can deliver the outcome that the service was delivering, at dramatically lower cost, with dramatically more consistency?",
+        "The answer is not “the software companies win.” The answer is “whoever can deliver the outcome owns the spend.” That's not a software company. That's a services company with software-like economics.",
+        "Six is the number. It keeps me oriented when everything else gets noisy."
+      ]
+    },
+    {
+      slug:"operators-vs-optimizers", era:"2024", period:"2024-08", category:"Operating", status:"live",
+      title:"Operators vs Optimizers",
+      dek:"Operators build the machine. Managers run it. AI is minting optimizers and mistaking them for operators.",
+      body:[
+        "I want to be precise about what I mean by an operator, because the word gets used loosely.",
+        "An operator is not someone who runs a business that has already been figured out. An operator is someone who figures out how to run a business — who designs the workflows, builds the team, sets the incentive structures, and iterates until the system produces the outcome reliably. Operators build the machine. Managers run the machine. Those are different skills.",
+        "The distinction matters right now because AI is producing an enormous class of optimizers — people who can take an existing workflow and make it faster, cheaper, more automated. Optimizers are essential. They're also different from operators.",
+        "An optimizer looks at a process and asks: how do I reduce friction here? What's the bottleneck? What can I automate?",
+        "An operator looks at a process and asks: why does this process exist? Who depends on it? What does it need to produce that it isn't producing? What breaks when I change it?",
+        {t:"table", cols:["optimizer","operator"],
+          rows:[
+            ["asks how to reduce friction, where the bottleneck is, what to automate","asks why it exists, who depends on it, what breaks when it changes"],
+            ["answered in weeks","answered in months to years"],
+            ["makes an existing workflow faster","figures out what the workflow should be"],
+            ["essential, and multiplying fast","rare, and worth finding"]
+          ],
+          cap:"Both are essential. The optimizer question is answered in weeks; the operator question takes being inside the system long enough to see what it's actually doing."},
+        "The optimizer question is answered in weeks. The operator question takes months to years to answer properly, and it requires being inside the system long enough to understand what it's actually doing versus what it appears to be doing from the outside.",
+        "Building in DeFi was an operator education. You couldn't understand DeFi by looking at the code. You had to understand the incentive structures, the liquidity dynamics, the user behaviors that emerged from those incentives. Those were not visible at the protocol layer. They were visible only through operating — through watching what happened when you deployed something into the system and observed what users actually did with it.",
+        "Building across markets in Africa and Asia was the same education in a different domain. You couldn't understand the growth dynamics in Nairobi by reading a report. You had to be there, operating, watching, iterating.",
+        "Operators are the people who've done that. They're rare. They're worth finding."
+      ]
+    },
+    {
+      slug:"founder-mode-vs-operator-mode", era:"2024", period:"2024-06", category:"Operating", status:"live",
+      title:"Founder Mode vs Operator Mode",
+      dek:"Founder mode is right early. Its failure condition is staying in it six months too long.",
+      body:[
+        "Paul Graham's essay on founder mode versus manager mode describes something real, but I think it understates the cost of staying in founder mode too long.",
+        "Founder mode — being in the details, talking to customers directly, setting context for every important decision — is right in the early stages. It's the only way to build conviction about what you're building and for whom. Without it, you end up with a company that's executing efficiently toward the wrong goal, which is a worse failure mode than executing slowly toward the right one.",
+        "But founder mode has a failure condition too: it doesn't scale, and founders who don't exit it at the right moment build companies that can't survive without them.",
+        "I've watched both failure modes across different markets. In SF, the failure mode I see more often is premature professionalization — founders who hire managers and remove themselves from the details before they've understood the details well enough to set the right constraints. The company looks professional. It executes toward the wrong goal.",
+        "In the markets I've operated in internationally, the failure mode is often the opposite: founders who can't exit founder mode because they never hired people capable of operating at the required level, so they remain the bottleneck forever.",
+        "The resolution isn't “founder mode is right” or “operator mode is right.” It's that the transition between them is a specific skill, and most founder education either ignores it or treats it as binary.",
+        "What I've found works: stay in founder mode on the things that define the character of the company — the customer relationship, the product direction, the culture — and exit founder mode specifically and deliberately on everything else. Not all at once. Piece by piece, as you find people capable of operating each piece at the required level.",
+        "The goal isn't to get out of the details. It's to be in the right details."
+      ]
+    },
+    {
+      slug:"polyglot-advantage", era:"2024", period:"2024-05", category:"Reflection", status:"live",
+      title:"The Polyglot Advantage",
+      dek:"I've pitched in seven countries. The edge isn't language — it's holding enough cultural models to see structure, not surface.",
+      body:[
+        "I have given a pitch in seven different countries. I have eaten breakfast with potential investors in Colombo, lunch with product advisors in Nairobi, and dinner with engineers in Buenos Aires — sometimes in the same week. I have navigated professional negotiations in cultural contexts where the word “no” is never said directly, and contexts where “maybe” means “no” and “yes” means “maybe.”",
+        "This is not a flex. It's a capability that took years to develop and is genuinely undervalued in the startup world.",
+        "The polyglot advantage isn't about language, though language helps. It's about having enough cultural models in your head simultaneously that you can identify the structural features of a situation — what kind of trust dynamic is at play, what's the actual information being exchanged, what does the person across the table actually need — rather than pattern-matching on the surface-level features.",
+        "Most founders operate from one cultural model. Not because they're incurious — because they haven't been forced to build others. If you grow up in one country, go to university in one country, work in one country, your model of “how things work” is very thick in one place and very thin everywhere else. That thickness is efficient in a single context. It's a liability in multiple ones.",
+        "I didn't choose to build multiple models — I was raised inside them. I grew up in international schools across Guangzhou, Cairo, and Seoul, moving cities roughly every other year. China and Egypt between 2006 and 2014 weren't backdrops; they were the two fastest-changing economies I would ever stand inside, and I watched the gap between who was capturing that growth and who was being left behind widen in real time, right up until my family moved to Los Angeles. By the time I was a teenager I had already learned, the hard way, that the rules of one classroom didn't transfer to the next country — and that the kids who assumed they did were the ones who struggled most.",
+        "Later I made the bet deliberately. I went through the World Bachelor in Business as part of its second cohort — a program that moves the same group of students through USC, Bocconi, and HKUST, a continent a year, compressing a full four-year business curriculum into the single year you spend in each country. You come out with three separate BBAs from three universities on three continents. The triple credential was never the point. The point was that I had to actually function — academically, socially, commercially — in Los Angeles, then Milan, then Hong Kong, back to back, with no year anywhere to settle in and let my assumptions harden.",
+        "And I didn't just study in each city; I built in each one. In Los Angeles I ran a model agency out of Hollywood. In Hong Kong I worked inside a VC portfolio. In Milan I ran two things at once — sourcing startups and a translation-and-pitching agency that connected Korean and Chinese startups and brands into Italian and broader European markets. Which is to say I was doing cross-border arbitrage on talent and demand, 0-to-1, before I had a word for it. You don't come out of four years like that with a single “home market.” You come out with a permanent suspicion of anyone who has one.",
+        "These days home is less a city than a circuit — Hong Kong, Seoul, San Francisco, Singapore, Buenos Aires, with regular loops through London and New York. Part of my family moved to Argentina in 2021, so Buenos Aires isn't a research trip for me; it's where I've watched people I love price their groceries in a currency shedding a third of its value a year, and adapt with a sophistication that no stable economy ever forces you to develop. That sounds like a lifestyle. It's actually a research method. Every leg recalibrates assumptions that had quietly hardened into facts somewhere else.",
+        "I've built in ten countries across four continents. The model-building was uncomfortable and often humbling — there were markets where my assumptions about user behavior were wrong in ways I didn't detect until I'd wasted months. But the accumulation of those corrections has produced something useful: a sensitivity to the difference between “this is how things work” and “this is how things work here.”",
+        "One concrete application: user research. I've watched SF founders conduct user interviews in Nairobi, translating their interview frameworks directly from the cultural context in which those frameworks were developed. The interviews produce data. The data is wrong — not because the users lied, but because the frame produced answers that map to the frame rather than to reality.",
+        "Different data means different product decisions. Different product decisions, compounded over time, mean different companies."
+      ]
+    },
+    {
+      slug:"letter-to-pre-founder-self", era:"2024", period:"2024-04", category:"Reflection", status:"live",
+      title:"Letter to My Pre-Founder Self",
+      dek:"You'll spend six months on the deck before talking to customers. Don't. Own the background — it's the thing nobody else has.",
+      body:[
+        "You're going to spend six months optimizing the pitch deck before you talk to customers. Don't.",
+        "Talk to customers first. Talk to them before you have slides, before you have a product, before you have a name. Especially before you have a name — the name will make you feel like something is real, and that feeling will make you more interested in protecting the idea than in testing whether it's right.",
+        "The conversations you're afraid of — the ones where you show up without anything and just ask questions — those are the most valuable ones you'll have. The customer who tells you that your initial premise is slightly wrong is more useful than the ten who nod politely at your deck.",
+        "You're also going to overestimate how much other people care about your company. They mostly don't. This is freeing once you accept it.",
+        "On co-founders: the right co-founder is someone who makes you more yourself, not someone who fills in a skills matrix. Skills can be hired. The thing that's hard to hire is someone who believes what you believe about the problem, has complementary judgment, and will still be honest with you after you've both been awake for thirty hours.",
+        "You will think about quitting more often than you expect. This is not a sign that you're wrong. It's a sign that you're paying attention.",
+        "One more thing, specific to you: stop pretending the work you did in DeFi and in Nairobi and in Colombo is a detour. It's not a detour. It's the thesis. The person who's been technical enough to read a smart contract, experienced enough to know what a market looks like before it works, and humbled enough by operating in genuinely hard conditions — that's the person who builds a company that lasts.",
+        "And go back further than DeFi. Your first project wasn't a company — it was a classical-music album you produced and funded to stand up an orphanage in a rural Cambodian town. You didn't call it entrepreneurship; you called it the thing in front of you that obviously needed doing. But it was the same muscle you use now: see a gap nobody is serving, assemble the people and the money to close it, and ship something real that outlives the moment. You've been doing this since long before you had a deck.",
+        "Own the background. It's the thing nobody else has.",
+        "One last thing: be specific. Your instinct will be to stay general because general feels safer. It isn't. General means you're competing with everyone. Specific means you know something others don't.",
+        "Know something they don't."
+      ]
+    },
+    {
+      slug:"kathmandu-engineering-culture", era:"2024", period:"2024-03", category:"Field notes", status:"live",
+      title:"What Kathmandu Taught Me About Engineering Culture",
+      dek:"There's an engineering culture in Kathmandu the tech press has entirely failed to describe. I've hired from it three times.",
+      body:[
+        "There is an engineering culture in Kathmandu that the global tech press has almost entirely failed to describe.",
+        "I don't mean this as a criticism — there are obvious structural reasons why Kathmandu doesn't appear in TechCrunch. But the absence creates a gap between what actually exists there and what most people in SF imagine when you say “Nepali engineers.” The gap is large and the gap is costly.",
+        "I should say how I got close enough to see any of this. I didn't arrive in Nepal as a recruiter. I first came years earlier for humanitarian work — orphanage projects that took me across Nepal, Cambodia, and Mongolia, and later anti-human-trafficking efforts that ran along the Nepal–India border. That work takes you through parts of a country that never appear in an investor memo. So by the time I was hiring engineers in Kathmandu, Nepal wasn't a line on an emerging-markets slide to me. It was a place I already knew at ground level, which is a very different starting point for judging talent.",
+        "What exists: a deep culture of engineering discipline that comes partly from the constraints of operating in a developing infrastructure context, partly from a rigorous university system that selects hard on fundamentals, and partly from a diaspora feedback loop — Nepali engineers who've worked in the US, the UK, and Australia who return or remote-in and bring back standards alongside capital.",
+        "What I found specifically: an unusually high density of engineers who are good at holding complexity. Systems that would be modular in an SF codebase are often monolithic in Kathmandu, not because the engineers don't know better but because they're working in contexts where the operational overhead of distributed systems is prohibitive. The result is engineers who deeply understand the full stack — who can reason about a codebase from database schema to UI rendering without losing the thread.",
+        "This is a specific and rare skill. In SF, specialization is so deep that most engineers have narrow horizontal slices of the stack and very little vertical depth. The Kathmandu engineers I've worked with have the opposite profile.",
+        "There are also real constraints: the power grid is unreliable enough that uninterruptible power supply is a legitimate engineering concern, not just a data center problem. Connectivity is inconsistent. Hardware procurement takes longer. These constraints produce engineers with a different relationship to robustness and fault tolerance than engineers who've only built in environments with reliable infrastructure.",
+        "I've hired from Kathmandu three times. The return on that work has been among the highest of any hiring I've done anywhere."
+      ]
+    },
+    {
+      slug:"bitcoin-early-what-it-taught", era:"2024", period:"2024-02", category:"Reflection", status:"live",
+      title:"What Buying Bitcoin Early Actually Taught Me — and It Wasn’t the Money",
+      dek:"I bought early, sold too soon, and made nearly every mistake on the list. Early is repeatable. Smart is not.",
+      body:[
+        "I bought my first Bitcoin in 2017, the year before I ever wrote a smart contract. I’d love to tell you it was a thesis-driven bet by someone who saw the future. It wasn’t. I was curious, I was young, and the amount was small enough that losing all of it wouldn’t have hurt.",
+        "I also sold most of it far too early, bought back higher, panicked through one crash, and got bored during another. If you handed me the list of classic mistakes early holders make, I made most of them. So when I say buying early taught me something, I don’t mean it made me rich and wise. Mostly it made me humble.",
+        "The first real lesson was emotional, not financial: being early feels identical to being wrong, and it stays that way for a long time. For years, holding Bitcoin meant being the person at dinner who had to explain why they owned “internet money,” usually badly. There is no scoreboard inside the early window. If you need one, you’ll sell — I almost did, repeatedly.",
+        "The second lesson took longer. I’d quietly conflated the price with the point. It took watching the price swing by absurd multiples to understand that the price was the least interesting thing about it — that what mattered was a working system for trustless value transfer, and that the system kept working whether the chart was green or red. Separating the asset from the technology, the narrative from the mechanism, is the single most useful habit I carried into DeFi and later into AI.",
+        "The third lesson was about me. My conviction was fragile when it was tied to my P&L and durable when it was tied to whether the thing actually worked. The early Bitcoin years were where I first felt that difference in my own body, well before I could put words to it — long before I understood that conviction is a skill rather than a mood.",
+        "That slow education eventually turned into something more structured. The clumsy spot buying became derivative and index strategies across BTC, ETH, and the other blue-chip assets — and, later, backing VegaX Holdings, where that kind of work gets done at an institutional level. None of it came from being right about price. It came from the one habit the early years drilled in: separate the working system from the number attached to it, and size your conviction to the first, never the second.",
+        "I won’t pretend the financial outcome didn’t matter; it bought me a little runway and optionality I’m grateful for. But if the money had been all I got, it might have been the worst thing that could have happened to me — I’d have learned that I was smart, when the truer lesson was that I’d been early. Early is a process you can repeat on purpose. “Smart,” in the way a rising chart briefly tells you that you are, is not.",
+        "So I try to stay early now, deliberately. It still feels exactly like being wrong. I’ve stopped expecting it to feel like anything else."
+      ]
+    },
+    {
+      slug:"angel-investing-in-accra", era:"2024", period:"2024-01", category:"Field notes", status:"live",
+      title:"Angel Investing in Accra",
+      dek:"The first check I wrote in Ghana would never have survived a typical IC memo. Three of six are performing — a lower failure rate than my SF book.",
+      body:[
+        "The first check I wrote in Ghana was to a company building trade finance infrastructure for small importers who couldn't access the formal banking system for letters of credit.",
+        "It was not the kind of deal that makes it into the IC memo of a typical venture firm. The market size slide would have been hard to defend. The comparable transactions column would have been thin. The founders weren't YC alumni. The product wasn't SaaS.",
+        "But the unit economics were extraordinary, the founders understood their customers with an intimacy that I've rarely seen in any market, and the problem — small importers frozen out of the formal credit infrastructure — was both real and large in a way that no amount of slide optimization could misrepresent.",
+        "I wrote the check.",
+        "Angel investing in West Africa has forced me to develop a different evaluation framework than the one I use in SF. The standard VC checklist — market size, team background, traction comps, comparable fundraises — is built for a market with abundant comparable data. Ghana doesn't have that data. Comparable transactions in formal VC are thin. Market sizing is harder because much of the activity is informal.",
+        "What I've learned to evaluate instead: the density of the founders' customer knowledge, the quality of the informal network they're embedded in, the specific insight that lets them see the opportunity that outsiders can't, and the operational capability to build something in a context where the infrastructure you'd take for granted in SF doesn't exist.",
+        "That evaluation framework is harder to systematize and much better at finding companies that survive.",
+        "There's a straight line, for me, from the first thing I ever funded — an orphanage in rural Cambodia — to the checks I write in Accra now. Both come from the same refusal to accept that where a person happens to be born should cap what they're allowed to build. The difference is what I've learned in between: charity treats the symptom, and a well-placed check treats the cause. A check backs someone who will go on to employ, train, and compound value in a place the formal system wrote off. When that option exists, I'd rather take it.",
+        "Three of the six checks I've written in Accra and Lagos are performing. One is outstanding. The failure rate is lower than my SF portfolio, which is a finding I can't fully explain but that I've stopped trying to explain away."
+      ]
+    },
+
+    // ---- 2023 · Earliest takes --------------------------------------------
+    {
+      slug:"abstraction-keeps-moving", era:"2023", period:"2023-12", category:"AI", status:"live",
+      title:"From Smart Contracts to LLMs: The Abstraction Keeps Moving",
+      dek:"In 2018 I wrote Solidity. By 2024, natural language against LLMs. The abstraction keeps moving up — and so should you.",
+      body:[
+        "In 2018 I wrote smart contracts in Solidity. By 2022 I was writing mostly in Python against smart contract interfaces. By 2024 I'm writing in natural language against LLM interfaces.",
+        "This is not an accident. It's a pattern.",
+        "Every technology wave moves the abstraction layer upward. The people who were writing machine code in 1975 didn't disappear when high-level languages arrived — some of them became extremely valuable because they understood what was happening underneath the abstraction. But the center of gravity of where productive technical work happened moved up.",
+        "The same thing is happening with AI, and it's happening faster than any previous abstraction shift I've seen. The center of gravity is moving from “write the code” to “design the system” to “specify the outcome.” The people who understand all three layers will be the most valuable builders for the next decade. The people who understand only the top layer will be cheap and plentiful within a few years.",
+        "What I took from six years of writing smart contracts: a detailed understanding of what happens when you delegate trust to a system — what the failure modes are, where the assumptions break down, what the system can't know and therefore can't do correctly. LLMs have analogous properties. They're better understood by people who've worked with trustless systems, because the failure modes rhyme: hallucination in LLMs rhymes with oracle failure in DeFi, context window limits rhyme with callstack depth limits, alignment problems rhyme with incentive misalignment in token economics.",
+        "The abstraction keeps moving. The people who build well at multiple layers of the same technology stack — not just the current top layer — are the ones who will still be building well when the abstraction moves again.",
+        "I've tried to stay technical through each shift. It gets harder. It gets more valuable."
+      ]
+    },
+    {
+      slug:"one-of-the-first-nft-projects", era:"2023", period:"2023-11", category:"Product", status:"live",
+      title:"I Helped Power One of the First NFT Projects. Most of What I Believed Was Wrong.",
+      dek:"The technology was real. Almost every use case I was excited about wasn’t. Telling those two apart turned out to be the entire skill.",
+      body:[
+        "I was involved early — embarrassingly early, by current standards — in one of the first waves of NFT projects: CryptoKitties, in the stretch when it single-handedly congested the entire Ethereum network, plus a handful of others from that same wave that have since vanished so completely they don’t even have a working website anymore. I worked the technical and coordination side — the contract mechanics, the mint, and the community that formed around it. And looking back, most of what I confidently believed at the time was wrong.",
+        "Here’s what I believed: that NFTs would reorganize digital ownership across the internet within a couple of years; that the use cases I was excited about — art provenance, in-game assets, identity — were all roughly equally close; and that the early prices were signal. I held all three with real conviction.",
+        "Here’s what was actually true. The underlying primitive — verifiable, transferable digital ownership — was real, and it still is. But almost none of the specific applications I was most excited about were close, and the prices were mostly noise, produced by speculation flooding in faster than real usage could form underneath it.",
+        "The most valuable thing I worked on wasn’t the asset. It was the coordination layer — the community, the shared incentive to show up, build, and hold. When that was genuine, the project survived things that should have killed it. When it was manufactured to pump a price, it evaporated the instant the price did. I’ve never seen a cleaner natural experiment in what is and isn’t a real network.",
+        "The hard skill the whole experience drilled into me is separating a real technical primitive from the speculative story wrapped around it. Both things can be true at once: the primitive is genuinely important and the current application of it is mostly nonsense. Most people pick a side — “it’s all a scam” or “it’s all the future” — because holding both is uncomfortable. Holding both is the job.",
+        "I got the timeline wrong, I got specific bets wrong, and I held some convictions long after the evidence stopped justifying them. I’m not proud of all of it. But being wrong in public, early, with my own time and reputation on the line, taught me more than any amount of being right in theory ever could.",
+        "I think about it constantly in AI now, where the same dynamic is running ten times faster: a primitive that’s obviously real, wrapped in a thousand stories that mostly aren’t. The NFT years are why I try to ask, every single time, “which part of this is the technology, and which part is the narrative renting space on top of it?”"
+      ]
+    },
+    {
+      slug:"services-economy-southeast-asia", era:"2023", period:"2023-10", category:"Markets", status:"live",
+      title:"The Services Economy Southeast Asia Is Quietly Building",
+      dek:"There's a services economy in Southeast Asia that's, in important ways, more sophisticated than the one it's supposedly catching up to.",
+      body:[
+        "There's a services economy emerging across Southeast Asia that is, in important ways, more sophisticated than the one it's supposed to be catching up to.",
+        "This sounds wrong. It feels wrong. Per-capita income figures make it feel wrong. But per-capita income measures the wrong thing if what you're trying to understand is the structure and sophistication of the services market.",
+        "What I've seen specifically in Indonesia, Vietnam, and the Philippines: a generation of services businesses built on top of mobile-first infrastructure, serving customers who skipped the desktop era entirely. These businesses have user experiences, pricing models, and delivery mechanisms that were designed for the actual user — not the theoretical Western user that the Silicon Valley model imagines.",
+        "Gojek's expansion from ride-hailing into a full-stack services super-app isn't a Southeast Asian version of something that exists in the West. It's a genuinely novel architecture for services delivery that doesn't have a clean Western analog. The reason it works there isn't that Southeast Asia is unusual. It's that the platform was built without the legacy constraints — desktop software, call centers, franchise models — that forced Western services businesses into the shapes they're in.",
+        "The AI opportunity in Southeast Asia isn't “take what works in SF and localize it.” It's “find the services architectures that emerged from mobile-first constraints and figure out what they look like with AI on top.”",
+        "That's a different research agenda than most AI founders are pursuing. It requires being in the market, talking to the operators, understanding the constraints that shaped the current architecture. It can't be done from Sand Hill Road.",
+        "I've been doing it for two years. The view from inside is different from the view from outside."
+      ]
+    },
+    {
+      slug:"scammed-into-cbdc", era:"2023", period:"2023-09", category:"Reflection", status:"live",
+      title:"I Got Scammed Into a CBDC Project. The Part I’m Not Proud Of Is Why I Fell For It.",
+      dek:"It had the logos, the language, and the credentials. It had almost nothing real underneath. I wanted it to be real, so I didn’t look hard enough.",
+      body:[
+        "Early in my crypto years, before I knew enough to be properly skeptical, I got pulled into what was presented as a central bank digital currency project. It had institutional language, impressive-sounding partners, and people with serious-looking credentials in the room. It turned out to be, at best, vaporware — and at worst a vehicle for separating credulous people from their money and their time. I was one of the credulous people. It cost me around $10,000 — which doesn’t sound like much until you know it was most of what I had at the time. That money was hard-won: built fresh out of university from a live-translation and startup agency I ran between Italy, China, and Korea and from websites I freelanced on the side, after turning down return offers from JPMorgan in London, Bloomberg in London, and Bain & Company in Korea to fund a founder’s life instead. Losing a chunk of it to a deck and a set of logos stung accordingly.",
+        "The whole pitch ran on borrowed gravity. Good chairs in a good room, the kind with a glass wall and a view that does half the convincing for you. A deck with an official-looking seal a few slides in. A man who’d “advised on monetary policy” somewhere, naming institutions the way other people name old friends, letting each one hang in the air for a second too long. Nobody ever actually said a central bank had endorsed the thing — they just stood close enough to the words that my own brain filled in the endorsement for free. I walked out of that first meeting feeling like I’d been quietly let in on something serious and early. That feeling is the entire product a scam like this sells.",
+        "I’ve thought a lot about why I fell for it, and the honest answer isn’t flattering. It wasn’t that the scam was sophisticated. It was that it came wrapped in exactly the signals I’d been trained to trust — institutional affiliation, regulatory vocabulary, the gravity of the words “central bank.” I was a fresh graduate who had just walked away from JPMorgan and Bain precisely because I thought I could read the real thing better than a salaried seat would let me. The irony wasn’t lost on me later: I’d turned down the institutions and then handed my savings to a man who was merely dressed as one.",
+        "The unraveling wasn’t dramatic. There was no dramatic exit, no overnight disappearance — just a slow accumulation of questions that never quite got answered. A demo that was always two weeks out. A “partner” who, when I finally reached someone there directly, had no idea what I was describing. A technical explanation that retreated one level deeper into vocabulary every time I pushed on it. One ordinary morning I simply understood there was nothing underneath, and that some part of me had known for a while and hadn’t wanted to.",
+        "The lesson, which I’ve never let go of, is how cheaply legitimacy can be manufactured. Logos, titles, jargon, and a confident deck are inexpensive to assemble, and they reliably switch off the skepticism of intelligent people — especially intelligent people who want the thing to be real. A CBDC project sounds too official to be a scam. That feeling is precisely the attack surface.",
+        "What I should have done was simple and unglamorous: ignore the signals and look for the substance. Is there working code? Is there a real counterparty with something to lose? Can anyone in the room explain the mechanism without retreating into vocabulary? Real projects answer those questions immediately. Theater can’t, and it tends to get irritated when you ask.",
+        "I’m not proud of having been fooled. For a year I barely told anyone. That’s probably why it stuck — a lesson you’re too embarrassed to repeat is one you don’t get to forget, in a way a lesson you only read about never is.",
+        "It permanently changed how I evaluate anything, including my own deals. When something is dressed in borrowed institutional credibility, I now treat that as a reason to look harder, not a reason to relax. The more official it sounds, the more I want to see the boring evidence that something real is genuinely being built.",
+        "It’s also why I’m careful, on the other side, never to let Oriya or anything I build coast on borrowed legitimacy. If the substance isn’t there, the logos are just a more expensive way to lie. I learned that the cheap way — by being on the wrong end of it."
+      ]
+    },
+    {
+      slug:"colombo-kathmandu-ecosystems", era:"2023", period:"2023-08", category:"Field notes", status:"live",
+      title:"Colombo and Kathmandu: The Startup Ecosystems Nobody's Writing About",
+      dek:"Two cities, back to back, to see what's actually building. The story I found was more interesting than the one I expected.",
+      body:[
+        "In 2021 I was in Colombo for a month and Kathmandu for three weeks, back to back, specifically to understand what was building in each city.",
+        "The story I expected: scrappy local founders building local-market solutions with limited ambition and limited capital. The story I found: something more interesting and more complicated.",
+        "In Colombo: a startup ecosystem shaped almost entirely by the diaspora feedback loop. The Colombo founders I met had often spent time in Singapore, London, or Sydney. They came back with capital connections, with a higher reference point for what “product quality” means, and with a specific frustration — they'd seen how problems that existed in Colombo were solved elsewhere, and they'd come back to solve them at home. The best founders in that ecosystem are building for global markets, not just local ones, because their reference class is global.",
+        "In Kathmandu: something different. An ecosystem driven less by diaspora return and more by remote work enabling local accumulation. Nepali engineers who built careers at Western companies while living in Kathmandu, who then had both the capital and the confidence to start something local. The companies coming out of this ecosystem are more technical, less polished on the product side, and solving problems at the infrastructure layer that are interesting everywhere, not just in Nepal.",
+        "The common thread: both ecosystems are producing founders who understand constraint in a way that founders who've only built in abundant markets don't. Constraint is a design tool. Building in constrained environments produces different instincts than building in abundant ones, and those instincts are valuable wherever the builder ends up.",
+        "Both cities are five years behind where they’ll be in ten years. I’d rather be paying attention now."
+      ]
+    },
+    {
+      slug:"fintech-in-bank-queues", era:"2023", period:"2023-07", category:"Fintech", status:"live",
+      title:"I Was the Manual Version of Every Fintech App You Use",
+      dek:"Moving my own money across continents used to take days and a physical line. That friction turned out to be the best fintech education I could have had.",
+      body:[
+        "Wise was still called TransferWise. Revolut was a few engineers and a pitch deck. N26 didn’t have a banking license yet. And I was already a power user of cross-border money movement — not because I was sophisticated, but because I had no choice.",
+        "I grew up moving between continents, which meant money had to move with me. Tuition due in one country, an allowance wired from another, a freelance payment landing in a third, a bank account that worked perfectly in the city I’d just left and was useless in the one I’d just arrived in. Before the apps existed, there was no clean layer over any of this. There was just me, a stack of currencies, and a set of banks that did not want to talk to each other.",
+        "I have stood in line inside a Banco Popolare branch in Milan for most of a day in 2016 to claim a wire the system swore hadn’t arrived, then gone back the next morning to do it again. A year earlier I’d sat across from a teller at a Bank of America in Los Angeles, reconciling a transfer by hand, matching reference numbers off a printout, because the money had technically landed but attached itself to nothing. Somewhere in those queues I learned what a SWIFT reference actually is, what an intermediary bank quietly does to your funds in transit, why the same transfer costs wildly different amounts depending on a routing decision you never see — once, €140 of a wire simply vanished into intermediary-bank fees before it reached me — and how many business days “instant” can secretly mean.",
+        "So I got resourceful in the specific way you do when the official path is broken. I tracked which banks in which countries cleared faster. I learned which currencies to hold and when to move them. I was an early, eager user of every new player the week it launched — TransferWise in its early days, when it still felt like a clever workaround you had to trust; Revolut the moment it opened to my country; every multicurrency card and neobank after — because each one shaved a real cost or a real day off a problem I was living, not reading about.",
+        "That’s what stuck. I never learned fintech as a category to invest in — I learned it as a set of frictions I felt in my own week, in three currencies, with my own money on the line. When the neobanks finally arrived, I understood exactly which friction each one was killing and which they were quietly leaving in place — because I had been the manual version of the feature they were automating.",
+        "People who study fintech as a market and people who first meet it as their own logistics problem read the products completely differently. TransferWise existed because two friends in London were quietly bleeding money every month swapping pounds and euros through their banks, and built a way to net the swap out directly. I’d had that same annoyance earlier, in three currencies instead of two — so when a neobank finally shipped, I wasn’t evaluating it. I was checking whether it killed a problem I’d been doing by hand.",
+        "I don’t want to romanticize it. A lot of it was simply tedious, and I’d have traded the “education” for a working app in a heartbeat. But you don’t get to choose your training data. Mine happened to be years of pushing money through a system that didn’t want to cooperate, across borders, before the tools existed. It’s why I can read a payments product in about ten seconds, and why I have so little patience for fintech that adds a layer of polish without removing a layer of friction.",
+        "The apps fixed the problem I grew up inside of. I’m genuinely grateful for them — and I still, reflexively, check how long the money will actually take to land."
+      ]
+    },
+    {
+      slug:"talent-premium-mispriced", era:"2023", period:"2023-06", category:"Talent", status:"live",
+      title:"The Talent Premium Is Mispriced",
+      dek:"Colombo, 11pm: a room as sharp as San Francisco, priced at a quarter.",
+      body:[
+        "Colombo at 11pm on a Wednesday: a group of engineers working on a DeFi protocol, one of them just off a call with a VC in Palo Alto, another simultaneously debugging a smart contract and teaching their junior colleague about MEV. The room is sharp, competitive, and cheaper by a factor of four than an equivalent room in San Francisco.",
+        "I've been in rooms like this in Colombo, in Kathmandu, in Lagos, in Accra, in Tbilisi, in Buenos Aires. The talent is there. The mispricing is dramatic.",
+        "The standard counterargument is timezone. It's a real constraint. But it's a constraint that scales poorly as a reason not to hire — because the friction of async work with a brilliant engineer in Kathmandu is lower than the friction of working with a mediocre engineer in your timezone. Most people making the timezone argument have never actually managed a high-performing distributed team. They're modeling a failure mode they haven't tested against the upside.",
+        "The second counterargument is communication. Also real. Also frequently overstated. The engineers I've worked with in Sri Lanka and Nepal speak more precise English than most of the engineers I worked with in San Francisco — because precise English is something you have to deliberately learn and practice, rather than something you absorb ambient.",
+        "What's actually happening is a combination of perception lag and search cost. The venture-backed startup ecosystem runs on networks, and the networks are concentrated in a handful of cities on two coasts. If you're not in those networks, you don't get considered for the competitive roles, regardless of ability.",
+        "What these engineers share, across countries, is something you can't hire for in SF at any price: the experience of building for constraints. Constrained compute. Constrained connectivity. Constrained payment infrastructure. Builders who've shipped in those conditions have a different relationship with product tradeoffs than builders who've only shipped in abundance.",
+        "This isn't a detached arbitrage observation for me. I grew up watching the other side of it — in Guangzhou and Cairo, where extraordinary growth was being captured by some people and routed entirely around others, often the most capable ones in the room. So the mispricing of talent doesn't read to me as a clever inefficiency to exploit; it reads as the thing I most want to break. Technology is the only lever I've found that closes that gap fast enough to matter: you can route capital, work, and opportunity to a brilliant engineer in Kathmandu or Accra in a way the old institutions never could. That's most of why I build, and most of why I invest where I do.",
+        "The talent premium is mispriced. The founders who figure this out in the next three years will have a structural advantage that the ones still hiring exclusively in San Francisco will spend a decade trying to close."
+      ]
+    },
+    {
+      slug:"on-seeing-what-others-miss", era:"2023", period:"2023-04", category:"Thesis", status:"live",
+      title:"On Seeing What Others Miss",
+      dek:"Seeing what others miss isn't about intelligence. It's about position — where you're standing when you look.",
+      body:[
+        "I used to think that seeing what others miss was about intelligence. The smarter you are, the earlier you see things.",
+        "I've updated this significantly. Seeing what others miss is mostly about position. Where you are standing when you look at something determines what you can see.",
+        "In 2018, the reason I saw DeFi clearly and most people didn't wasn't that I was smarter than them. It was that I was standing in a different place. I had a technical background that let me read smart contracts, a finance background that let me understand what the contracts were doing, and a product background that let me evaluate whether what they were doing was something users would care about. Most people had one or two of those backgrounds. Having all three made the opportunity visible from where I was standing.",
+        "The same thing has happened in every market I've operated in. In Nairobi, what I saw wasn't visible to people who'd only built in San Francisco, because the San Francisco frame made it look like a smaller, less efficient version of a market they already understood. From where I was standing — having built in DeFi, having thought about constrained infrastructure, having watched informal economies function — I saw something different.",
+        "This is the argument for doing things that feel laterally unrelated to your main thesis. Building in DeFi made me better at seeing AI. Spending time in Nairobi made me better at seeing growth. Working with engineers in Kathmandu made me better at evaluating talent. The positions accumulate and they produce a vantage point that can't be replicated by people who've only been in one place.",
+        "The question I ask myself regularly: am I standing somewhere that lets me see what others can't? If not, I need to move."
+      ]
+    },
+    {
+      slug:"country-i-explained", era:"2023", period:"2023-02", category:"Reflection", status:"live",
+      title:"The Country I Used to Have to Explain",
+      dek:"I grew up introducing Korea to people who asked if I meant the North. I learned growth watching a skyline — and a brand — compound in real time.",
+      body:[
+        "The first question was almost always the same. \"Korea — like, North or South?\" I'd be the new kid again, in another international school in another city, and before anyone had learned my name they wanted to know which Korea I meant — usually with a nervous half-smile, as if I might be about to defend a missile program.",
+        "I have introduced my country more times than I can count. That sounds like a small thing. It shaped how I see almost everything.",
+        "I grew up a Korean kid with an American-school education, taking French in a classroom in Guangzhou, hearing Mandarin on the street outside it, defaulting to English because English was the one language the whole rotating cast of us had in common. We moved every couple of years — Guangzhou, Cairo, Seoul, and the gaps between. Home was never a place. It was a suitcase, a new uniform, and the specific skill of walking into a room where you belong to no group and making yourself legible fast.",
+        "The thing I had that most kids didn't was a front-row seat to exponential growth — the real thing, not the chart.",
+        "In Guangzhou there was a stretch of ground I passed on the way to school — call it a field, half construction, half nothing. Within two years it was a tower. Then the tower had siblings. The skyline I memorized in one grade was obsolete by the next. I watched a city rewrite itself in fast-forward: cranes like a permanent weather system, whole districts of raw farmland turning into glass in the time it took me to grow a few inches. China was never a GDP figure to me. It was the view from the bus, changing.",
+        {t:"quote", text:"Being early feels exactly like being from a country nobody can place. You spend years explaining the thing before anyone is ready to want it."},
+        "And next to China's raw economic ascent, I watched a quieter, stranger thing: my own small country brand itself into the world. When I was young, Korea was a question mark — a place you had to disambiguate. There was no cultural shorthand for it. You led with the North, because that was the only Korea the news had handed people.",
+        "I don't have to explain it anymore. The kimbap I packed as lunchbox food — the thing that once got me looked at sideways in a cafeteria — now sells out as a frozen item at Trader Joe's, bought by people who have never had to think about which Korea it comes from. A boy band I'd have had to introduce sells out the stadium down the freeway and turns up as a case study assigned in business school. Squid Game was, for a stretch, the most-watched thing on the planet. Half the skincare aisle is Korean. The country I used to spell out is ambient now — a default, not a footnote.",
+        "I got to watch that whole arc, from unknown to inevitable, twice, in two countries, from the inside. Most people meet a brand or an economy after it has already won, when the growth looks obvious and smooth in hindsight. I met both of mine while they were still awkward and unplaceable, and I watched the curve bend in real time.",
+        "That is where my instinct for growth actually comes from. Not a playbook, not a marketing blog — the lived experience of watching things compound from nothing, and of being, myself, the unfamiliar thing that has to be explained before it can be wanted. I learned to tell real growth from performed growth by watching who was building versus who was posturing, in cities where the difference showed up in poured concrete. I learned that being early is indistinguishable from being obscure, right up until it isn't.",
+        "So when I look at a founder in Nairobi or Accra now — building something the market hasn't learned to want yet, in a place most investors can't find on a map — I don't see a risk I need to be talked into. I see the country I used to have to explain. I have watched exactly this become obvious before. I just try to be early to the part where it does."
+      ]
+    }
+  ];
+
+  if (typeof window !== "undefined") { window.ERAS = ERAS; window.ESSAYS = ESSAYS; }
+  if (typeof module !== "undefined" && module.exports) { module.exports = { ERAS: ERAS, ESSAYS: ESSAYS }; }
+})();
