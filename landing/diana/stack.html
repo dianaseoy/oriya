@@ -22,7 +22,7 @@
       --ease:cubic-bezier(0.16,1,0.3,1);--sidebar:312px;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{-webkit-font-smoothing:antialiased}
+    html{-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
     body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.6;font-size:15px;min-height:100vh;
       background-image:radial-gradient(1000px 600px at 15% -8%,rgba(185,84,45,0.05),transparent 60%)}
     a{color:inherit;text-decoration:none}
@@ -183,8 +183,17 @@
 
     @media(max-width:820px){
       .shell{grid-template-columns:1fr}
-      .side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}
-      .side-links{margin-top:8px}
+      /* compact header, not a stacked sidebar — the stack stays one thumb-flick away */
+      .side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);gap:16px;padding:26px 22px 22px}
+      .site-nav{flex-direction:row;gap:6px}
+      .site-nav a{flex:1 1 0;justify-content:center;padding:10px 6px;border-color:var(--line)}
+      .site-nav a .n{display:none}
+      .meta{flex-direction:row;flex-wrap:wrap;gap:7px 18px}
+      .meta-row .k{width:auto}
+      .side-links{flex-direction:row;flex-wrap:wrap;gap:6px;margin-top:0}
+      .side-link{gap:7px;border-color:var(--line);border-radius:999px;padding:7px 12px}
+      .sub{margin-top:0}
+      .sub-in{font-size:16px;padding:9px 10px} /* ≥16px so iOS Safari doesn't zoom on focus */
       .main{padding:28px 22px 64px}
       .lede{font-size:21px}
     }
@@ -193,6 +202,8 @@
       .dev .raw{grid-column:1;font-size:10.5px}
       .dev .track{grid-column:1 / span 2;order:3}
       .dev .nz{grid-row:1}
+      .demo-body{padding:16px 12px}
+      .console{padding:13px 12px;font-size:12px}
     }
   </style>
 </head>
@@ -210,7 +221,7 @@
       </div>
       <p class="bio">Building <b>Oriya</b> — the recovery network. It normalizes every wearable (Oura, Whoop, Garmin, Apple) onto one fair <b>0–100</b> index, so a squad competes on how well they recover — the longer arc is user-owned health infrastructure. Before AI, I spent years in <b>crypto, web3 &amp; fintech</b> (Bitcoin in 2017, building by 2018); I grew up between continents and have built across four of them.</p>
       <nav class="site-nav">
-        <a href="index.html">Writing <span class="n">40</span></a>
+        <a href="index.html">Writing <span class="n">41</span></a>
         <a href="stack.html" class="active">Stack <span class="n">how I build</span></a>
         <a href="reading.html">Reading <span class="n">the canon</span></a>
       </nav>
@@ -328,26 +339,27 @@
 
       <section class="grp">
         <div class="grp-head"><span class="grp-key">05</span><span class="grp-label">Tools I back · referral</span><span class="grp-rule"></span></div>
-        <p class="grp-note">The stack behind the teams I back — the tools I actually reach for in the trenches with a company, and the AI ones I'd stake my name on. Where I have a partner link, <b>my readers get a discount or an extended trial</b>. I keep the list honest by only naming what I use or would recommend without one.</p>
-        <!-- warm — tools I already use & have written up; replace href="#" with real referral/partner links -->
-        <div class="ref"><span class="ref-name">Vercel</span><span class="ref-perk">extended trial</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">The deploy layer I moved my own stack to. Preview URL per branch, instant rollback, zero infra babysitting — the reason “show me” becomes a link, not a meeting.</div></div>
-        <div class="ref"><span class="ref-name">Replit</span><span class="ref-perk">free credits</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">Where an idea earns its keep before it earns a repo. Zero to a running app in one tab — the fastest way I know to kill a bad idea in thirty minutes.</div></div>
-        <div class="ref"><span class="ref-name">Modal</span><span class="ref-perk">free credits</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">Serverless GPUs the way the word was meant. Decorate a Python function, pay for the ninety seconds it runs, nothing idles — the end of the surprise $400 bill.</div></div>
-        <div class="ref"><span class="ref-name">Claude</span><span class="ref-perk">free trial</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">My primary pair on real codebases. The model isn't the moat — knowing what to ask is — and this is the one I trust to hold the architecture while I review every diff.</div></div>
-        <!-- tier 1 — AI startups I'd back / advise; replace href="#" with real referral/partner links -->
-        <div class="ref"><span class="ref-name">Lovable</span><span class="ref-perk">discount</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">AI that ships a real front end from a sentence. What I hand a non-technical founder who needs a working product in front of users this week, not next quarter.</div></div>
-        <div class="ref"><span class="ref-name">Fyxer</span><span class="ref-perk">free trial</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">An AI exec assistant that clears the inbox and drafts in your voice. The first one I've kept past the trial — it buys back the hour founders pretend they don't lose to email.</div></div>
-        <div class="ref"><span class="ref-name">Decagon</span><span class="ref-perk">demo + discount</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">AI customer support that resolves instead of deflecting — the rare support layer that moves the metric the right way: resolution up, headcount flat.</div></div>
-        <div class="ref"><span class="ref-name">Scribe</span><span class="ref-perk">free plan</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">Turns any process you run into a step-by-step doc automatically. The fastest way I've found to get tribal knowledge out of one head and into the team.</div></div>
-        <div class="ref"><span class="ref-name">Fireworks</span><span class="ref-perk">free credits</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">Fast, cheap inference for teams shipping on open models — where the inference bill stops outrunning the product, the exact math that decides whether an AI feature survives.</div></div>
-        <div class="ref"><span class="ref-name">Render</span><span class="ref-perk">free tier</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">The boring, reliable place to run the backend so you don't hand-roll infra. Heroku's ease without the ceiling — I reach for it when the app just needs to run.</div></div>
-        <div class="ref"><span class="ref-name">ElevenLabs</span><span class="ref-perk">free credits</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">The voice layer for anything that talks — agents, media, localization. The one I'd bet on for going multilingual into markets your current product can't yet speak to.</div></div>
-        <div class="ref"><span class="ref-name">Runway</span><span class="ref-perk">free credits</span><a class="ref-link" href="#" target="_blank" rel="noopener sponsored">claim via my link <span class="arr">↗</span></a><div class="ref-why">Generative video a real creative team will actually use — where the cost of a moving image drops far enough to change what a small team can ship.</div></div>
-        <p class="ref-disc">Some links above are affiliate or referral links — they cost you nothing extra, often less. I only list tools I use, or would recommend without one.</p>
+        <p class="grp-note">The stack behind the teams I back — the tools I actually reach for in the trenches with a company, and the AI ones I'd stake my name on. As partner links land, <b>readers get a discount or an extended trial</b> — I'll mark each one here. I keep the list honest by only naming what I use or would recommend without one.</p>
+        <!-- warm — tools I already use & have written up. When real referral/partner URLs land:
+             swap the href, restore link text to "claim via my link", and set the negotiated perk chip. -->
+        <div class="ref"><span class="ref-name">Vercel</span><span class="ref-perk">free hobby tier</span><a class="ref-link" href="https://vercel.com" target="_blank" rel="noopener sponsored">try it <span class="arr">↗</span></a><div class="ref-why">The deploy layer I moved my own stack to. Preview URL per branch, instant rollback, zero infra babysitting — the reason “show me” becomes a link, not a meeting.</div></div>
+        <div class="ref"><span class="ref-name">Replit</span><span class="ref-perk">free to start</span><a class="ref-link" href="https://replit.com" target="_blank" rel="noopener sponsored">try it <span class="arr">↗</span></a><div class="ref-why">Where an idea earns its keep before it earns a repo. Zero to a running app in one tab — the fastest way I know to kill a bad idea in thirty minutes.</div></div>
+        <div class="ref"><span class="ref-name">Modal</span><span class="ref-perk">free credits</span><a class="ref-link" href="https://modal.com" target="_blank" rel="noopener sponsored">try it <span class="arr">↗</span></a><div class="ref-why">Serverless GPUs the way the word was meant. Decorate a Python function, pay for the ninety seconds it runs, nothing idles — the end of the surprise $400 bill.</div></div>
+        <div class="ref"><span class="ref-name">Claude</span><span class="ref-perk">free tier</span><a class="ref-link" href="https://claude.ai" target="_blank" rel="noopener sponsored">try it <span class="arr">↗</span></a><div class="ref-why">My primary pair on real codebases. The model isn't the moat — knowing what to ask is — and this is the one I trust to hold the architecture while I review every diff.</div></div>
+        <!-- tier 1 — AI startups I'd back / advise; same swap when partner links land -->
+        <div class="ref"><span class="ref-name">Lovable</span><span class="ref-perk">free to try</span><a class="ref-link" href="https://lovable.dev" target="_blank" rel="noopener sponsored">try it <span class="arr">↗</span></a><div class="ref-why">AI that ships a real front end from a sentence. What I hand a non-technical founder who needs a working product in front of users this week, not next quarter.</div></div>
+        <div class="ref"><span class="ref-name">Fyxer</span><span class="ref-perk">free trial</span><a class="ref-link" href="https://www.fyxer.com" target="_blank" rel="noopener sponsored">try it <span class="arr">↗</span></a><div class="ref-why">An AI exec assistant that clears the inbox and drafts in your voice. The first one I've kept past the trial — it buys back the hour founders pretend they don't lose to email.</div></div>
+        <div class="ref"><span class="ref-name">Decagon</span><span class="ref-perk">book a demo</span><a class="ref-link" href="https://decagon.ai" target="_blank" rel="noopener sponsored">try it <span class="arr">↗</span></a><div class="ref-why">AI customer support that resolves instead of deflecting — the rare support layer that moves the metric the right way: resolution up, headcount flat.</div></div>
+        <div class="ref"><span class="ref-name">Scribe</span><span class="ref-perk">free plan</span><a class="ref-link" href="https://scribehow.com" target="_blank" rel="noopener sponsored">try it <span class="arr">↗</span></a><div class="ref-why">Turns any process you run into a step-by-step doc automatically. The fastest way I've found to get tribal knowledge out of one head and into the team.</div></div>
+        <div class="ref"><span class="ref-name">Fireworks</span><span class="ref-perk">free credits</span><a class="ref-link" href="https://fireworks.ai" target="_blank" rel="noopener sponsored">try it <span class="arr">↗</span></a><div class="ref-why">Fast, cheap inference for teams shipping on open models — where the inference bill stops outrunning the product, the exact math that decides whether an AI feature survives.</div></div>
+        <div class="ref"><span class="ref-name">Render</span><span class="ref-perk">free tier</span><a class="ref-link" href="https://render.com" target="_blank" rel="noopener sponsored">try it <span class="arr">↗</span></a><div class="ref-why">The boring, reliable place to run the backend so you don't hand-roll infra. Heroku's ease without the ceiling — I reach for it when the app just needs to run.</div></div>
+        <div class="ref"><span class="ref-name">ElevenLabs</span><span class="ref-perk">free tier</span><a class="ref-link" href="https://elevenlabs.io" target="_blank" rel="noopener sponsored">try it <span class="arr">↗</span></a><div class="ref-why">The voice layer for anything that talks — agents, media, localization. The one I'd bet on for going multilingual into markets your current product can't yet speak to.</div></div>
+        <div class="ref"><span class="ref-name">Runway</span><span class="ref-perk">free to try</span><a class="ref-link" href="https://runwayml.com" target="_blank" rel="noopener sponsored">try it <span class="arr">↗</span></a><div class="ref-why">Generative video a real creative team will actually use — where the cost of a moving image drops far enough to change what a small team can ship.</div></div>
+        <p class="ref-disc">Where a link above becomes an affiliate or referral link, it costs you nothing extra — often less — and I'll say so. I only list tools I use, or would recommend without one.</p>
       </section>
 
       <section class="grp">
-        <div class="grp-head"><span class="grp-key">06</span><span class="grp-label">Stack insights</span><span class="grp-rule"></span></div>
+        <div class="grp-head"><span class="grp-key">06</span><span class="grp-label">Takes · what I actually believe</span><span class="grp-rule"></span></div>
         <div class="insights">
           <div class="insight">The bottleneck moved from writing code to specifying intent. Taste and judgment are the scarce inputs now.</div>
           <div class="insight">Most “AI products” are a system prompt in a trench coat. Defensibility lives in the data loop and the distribution — not the model call.</div>
@@ -406,12 +418,12 @@
         {node:0,key:"Manus",msg:"queued the grunt work — every vendor's ranges + what each metric really measures",
           meta:"manus · high latency, low cost — runs async while I sleep"},
         {node:1,key:"GPT",tag:"adversary",msg:"made it argue against me: a naïve average punishes Apple, which has no native score",
-          meta:"gpt-4o / o1 · high reasoning cost — used once, as a single-pass logic gatekeeper, not a workhorse"},
+          meta:"gpt-5 · high reasoning cost — used once, as a single-pass logic gatekeeper, not a workhorse"},
         {node:2,key:"Claude Code",msg:"wrote the per-device handicap + normalizer; I reviewed every diff",
-          meta:"claude 3.5 sonnet · best context-to-cost window for structural codebase edits",
+          meta:"claude sonnet 4.5 · best context-to-cost window for structural codebase edits",
           audit:["Claude tried to rewrite the user-object DB schema.","Rejected the diff → pinned execution to stateless, pure-function only."]},
         {node:3,key:"Replit",msg:"prototype live in an isolated sandbox before anything touches the main trunk"},
-        {node:4,key:"Evals",msg:"ran 50 historical synthetic packets — extreme low sleep, high strain",
+        {node:4,key:"Evals",msg:"ran 50 synthetic packets — extreme low sleep, high strain, mixed hardware",
           meta:"assert · the 0–100 index held: no clipping, no drift across hardware profiles"}
       ];
       var scope={key:"scope",msg:"Apple ships no native recovery score; Whoop, Oura & Garmin use unaligned scales. normalize them — tonight."};
