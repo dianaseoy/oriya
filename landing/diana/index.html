@@ -293,7 +293,6 @@
 
       <div class="side-links">
         <a class="side-link" href="https://oriya.app" target="_blank" rel="noopener">Oriya.app <span class="arr">↗</span></a>
-        <a class="side-link" href="https://x.com/dianayjseo" target="_blank" rel="noopener">X / Twitter <span class="arr">↗</span></a>
         <a class="side-link" href="https://www.instagram.com/dianaseo_/" target="_blank" rel="noopener">Instagram <span class="arr">↗</span></a>
         <a class="side-link" href="https://www.linkedin.com/in/dianaseo" target="_blank" rel="noopener">LinkedIn <span class="arr">↗</span></a>
         <a class="side-link" href="mailto:dianayjseo@gmail.com">Email <span class="arr">↗</span></a>
@@ -522,7 +521,7 @@
       ERAS.forEach(function(era){
         cmds.push({ type:"Jump", label:era.period+" — "+era.label, meta:"era", mk:"#", anchorEra:era.key, key:(era.period+" "+era.label).toLowerCase() });
       });
-      [["Oriya.app","https://oriya.app"],["Email Diana","mailto:dianayjseo@gmail.com"],["X / Twitter","https://x.com/dianayjseo"],["Instagram","https://www.instagram.com/dianaseo_/"],["LinkedIn","https://www.linkedin.com/in/dianaseo"]].forEach(function(l){
+      [["Oriya.app","https://oriya.app"],["Email Diana","mailto:dianayjseo@gmail.com"],["Instagram","https://www.instagram.com/dianaseo_/"],["LinkedIn","https://www.linkedin.com/in/dianaseo"]].forEach(function(l){
         cmds.push({ type:"Link", label:l[0], meta:"↗", mk:"→", href:l[1], external:true, key:l[0].toLowerCase() });
       });
       return cmds;
