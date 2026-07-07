@@ -394,6 +394,19 @@
     .proof-card p { font-size:13px; color:var(--ash); line-height:1.55; }
     .proof-meta { display:flex; justify-content:space-between; align-items:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--hairline); font-family:var(--font-mono); font-size:11.5px; }
     .proof-meta .ppl { color:var(--jade); } .proof-meta .prize { color:var(--amber-glow); }
+    a.proof-card { display:flex; flex-direction:column; color:inherit; cursor:pointer; }
+    a.proof-card .proof-meta { margin-top:auto; padding-top:14px; }
+    .proof-go { display:inline-flex; align-items:center; gap:6px; margin-top:12px; font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--amber-glow); opacity:0; transform:translateX(-4px); transition:opacity 0.3s, transform 0.3s var(--settle); }
+    .proof-card:hover .proof-go, .proof-card:focus-visible .proof-go { opacity:1; transform:none; }
+    @media (hover:none){ .proof-go { opacity:1; transform:none; } }
+    .proof-note { text-align:center; font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.05em; color:var(--ash); opacity:0.65; margin-top:16px; }
+    .proof-race { display:flex; height:6px; border-radius:999px; overflow:hidden; background:rgba(255,255,255,0.05); margin-top:14px; }
+    .proof-race i { display:block; height:100%; background:rgba(236,234,228,0.16); }
+    .proof-race i.lead { background:var(--jade); box-shadow:0 0 8px rgba(127,183,158,0.6); animation:raceGlow 2.6s ease infinite; }
+    @keyframes raceGlow { 0%,100% { filter:brightness(1); } 50% { filter:brightness(1.4); } }
+    .proof-race-key { display:flex; flex-wrap:wrap; gap:4px 12px; margin-top:7px; font-family:var(--font-mono); font-size:10px; color:var(--ash); }
+    .proof-race-key .lead { color:var(--jade); }
+    @media (prefers-reduced-motion: reduce) { .proof-race i.lead { animation:none; } }
     .proof-cta { display:flex; flex-direction:column; align-items:center; gap:14px; margin-top:46px; }
     @media (max-width:760px){ .proof-grid { grid-template-columns:1fr; max-width:420px; } }
 
@@ -1391,29 +1404,39 @@
     <div class="act-head" style="margin:0 auto; text-align:center;">
       <span class="eyebrow">Already a competition · SF &amp; NYC</span>
       <h2 class="display display-l">Recovery's better<br>as a team sport.</h2>
-      <p class="lede" style="margin:18px auto 0;">Run clubs, founder crews and on-call eng teams are already on the board — bring yours, whatever they wear. Every device is normalized to the same index and ranked against each person's own baseline, so nobody's sandbagged by their hardware and no one's shamed for a red morning.</p>
+      <p class="lede" style="margin:18px auto 0;">Run clubs, founder crews and on-call eng teams are already on the board — bring yours, whatever they wear. Every device is normalized to the same index and ranked against each person's own baseline, so your Oura and my Whoop compete fairly and no one's shamed for a red morning.</p>
     </div>
 
     <div class="proof-grid">
-      <div class="proof-card">
+      <a class="proof-card" href="try.html?challenge=ai">
         <span class="proof-live"><span class="dot"></span> Live</span>
         <h4>Launch-Crunch Bracket</h4>
         <p>Anthropic's red-team week vs OpenAI's alignment on-call vs Stripe's peak-traffic infra. Highest normalized readiness under load holds the lead.</p>
-        <div class="proof-meta"><span class="ppl">53 logging</span><span class="prize">$1,200 pool</span></div>
-      </div>
-      <div class="proof-card">
+        <div class="proof-race" aria-hidden="true"><i class="lead" style="width:34.2%"></i><i style="width:33%"></i><i style="width:32.8%"></i></div>
+        <div class="proof-race-key"><span class="lead">Anthropic 86 · leads</span><span>OpenAI 82.7</span><span>Stripe 82.5</span></div>
+        <span class="proof-go">See where you'd land →</span>
+        <div class="proof-meta"><span class="ppl">53 logging</span><span class="prize">$1,200 · 1st $700</span></div>
+      </a>
+      <a class="proof-card" href="try.html?challenge=marina">
         <span class="proof-live"><span class="dot"></span> Live</span>
         <h4>Marina RC vs Stanford RC</h4>
-        <p>The Bay's oldest running rivalry, settled on a 7-day team recovery average instead of an argument about 10K splits.</p>
-        <div class="proof-meta"><span class="ppl">38 logging</span><span class="prize">$500 pool</span></div>
-      </div>
-      <div class="proof-card">
+        <p>The Bay's oldest running rivalry, settled by a 7-day team recovery average — no more arguing about 10K splits.</p>
+        <div class="proof-race" aria-hidden="true"><i style="width:48.9%"></i><i class="lead" style="width:51.1%"></i></div>
+        <div class="proof-race-key"><span>Marina RC 77.8</span><span class="lead">Stanford 81.3 · leads</span></div>
+        <span class="proof-go">See where you'd land →</span>
+        <div class="proof-meta"><span class="ppl">38 logging</span><span class="prize">$500 · $50/winner</span></div>
+      </a>
+      <a class="proof-card" href="try.html?challenge=founders">
         <span class="proof-live"><span class="dot"></span> Live</span>
         <h4>Founders vs Operators</h4>
-        <p>Do founders recover better when they own the schedule, or are operators more disciplined? 71 athletes, five companies, 21 days.</p>
-        <div class="proof-meta"><span class="ppl">71 logging</span><span class="prize">$2,000 pool</span></div>
-      </div>
+        <p>Founders own the schedule. Operators run the machine. 21 days — and 71 athletes across five companies — to find out which one recovers better. Founders are currently losing.</p>
+        <div class="proof-race" aria-hidden="true"><i style="width:49.9%"></i><i class="lead" style="width:50.1%"></i></div>
+        <div class="proof-race-key"><span>Founders 73.0</span><span class="lead">Operators 73.3 · leads</span></div>
+        <span class="proof-go">See where you'd land →</span>
+        <div class="proof-meta"><span class="ppl">71 logging</span><span class="prize">$2,000 · winner takes all</span></div>
+      </a>
     </div>
+    <p class="proof-note">Founding season — boards run with sample athletes until each side fills. Your score ranks against them for real, in about 45 seconds.</p>
 
     <div class="squad">
       <div class="squad-live"><span class="ld"></span> Live squad board · ranked vs each person's own baseline</div>
@@ -1743,6 +1766,34 @@
     window.dataLayer.push(payload);
     if (window.console) console.debug("[oriya:event]", event, payload);
   };
+
+  /* ========== Unified email capture (mirrors try.html's logUserEmail) ==========
+     Any email input on this page is background-logged on submit — the form's own
+     action (Substack subscribe, Tally embed) still runs; this just guarantees the
+     address also lands in our funnel log. Remote persistence requires
+     window.ORIYA_EMAIL_WEBHOOK / ORIYA_INGEST_URL to be set — with neither,
+     nothing leaves the visitor's device. */
+  window.oriyaLogEmail = function (email, source, extra) {
+    email = String(email || "").trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
+    var rec = Object.assign({ email: email, source: source || "unknown" }, extra || {});
+    window.oriyaTrack("email_captured", rec);
+    try {
+      var body = JSON.stringify(Object.assign({ ts: Date.now() }, rec));
+      if (window.ORIYA_EMAIL_WEBHOOK) fetch(window.ORIYA_EMAIL_WEBHOOK, { method: "POST", mode: "no-cors", keepalive: true, headers: { "Content-Type": "application/json" }, body: body });
+      else if (window.ORIYA_INGEST_URL && navigator.sendBeacon) navigator.sendBeacon(window.ORIYA_INGEST_URL, body);
+    } catch (e) {}
+    return true;
+  };
+  // Substack form: log in the background, then let the real GET submission proceed.
+  (function () {
+    var f = document.querySelector(".reads-sub-form");
+    if (!f) return;
+    f.addEventListener("submit", function () {
+      var inp = f.querySelector('input[type="email"]');
+      if (inp) window.oriyaLogEmail(inp.value, "substack", { from: "index_reads" });
+    });
+  })();
 
   const REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 

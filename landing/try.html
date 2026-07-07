@@ -278,6 +278,30 @@
     }
     window.oriyaTrack = track;
 
+    /* =================== unified email capture ===================
+       EVERY email input on this page routes through here — one seam, no
+       redirects, no bottom-form dependency. Locally: appended to a durable
+       oriya:emails log. Remotely: track() beacons to ORIYA_INGEST_URL, and
+       if window.ORIYA_EMAIL_WEBHOOK is set the record is also POSTed there
+       (point it at a Tally/collector webhook). With neither set, emails
+       NEVER leave the visitor's device — wire an endpoint before counting
+       these as captured leads. Capture fires only on an explicit submit
+       action (button/Enter), never on keystrokes. */
+    const EMAILS_KEY = "oriya:emails";
+    const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || "").trim());
+    function logUserEmail(email, source, extra) {
+      email = String(email || "").trim().toLowerCase();
+      if (!isEmail(email)) return false;
+      const rec = Object.assign({ email, source: source || "unknown" }, extra || {});
+      try { const list = readJSON(EMAILS_KEY, []); list.push(Object.assign({ ts: Date.now() }, rec)); while (list.length > 120) list.shift(); writeJSON(EMAILS_KEY, list); } catch (e) {}
+      track("email_captured", rec);
+      try {
+        if (window.ORIYA_EMAIL_WEBHOOK) fetch(window.ORIYA_EMAIL_WEBHOOK, { method: "POST", mode: "no-cors", keepalive: true, headers: { "Content-Type": "application/json" }, body: JSON.stringify(Object.assign({ ts: Date.now() }, rec)) });
+      } catch (e) {}
+      return true;
+    }
+    window.oriyaLogEmail = logUserEmail;
+
     /* =================== lazy CDN loader =================== */
     const TESS_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
     const HTI_URL  = "https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js";
@@ -446,8 +470,8 @@
     ];
     const CHALLENGES = [
       { id:"marina", emoji:"🏃", icon:Users, status:"LIVE", sponsor:"Lululemon SF",
-        title:"Marina Run Club vs Stanford Run Club", subtitle:"7-day avg recovery — who runs the Bay?",
-        days:4, prize:"$500", projectedPayout:50, payout:"Winner takes all — paid out as $50 gift cards per winning member",
+        title:"Marina Run Club vs Stanford Run Club", subtitle:"38 runners. Two clubs. One recovery average that settles it — no more arguing 10K splits.",
+        days:4, prize:"$500", split:"$50/winner", projectedPayout:50, payout:"Winner takes all — paid out as $50 gift cards per winning member",
         participants:38, avg:76, joinTeam:"Marina RC", categories:["Run Club","Team Battle","SF"],
         description:"The Bay's oldest rivalry. Marina hustles hills, Stanford clocks miles. 7 days of consistent recovery logging — highest 7-day team average wins. Log every day or you cost your team.",
         leaderboard:[
@@ -463,53 +487,68 @@
       { id:"ai", emoji:"🤖", icon:Zap, status:"LIVE", sponsor:"Whoop × Oriya",
         title:"Launch-Crunch Bracket", subtitle:"Red-team week vs alignment on-call vs peak-traffic — who holds readiness under load",
         feed:[
-          { who:"Riley M.", team:"Anthropic", text:"our 7-day team avg dropped to 79 after the red-team crunch. Whoop says my recovery is 74, Oriya normalized it to 68. explain the 6-point haircut." },
-          { who:"Alex K.",  team:"Anthropic", text:"Whoop over-weights respiratory-rate variance in its sleep-stage call. a Whoop 74 is a lower readiness tier than a 74 off an Oura — it's correcting, not sandbagging you." },
-          { who:"Sarah P.", team:"Anthropic", text:"we're 4 normalized points off OpenAI. anyone not logging is a zero today — get your morning reading in before 0900 or you cost the team." },
-          { who:"Jessica",  team:"Anthropic", text:"pulled lights-out to 22:30 for 3 nights, RMSSD up ~12ms, normalized 88 this morning. debt's clearing." },
+          { sys:true, text:"jessica logged a 94% sleep performance after a 14-hour crunch session. Godspeed." },
+          { who:"Riley M.", team:"Anthropic", text:"our 7-day team avg dropped to 79 after the red-team crunch. Whoop says my recovery is 74, Oriya normalized it to 68. explain the 6-point haircut.", reacts:[["Proof of Work",4],["Unaligned",1]] },
+          { who:"Alex K.",  team:"Anthropic", text:"Whoop over-weights respiratory-rate variance in its sleep-stage call. a Whoop 74 is a lower readiness tier than a 74 off an Oura — it's correcting, not sandbagging you.", reacts:[["Citation Provided",3]] },
+          { sys:true, text:"riley.m broke a 5-day logging streak. someone check on their deployment." },
+          { who:"Sarah P.", team:"Anthropic", text:"we're 4 normalized points off OpenAI. anyone not logging is a zero today — get your morning reading in before 0900 or you cost the team.", reacts:[["Proof of Work",6],["Deep Sleep or Didn't Happen",2]] },
+          { who:"Jessica",  team:"Anthropic", text:"pulled lights-out to 22:30 for 3 nights, RMSSD up ~12ms, normalized 88 this morning. debt's clearing.", reacts:[["Deep Sleep or Didn't Happen",5]] },
         ],
-        days:9, prize:"$1,200", projectedPayout:120, payout:"1st: $700 · 2nd: $350 · 3rd: $150 — split across participating team members",
+        days:9, prize:"$1,200", split:"1st $700", projectedPayout:120, payout:"1st: $700 · 2nd: $350 · 3rd: $150 — split across participating team members",
         participants:53, avg:79, joinTeam:"Anthropic", categories:["Corporate","Multi-team","Invite-only"],
         description:"Three teams shipping under acute load, 14 days. Anthropic's model-context crew is mid red-teaming crunch. OpenAI's alignment on-call is eating 4-hour fragmented-REM nights. Stripe's infra team is bracing for peak-traffic. Highest normalized team readiness wins — sleep debt is the silent leader, and a missed morning logs as a zero.",
         leaderboard:[
           {init:"RM",handle:"riley.m",team:"Anthropic",score:91,streak:"7d"},
           {init:"CP",handle:"casey.p",team:"Anthropic",score:87,streak:"5d"},
-          {init:"BT",handle:"blake.t",team:"OpenAI",score:86,streak:"4d"},
+          {init:"◒",handle:"anon-kestrel",team:"OpenAI",score:86,streak:"4d",anon:true},
           {init:"JK",handle:"jordan.k",team:"Stripe",score:84,streak:"5d"},
           {init:"SK",handle:"sage.k",team:"OpenAI",score:83,streak:"6d"},
-          {init:"MT",handle:"mia.t",team:"Stripe",score:81,streak:"3d"},
+          {init:"◒",handle:"anon-marmot",team:"Stripe",score:81,streak:"3d",anon:true},
           {init:"DH",handle:"dana.h",team:"Anthropic",score:80,streak:"7d"},
           {init:"RA",handle:"river.a",team:"OpenAI",score:79,streak:"4d"},
         ] },
       { id:"founders", emoji:"⚡", icon:Zap, status:"LIVE", sponsor:"Sequoia Capital",
-        title:"Founders vs Operators", subtitle:"YC / a16z founders vs corporate employees — 21 days",
-        days:14, prize:"$2,000", projectedPayout:200, payout:"Top company wins $2k. Winner distributes as team dinner or charity donation. Vote decided by team.",
+        title:"Founders vs Operators", subtitle:"Founders own the schedule. Operators run the machine. 21 days to find out which one recovers better.",
+        days:14, prize:"$2,000", split:"winning side takes $2k", projectedPayout:200, payout:"Top company wins $2k. Winner distributes as team dinner or charity donation. Vote decided by team.",
         participants:71, avg:72, joinTeam:"YC Founders", categories:["Founders","Corporate","Epic"],
-        description:"Do founders actually sleep better because they control their schedule? Or are operators more disciplined? The biggest cross-company challenge of the season. 5 teams, 71 athletes, 21 days.",
+        race:[{ t:"Founders", v:73.0 }, { t:"Operators", v:73.3 }],
+        description:"Do founders actually sleep better because they control their schedule? Or are operators more disciplined? The biggest cross-company challenge of the season. 5 teams, 71 athletes, 21 days. Founders are currently losing.",
         leaderboard:[
           {init:"BG",handle:"b.gupta",team:"YC Founders",score:76,streak:"7d"},
           {init:"RM",handle:"riley.m",team:"Anthropic",score:75,streak:"5d"},
           {init:"JK",handle:"jordan.k",team:"Stripe",score:74,streak:"4d"},
-          {init:"PS",handle:"priya.s",team:"a16z",score:73,streak:"6d"},
+          {init:"PS",handle:"priya.s",team:"a16z",score:70,streak:"6d"},
           {init:"DM",handle:"drew.m",team:"Notion",score:71,streak:"3d"},
         ] },
-      { id:"devicewars", emoji:"⌚", icon:Sparkles, status:"SOON", startLabel:"Starts June 28", sponsor:null,
-        title:"Device Wars: Oura vs Whoop", subtitle:"Which wearable community recovers better?",
+      { id:"devicewars", emoji:"⌚", icon:Sparkles, status:"SOON", startLabel:"Starts July 8", sponsor:null,
+        title:"Ring vs Band", subtitle:"Oura wearers vs Whoop wearers — same 7 days, same fair scoring. Which community actually holds recovery?",
         days:null, prize:null, payout:"Bragging rights settled on the leaderboard, not Twitter.",
         participants:null, avg:null, joinTeam:"Oura", categories:["Devices","Open","Community"],
-        description:"The eternal debate: Oura or Whoop? This is settled on the leaderboard, not Twitter. Team avg over 14 days — scores normalized so your ring isn't at a disadvantage.",
+        description:"The eternal debate, settled on the leaderboard instead of Twitter. Ring wearers vs band wearers — team avg over 7 days, scores normalized so neither device gets a hardware handicap it didn't earn.",
         leaderboard:[] },
-      { id:"vc", emoji:"🏦", icon:Trophy, status:"SOON", startLabel:"Starts July 1", sponsor:"Sequoia Capital × a16z",
-        title:"Sequoia vs a16z 30-Day", subtitle:"Monthly recovery marathon — portfolio health competition",
-        days:null, prize:"$3,000", projectedPayout:250, payout:"1st: $2,000 · 2nd: $1,000 — team split proportional to participation rate",
+      { id:"vc", emoji:"🏦", icon:Trophy, status:"SOON", startLabel:"Starts July 14", sponsor:"Sequoia Capital × a16z",
+        title:"Sequoia vs a16z 30-Day", subtitle:"30 days. Two funds. Which portfolio recovers better under the same market pressure?",
+        days:null, prize:"$3,000", split:"1st fund $2k", projectedPayout:250, payout:"1st: $2,000 · 2nd: $1,000 — team split proportional to participation rate",
         participants:null, avg:null, joinTeam:"Sequoia", categories:["VC","Founders","Monthly"],
         description:"The Valley's biggest VC firms test their portfolio health. 30 days, any device, full normalization. Both firms are actively recruiting participants from their networks.",
         leaderboard:[] },
-      { id:"oakland", emoji:"🌉", icon:Flame, status:"SOON", startLabel:"Starts July 5", sponsor:"Brooks Running",
-        title:"Oakland Run Crew vs Caltrain Runners", subtitle:"Weekend warriors — 3-week battle",
-        days:null, prize:"$400", projectedPayout:40, payout:"Winner takes all — gift cards distributed to active members",
+      { id:"oakland", emoji:"🌉", icon:Flame, status:"SOON", startLabel:"Starts July 12", sponsor:"Brooks Running",
+        title:"Oakland Run Crew vs Caltrain Runners", subtitle:"East Bay grit vs Peninsula discipline — 3 weeks, one recovery average.",
+        days:null, prize:"$400", split:"winner takes all", projectedPayout:40, payout:"Winner takes all — gift cards distributed to active members",
         participants:null, avg:null, joinTeam:"Oakland Run Crew", categories:["Run Club","East Bay","Peninsula"],
         description:"Oakland's track crew against the South Bay commuter runners. Who brings the discipline outside of their usual routes? 3 weekends, highest team avg on Saturdays and Sundays wins.",
+        leaderboard:[] },
+      { id:"computeburn", emoji:"🔥", icon:Zap, status:"SOON", startLabel:"Starts July 21", sponsor:null,
+        title:"The Compute Burn", subtitle:"OpenAI vs Anthropic — output is easy to flex. Holding recovery while you ship is the signal. Readiness-per-load ratio, one week.",
+        days:null, prize:null, split:null, payout:"Founding season — bragging rights. The pot opens once both sides seed 5 real athletes.",
+        participants:null, avg:null, joinTeam:"Anthropic", categories:["Tech","Rivalry","Weekly"],
+        description:"The efficiency metric, not the grind metric. One week, highest normalized readiness-to-training-load ratio across the whole side, any device. Company culture settled in a number — and a red morning logged still beats a forgotten green one.",
+        leaderboard:[] },
+      { id:"alignment", emoji:"🎯", icon:Sparkles, status:"SOON", startLabel:"Opens with Season 1", sponsor:null,
+        title:"The Alignment Problem", subtitle:"Hold your Index within ±3 of your own par for 7 straight days. Precision beats maxing.",
+        days:null, prize:null, split:null, payout:"Solo discipline ladder — no pot, streak badges only.",
+        participants:null, avg:null, joinTeam:"Aligned", categories:["Solo","Precision","Streak"],
+        description:"Not who scores highest — who stays aligned to their own baseline. Seven days inside ±3 of par is the anti-burnout flex, and the one board where sandbagging is impossible by design.",
         leaderboard:[] },
     ];
     // Each battle has sides the athlete must choose between (shows on their passport as their squad)
@@ -520,8 +559,34 @@
       devicewars:["Oura","Whoop"],
       vc:["Sequoia","a16z"],
       oakland:["Oakland Run Crew","Caltrain Runners"],
+      computeburn:["Anthropic","OpenAI"],
+      alignment:["Aligned"],
     };
     CHALLENGES.forEach((c) => { c.teams = CHALLENGE_TEAMS[c.id] || [c.joinTeam]; });
+    // sample-athlete company domains (illustrative — the bracket is a culture reference, not an enrollment)
+    const TEAM_DOMAINS = { Anthropic:"anthropic.com", OpenAI:"openai.com", Stripe:"stripe.com" };
+    /* dynamic rivalry matching — if the founding account's email is on a tech
+       domain, elevate the board that pits their company against its natural
+       rival. Purely presentational (ordering + a flag); no enrollment implied. */
+    const RIVALRIES = {
+      "anthropic.com":"computeburn", "openai.com":"computeburn",
+      "stripe.com":"ai", "adyen.com":"ai",
+      "sequoiacap.com":"vc", "a16z.com":"vc",
+      "ouraring.com":"devicewars", "whoop.com":"devicewars",
+    };
+    function rivalryFor(email) {
+      try { const d = String(email || "").split("@")[1].toLowerCase(); return RIVALRIES[d] || null; } catch (e) { return null; }
+    }
+    // per-team live standing for the race bar: explicit c.race, else derived from the sample board
+    const raceFor = (c) => {
+      if (c.race) return c.race;
+      if (!c.teams || c.teams.length < 2 || !c.leaderboard || !c.leaderboard.length) return null;
+      const segs = c.teams.map((t) => {
+        const rows = c.leaderboard.filter((r) => r.team === t);
+        return rows.length ? { t, v: Math.round(rows.reduce((s, r) => s + r.score, 0) / rows.length * 10) / 10 } : null;
+      });
+      return segs.every(Boolean) ? segs : null;
+    };
     const SQUAD_EMOJIS = ["🏃","🔥","🌅","💪","🧗","🚴","🏆","⚡","🌙","🌊"];
     // leaderboard baseline + device inference for board rows (illustrative demo data)
     const PAR = 71;                                   // your board baseline — matches the app's Par
@@ -640,8 +705,8 @@
             ) : (
               <div className="py-7 text-center">
                 <div className="mx-auto w-10 h-10 rounded-full border-2 border-white/10 border-t-jade animate-spin mb-4" />
-                <div className="text-sm text-bone">{stage === "pulling" ? "Reading your latest " + c.kind.toLowerCase() + "…" : "Connecting to " + m.tag + "…"}</div>
-                <div className="text-[11px] text-ash font-mono mt-2">{stage === "pulling" ? "Normalizing to the Oriya Index" : c.scope}</div>
+                <div className="text-sm text-bone">{stage === "pulling" ? "Handshake complete. Pulling your latest " + c.kind.toLowerCase() + "…" : "Connecting to " + m.tag + "…"}</div>
+                <div className="text-[11px] text-ash font-mono mt-2">{stage === "pulling" ? "Normalizing to the Oriya Index · demo sync" : c.scope}</div>
               </div>
             )}
           </div>
@@ -650,7 +715,7 @@
     }
 
     /* =============================== Hook view =============================== */
-    function Hook({ onPreset, onScreenshot, onConnect, resume, onResume }) {
+    function Hook({ onPreset, onScreenshot, onConnect, resume, onResume, deep }) {
       const [dragging, setDragging] = useState(false);
       const fileRef = useRef(null);
       const readFile = (file) => {
@@ -661,11 +726,25 @@
       };
       return (
         <div className="min-h-screen flex flex-col items-center justify-center px-5 py-16 bg-void">
-          <div className="w-full max-w-xl animate-fade-up">
+          {/* funnel is viewport-locked to a phone-width column — same canvas on every device */}
+          <div className="w-full max-w-md animate-fade-up">
             <div className="flex items-center justify-center gap-2 mb-5">
               <Sparkles className="w-4 h-4 text-jade" />
               <span className="text-xs uppercase tracking-[0.22em] text-ash font-mono">Oriya · Body Passport</span>
             </div>
+            {deep && (
+              <div className="mb-6 max-w-md mx-auto rounded-2xl border border-amber-brand/40 bg-gradient-to-br from-amber-brand/[0.10] to-transparent px-4 py-3.5 text-left animate-fade-up">
+                <div className="text-[10px] uppercase tracking-wider font-mono text-amber-glow/80 mb-1">
+                  {deep.status === "LIVE" ? "● Live now — your spot on this board is open" : (deep.startLabel || "Opening soon") + " — sides are forming"}
+                </div>
+                <div className="text-sm text-bone leading-snug">
+                  <span className="font-semibold">{deep.emoji} {deep.title}</span>
+                  {deep.participants != null && <span className="text-ash"> · {deep.participants} logging</span>}
+                  {deep.prize && <span className="text-amber-glow font-mono"> · {deep.prize} pool</span>}
+                </div>
+                <div className="text-xs text-ash mt-1">Build your Index below — takes ~45 seconds — and we'll show you exactly where you'd land.</div>
+              </div>
+            )}
             <h1 className="display text-[2.9rem] sm:text-[3.6rem] leading-[1.02] text-center tracking-tight text-bone">
               Switch your ring for a watch.<br/>
               <span className="text-jade italic">Keep your score.</span>
@@ -728,6 +807,9 @@
               <p className="text-ash text-xs mt-1">Samsung · Pixel · any app we don't sync yet — we read it for you</p>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => readFile(e.target.files[0])} />
             </div>
+            <p className="text-center text-[11px] text-ash/70 mt-3 font-mono leading-relaxed">
+              No screenshot handy? Email your recovery screen to <a href="mailto:team@oriya.app?subject=My%20recovery%20screenshot%20%E2%80%94%20normalize%20me" className="text-jade hover:underline" onClick={() => track("email_proof_clicked", { from: "hook" })}>team@oriya.app</a> — we reply with your Index and your board spot.
+            </p>
 
             <PreviewTour />
 
@@ -756,7 +838,7 @@
             const steps = ["Reading your " + m.tag + " score…", "Applying " + m.tag + " correction (×" + m.factor + ")…", "Computing Oriya Index…"];
             for (let i = 0; i < steps.length; i++) { if (cancelled) return; setMsg(steps[i]); setProgress((i + 1) / steps.length * 0.92); await wait(440); }
             if (cancelled) return; setProgress(1);
-            onDone({ deviceKey: pending.deviceKey, native: pending.native, name: null, confident: true });
+            onDone({ deviceKey: pending.deviceKey, native: pending.native, name: null, confident: true, from: "preset" });
             return;
           }
           // screenshot → OCR
@@ -778,15 +860,15 @@
               const m = DEVICE_MODEL[deviceKey];
               setMsg("Applying " + m.tag + " correction (×" + m.factor + ")…"); setProgress(0.94); await wait(520);
               if (cancelled) return; setProgress(1);
-              onDone({ deviceKey, native, name, confident: true });
+              onDone({ deviceKey, native, name, confident: true, from: "screenshot" });
             } else {
               track("ocr_fallback", { device: deviceKey, rawScore: native });
-              onDone({ deviceKey: deviceKey || null, native: native || null, name: name || null, confident: false });
+              onDone({ deviceKey: deviceKey || null, native: native || null, name: name || null, confident: false, from: "screenshot" });
             }
           } catch (e) {
             if (cancelled) return;
             track("ocr_fallback", { error: String(e && e.message || e) });
-            onDone({ deviceKey: null, native: null, name: null, confident: false });
+            onDone({ deviceKey: null, native: null, name: null, confident: false, from: "screenshot" });
           }
         })();
         return () => { cancelled = true; };
@@ -812,6 +894,7 @@
 
     /* =============================== Manual confirm fallback =============================== */
     function Confirm({ prefill, onConfirm, onBack }) {
+      const read = !!(prefill && prefill.confident); // OCR got a clean read — this step is verification, not rescue
       const [key, setKey] = useState(prefill && prefill.deviceKey || "oura");
       const [score, setScore] = useState(prefill && prefill.native != null ? String(prefill.native) : "");
       const [name, setName] = useState(prefill && prefill.name || "");
@@ -823,8 +906,10 @@
             <button onClick={onBack} className="inline-flex items-center gap-1.5 text-xs text-ash hover:text-bone font-mono mb-6">
               <ArrowLeft className="w-3.5 h-3.5" /> back
             </button>
-            <h2 className="text-2xl font-semibold tracking-tight">Confirm your reading</h2>
-            <p className="text-ash text-sm mt-2 mb-6">We couldn't fully read the screenshot. Pick your device and enter your score — we'll normalize it to the Oriya Index.</p>
+            <h2 className="text-2xl font-semibold tracking-tight">{read ? "Verify your score" : "Confirm your reading"}</h2>
+            <p className="text-ash text-sm mt-2 mb-6">{read
+              ? <React.Fragment>Looks like a <span className="text-jade font-mono">{prefill.native}</span> off your {DEVICE_MODEL[prefill.deviceKey] ? DEVICE_MODEL[prefill.deviceKey].tag : "device"} screen — adjust if the OCR read it wrong, then it goes on your Passport.</React.Fragment>
+              : "We couldn't fully read the screenshot. Pick your device and enter your score — we'll normalize it to the Oriya Index."}</p>
 
             <label className="block text-[11px] uppercase tracking-wider font-mono text-ash mb-2">Device</label>
             <div className="flex flex-wrap gap-2 mb-6">
@@ -1037,30 +1122,84 @@
     }
 
     /* =============================== Challenge card =============================== */
-    function ChallengeCard({ c, joined, onOpen }) {
+    /* live standing bar — the "race" read of the table, leader glows */
+    function RaceBar({ race }) {
+      const max = Math.max.apply(null, race.map((s) => s.v));
+      const sum = race.reduce((s, x) => s + x.v, 0) || 1;
+      return (
+        <div className="mt-3">
+          <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+            {race.map((s) => (
+              <span key={s.t} className={"h-full " + (s.v === max ? "bg-jade shadow-[0_0_8px_rgba(127,183,158,0.7)]" : "bg-white/15")} style={{ width: (s.v / sum * 100) + "%" }} />
+            ))}
+          </div>
+          <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
+            {race.map((s) => (
+              <span key={s.t} className={"font-mono text-[10px] " + (s.v === max ? "text-jade" : "text-ash")}>{s.t} {s.v}{s.v === max ? " · leads" : ""}</span>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    /* Slack-ready dare — the snippet leads with who's beating whom by how much,
+       because the margin is the line people paste to their team channel.
+       Board figures are founding-season samples, so the snippet says so. */
+    function slackSnippet(c, race) {
+      const link = "https://oriya.app/try.html?challenge=" + c.id;
+      let live = "";
+      if (race && race.length > 1) {
+        const s = race.slice().sort((a, b) => b.v - a.v);
+        const margin = Math.round((s[0].v - s[1].v) * 10) / 10;
+        live = "\n" + s[0].t + " is beating " + s.slice(1).map((x) => x.t).join(" and ") + " by " + margin + " point" + (margin === 1 ? "" : "s") + " on the recovery board (founding-season board — sample athletes until sides fill).";
+      }
+      return "🟩 [Oriya] *" + c.title + "*" + live
+        + (c.prize ? "\nPot: " + c.prize + (c.split ? " · " + c.split : "") : "")
+        + "\nAny wearable, one fair index. Join to defend your side: " + link;
+    }
+
+    function ChallengeCard({ c, joined, rival, onOpen }) {
       const Icon = c.icon;
+      const race = raceFor(c);
+      const [copied, setCopied] = useState(false);
+      const copySlack = (e) => {
+        e.stopPropagation();
+        try { navigator.clipboard.writeText(slackSnippet(c, race)); } catch (err) {}
+        track("challenge_slack_copied", { challenge: c.id });
+        setCopied(true); window.setTimeout(() => setCopied(false), 1600);
+      };
       return (
         <button onClick={() => onOpen(c)}
-          className="text-left rounded-xl border border-white/10 bg-white/[0.025] p-4 hover:border-jade/40 hover:bg-white/[0.05] transition-all flex flex-col">
+          className="text-left rounded-xl border border-white/10 bg-white/[0.025] p-4 hover:border-amber-brand/40 hover:bg-white/[0.05] transition-all flex flex-col">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-lg leading-none">{c.emoji}</span>
               {c.status === "LIVE"
-                ? <span className="text-[10px] uppercase tracking-wider font-mono text-jade inline-flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-jade animate-pulse" /> Live</span>
+                ? <span className="text-[10px] uppercase tracking-wider font-mono text-jade inline-flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-jade animate-pulse" /> Live table</span>
                 : <span className="text-[10px] uppercase tracking-wider font-mono text-ash">{c.startLabel}</span>}
             </div>
             {c.createdByYou ? <span className="text-[10px] font-mono text-amber-glow inline-flex items-center gap-1"><Star className="w-3 h-3" /> Yours</span>
-              : joined ? <span className="text-[10px] font-mono text-jade">JOINED ✓</span>
+              : joined ? <span className="text-[10px] font-mono text-jade">SEATED ✓</span>
+              : rival ? <span className="text-[10px] font-mono text-amber-glow">⚔ your rivalry</span>
               : c.days != null ? <span className="inline-flex items-center gap-1 text-[11px] text-ash font-mono"><Clock className="w-3 h-3" /> {c.days}d</span> : null}
           </div>
           <h3 className="mt-3 text-sm font-semibold text-bone leading-snug">{c.title}</h3>
           <p className="mt-1 text-xs text-ash leading-relaxed">{c.subtitle}</p>
-          <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
-            <span className="inline-flex items-center gap-1.5 text-xs text-jade">
-              <Users className="w-3.5 h-3.5" /> {c.participants != null ? c.participants + " joined" : "Opening soon"}
+          {race && <RaceBar race={race} />}
+          <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+            <span className="inline-flex items-center gap-1.5 text-xs text-jade min-w-0">
+              <Users className="w-3.5 h-3.5 shrink-0" /> <span className="truncate">{c.participants != null ? c.participants + " seated" : "Seats open"}</span>
             </span>
-            {c.prize ? <span className="inline-flex items-center gap-1 text-[11px] text-amber-glow/90 font-mono"><Trophy className="w-3 h-3" /> {c.prize}</span>
-              : c.sponsor ? <span className="text-[11px] text-amber-glow/80 font-mono">{c.sponsor}</span> : null}
+            <span className="flex items-center gap-2 shrink-0">
+              {c.prize ? <span className="inline-flex items-center gap-1 rounded-full border border-amber-brand/30 bg-amber-brand/[0.07] px-2 py-0.5 text-[10px] text-amber-glow font-mono"><Trophy className="w-3 h-3" /> POT {c.prize}{c.split ? " · " + c.split : ""}</span>
+                : c.sponsor ? <span className="text-[11px] text-amber-glow/80 font-mono">{c.sponsor}</span> : null}
+              <span role="button" tabIndex={0} onClick={copySlack}
+                onKeyDown={(e) => { if (e.key === "Enter") copySlack(e); }}
+                className={"font-mono text-[10px] rounded-full border px-2 py-0.5 transition-colors " + (copied ? "border-jade/50 text-jade" : "border-white/15 text-ash hover:text-bone hover:border-white/30")}
+                title="Challenge a coworker — copies a Slack-ready snippet">
+                {copied ? "copied ✓" : "⚔ coworker"}
+              </span>
+            </span>
           </div>
         </button>
       );
@@ -1086,6 +1225,11 @@
           </div>
           <div className="rounded-xl border border-white/10 bg-black/40 p-3.5 space-y-3">
             {shown.map((msg, i) => {
+              if (msg.sys) return (
+                <div key={i} className="font-mono text-[11px] text-ash/70 leading-snug animate-fade-up pl-1">
+                  <span className="text-jade/60">▸</span> {msg.text}
+                </div>
+              );
               const col = TEAM_COLORS[msg.team] || "#8A8F98";
               return (
                 <div key={i} className="flex gap-2.5 animate-fade-up">
@@ -1093,6 +1237,13 @@
                   <div className="min-w-0">
                     <div className="text-[11px] font-mono"><span style={{ color: col }}>{msg.who}</span> <span className="text-ash/50">· {msg.team}</span></div>
                     <div className="text-[13px] text-bone/90 leading-snug">{msg.text}</div>
+                    {msg.reacts && (
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {msg.reacts.map(([tag, n]) => (
+                          <span key={tag} className="font-mono text-[9px] text-ash rounded border border-white/10 bg-white/[0.03] px-1.5 py-0.5">[{tag}] {n}</span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -1113,11 +1264,137 @@
       );
     }
 
+    /* =============================== Season 1 seat lock (native modal, email capture) =============================== */
+    function Season1Lock({ c, onToast }) {
+      const [open, setOpen] = useState(false);
+      const [email, setEmail] = useState("");
+      const [done, setDone] = useState(() => { try { return !!readJSON("oriya:season1", null); } catch (e) { return false; } });
+      const lock = () => {
+        if (!logUserEmail(email, "season1_lock", { challenge: c.id })) { if (onToast) onToast("Enter a real email — that's your seat"); return; }
+        try { writeJSON("oriya:season1", { email: email.trim().toLowerCase(), challenge: c.id, ts: Date.now() }); } catch (e) {}
+        try { if (!readJSON("oriya:account", null)) writeJSON("oriya:account", { name: "", email: email.trim().toLowerCase(), ts: Date.now() }); } catch (e) {}
+        setDone(true); setOpen(false);
+        if (onToast) onToast("Seat locked — you're on the Season 1 founding list");
+      };
+      return (
+        <React.Fragment>
+          {done
+            ? <p className="mt-3 font-mono text-[11px] text-jade">SEASON 1 · seat locked ✓ — we email your seat number when this board opens with real athletes</p>
+            : <button onClick={() => { setOpen(true); track("season1_lock_opened", { challenge: c.id }); }}
+                className="mt-3 w-full rounded-xl border border-amber-brand/40 bg-amber-brand/[0.07] py-3 text-sm font-semibold text-amber-glow hover:bg-amber-brand/[0.12] transition inline-flex items-center justify-center gap-2">
+                Lock your spot for Season 1 <ChevronRight className="w-4 h-4" />
+              </button>}
+          {open && (
+            <div className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-label="Lock your Season 1 spot">
+              <div className="absolute inset-0 bg-void/80 backdrop-blur-sm" onClick={() => setOpen(false)} />
+              <div className="relative w-full sm:max-w-md bg-[#0a0d14] border border-white/10 rounded-t-3xl sm:rounded-3xl p-6 pb-8 animate-sheet-up">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider font-mono text-amber-glow/80">Season 1 · founding list</div>
+                    <h3 className="text-lg font-semibold text-bone mt-1">Lock your spot on {c.title}</h3>
+                  </div>
+                  <button onClick={() => setOpen(false)} aria-label="Close" className="text-ash hover:text-bone text-lg leading-none p-2 -m-2 shrink-0">✕</button>
+                </div>
+                <p className="text-xs text-ash mt-2 leading-relaxed">Seats are assigned in join order. One email — no password, no spam. You get your seat number the moment this board goes live with real athletes.</p>
+                <div className="mt-4 flex flex-col sm:flex-row gap-2">
+                  <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" type="email" autoFocus
+                    onKeyDown={(e) => { if (e.key === "Enter") lock(); }}
+                    className="flex-1 min-w-0 rounded-xl bg-white/[0.04] border border-white/10 px-4 py-3 text-sm text-bone outline-none focus:border-jade" />
+                  <button onClick={lock} className="rounded-xl bg-jade px-5 py-3 text-sm font-semibold text-void shrink-0">Lock my seat</button>
+                </div>
+                <p className="mt-3 text-[10px] font-mono text-ash/60">Founding season — this board runs on sample athletes until real entries fill it. Locking a seat is free and doubles as your founding account.</p>
+              </div>
+            </div>
+          )}
+        </React.Fragment>
+      );
+    }
+
+    /* =============================== "Proof of Work" Substack hook (micro-card) =============================== */
+    function SubstackHook({ source }) {
+      const [email, setEmail] = useState("");
+      const [ok, setOk] = useState(false);
+      const go = () => {
+        if (!logUserEmail(email, "substack", { from: source })) return;
+        setOk(true);
+        track("substack_hook_subscribed", { from: source });
+        try { window.open("https://oriyaapp.substack.com/subscribe?email=" + encodeURIComponent(email.trim()), "_blank", "noopener"); } catch (e) {}
+      };
+      return (
+        <div className="mt-4 rounded-lg border border-white/10 bg-white/[0.02] p-3.5 animate-fade-up">
+          <p className="text-xs text-bone/90 leading-snug">The math behind this board — <span className="italic">why an Oura 62 ≠ a Whoop 62</span>. The full breakdown is on <span className="text-jade">The Long Game</span>.</p>
+          {ok
+            ? <p className="mt-2 font-mono text-[11px] text-jade">✓ opening Substack — confirm there and the next breakdown lands in your inbox</p>
+            : <div className="mt-2 flex gap-2">
+                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" type="email"
+                  onKeyDown={(e) => { if (e.key === "Enter") go(); }}
+                  className="flex-1 min-w-0 rounded-lg bg-white/[0.04] border border-white/10 px-3 py-2 text-xs text-bone outline-none focus:border-jade" />
+                <button onClick={go} className="rounded-lg border border-jade/40 px-3 py-2 text-xs font-semibold text-jade hover:bg-jade/10 transition shrink-0">Read it</button>
+              </div>}
+        </div>
+      );
+    }
+
     /* =============================== Challenge detail =============================== */
-    function ChallengeDetail({ c, joined, joinedTeam, me, onJoin, onClose, onShare }) {
+    function ChallengeDetail({ c, joined, joinedTeam, me, onJoin, onClose, onShare, onToast }) {
       const multi = c.teams && c.teams.length > 1;
       const [team, setTeam] = useState(multi ? null : (c.teams ? c.teams[0] : c.joinTeam));
       const myTeam = joined ? (joinedTeam || c.joinTeam) : team;
+      const challengeLink = "https://oriya.app/try.html?challenge=" + c.id;
+      const proofMail = "mailto:team@oriya.app?subject=" + encodeURIComponent("Entering " + c.title + (myTeam ? " — " + myTeam : "") + " (screenshot proof)")
+        + "&body=" + encodeURIComponent("Name / IG handle:\nDevice (Oura / Whoop / Garmin / Apple / other):\nThis morning's score:\nSide I'm joining: " + (myTeam || "(tell us which)") + "\nAnonymous on the board? (yes/no — send from your work email and we show only ◒ anon + your @company.com)\n\nAttach this morning's recovery screenshot and hit send — we normalize it by hand and reply with your Oriya Index and where you land on this board.");
+      const copyRally = () => {
+        const msg = "I'm holding " + (myTeam || "my side") + " down in " + c.title + " on Oriya — my normalized recovery score is on the board. Where would yours land? " + challengeLink;
+        try { navigator.clipboard.writeText(msg); } catch (e) {}
+        track("challenge_rally_copied", { challenge: c.id, team: myTeam || null });
+        if (onToast) onToast("Call-out copied — send it to someone on the other side");
+      };
+      /* ---- call the winner: free prediction, no buy-in — the opinion IS the hook.
+             Locking a call requires a founding account (name+email) — the sign-up moment. ---- */
+      const [call, setCall] = useState(() => { try { return readJSON("oriya:calls", {})[c.id] || null; } catch (e) { return null; } });
+      const [account, setAccount] = useState(() => { try { return readJSON("oriya:account", null); } catch (e) { return null; } });
+      const [pendingCall, setPendingCall] = useState(null);
+      const [acctName, setAcctName] = useState("");
+      const [acctEmail, setAcctEmail] = useState("");
+      const createAccount = () => {
+        const email = acctEmail.trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { if (onToast) onToast("Enter a real email — that's the whole account"); return; }
+        const acct = { name: acctName.trim(), email, ts: Date.now() };
+        try { writeJSON("oriya:account", acct); } catch (e) {}
+        setAccount(acct);
+        track("account_created", { from: "call_winner", challenge: c.id, email });
+        logUserEmail(email, "founding_account", { challenge: c.id, name: acct.name });
+        if (pendingCall) { lockCall(pendingCall); setPendingCall(null); }
+      };
+      /* ---- challenge a coworker: stage the invite (explicit submit → captured
+             under source 'challenge_invite') + copy the dare to the clipboard ---- */
+      const [invEmail, setInvEmail] = useState("");
+      const [invStaged, setInvStaged] = useState(false);
+      const stageInvite = () => {
+        if (!logUserEmail(invEmail, "challenge_invite", { challenge: c.id, team: myTeam || null })) { if (onToast) onToast("That's not an email yet"); return; }
+        try { navigator.clipboard.writeText(slackSnippet(c, raceFor(c))); } catch (e) {}
+        setInvStaged(true);
+        if (onToast) onToast("Invite staged — the dare is on your clipboard");
+      };
+      const callWeights = (c.teams || []).map((t) => ({ t, w: 30 + (Math.abs(hashStr(c.id + t)) % 41) }));
+      const wSum = callWeights.reduce((s, x) => s + x.w, 0) || 1;
+      const callPcts = callWeights.map((x, i) => ({ t: x.t,
+        pct: i === callWeights.length - 1
+          ? 100 - callWeights.slice(0, -1).reduce((s, y) => s + Math.round(y.w / wSum * 100), 0)
+          : Math.round(x.w / wSum * 100) }));
+      const lockCall = (t) => {
+        setCall(t);
+        try { const m = readJSON("oriya:calls", {}); m[c.id] = t; writeJSON("oriya:calls", m); } catch (e) {}
+        track("challenge_winner_called", { challenge: c.id, team: t });
+        if (onToast) onToast("Call locked — " + t + " to take it");
+      };
+      const makeCall = (t) => { if (!account) { setPendingCall(t); return; } lockCall(t); };
+      const copyCall = () => {
+        const msg = "I'm calling " + call + " to win " + c.title + " on Oriya. Disagree? Put your number on the board: " + challengeLink;
+        try { navigator.clipboard.writeText(msg); } catch (e) {}
+        track("challenge_call_shared", { challenge: c.id, team: call });
+        if (onToast) onToast("Your call is on the clipboard — go start the argument");
+      };
       const board = c.leaderboard.slice();
       if (joined && me && !board.some((r) => r.you)) board.push({ you: true, init: initials(me.name), handle: me.name || "you", team: myTeam, score: me.oriya, streak: "1d" });
       board.sort((a, b) => b.score - a.score);
@@ -1153,7 +1430,61 @@
                 : <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3"><div className="text-[10px] uppercase tracking-wider font-mono text-ash">Avg score</div><div className="text-lg font-semibold text-bone">{c.avg != null ? c.avg : "—"}</div></div>}
             </div>
             {c.payout && <p className="text-xs text-ash mt-3 font-mono">{c.payout}</p>}
+            <Season1Lock c={c} onToast={onToast} />
             <p className="text-sm text-bone/80 leading-relaxed mt-5">{c.description}</p>
+            {raceFor(c) && (
+              <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                <div className="text-[10px] uppercase tracking-wider font-mono text-ash mb-1">The table right now</div>
+                <RaceBar race={raceFor(c)} />
+              </div>
+            )}
+
+            {multi && (
+              <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-semibold text-bone uppercase tracking-wider">Call the winner</h3>
+                  <span className="text-[10px] font-mono text-ash shrink-0">no buy-in · bragging rights</span>
+                </div>
+                <p className="text-xs text-ash mt-1">{call ? "The room so far — your call is locked in." : "Before you look at the board: which side takes it?"}</p>
+                <div className="mt-3 space-y-2">
+                  {callPcts.map(({ t, pct }) => (
+                    <button key={t} onClick={() => makeCall(t)} disabled={!!call}
+                      className={"relative w-full overflow-hidden rounded-lg border px-3 py-2.5 text-left text-sm transition-all " + (call === t ? "border-jade/60 bg-jade/[0.06] text-bone" : call ? "border-white/10 text-ash" : (pendingCall === t ? "border-amber-brand/60 bg-amber-brand/[0.05] text-bone" : "border-white/15 text-bone hover:border-jade/50 hover:bg-white/[0.04]"))}>
+                      {call && <span className="absolute inset-y-0 left-0 bg-jade/10" style={{ width: pct + "%" }} />}
+                      <span className="relative flex items-center justify-between gap-2">
+                        <span className="font-medium truncate">{t}{call === t ? " — your call" : ""}</span>
+                        {call
+                          ? <span className="font-mono text-xs shrink-0"><span className="text-jade">{pct}%</span><span className="text-ash/60"> · pays ×{(100 / pct).toFixed(1)} in respect</span></span>
+                          : <ChevronRight className="w-4 h-4 text-ash/60 shrink-0" />}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                {pendingCall && !account && (
+                  <div className="mt-3 rounded-lg border border-amber-brand/40 bg-amber-brand/[0.06] p-3 animate-fade-up">
+                    <p className="text-xs text-bone font-medium">Calls go on the record. Claim your founding account to lock <span className="text-amber-glow">{pendingCall}</span>.</p>
+                    <div className="mt-2 flex flex-col sm:flex-row gap-2">
+                      <input value={acctName} onChange={(e) => setAcctName(e.target.value)} placeholder="Name or @handle"
+                        className="flex-1 min-w-0 rounded-lg bg-white/[0.04] border border-white/10 px-3 py-2 text-sm text-bone outline-none focus:border-jade" />
+                      <input value={acctEmail} onChange={(e) => setAcctEmail(e.target.value)} placeholder="you@email.com" type="email"
+                        onKeyDown={(e) => { if (e.key === "Enter") createAccount(); }}
+                        className="flex-1 min-w-0 rounded-lg bg-white/[0.04] border border-white/10 px-3 py-2 text-sm text-bone outline-none focus:border-jade" />
+                      <button onClick={createAccount} className="rounded-lg bg-jade px-4 py-2 text-sm font-semibold text-void shrink-0">Lock my call</button>
+                    </div>
+                    <p className="mt-2 text-[10px] font-mono text-ash/60">Founding account · no password yet · saved on this device and to the founding list</p>
+                  </div>
+                )}
+                {call && (
+                  <React.Fragment>
+                    <button onClick={copyCall} className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-amber-glow hover:brightness-110">
+                      <Copy className="w-4 h-4" /> Copy your call — make someone bet against you
+                    </button>
+                    <p className="mt-2 text-[10px] font-mono text-ash/60">Founding season · sample split · your call is saved on this device</p>
+                    {!joined && <SubstackHook source="call_locked" />}
+                  </React.Fragment>
+                )}
+              </div>
+            )}
 
             {joined && (
               <div className="mt-5 rounded-xl border border-jade/40 bg-jade/[0.08] p-4 animate-fade-up">
@@ -1161,6 +1492,11 @@
                 <button onClick={onShare} className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-jade hover:text-jade-glow">
                   <Share2 className="w-4 h-4" /> Share your Passport — pull a teammate onto the board before tomorrow's sync
                 </button>
+                <button onClick={copyRally} className="mt-2 flex items-start gap-2 text-left text-sm font-medium text-amber-glow hover:brightness-110">
+                  <Copy className="w-4 h-4 shrink-0 mt-0.5" /> Copy the call-out — send it to the rival side and make them post a number
+                </button>
+                <p className="mt-3 text-[11px] text-ash font-mono leading-relaxed">When your side takes the pot, the win is stamped on your Body Passport — that stamp is your claim, verified by us before anything is paid out.</p>
+                <SubstackHook source="joined" />
               </div>
             )}
 
@@ -1195,9 +1531,13 @@
                       <span className="w-6 text-center font-mono text-ash text-sm shrink-0">{medal(i)}</span>
                       <span className={"w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-semibold shrink-0 " + (r.you ? "bg-jade text-void" : "bg-white/8 text-bone")}>{r.init}</span>
                       <div className="flex-1 min-w-0">
-                        <div className={"truncate text-sm leading-tight " + (r.you ? "text-jade font-semibold" : "text-bone")}>{r.you ? (me.name || "you") + " (you)" : r.handle}</div>
+                        <div className={"truncate text-sm leading-tight " + (r.you ? "text-jade font-semibold" : "text-bone")}>
+                          {r.you ? (me.name || "you") + " (you)" : r.handle}
+                          {r.anon && <span className="ml-1.5 align-middle font-mono text-[9px] text-jade/80 border border-jade/30 rounded-full px-1.5 py-px whitespace-nowrap">anon · work-email</span>}
+                        </div>
                         <div className="flex items-center gap-1.5 mt-0.5 font-mono text-[10px] text-ash truncate">
                           <span className="text-jade/80 truncate max-w-[6.5rem]">{r.team}</span>
+                          {!r.you && TEAM_DOMAINS[r.team] && <span className={(r.anon ? "" : "hidden sm:inline ") + "shrink-0 " + (r.anon ? "text-jade/70" : "text-ash/50")}>@{TEAM_DOMAINS[r.team]}</span>}
                           <span className="text-ash/40">·</span>
                           <span className="shrink-0">{dev}</span>
                           <span className="text-ash/40">·</span>
@@ -1211,7 +1551,7 @@
                     </div>
                   );})}
                 </div>
-                <p className="mt-2 text-[10px] text-ash/60 font-mono">Par 71 · your board baseline. A red morning logged still beats a forgotten green one.</p>
+                <p className="mt-2 text-[10px] text-ash/60 font-mono">Par 71 · your board baseline. ◒ anon = name hidden, entry proved from a work email — you flex the domain, not the name. Founding season — sample athletes (domain flags illustrative) until each side fills with real entries. A red morning logged still beats a forgotten green one.</p>
               </div>
             )}
 
@@ -1232,7 +1572,40 @@
               ))}
             </div>
 
-            <div className="mt-8 rounded-xl border border-white/10 bg-white/[0.02] p-5">
+            <div className="mt-8 rounded-xl border border-jade/25 bg-jade/[0.04] p-5">
+              <p className="text-sm text-bone font-medium">Enter by email — no sync needed.</p>
+              <p className="text-xs text-ash mt-1">Founding season runs hands-on: email this morning's recovery screenshot and we normalize it ourselves, reply with your Oriya Index, and post you to this board{myTeam ? " on " + myTeam : ""}.</p>
+              <a href={proofMail} onClick={() => track("challenge_email_proof", { challenge: c.id, team: myTeam || null })}
+                className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-jade hover:text-jade-glow">
+                <Upload className="w-4 h-4" /> Email your proof → team@oriya.app
+              </a>
+              <p className="text-[10px] font-mono text-ash/60 mt-2">Want to flex anonymously? Send it from your work email — the board shows only ◒ anon + your @company.com.</p>
+            </div>
+
+            <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] p-5">
+              <p className="text-sm text-bone font-medium">Challenge a coworker ⚔</p>
+              <p className="text-xs text-ash mt-1">Drop their email — we stage the invite and put the Slack-ready dare on your clipboard. One invite, used once to seat them on this board; never a mailing list.</p>
+              {invStaged
+                ? <p className="mt-3 font-mono text-[11px] text-jade">Invite staged ✓ — the dare is on your clipboard, paste it to them</p>
+                : <div className="mt-3 flex flex-col sm:flex-row gap-2">
+                    <input value={invEmail} onChange={(e) => setInvEmail(e.target.value)} placeholder="coworker@company.com" type="email"
+                      onKeyDown={(e) => { if (e.key === "Enter") stageInvite(); }}
+                      className="flex-1 min-w-0 rounded-lg bg-white/[0.04] border border-white/10 px-3 py-2 text-sm text-bone outline-none focus:border-jade" />
+                    <button onClick={stageInvite} className="rounded-lg border border-amber-brand/40 px-4 py-2 text-sm font-semibold text-amber-glow hover:bg-amber-brand/10 transition shrink-0">Stage invite</button>
+                  </div>}
+            </div>
+
+            <div className="mt-4 rounded-xl border border-amber-brand/25 bg-amber-brand/[0.04] p-5">
+              <p className="text-sm text-bone font-medium">Back the pot 🪙</p>
+              <p className="text-xs text-ash mt-1 leading-relaxed">Sponsors and side-loyalists can add to the prize purse. Backing is sponsorship of the prize, <span className="text-bone">not a wager</span> — backers don't get paid out, athletes do. We verify every backer and invoice through a secure Airwallex payment link; we never take wires against details posted on a webpage, and pots only open once a board is filled with real, verified athletes.</p>
+              <a href={"mailto:team@oriya.app?subject=" + encodeURIComponent("Backing the pot — " + c.title) + "&body=" + encodeURIComponent("I want to add $___ to the " + c.title + " prize purse.\nName / company:\nSide I'm backing (optional):\n\nOriya replies with a verified Airwallex payment link once the board is live with real athletes. Purse backing is prize sponsorship, not a wager, and does not pay out to the backer.")}
+                onClick={() => track("pot_backing_started", { challenge: c.id })}
+                className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-amber-glow hover:brightness-110">
+                <Trophy className="w-4 h-4" /> Pledge to the purse → team@oriya.app
+              </a>
+            </div>
+
+            <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] p-5">
               <p className="text-sm text-bone font-medium">Want to run one for your team?</p>
               <p className="text-xs text-ash mt-1">We run the normalization, scoring, and payout. You bring the crew and the pool.</p>
               <p className="text-xs font-mono mt-3"><a href="mailto:team@oriya.app" className="text-jade">team@oriya.app</a> <span className="text-ash">·</span> <a href="mailto:hello@oriya.app" className="text-jade">hello@oriya.app</a></p>
@@ -1359,8 +1732,14 @@
     }
 
     /* =============================== Dashboard =============================== */
-    function Dashboard({ passport, setPassport }) {
+    function Dashboard({ passport, setPassport, deepId }) {
       const [selected, setSelected] = useState(null);
+      // deep-linked from a challenge card — drop them straight onto the board they came for
+      useEffect(() => {
+        if (!deepId) return;
+        const c = CHALLENGES.find((x) => x.id === deepId);
+        if (c) { setSelected(c); track("challenge_deeplink_opened", { challenge: deepId }); }
+      }, []);
       const [joined, setJoined] = useState({});
       const [userSquads, setUserSquads] = useState([]);
       const [teammates, setTeammates] = useState([]);
@@ -1400,8 +1779,15 @@
       joinedChallenges.slice(0, 1).forEach((c) => countryStamps.push({ label: (joined[c.id] || c.joinTeam) }));
       if (countryStamps.length < 3) countryStamps.push({ label: "LOCKED", locked: true });
 
+      /* ---- dynamic rivalry: a founding-account email on a known tech domain elevates
+             the board pitting their company against its natural rival ---- */
+      const account = readJSON("oriya:account", null);
+      const rivalId = rivalryFor(account && account.email);
+
       /* ---- "where you'd land" — the status payoff BEFORE commitment (Mom Test: lead with the rank, not after) ---- */
-      const hotChallenge = CHALLENGES.find((c) => c.status === "LIVE" && c.leaderboard && c.leaderboard.length > 0);
+      const hotChallenge = CHALLENGES.find((c) => c.id === deepId && c.status === "LIVE" && c.leaderboard && c.leaderboard.length > 0)
+        || CHALLENGES.find((c) => c.id === rivalId && c.status === "LIVE" && c.leaderboard && c.leaderboard.length > 0)
+        || CHALLENGES.find((c) => c.status === "LIVE" && c.leaderboard && c.leaderboard.length > 0);
       const hotPreviewRank = hotChallenge ? hotChallenge.leaderboard.filter((r) => r.score > passport.oriya).length + 1 : null;
       const hotField = hotChallenge ? hotChallenge.leaderboard.length + 1 : null;
       const alreadyJoinedHot = hotChallenge ? !!joined[hotChallenge.id] : false;
@@ -1410,8 +1796,11 @@
       const tierState = { hasSquad, joinedCount: joinedChallenges.length, earnings, teammates: teammates.length };
       const tier = tierFor(tierState);
       const tierHint = nextTierHint(tierState);
-      // LIVE clusters first — a board with people on it, never an empty marketplace for user #1
-      const sortedChallenges = CHALLENGES.slice().sort((a, b) => (a.status === "LIVE" ? 0 : 1) - (b.status === "LIVE" ? 0 : 1));
+      // LIVE clusters first — a board with people on it, never an empty marketplace for user #1.
+      // Within each status group, the visitor's company rivalry (if known) floats to the top.
+      const sortedChallenges = CHALLENGES.slice().sort((a, b) =>
+        ((a.status === "LIVE" ? 0 : 1) - (b.status === "LIVE" ? 0 : 1))
+        || ((a.id === rivalId ? 0 : 1) - (b.id === rivalId ? 0 : 1)));
 
       const shareUrl = "https://oriya.app/?ref=" + slug(passport.name) + "-" + passport.oriya + (passport.squad ? "&squad=" + encodeURIComponent(passport.squad) : "");
       const caption = (passport.squad ? "Running " + passport.squad + " on Oriya. " : "") + "My readiness normalizes to " + passport.oriya + " on the Oriya Index — same number on any wearable (" + DEVICE_MODEL[passport.deviceKey].tag + ")." + (igHandle ? " @" + igHandle : "") + " Squad's open, pull up 👇";
@@ -1626,7 +2015,7 @@
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {userSquads.map((c) => <ChallengeCard key={c.id} c={c} joined={true} onOpen={setSelected} />)}
-              {sortedChallenges.map((c) => <ChallengeCard key={c.id} c={c} joined={!!joined[c.id]} onOpen={setSelected} />)}
+              {sortedChallenges.map((c) => <ChallengeCard key={c.id} c={c} joined={!!joined[c.id]} rival={c.id === rivalId} onOpen={setSelected} />)}
             </div>
 
             {showSim && (
@@ -1641,7 +2030,7 @@
 
           {selected && (
             <ChallengeDetail c={selected} joined={!!joined[selected.id]} joinedTeam={joined[selected.id]} me={passport}
-              onJoin={(c, team) => joinChallenge(c, team)} onClose={() => setSelected(null)} onShare={sharePassport} />
+              onJoin={(c, team) => joinChallenge(c, team)} onClose={() => setSelected(null)} onShare={sharePassport} onToast={flashToast} />
           )}
 
           {toast && (
@@ -1731,11 +2120,20 @@
       const [privacy, setPrivacy] = useState(false);
       const [connectKey, setConnectKey] = useState(null);
       const [resume, setResume] = useState(() => { const t = loadTrial(); return t && t.passport ? t.passport : null; });
+      // arrived via a challenge card (index.html?challenge=<id>) — carry that intent through the whole flow
+      const [deepId, setDeepId] = useState(() => {
+        try {
+          const c = new URLSearchParams(location.search).get("challenge");
+          return c && CHALLENGES.some((x) => x.id === c) ? c : null;
+        } catch (e) { return null; }
+      });
+      const deepChallenge = deepId ? CHALLENGES.find((x) => x.id === deepId) : null;
 
       useEffect(() => {
         try {
           const p = new URLSearchParams(location.search);
           if (p.get("ref") || p.get("squad")) track("door_selected", { door: "join", squad: p.get("squad") || null, ref: p.get("ref") || null });
+          if (deepId) track("challenge_deeplink", { challenge: deepId });
         } catch (e) {}
       }, []);
 
@@ -1763,12 +2161,14 @@
         setResume(p);
         setView("dashboard");
       };
-      const handleResolved = (r) => { if (!r.confident) { setPrefill(r); setView("confirm"); return; } finalize(r.deviceKey, r.native, r.name); };
+      // screenshots ALWAYS pass through the verify step (editable, pre-filled) — the user
+      // confirms the OCR read before it becomes their number; presets/sync skip it.
+      const handleResolved = (r) => { if (r.from === "screenshot" || !r.confident) { setPrefill(r); setView("confirm"); return; } finalize(r.deviceKey, r.native, r.name); };
 
-      const screen = view === "hook" ? <Hook onScreenshot={startScreenshot} onConnect={startConnect} resume={resume} onResume={doResume} />
+      const screen = view === "hook" ? <Hook onScreenshot={startScreenshot} onConnect={startConnect} resume={resume} onResume={doResume} deep={deepChallenge} />
         : view === "normalizing" ? <Normalizing pending={pending} onDone={handleResolved} />
         : view === "confirm" ? <Confirm prefill={prefill} onConfirm={(d) => finalize(d.deviceKey, d.native, d.name, "manual")} onBack={() => setView("hook")} />
-        : <Dashboard passport={passport} setPassport={setPassport} />;
+        : <Dashboard passport={passport} setPassport={setPassport} deepId={deepId} />;
       return (
         <React.Fragment>
           {screen}
