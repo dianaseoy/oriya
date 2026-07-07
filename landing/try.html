@@ -281,13 +281,18 @@
     /* =================== unified email capture ===================
        EVERY email input on this page routes through here — one seam, no
        redirects, no bottom-form dependency. Locally: appended to a durable
-       oriya:emails log. Remotely: track() beacons to ORIYA_INGEST_URL, and
-       if window.ORIYA_EMAIL_WEBHOOK is set the record is also POSTed there
-       (point it at a Tally/collector webhook). With neither set, emails
-       NEVER leave the visitor's device — wire an endpoint before counting
-       these as captured leads. Capture fires only on an explicit submit
-       action (button/Enter), never on keystrokes. */
+       oriya:emails log. Remotely: submitted into the Tally form xXB0xy
+       ("email list - landing/try") through the same respond endpoint the
+       Tally form page itself calls, so each capture lands as a row in the
+       Tally Responses tab (email + source). track() still beacons to
+       ORIYA_INGEST_URL, and window.ORIYA_EMAIL_WEBHOOK (if set) gets a JSON
+       copy. Capture fires only on an explicit submit action (button/Enter),
+       never on keystrokes. */
     const EMAILS_KEY = "oriya:emails";
+    const TALLY_RESPOND = "https://api.tally.so/forms/xXB0xy/respond";
+    /* groupUuids of the form's questions — if fields are edited in Tally,
+       re-read them from the form page's __NEXT_DATA__ blocks */
+    const TALLY_Q = { email: "37cd2a09-f318-438a-91f8-2ef0fa02d065", source: "84f96066-a5ad-4db1-8e79-75b7eef16231" };
     const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || "").trim());
     function logUserEmail(email, source, extra) {
       email = String(email || "").trim().toLowerCase();
@@ -295,6 +300,14 @@
       const rec = Object.assign({ email, source: source || "unknown" }, extra || {});
       try { const list = readJSON(EMAILS_KEY, []); list.push(Object.assign({ ts: Date.now() }, rec)); while (list.length > 120) list.shift(); writeJSON(EMAILS_KEY, list); } catch (e) {}
       track("email_captured", rec);
+      try {
+        const label = Object.keys(rec).filter((k) => k !== "email" && rec[k] != null).map((k) => (k === "source" ? String(rec[k]) : k + ":" + rec[k])).join(" · ");
+        const uid = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(16).slice(2));
+        const responses = {};
+        responses[TALLY_Q.email] = email;
+        responses[TALLY_Q.source] = label;
+        fetch(TALLY_RESPOND, { method: "POST", keepalive: true, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionUuid: uid(), respondentUuid: uid(), responses: responses, captchas: {}, isCompleted: true }) }).catch(() => {});
+      } catch (e) {}
       try {
         if (window.ORIYA_EMAIL_WEBHOOK) fetch(window.ORIYA_EMAIL_WEBHOOK, { method: "POST", mode: "no-cors", keepalive: true, headers: { "Content-Type": "application/json" }, body: JSON.stringify(Object.assign({ ts: Date.now() }, rec)) });
       } catch (e) {}

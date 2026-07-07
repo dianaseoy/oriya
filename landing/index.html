@@ -1769,15 +1769,24 @@
 
   /* ========== Unified email capture (mirrors try.html's logUserEmail) ==========
      Any email input on this page is background-logged on submit — the form's own
-     action (Substack subscribe, Tally embed) still runs; this just guarantees the
-     address also lands in our funnel log. Remote persistence requires
-     window.ORIYA_EMAIL_WEBHOOK / ORIYA_INGEST_URL to be set — with neither,
-     nothing leaves the visitor's device. */
+     action (Substack subscribe, Tally embed) still runs; this also submits the
+     address into the Tally form xXB0xy ("email list - landing/try") via the same
+     respond endpoint the Tally form page itself calls, so it lands as a row in
+     the Tally Responses tab (email + source). groupUuids below are the form's
+     question ids — re-read from the form page's __NEXT_DATA__ if fields change. */
   window.oriyaLogEmail = function (email, source, extra) {
     email = String(email || "").trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
     var rec = Object.assign({ email: email, source: source || "unknown" }, extra || {});
     window.oriyaTrack("email_captured", rec);
+    try {
+      var label = Object.keys(rec).filter(function (k) { return k !== "email" && rec[k] != null; }).map(function (k) { return k === "source" ? String(rec[k]) : k + ":" + rec[k]; }).join(" · ");
+      var uid = function () { return window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(16).slice(2); };
+      var responses = {};
+      responses["37cd2a09-f318-438a-91f8-2ef0fa02d065"] = email;  // Email question
+      responses["84f96066-a5ad-4db1-8e79-75b7eef16231"] = label;  // source question
+      fetch("https://api.tally.so/forms/xXB0xy/respond", { method: "POST", keepalive: true, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionUuid: uid(), respondentUuid: uid(), responses: responses, captchas: {}, isCompleted: true }) }).catch(function () {});
+    } catch (e) {}
     try {
       var body = JSON.stringify(Object.assign({ ts: Date.now() }, rec));
       if (window.ORIYA_EMAIL_WEBHOOK) fetch(window.ORIYA_EMAIL_WEBHOOK, { method: "POST", mode: "no-cors", keepalive: true, headers: { "Content-Type": "application/json" }, body: body });
