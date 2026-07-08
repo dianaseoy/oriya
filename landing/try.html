@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Oriya — Your Body Passport</title>
   <meta name="description" content="Drop a recovery screenshot. We OCR-verify it, normalize it to the Oriya Index, and drop you into live recovery challenges." />
+  <meta name="theme-color" content="#020617">
+  <script>
+    /* Theme boot — before first paint; same key as index.html so the choice
+       follows the visitor across pages. Brand default is dark. */
+    (function () {
+      var t = "dark";
+      try { var s = localStorage.getItem("oriya:theme"); if (s === "light" || s === "dark") t = s; } catch (e) {}
+      document.documentElement.dataset.theme = t;
+      try { var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = t === "light" ? "#F4F2EB" : "#020617"; } catch (e) {}
+    })();
+  </script>
 
   <!-- No build step. UMD React + ReactDOM + Babel Standalone (plain text/babel).
        Tesseract.js (OCR) and html-to-image (share PNG) are lazy-loaded on demand. -->
@@ -14,10 +25,12 @@
       theme: {
         extend: {
           colors: {
-            void: "#020617", ink: "#0c0e12", graphite: "#16191F",
-            bone: "#ECEAE4", ash: "#8A8F98",
-            jade: { DEFAULT: "#7FB79E", deep: "#3E6F5E", glow: "#9FD3BB" },
-            amber: { brand: "#D7A25C", deep: "#B5723C", glow: "#F0C083" },
+            /* var-based so the light/dark toggle re-colors every utility class;
+               triplets live in :root / :root[data-theme="light"] in the page stylesheet */
+            void: "rgb(var(--c-void) / <alpha-value>)", ink: "rgb(var(--c-ink) / <alpha-value>)", graphite: "rgb(var(--c-graphite) / <alpha-value>)",
+            bone: "rgb(var(--c-bone) / <alpha-value>)", ash: "rgb(var(--c-ash) / <alpha-value>)",
+            jade: { DEFAULT: "rgb(var(--c-jade) / <alpha-value>)", deep: "rgb(var(--c-jade-deep) / <alpha-value>)", glow: "rgb(var(--c-jade-glow) / <alpha-value>)" },
+            amber: { brand: "rgb(var(--c-amber) / <alpha-value>)", deep: "rgb(var(--c-amber-deep) / <alpha-value>)", glow: "rgb(var(--c-amber-glow) / <alpha-value>)" },
           },
           fontFamily: {
             sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
@@ -52,14 +65,60 @@
       --bone:#ECEAE4; --ash:#8A8F98; --hairline:rgba(236,234,228,.10);
       --jade:#7FB79E; --jade-deep:#3E6F5E; --amber:#D7A25C; --amber-deep:#B5723C;
       --font-mono:'JetBrains Mono',ui-monospace,monospace;
+      /* space-separated triplets feed tailwind's rgb(var() / <alpha-value>) colors */
+      --c-void:2 6 23; --c-ink:12 14 18; --c-graphite:22 25 31;
+      --c-bone:236 234 228; --c-ash:138 143 152;
+      --c-jade:127 183 158; --c-jade-deep:62 111 94; --c-jade-glow:159 211 187;
+      --c-amber:215 162 92; --c-amber-deep:181 114 60; --c-amber-glow:240 192 131;
+      color-scheme:dark;
     }
-    html, body { background:#020617; }
+    :root[data-theme="light"]{
+      color-scheme:light;
+      --void:#F4F2EB; --ink:#FAF8F2; --graphite:#ECE9E0;
+      --bone:#181C25; --ash:#5C6270; --hairline:rgba(24,28,37,.14);
+      --jade:#3E7A5F; --jade-deep:#2E5C47; --amber:#A9691F; --amber-deep:#8A5518;
+      --c-void:244 242 235; --c-ink:250 248 242; --c-graphite:236 233 224;
+      --c-bone:24 28 37; --c-ash:92 98 112;
+      --c-jade:62 122 95; --c-jade-deep:46 92 71; --c-jade-glow:78 148 116;
+      --c-amber:169 105 31; --c-amber-deep:138 85 24; --c-amber-glow:185 126 44;
+    }
+    /* dark-pinned islands: the passport artifact and the neon challenge cards
+       keep the night palette in light mode (dark console on a light page) */
+    :root[data-theme="light"] :is(.dark-pin, .passport-card){
+      --bone:#ECEAE4; --ash:#8A8F98; --hairline:rgba(236,234,228,.10);
+      --jade:#7FB79E; --jade-deep:#3E6F5E; --amber:#D7A25C; --amber-deep:#B5723C;
+      --c-void:2 6 23; --c-ink:12 14 18; --c-graphite:22 25 31;
+      --c-bone:236 234 228; --c-ash:138 143 152;
+      --c-jade:127 183 158; --c-jade-deep:62 111 94; --c-jade-glow:159 211 187;
+      --c-amber:215 162 92; --c-amber-deep:181 114 60; --c-amber-glow:240 192 131;
+      color-scheme:dark;
+    }
+    :root[data-theme="light"] .topnav{ background:rgba(250,248,242,.78); border-bottom:1px solid rgba(24,28,37,.12); }
+    .theme-toggle{ width:32px; height:32px; border-radius:50%; border:1px solid var(--hairline);
+      background:transparent; color:var(--bone); font-size:14px; line-height:1; cursor:pointer;
+      display:inline-grid; place-items:center; flex:none; transition:border-color .25s; }
+    .theme-toggle:hover{ border-color:var(--jade-deep); }
+    html, body { background:var(--void); }
     body { -webkit-font-smoothing:antialiased; }
     /* serif display — mirrors landing index.html for cross-page cohesion */
     .display{ font-family:'Instrument Serif',ui-serif,Georgia,serif; font-weight:400; letter-spacing:-0.005em; }
     .display em{ font-style:italic; }
     .spin { animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---- Live Challenges arena: neon cyber-sport accents (scoped to the
+       challenge cards; base tokens elsewhere stay jade/amber on void) ---- */
+    .chal-scan { background:linear-gradient(105deg, transparent 42%, rgba(0,255,135,.055) 50%, transparent 58%);
+      background-size:260% 100%; animation:chalScan 4.4s linear infinite; }
+    @keyframes chalScan { from { background-position:200% 0; } to { background-position:-100% 0; } }
+    .live-ring { animation:chalPulseRing 2.2s ease-out infinite; }
+    @keyframes chalPulseRing { 0%{ box-shadow:0 0 0 0 rgba(0,255,135,.4); } 70%{ box-shadow:0 0 0 6px rgba(0,255,135,0); } 100%{ box-shadow:0 0 0 0 rgba(0,255,135,0); } }
+    /* physics-feel bar fill: overshoot spring curve, fired on scroll-into-view */
+    .race-fill { transition:width 1.15s cubic-bezier(.34,1.56,.64,1); }
+    @media (prefers-reduced-motion: reduce){
+      .chal-scan, .live-ring { animation:none; }
+      .race-fill { transition:none; }
+    }
 
     /* ---- Credit-card Body Passport (mirrors landing .passport) ---- */
     .passport-card{
@@ -209,6 +268,49 @@
     .qt-pulse{ animation:qtPulse 2.4s ease-in-out infinite; }
     @keyframes qtPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(127,183,158,0); } 50%{ box-shadow:0 0 22px -5px rgba(127,183,158,.5); } }
     @media (prefers-reduced-motion: reduce){ .qt-pulse{ animation:none } }
+  
+    /* ---- LIGHT MODE: white-alpha utility remaps (generated). Dark washes on
+       cream; .dark-pin/.passport-card re-pin the originals inside islands ---- */
+    [data-theme="light"] .bg-white\/\[0\.015\] { background-color:rgba(16,20,33,0.035); }
+    [data-theme="light"] .bg-white\/\[0\.02\] { background-color:rgba(16,20,33,0.042); }
+    [data-theme="light"] .bg-white\/\[0\.03\] { background-color:rgba(16,20,33,0.056); }
+    [data-theme="light"] .bg-white\/\[0\.04\] { background-color:rgba(16,20,33,0.069); }
+    [data-theme="light"] .bg-white\/\[0\.05\] { background-color:rgba(16,20,33,0.083); }
+    [data-theme="light"] .bg-white\/5 { background-color:rgba(16,20,33,0.083); }
+    [data-theme="light"] .bg-white\/8 { background-color:rgba(16,20,33,0.123); }
+    [data-theme="light"] .bg-white\/10 { background-color:rgba(16,20,33,0.15); }
+    [data-theme="light"] .bg-white\/15 { background-color:rgba(16,20,33,0.218); }
+    [data-theme="light"] .hover\:bg-white\/\[0\.04\]:hover { background-color:rgba(16,20,33,0.069); }
+    [data-theme="light"] .hover\:bg-white\/\[0\.06\]:hover { background-color:rgba(16,20,33,0.096); }
+    [data-theme="light"] .hover\:bg-white\/\[0\.07\]:hover { background-color:rgba(16,20,33,0.11); }
+    [data-theme="light"] .border-white\/5 { border-color:rgba(16,20,33,0.118); }
+    [data-theme="light"] .border-white\/8 { border-color:rgba(16,20,33,0.158); }
+    [data-theme="light"] .border-white\/10 { border-color:rgba(16,20,33,0.185); }
+    [data-theme="light"] .border-white\/12 { border-color:rgba(16,20,33,0.212); }
+    [data-theme="light"] .border-white\/15 { border-color:rgba(16,20,33,0.253); }
+    [data-theme="light"] .hover\:border-white\/20:hover { border-color:rgba(16,20,33,0.32); }
+    [data-theme="light"] .hover\:border-white\/25:hover { border-color:rgba(16,20,33,0.388); }
+    [data-theme="light"] .hover\:border-white\/30:hover { border-color:rgba(16,20,33,0.455); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .bg-white\/\[0\.015\], [data-theme="light"] :is(.dark-pin.bg-white\/\[0\.015\],.passport-card.bg-white\/\[0\.015\]) { background-color:rgba(255,255,255,0.015); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .bg-white\/\[0\.02\], [data-theme="light"] :is(.dark-pin.bg-white\/\[0\.02\],.passport-card.bg-white\/\[0\.02\]) { background-color:rgba(255,255,255,0.02); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .bg-white\/\[0\.03\], [data-theme="light"] :is(.dark-pin.bg-white\/\[0\.03\],.passport-card.bg-white\/\[0\.03\]) { background-color:rgba(255,255,255,0.03); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .bg-white\/\[0\.04\], [data-theme="light"] :is(.dark-pin.bg-white\/\[0\.04\],.passport-card.bg-white\/\[0\.04\]) { background-color:rgba(255,255,255,0.04); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .bg-white\/\[0\.05\], [data-theme="light"] :is(.dark-pin.bg-white\/\[0\.05\],.passport-card.bg-white\/\[0\.05\]) { background-color:rgba(255,255,255,0.05); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .bg-white\/5, [data-theme="light"] :is(.dark-pin.bg-white\/5,.passport-card.bg-white\/5) { background-color:rgba(255,255,255,0.05); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .bg-white\/8, [data-theme="light"] :is(.dark-pin.bg-white\/8,.passport-card.bg-white\/8) { background-color:rgba(255,255,255,0.08); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .bg-white\/10, [data-theme="light"] :is(.dark-pin.bg-white\/10,.passport-card.bg-white\/10) { background-color:rgba(255,255,255,0.1); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .bg-white\/15, [data-theme="light"] :is(.dark-pin.bg-white\/15,.passport-card.bg-white\/15) { background-color:rgba(255,255,255,0.15); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .hover\:bg-white\/\[0\.04\]:hover, [data-theme="light"] :is(.dark-pin.hover\:bg-white\/\[0\.04\]:hover,.passport-card.hover\:bg-white\/\[0\.04\]:hover) { background-color:rgba(255,255,255,0.04); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .hover\:bg-white\/\[0\.06\]:hover, [data-theme="light"] :is(.dark-pin.hover\:bg-white\/\[0\.06\]:hover,.passport-card.hover\:bg-white\/\[0\.06\]:hover) { background-color:rgba(255,255,255,0.06); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .hover\:bg-white\/\[0\.07\]:hover, [data-theme="light"] :is(.dark-pin.hover\:bg-white\/\[0\.07\]:hover,.passport-card.hover\:bg-white\/\[0\.07\]:hover) { background-color:rgba(255,255,255,0.07); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .border-white\/5, [data-theme="light"] :is(.dark-pin.border-white\/5,.passport-card.border-white\/5) { border-color:rgba(255,255,255,0.05); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .border-white\/8, [data-theme="light"] :is(.dark-pin.border-white\/8,.passport-card.border-white\/8) { border-color:rgba(255,255,255,0.08); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .border-white\/10, [data-theme="light"] :is(.dark-pin.border-white\/10,.passport-card.border-white\/10) { border-color:rgba(255,255,255,0.1); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .border-white\/12, [data-theme="light"] :is(.dark-pin.border-white\/12,.passport-card.border-white\/12) { border-color:rgba(255,255,255,0.12); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .border-white\/15, [data-theme="light"] :is(.dark-pin.border-white\/15,.passport-card.border-white\/15) { border-color:rgba(255,255,255,0.15); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .hover\:border-white\/20:hover, [data-theme="light"] :is(.dark-pin.hover\:border-white\/20:hover,.passport-card.hover\:border-white\/20:hover) { border-color:rgba(255,255,255,0.2); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .hover\:border-white\/25:hover, [data-theme="light"] :is(.dark-pin.hover\:border-white\/25:hover,.passport-card.hover\:border-white\/25:hover) { border-color:rgba(255,255,255,0.25); }
+    [data-theme="light"] :is(.dark-pin,.passport-card) .hover\:border-white\/30:hover, [data-theme="light"] :is(.dark-pin.hover\:border-white\/30:hover,.passport-card.hover\:border-white\/30:hover) { border-color:rgba(255,255,255,0.3); }
   </style>
 </head>
 <body class="bg-void text-bone font-sans">
@@ -235,10 +337,31 @@
       <div class="lnks">
         <a href="science.html" class="sci">The Science</a>
         <a href="#privacy" class="sci" onclick="window.dispatchEvent(new CustomEvent('oriya:privacy'));return false;">Privacy</a>
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark theme">☀</button>
         <a href="index.html#join" class="cta">Join Season 1</a>
       </div>
     </div>
   </nav>
+  <script>
+  // Theme toggle — the boot script in <head> set data-theme before first paint.
+  (function () {
+    var btn = document.getElementById("themeToggle");
+    if (!btn) return;
+    var paint = function () {
+      var t = document.documentElement.dataset.theme;
+      btn.textContent = t === "light" ? "☾" : "☀";  // shows what you switch TO
+      try { var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = t === "light" ? "#F4F2EB" : "#020617"; } catch (e) {}
+    };
+    paint();
+    btn.addEventListener("click", function () {
+      var next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem("oriya:theme", next); } catch (e) {}
+      paint();
+      if (window.oriyaTrack) window.oriyaTrack("theme_toggled", { theme: next });
+    });
+  })();
+  </script>
   <div id="root"><div class="boot"><div class="boot-card"></div><div class="boot-t"><span class="boot-dot"></span>Warming up your Body Passport…</div></div></div>
 
   <script type="text/babel" data-presets="react">
@@ -1138,17 +1261,35 @@
     /* live standing bar — the "race" read of the table, leader glows */
     function RaceBar({ race }) {
       const max = Math.max.apply(null, race.map((s) => s.v));
+      const sorted = race.slice().sort((a, b) => b.v - a.v);
+      const second = sorted.length > 1 ? sorted[1].v : null;
       const sum = race.reduce((s, x) => s + x.v, 0) || 1;
+      /* spring-fill: bars start at 0 and overshoot into place on scroll-into-view */
+      const [go, setGo] = useState(false);
+      const barRef = useRef(null);
+      useEffect(() => {
+        const el = barRef.current;
+        if (!el || !("IntersectionObserver" in window)) { setGo(true); return; }
+        const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { setGo(true); io.disconnect(); } }), { threshold: 0.4 });
+        io.observe(el);
+        return () => io.disconnect();
+      }, []);
+      const tone = (v) => v === max
+        ? "bg-[#00FF87] shadow-[0_0_8px_rgba(0,255,135,0.6)]"
+        : v === second && sorted[0].v !== second
+        ? "bg-[#FF5A36]/80 shadow-[0_0_6px_rgba(255,90,54,0.35)]"
+        : "bg-white/15";
+      const toneText = (v) => v === max ? "text-[#00FF87]" : v === second && sorted[0].v !== second ? "text-[#FF5A36]/90" : "text-ash";
       return (
-        <div className="mt-3">
-          <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+        <div className="mt-3" ref={barRef}>
+          <div className="flex h-1.5 w-full gap-px overflow-hidden rounded-full bg-white/5">
             {race.map((s) => (
-              <span key={s.t} className={"h-full " + (s.v === max ? "bg-jade shadow-[0_0_8px_rgba(127,183,158,0.7)]" : "bg-white/15")} style={{ width: (s.v / sum * 100) + "%" }} />
+              <span key={s.t} className={"h-full race-fill " + tone(s.v)} style={{ width: go ? (s.v / sum * 100) + "%" : "0%" }} />
             ))}
           </div>
           <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
             {race.map((s) => (
-              <span key={s.t} className={"font-mono text-[10px] " + (s.v === max ? "text-jade" : "text-ash")}>{s.t} {s.v}{s.v === max ? " · leads" : ""}</span>
+              <span key={s.t} className={"font-mono tabular-nums text-[10px] " + toneText(s.v)}>{s.t} {s.v}{s.v === max ? " · leads" : ""}</span>
             ))}
           </div>
         </div>
@@ -1181,14 +1322,18 @@
         track("challenge_slack_copied", { challenge: c.id });
         setCopied(true); window.setTimeout(() => setCopied(false), 1600);
       };
+      const live = c.status === "LIVE";
       return (
         <button onClick={() => onOpen(c)}
-          className="text-left rounded-xl border border-white/10 bg-white/[0.025] p-4 hover:border-amber-brand/40 hover:bg-white/[0.05] transition-all flex flex-col">
-          <div className="flex items-start justify-between gap-3">
+          className={"dark-pin relative overflow-hidden text-left rounded-xl border bg-[#0B0F19] p-4 transition-all flex flex-col " + (live
+            ? "border-[#00FF87]/40 drop-shadow-[0_0_15px_rgba(0,255,135,0.15)] hover:border-[#00FF87]/70 hover:drop-shadow-[0_0_22px_rgba(0,255,135,0.25)]"
+            : "border-white/10 hover:border-[#00FF87]/30 hover:bg-white/[0.04]")}>
+          {live && <span aria-hidden="true" className="chal-scan pointer-events-none absolute inset-0" />}
+          <div className="relative flex items-start justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-lg leading-none">{c.emoji}</span>
-              {c.status === "LIVE"
-                ? <span className="text-[10px] uppercase tracking-wider font-mono text-jade inline-flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-jade animate-pulse" /> Live table</span>
+              {live
+                ? <span className="text-[10px] uppercase tracking-wider font-mono text-[#00FF87] inline-flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[#00FF87] live-ring" /> Live table</span>
                 : <span className="text-[10px] uppercase tracking-wider font-mono text-ash">{c.startLabel}</span>}
             </div>
             {c.createdByYou ? <span className="text-[10px] font-mono text-amber-glow inline-flex items-center gap-1"><Star className="w-3 h-3" /> Yours</span>
@@ -1196,11 +1341,11 @@
               : rival ? <span className="text-[10px] font-mono text-amber-glow">⚔ your rivalry</span>
               : c.days != null ? <span className="inline-flex items-center gap-1 text-[11px] text-ash font-mono"><Clock className="w-3 h-3" /> {c.days}d</span> : null}
           </div>
-          <h3 className="mt-3 text-sm font-semibold text-bone leading-snug">{c.title}</h3>
-          <p className="mt-1 text-xs text-ash leading-relaxed">{c.subtitle}</p>
+          <h3 className="relative mt-3 text-sm font-semibold text-bone leading-snug">{c.title}</h3>
+          <p className="relative mt-1 text-xs text-ash leading-relaxed">{c.subtitle}</p>
           {race && <RaceBar race={race} />}
-          <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5 text-xs text-jade min-w-0">
+          <div className="relative mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+            <span className={"inline-flex items-center gap-1.5 text-xs min-w-0 " + (live ? "text-[#00FF87]/90" : "text-jade")}>
               <Users className="w-3.5 h-3.5 shrink-0" /> <span className="truncate">{c.participants != null ? c.participants + " seated" : "Seats open"}</span>
             </span>
             <span className="flex items-center gap-2 shrink-0">
@@ -2022,7 +2167,8 @@
 
             <div className="mt-10 mb-1 flex items-center gap-2">
               <Flame className="w-4 h-4 text-amber-glow" />
-              <h2 className="text-sm font-semibold text-bone uppercase tracking-wider">Live challenges near you</h2>
+              <h2 className="font-mono font-extrabold italic uppercase tracking-tighter text-xl bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Live Challenges</h2>
+              <span className="text-[10px] font-mono text-ash uppercase tracking-wider mt-1.5">near you</span>
             </div>
             <p className="text-xs text-ash mb-4">Live boards first — real people already logging. Pick a side and your Oriya Index drops straight onto the leaderboard.</p>
 
