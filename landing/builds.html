@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oriya — What a readable export unlocks</title>
+  <meta name="description" content="What people actually build with exported wearable data — recovery-aware smart homes, HRV-autoregulated training, personal dashboards, morning agents — and the door Oriya is building.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 78 22 A 40 40 0 1 0 79 23' stroke='%237FB79E' stroke-width='5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='50' cy='55' r='14' fill='%237FB79E'/%3E%3Ccircle cx='78' cy='22' r='7' fill='%23D7A25C'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#070809">
+  <script>
+    /* Theme boot — same key as index/try so the choice follows the visitor. */
+    (function () {
+      var t = "dark";
+      try { var s = localStorage.getItem("oriya:theme"); if (s === "light" || s === "dark") t = s; } catch (e) {}
+      document.documentElement.dataset.theme = t;
+      try { var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = t === "light" ? "#F4F2EB" : "#070809"; } catch (e) {}
+    })();
+  </script>
+  <style>
+    :root {
+      --void:#070809; --obsidian:#0E1014; --graphite:#1A1E24; --hairline:#2A2F38;
+      --bone:#ECEAE4; --ash:#878D99;
+      --jade:#7FB79E; --jade-deep:#3E6F5E; --amber:#D7A25C; --amber-glow:#F0C083;
+      --wash:255,255,255;
+      --font-display:"Instrument Serif",Georgia,serif;
+      --font-sans:"Inter",system-ui,sans-serif;
+      --font-mono:"JetBrains Mono",ui-monospace,monospace;
+      --settle:cubic-bezier(0.22,0.61,0.36,1);
+      color-scheme:dark;
+    }
+    :root[data-theme="light"] {
+      color-scheme:light;
+      --void:#F4F2EB; --obsidian:#FAF8F2; --graphite:#ECE9E0; --hairline:#D9D5C9;
+      --bone:#181C25; --ash:#5C6270;
+      --jade:#3E7A5F; --jade-deep:#2E5C47; --amber:#A9691F; --amber-glow:#B97E2C;
+      --wash:16,20,33;
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased; }
+    body { font-family:var(--font-sans); background:var(--obsidian); color:var(--bone); line-height:1.6; min-width:320px; overflow-x:clip; }
+    a { color:inherit; text-decoration:none; }
+    .wrap { max-width:980px; margin:0 auto; padding:0 24px; }
+
+    .nav { display:flex; align-items:center; justify-content:space-between; padding:22px 0; }
+    .logo { display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-size:22px; }
+    .logo svg { width:26px; height:26px; }
+    .nav-r { display:flex; align-items:center; gap:14px; }
+    .nav-r a { font-size:13px; color:var(--ash); transition:color .25s; }
+    .nav-r a:hover { color:var(--bone); }
+    .nav-r a.cta { color:var(--void); background:var(--jade); border-radius:999px; padding:9px 18px; font-weight:600; }
+    .theme-toggle { width:32px; height:32px; border-radius:50%; border:1px solid var(--hairline); background:rgba(var(--wash),.04);
+      color:var(--bone); font-size:14px; line-height:1; cursor:pointer; display:grid; place-items:center; flex:none; transition:border-color .25s; }
+    .theme-toggle:hover { border-color:var(--jade-deep); }
+
+    .head { padding:64px 0 20px; max-width:640px; }
+    .eyebrow { font-family:var(--font-mono); font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--jade); }
+    h1 { font-family:var(--font-display); font-weight:400; font-size:clamp(2.3rem,6vw,3.4rem); line-height:1.05; margin-top:14px; }
+    .lede { color:var(--ash); font-size:15.5px; margin-top:16px; max-width:56ch; }
+    .lede b { color:var(--bone); font-weight:500; }
+    .prov { font-family:var(--font-mono); font-size:11px; color:var(--ash); margin-top:14px; line-height:1.7; max-width:60ch; }
+    .prov span { color:var(--jade); }
+
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:36px 0 0; }
+    @media (max-width:720px){ .grid { grid-template-columns:1fr; } }
+    .card { border:1px solid var(--hairline); border-radius:16px; background:rgba(var(--wash),.02); padding:22px 24px;
+      display:flex; flex-direction:column; gap:9px; transition:border-color .3s var(--settle); }
+    .card:hover { border-color:var(--jade-deep); }
+    .tag { font-family:var(--font-mono); font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; align-self:flex-start;
+      border:1px solid var(--hairline); border-radius:999px; padding:3px 10px; color:var(--ash); }
+    .tag.wild { color:var(--jade); border-color:rgba(127,183,158,.35); }
+    .tag.idea { color:var(--amber-glow); border-color:rgba(215,162,92,.35); }
+    .card h3 { font-family:var(--font-display); font-weight:400; font-size:21px; line-height:1.2; }
+    .card p { font-size:13.5px; color:var(--ash); }
+    .card .src { font-family:var(--font-mono); font-size:10px; color:var(--ash); opacity:.7; margin-top:auto; padding-top:6px; }
+
+    .door { margin:52px 0 0; border:1px solid rgba(127,183,158,.3); border-radius:18px; padding:30px 28px; background:rgba(var(--wash),.02); }
+    .door h2 { font-family:var(--font-display); font-weight:400; font-size:clamp(1.6rem,3.4vw,2.1rem); line-height:1.15; }
+    .door p { color:var(--ash); font-size:14px; margin-top:10px; max-width:62ch; }
+    .door p b { color:var(--bone); font-weight:500; }
+    .door .schema { font-family:var(--font-mono); font-size:12px; color:var(--jade); background:rgba(var(--wash),.03);
+      border:1px solid var(--hairline); border-radius:10px; padding:14px 16px; margin-top:16px; overflow-x:auto; white-space:pre; line-height:1.7; }
+    .door .note { font-family:var(--font-mono); font-size:11px; margin-top:14px; color:var(--ash); }
+    .cta-row { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-top:20px; }
+    .btn { display:inline-flex; align-items:center; gap:8px; background:var(--jade); color:var(--void); border-radius:999px;
+      padding:12px 22px; font-weight:600; font-size:14px; transition:filter .25s; }
+    .btn:hover { filter:brightness(1.08); }
+    .lnk { font-family:var(--font-mono); font-size:12px; color:var(--jade); border-bottom:1px solid rgba(127,183,158,.35); padding-bottom:2px; }
+    .lnk:hover { color:var(--bone); border-color:var(--bone); }
+
+    .footer { margin-top:70px; border-top:1px solid var(--hairline); padding:26px 0 40px; display:flex; flex-wrap:wrap; gap:10px 24px;
+      font-family:var(--font-mono); font-size:11px; color:var(--ash); }
+    .footer a:hover { color:var(--bone); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="nav">
+      <a href="index.html" class="logo">
+        <svg viewBox="0 0 100 100" fill="none"><path d="M 78 22 A 40 40 0 1 0 79 23" stroke="#7FB79E" stroke-width="5" stroke-linecap="round"/><circle cx="50" cy="55" r="14" fill="#7FB79E"/><circle cx="78" cy="22" r="7" fill="#D7A25C"/></svg>
+        Oriya
+      </a>
+      <div class="nav-r">
+        <a href="reads.html">Reads</a>
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark theme">☀</button>
+        <a href="try.html" class="cta">Get your Passport</a>
+      </div>
+    </nav>
+
+    <header class="head">
+      <span class="eyebrow">The private-language problem · what the door opens</span>
+      <h1>What a readable<br>export unlocks.</h1>
+      <p class="lede">Your wearable already collects the data. The only thing standing between you and any of the projects below is a schema you can actually read. <b>None of this is an Oriya feature</b> — it's what people build, and want to build, once the numbers come out of the walled garden.</p>
+      <p class="prov"><span>Provenance:</span> the "seen in the wild" cards are recurring project genres from the builder community — r/QuantifiedSelf, Hacker News, the Home Assistant forums, GitHub. The "build idea" cards are our own wishlist. No affiliation, no endorsement, no made-up numbers.</p>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <span class="tag wild">Seen in the wild</span>
+        <h3>The recovery-aware home</h3>
+        <p>Home Assistant users pipe readiness into the house: a red morning dims the lights up slower, nudges the thermostat warmer, and flips on do-not-disturb before standup. The house knows before you do.</p>
+        <span class="src">genre: Home Assistant community integrations</span>
+      </div>
+      <div class="card">
+        <span class="tag wild">Seen in the wild</span>
+        <h3>The Apple Health excavation</h3>
+        <p>The rite of passage: export.zip → XML parser → SQLite → a Grafana wall. Years of resting heart rate you've technically owned and never once seen, finally in one queryable table.</p>
+        <span class="src">genre: r/QuantifiedSelf · personal dashboards</span>
+      </div>
+      <div class="card">
+        <span class="tag wild">Seen in the wild</span>
+        <h3>HRV-autoregulated training</h3>
+        <p>Scripts that read the morning HRV trend and rewrite today's programmed load — deload when the baseline dips, push when it holds. This loop has run in the HRV-training crowd for a decade; the bottleneck was never the idea, it was the export.</p>
+        <span class="src">genre: HRV4Training-style autoregulation</span>
+      </div>
+      <div class="card">
+        <span class="tag wild">Seen in the wild</span>
+        <h3>A Slack status that tells the truth</h3>
+        <p>Recovery API → webhook → Slack: "red day — async only." The wearable finally gets to talk back to the meeting culture that wrecked the sleep in the first place.</p>
+        <span class="src">genre: API + webhook side projects</span>
+      </div>
+      <div class="card">
+        <span class="tag wild">Seen in the wild</span>
+        <h3>The correlation notebook</h3>
+        <p>A Jupyter notebook, two CSVs, and one honest question: what does the third beer actually cost in deep sleep? It's n=1 science — but it's your n, and no app will ever run that query for you.</p>
+        <span class="src">genre: quantified-self notebooks</span>
+      </div>
+      <div class="card">
+        <span class="tag idea">Build idea</span>
+        <h3>The morning agent</h3>
+        <p>An LLM agent that reads last night's data and today's calendar, then drafts the day: when to book the deep work, which meeting to move, when to actually stop. The data exists. The door doesn't — yet.</p>
+        <span class="src">wishlist — custom agents on your own baseline</span>
+      </div>
+      <div class="card">
+        <span class="tag idea">Build idea</span>
+        <h3>The handoff file</h3>
+        <p>Switch hardware without resetting your body's story to zero: a portable baseline file any new device could calibrate against on day one. Three years of history should transfer like a phone number does.</p>
+        <span class="src">wishlist — portability, not just export</span>
+      </div>
+      <div class="card">
+        <span class="tag idea">Build idea</span>
+        <h3>Readiness webhooks for anything</h3>
+        <p>IFTTT-grade triggers on your own thresholds: HRV 20% under baseline three days running → text the coach, block the calendar, kill tomorrow's alarm. Your rules, firing on your numbers.</p>
+        <span class="src">wishlist — thresholds you define</span>
+      </div>
+    </div>
+
+    <section class="door">
+      <h2>The door we're building</h2>
+      <p>Every project above dies at the same wall: the data comes out — when it comes out at all — in a device-specific schema only the vendor can read. The fix is <b>one consented, versioned, normalized export</b>: your scores on the Oriya Index, your baseline, your raw signals where the device allows it. Your data in a language <b>you</b> can read — no device to protect, no proprietary score to defend.</p>
+      <div class="schema">GET /v1/me/export          → one schema, every device
+{ "date": "2026-07-07", "oriya_index": 75, "par": 71,
+  "source": "whoop", "native": { "recovery": 83 },
+  "signals": { "hrv_ms": 62, "rhr": 51, "sleep_stages": … } }</div>
+      <p class="note">Roadmap-honest: this endpoint is not shipped. It's what the builder list is for — first access, and the list picks what gets built first.</p>
+      <div class="cta-row">
+        <a class="btn" href="index.html#builder">Lock first access — tell us what you'd build →</a>
+        <a class="lnk" href="https://oriyaapp.substack.com/p/your-wearable-is-measuring-you-in?utm_source=oriya_builds&utm_medium=builds_page" target="_blank" rel="noopener">Why the door doesn't exist yet — the essay →</a>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <a href="index.html">← oriya.app</a>
+      <a href="try.html">Get your Body Passport</a>
+      <a href="reads.html">The Long Game</a>
+      <span>© 2026 Oriya · built in the open, honestly labeled</span>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var btn = document.getElementById("themeToggle");
+      if (!btn) return;
+      var paint = function () {
+        var t = document.documentElement.dataset.theme;
+        btn.textContent = t === "light" ? "☾" : "☀";
+        try { var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = t === "light" ? "#F4F2EB" : "#070809"; } catch (e) {}
+      };
+      paint();
+      btn.addEventListener("click", function () {
+        var next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+        document.documentElement.dataset.theme = next;
+        try { localStorage.setItem("oriya:theme", next); } catch (e) {}
+        paint();
+      });
+    })();
+  </script>
+</body>
+</html>

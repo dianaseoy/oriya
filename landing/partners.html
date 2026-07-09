@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oriya for Partners — gyms, communities & sponsors</title>
+  <meta name="description" content="Host a recovery board for your gym, run club, or community — any wearable, one fair index. Or put your brand on a challenge pot. Founding season, SF & NYC.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 78 22 A 40 40 0 1 0 79 23' stroke='%237FB79E' stroke-width='5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='50' cy='55' r='14' fill='%237FB79E'/%3E%3Ccircle cx='78' cy='22' r='7' fill='%23D7A25C'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#070809">
+  <script>
+    /* Theme boot — same key as the rest of the site. */
+    (function () {
+      var t = "dark";
+      try { var s = localStorage.getItem("oriya:theme"); if (s === "light" || s === "dark") t = s; } catch (e) {}
+      document.documentElement.dataset.theme = t;
+      try { var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = t === "light" ? "#F4F2EB" : "#070809"; } catch (e) {}
+    })();
+  </script>
+  <style>
+    :root {
+      --void:#070809; --obsidian:#0E1014; --graphite:#1A1E24; --hairline:#2A2F38;
+      --bone:#ECEAE4; --ash:#878D99;
+      --jade:#7FB79E; --jade-deep:#3E6F5E; --amber:#D7A25C; --amber-glow:#F0C083;
+      --wash:255,255,255;
+      --font-display:"Instrument Serif",Georgia,serif;
+      --font-sans:"Inter",system-ui,sans-serif;
+      --font-mono:"JetBrains Mono",ui-monospace,monospace;
+      --settle:cubic-bezier(0.22,0.61,0.36,1);
+      color-scheme:dark;
+    }
+    :root[data-theme="light"] {
+      color-scheme:light;
+      --void:#F4F2EB; --obsidian:#FAF8F2; --graphite:#ECE9E0; --hairline:#D9D5C9;
+      --bone:#181C25; --ash:#5C6270;
+      --jade:#3E7A5F; --jade-deep:#2E5C47; --amber:#A9691F; --amber-glow:#B97E2C;
+      --wash:16,20,33;
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased; }
+    body { font-family:var(--font-sans); background:var(--obsidian); color:var(--bone); line-height:1.6; min-width:320px; overflow-x:clip; }
+    a { color:inherit; text-decoration:none; }
+    .wrap { max-width:980px; margin:0 auto; padding:0 24px; }
+
+    .nav { display:flex; align-items:center; justify-content:space-between; padding:22px 0; }
+    .logo { display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-size:22px; }
+    .logo svg { width:26px; height:26px; }
+    .nav-r { display:flex; align-items:center; gap:14px; }
+    .nav-r a { font-size:13px; color:var(--ash); transition:color .25s; }
+    .nav-r a:hover { color:var(--bone); }
+    .nav-r a.cta { color:var(--void); background:var(--jade); border-radius:999px; padding:9px 18px; font-weight:600; }
+    .theme-toggle { width:32px; height:32px; border-radius:50%; border:1px solid var(--hairline); background:rgba(var(--wash),.04);
+      color:var(--bone); font-size:14px; line-height:1; cursor:pointer; display:grid; place-items:center; flex:none; transition:border-color .25s; }
+    .theme-toggle:hover { border-color:var(--jade-deep); }
+
+    .head { padding:64px 0 8px; max-width:680px; }
+    .eyebrow { font-family:var(--font-mono); font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--jade); }
+    h1 { font-family:var(--font-display); font-weight:400; font-size:clamp(2.3rem,6vw,3.5rem); line-height:1.05; margin-top:14px; }
+    h1 em { font-style:italic; color:var(--jade); }
+    .lede { color:var(--ash); font-size:15.5px; margin-top:16px; max-width:58ch; }
+    .lede b { color:var(--bone); font-weight:500; }
+    .aud-note { font-family:var(--font-mono); font-size:11px; color:var(--ash); margin-top:14px; }
+    .aud-note a { color:var(--jade); border-bottom:1px solid rgba(127,183,158,.35); padding-bottom:1px; }
+
+    .tracks { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:44px; }
+    @media (max-width:840px){ .tracks { grid-template-columns:1fr; } }
+    .track { border:1px solid var(--hairline); border-radius:18px; background:rgba(var(--wash),.02); padding:26px 24px;
+      display:flex; flex-direction:column; gap:10px; transition:border-color .3s var(--settle); }
+    .track:hover { border-color:var(--jade-deep); }
+    .track .tk { font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--jade); }
+    .track h3 { font-family:var(--font-display); font-weight:400; font-size:23px; line-height:1.15; }
+    .track ul { list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:4px; }
+    .track li { font-size:13px; color:var(--ash); padding-left:16px; position:relative; }
+    .track li::before { content:"◆"; position:absolute; left:0; top:0; font-size:8px; color:var(--jade); }
+    .track li b { color:var(--bone); font-weight:500; }
+    .track .go { margin-top:auto; padding-top:14px; font-family:var(--font-mono); font-size:12px; color:var(--jade); }
+    .track .go:hover { color:var(--bone); }
+    .track.sponsor { border-color:rgba(215,162,92,.3); }
+    .track.sponsor .tk, .track.sponsor li::before, .track.sponsor .go { color:var(--amber-glow); }
+    .track.sponsor:hover { border-color:var(--amber); }
+
+    .pay { margin:52px 0 0; border:1px solid rgba(215,162,92,.3); border-radius:18px; padding:30px 28px; background:rgba(var(--wash),.02); }
+    .pay h2 { font-family:var(--font-display); font-weight:400; font-size:clamp(1.6rem,3.4vw,2.1rem); margin-top:10px; }
+    .pay-steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:20px; }
+    @media (max-width:720px){ .pay-steps { grid-template-columns:1fr; } }
+    .ps { border:1px solid var(--hairline); border-radius:12px; padding:16px 18px; }
+    .ps-n { font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--amber-glow); }
+    .ps p { font-size:13px; color:var(--ash); margin-top:7px; }
+    .ps p b { color:var(--bone); font-weight:500; }
+    .pay-methods { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:18px; }
+    .pm { font-family:var(--font-mono); font-size:11.5px; color:var(--bone); border:1px solid var(--hairline); border-radius:8px; padding:5px 12px; background:rgba(var(--wash),.03); }
+    .pm-via { font-family:var(--font-mono); font-size:10px; color:var(--ash); margin-left:4px; }
+    .amt-row { display:flex; gap:8px; align-items:stretch; flex-wrap:wrap; }
+    .amt { font-family:var(--font-mono); font-size:12px; color:var(--ash); border:1px solid var(--hairline); border-radius:10px; padding:12px 14px; background:rgba(var(--wash),.03); cursor:pointer; transition:color .2s, border-color .2s; }
+    .amt:hover { color:var(--bone); border-color:var(--jade-deep); }
+    .amt.on { color:var(--void); background:var(--jade); border-color:var(--jade); }
+    .pform #plOrg { width:190px; } .pform #plEmail { width:200px; } .pform #plBoard { width:250px; } .pform #plAmt { width:110px; }
+    @media (max-width:560px){ .amt-row { width:100%; } .pform #plAmt { flex:1; } }
+    .truth { margin:52px 0 0; border:1px solid var(--hairline); border-radius:18px; padding:28px; background:rgba(var(--wash),.015); }
+    .truth h2 { font-family:var(--font-display); font-weight:400; font-size:clamp(1.5rem,3vw,1.9rem); }
+    .truth p { color:var(--ash); font-size:14px; margin-top:10px; max-width:66ch; }
+    .truth p b { color:var(--bone); font-weight:500; }
+
+    .form-block { margin:52px 0 0; border:1px solid rgba(127,183,158,.3); border-radius:18px; padding:30px 28px; background:rgba(var(--wash),.02); }
+    .form-block h2 { font-family:var(--font-display); font-weight:400; font-size:clamp(1.6rem,3.4vw,2.1rem); }
+    .form-block .sub { color:var(--ash); font-size:14px; margin-top:8px; max-width:58ch; }
+    .pform { display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; }
+    .pform input, .pform select { background:rgba(var(--wash),.03); border:1px solid var(--hairline); border-radius:10px;
+      padding:12px 14px; color:var(--bone); font-family:var(--font-mono); font-size:12px; min-width:0; }
+    .pform input:focus, .pform select:focus { outline:none; border-color:var(--jade-deep); }
+    .pform select:invalid { color:var(--ash); }
+    .pform #pOrg { width:220px; } .pform #pEmail { width:220px; } .pform #pType { width:200px; }
+    .pform .btn { display:inline-flex; align-items:center; gap:8px; background:var(--jade); color:var(--void); border:0; cursor:pointer;
+      border-radius:999px; padding:12px 22px; font-weight:600; font-size:14px; font-family:var(--font-sans); transition:filter .25s; }
+    .pform .btn:hover { filter:brightness(1.08); }
+    @media (max-width:560px){ .pform input, .pform select, .pform .btn { width:100% !important; } }
+    .form-note { font-family:var(--font-mono); font-size:11px; color:var(--ash); margin-top:12px; line-height:1.7; }
+    .form-note a { color:var(--jade); }
+
+    .footer { margin-top:70px; border-top:1px solid var(--hairline); padding:26px 0 40px; display:flex; flex-wrap:wrap; gap:10px 24px;
+      font-family:var(--font-mono); font-size:11px; color:var(--ash); }
+    .footer a:hover { color:var(--bone); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="nav">
+      <a href="index.html" class="logo">
+        <svg viewBox="0 0 100 100" fill="none"><path d="M 78 22 A 40 40 0 1 0 79 23" stroke="#7FB79E" stroke-width="5" stroke-linecap="round"/><circle cx="50" cy="55" r="14" fill="#7FB79E"/><circle cx="78" cy="22" r="7" fill="#D7A25C"/></svg>
+        Oriya
+      </a>
+      <div class="nav-r">
+        <a href="index.html">For athletes</a>
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark theme">☀</button>
+        <a href="#start" class="cta">Start the conversation</a>
+      </div>
+    </nav>
+
+    <header class="head">
+      <span class="eyebrow">Oriya for partners · founding season · SF &amp; NYC</span>
+      <h1>Your people already wear the hardware.<br><em>Host the league.</em></h1>
+      <p class="lede">Oriya normalizes every wearable — Oura, Whoop, Garmin, Apple — onto <b>one comparable recovery index</b>, so a whole gym, run club, or company channel can finally compete on the same board. You bring the people, the venue, or the prize. We run the board.</p>
+      <p class="aud-note">Wearing the device instead of running the org? This page is for partners — <a href="try.html">the athlete side is here →</a></p>
+    </header>
+
+    <div class="tracks">
+      <div class="track">
+        <span class="tk">Gyms &amp; studios</span>
+        <h3>A member board, no new hardware</h3>
+        <ul>
+          <li><b>Whatever members already own</b> — nothing to stock, nothing to sell them.</li>
+          <li><b>Aggregate-only coach view</b> — minimum five members behind every stat, individual sharing off by default.</li>
+          <li>The morning check becomes a front-desk conversation — recovery as your studio's <b>retention layer</b>.</li>
+          <li>Founding season is concierge: members email a screenshot, <b>we normalize and post the board by hand</b>.</li>
+        </ul>
+        <a class="go" href="mailto:team@oriya.app?subject=Member%20board%20—%20%5Byour%20studio%5D&body=Studio%2Fgym%3A%0ACity%3A%0ARoster%20size%20(roughly)%3A%0AWhat%20your%20members%20wear%20(if%20you%20know)%3A" data-track="gym">Start a member board → team@oriya.app</a>
+      </div>
+
+      <div class="track">
+        <span class="tk">Communities &amp; clubs</span>
+        <h3>Your #recovery-squad, scored fairly</h3>
+        <ul>
+          <li>Run clubs, Discord and Slack fitness channels, company wellness crews — <b>one deep-linked board</b> for your people.</li>
+          <li>Members can flex <b>anonymously behind their work email</b> — the domain shows, the name doesn't.</li>
+          <li>Challenge cards built around your culture — crunch weeks, race blocks, <b>your rivalries</b>.</li>
+          <li><b>Free in Season 1.</b> You'd be a founding board, and it's priced like it.</li>
+        </ul>
+        <a class="go" href="mailto:team@oriya.app?subject=Community%20board%20—%20%5Byour%20community%5D&body=Community%2Fclub%3A%0AWhere%20it%20lives%20(Slack%2FDiscord%2FStrava%2FIRL)%3A%0AHeadcount%20(roughly)%3A" data-track="community">Start a community board → team@oriya.app</a>
+      </div>
+
+      <div class="track sponsor">
+        <span class="tk">Sponsors &amp; brands</span>
+        <h3>Your name on the pot</h3>
+        <ul>
+          <li>Sponsor a challenge purse — the card reads <b>“Sponsored by you”</b> while verified athletes race for it.</li>
+          <li>Backing is <b>prize sponsorship, not a wager</b> — how the money moves is spelled out below.</li>
+        </ul>
+        <a class="go" href="#pledge" data-track="sponsor">Back a purse — pledge in 30 seconds ↓</a>
+      </div>
+    </div>
+
+    <section class="truth">
+      <h2>Where we actually are</h2>
+      <p><b>Founder-run private beta, Season 1, SF &amp; NYC.</b> Demo boards run with sample athletes until each side fills — every board says so. No partner logos here because <b>there are no signed partners yet</b>; you'd be first, which is why Season 1 is free for gyms and communities and hands-on for everyone. Member data is never sold; team views are aggregate-only.</p>
+    </section>
+
+    <!-- Sponsor payment flow. DELIBERATELY not a pay-now button: this page never
+         touches money. Pledges are staged here; payment happens on an Airwallex-
+         HOSTED checkout (Apple Pay / cards) issued per verified pledge from
+         team@oriya.app — per the payments policy: backers verified, pots only
+         open on boards with real athletes, no bank details on any page. -->
+    <section class="pay" id="pledge">
+      <span class="eyebrow" style="color:var(--amber-glow);">Sponsors · how the money moves</span>
+      <h2>Pledge here. Pay by Apple&nbsp;Pay there.</h2>
+      <div class="pay-steps">
+        <div class="ps">
+          <span class="ps-n">01 · Pledge</span>
+          <p>Who you are, which board, how much. <b>Nothing is charged on this page</b> — it never touches money.</p>
+        </div>
+        <div class="ps">
+          <span class="ps-n">02 · Verify</span>
+          <p>We confirm you're real — and that the board is. Purses only open once <b>real, verified athletes</b> are racing; never against sample data.</p>
+        </div>
+        <div class="ps">
+          <span class="ps-n">03 · Pay</span>
+          <p>A one-off <b>Airwallex-hosted checkout</b> link arrives from team@oriya.app — Apple&nbsp;Pay or any major card, receipt included. Airwallex holds the card rails; we never see card numbers.</p>
+        </div>
+      </div>
+      <div class="pay-methods" aria-label="Accepted payment methods">
+        <span class="pm"> Pay</span><span class="pm">Visa</span><span class="pm">Mastercard</span><span class="pm">Amex</span>
+        <span class="pm-via">via Airwallex hosted checkout · PCI handled by Airwallex</span>
+      </div>
+      <form class="pform" id="pledgeForm" style="margin-top:22px;">
+        <input type="text" required placeholder="brand / company" id="plOrg" aria-label="Brand or company">
+        <input type="email" required placeholder="you@brand.com" id="plEmail" aria-label="Email">
+        <input type="text" required placeholder="which board? e.g. Launch-Crunch" id="plBoard" aria-label="Which board">
+        <div class="amt-row">
+          <button type="button" class="amt" data-amt="100">$100</button>
+          <button type="button" class="amt" data-amt="250">$250</button>
+          <button type="button" class="amt" data-amt="500">$500</button>
+          <input type="number" min="25" step="25" required placeholder="$ USD" id="plAmt" aria-label="Pledge amount in USD">
+        </div>
+        <button class="btn" type="submit">Stage my pledge →</button>
+      </form>
+      <p class="form-note">Pledging stages the conversation — it is not a payment and not a wager. Purse backing is prize sponsorship: backers are never paid out, athletes are. The checkout link only ever comes from <a href="mailto:team@oriya.app">team@oriya.app</a>, and only after verification. We never take wires against bank details posted on a webpage — if “Oriya” ever emails you bank numbers, it isn't us.</p>
+    </section>
+
+    <section class="form-block" id="start">
+      <h2>Start the conversation</h2>
+      <p class="sub">Thirty seconds here, or email <a href="mailto:team@oriya.app" style="color:var(--jade)">team@oriya.app</a> directly — either way a founder replies, not a funnel.</p>
+      <form class="pform" id="partnerForm">
+        <input type="text" required placeholder="org / studio / brand" id="pOrg" aria-label="Organization">
+        <input type="email" required placeholder="you@yourco.com" id="pEmail" aria-label="Email">
+        <select required id="pType" aria-label="Partner type">
+          <option value="" disabled selected>which are you?</option>
+          <option value="gym">gym / studio</option>
+          <option value="community">community / club</option>
+          <option value="sponsor">sponsor / brand</option>
+        </select>
+        <button class="btn" type="submit">Start the conversation →</button>
+      </form>
+      <p class="form-note">Season 1 is free for gyms and communities. Sponsors: pledge above ↑ — that section explains how the money moves.</p>
+    </section>
+
+    <footer class="footer">
+      <a href="index.html">← oriya.app · for athletes</a>
+      <a href="try.html">The Body Passport demo</a>
+      <a href="builds.html">What builders make with the data</a>
+      <a href="reads.html">The Long Game</a>
+      <span>© 2026 Oriya</span>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var btn = document.getElementById("themeToggle");
+      if (!btn) return;
+      var paint = function () {
+        var t = document.documentElement.dataset.theme;
+        btn.textContent = t === "light" ? "☾" : "☀";
+        try { var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = t === "light" ? "#F4F2EB" : "#070809"; } catch (e) {}
+      };
+      paint();
+      btn.addEventListener("click", function () {
+        var next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+        document.documentElement.dataset.theme = next;
+        try { localStorage.setItem("oriya:theme", next); } catch (e) {}
+        paint();
+      });
+    })();
+
+    /* Partner capture — same Tally form as the rest of the site (email + source
+       label); the org and type ride in the label. Mailto links are the direct
+       lane; this is the 30-second lane. Submit-only, never keystrokes. */
+    (function () {
+      var f = document.getElementById("partnerForm");
+      if (!f) return;
+      f.addEventListener("submit", function (ev) {
+        ev.preventDefault();
+        var email = String(document.getElementById("pEmail").value || "").trim().toLowerCase();
+        var org = String(document.getElementById("pOrg").value || "").trim();
+        var type = document.getElementById("pType").value;
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+        var uid = function () { return window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(16).slice(2); };
+        var responses = {};
+        responses["37cd2a09-f318-438a-91f8-2ef0fa02d065"] = email;                          // Email question
+        responses["84f96066-a5ad-4db1-8e79-75b7eef16231"] = "partner_" + type + " · org:" + org;  // source question
+        try {
+          fetch("https://api.tally.so/forms/xXB0xy/respond", { method: "POST", keepalive: true,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sessionUuid: uid(), respondentUuid: uid(), responses: responses, captchas: {}, isCompleted: true }) })
+            .catch(function () {});
+        } catch (e) {}
+        f.innerHTML = '<p class="form-note" style="margin:0">In the queue ✓ — a founder replies from team@oriya.app, usually same-day.</p>';
+      });
+    })();
+
+    /* Sponsor pledge composer — stages the pledge (Tally row + prefilled email).
+       No money moves here by design; the Airwallex-hosted checkout (Apple Pay /
+       cards) is issued per verified pledge from team@oriya.app. */
+    (function () {
+      var f = document.getElementById("pledgeForm");
+      if (!f) return;
+      var amt = document.getElementById("plAmt");
+      f.querySelectorAll(".amt").forEach(function (b) {
+        b.addEventListener("click", function () {
+          amt.value = b.dataset.amt;
+          f.querySelectorAll(".amt").forEach(function (x) { x.classList.toggle("on", x === b); });
+        });
+      });
+      if (amt) amt.addEventListener("input", function () {
+        f.querySelectorAll(".amt").forEach(function (x) { x.classList.toggle("on", x.dataset.amt === amt.value); });
+      });
+      f.addEventListener("submit", function (ev) {
+        ev.preventDefault();
+        var email = String(document.getElementById("plEmail").value || "").trim().toLowerCase();
+        var org = String(document.getElementById("plOrg").value || "").trim();
+        var board = String(document.getElementById("plBoard").value || "").trim();
+        var amount = String(amt.value || "").trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !amount) return;
+        var uid = function () { return window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(16).slice(2); };
+        var responses = {};
+        responses["37cd2a09-f318-438a-91f8-2ef0fa02d065"] = email;
+        responses["84f96066-a5ad-4db1-8e79-75b7eef16231"] = "sponsor_pledge · org:" + org + " · amount:$" + amount + " · board:" + board;
+        try {
+          fetch("https://api.tally.so/forms/xXB0xy/respond", { method: "POST", keepalive: true,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sessionUuid: uid(), respondentUuid: uid(), responses: responses, captchas: {}, isCompleted: true }) })
+            .catch(function () {});
+        } catch (e) {}
+        var mail = "mailto:team@oriya.app?subject=" + encodeURIComponent("Purse pledge — $" + amount + " — " + board + " (" + org + ")")
+          + "&body=" + encodeURIComponent("Pledge: $" + amount + " USD to the " + board + " purse.\nBrand/company: " + org + "\nReply-to: " + email
+          + "\n\nI understand this is prize sponsorship, not a wager; backers are never paid out. Send the verified Airwallex checkout link (Apple Pay / card) once the board is live with real athletes.");
+        f.innerHTML = '<div><p class="form-note" style="margin:0">Pledge staged ✓ — $' + amount.replace(/[^\d.]/g, "") + ' toward <b style="color:var(--bone)">' + board.replace(/[<>&]/g, "") + '</b>.</p>'
+          + '<a class="btn" style="margin-top:14px" href="' + mail + '">Send the pledge email →</a>'
+          + '<p class="form-note" style="margin-top:12px">After verification, your Airwallex checkout link (Apple Pay / any major card) arrives on that same thread — never from any other address.</p></div>';
+      });
+    })();
+  </script>
+</body>
+</html>

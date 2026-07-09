@@ -108,15 +108,12 @@
 
     /* ---- Live Challenges arena: neon cyber-sport accents (scoped to the
        challenge cards; base tokens elsewhere stay jade/amber on void) ---- */
-    .chal-scan { background:linear-gradient(105deg, transparent 42%, rgba(0,255,135,.055) 50%, transparent 58%);
-      background-size:260% 100%; animation:chalScan 4.4s linear infinite; }
-    @keyframes chalScan { from { background-position:200% 0; } to { background-position:-100% 0; } }
     .live-ring { animation:chalPulseRing 2.2s ease-out infinite; }
     @keyframes chalPulseRing { 0%{ box-shadow:0 0 0 0 rgba(0,255,135,.4); } 70%{ box-shadow:0 0 0 6px rgba(0,255,135,0); } 100%{ box-shadow:0 0 0 0 rgba(0,255,135,0); } }
     /* physics-feel bar fill: overshoot spring curve, fired on scroll-into-view */
     .race-fill { transition:width 1.15s cubic-bezier(.34,1.56,.64,1); }
     @media (prefers-reduced-motion: reduce){
-      .chal-scan, .live-ring { animation:none; }
+      .live-ring { animation:none; }
       .race-fill { transition:none; }
     }
 
@@ -336,6 +333,7 @@
       </a>
       <div class="lnks">
         <a href="science.html" class="sci">The Science</a>
+        <a href="partners.html" class="sci">Partners</a>
         <a href="#privacy" class="sci" onclick="window.dispatchEvent(new CustomEvent('oriya:privacy'));return false;">Privacy</a>
         <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark theme">☀</button>
         <a href="index.html#join" class="cta">Join Season 1</a>
@@ -1312,23 +1310,17 @@
         + "\nAny wearable, one fair index. Join to defend your side: " + link;
     }
 
+    // Focused card (founder feedback: "too much going on"): 5 signals max —
+    // title, live pill, race bar, seats, pot. The coworker dare, rivalry badge
+    // and countdown all live in ChallengeDetail now.
     function ChallengeCard({ c, joined, rival, onOpen }) {
-      const Icon = c.icon;
       const race = raceFor(c);
-      const [copied, setCopied] = useState(false);
-      const copySlack = (e) => {
-        e.stopPropagation();
-        try { navigator.clipboard.writeText(slackSnippet(c, race)); } catch (err) {}
-        track("challenge_slack_copied", { challenge: c.id });
-        setCopied(true); window.setTimeout(() => setCopied(false), 1600);
-      };
       const live = c.status === "LIVE";
       return (
         <button onClick={() => onOpen(c)}
           className={"dark-pin relative overflow-hidden text-left rounded-xl border bg-[#0B0F19] p-4 transition-all flex flex-col " + (live
             ? "border-[#00FF87]/40 drop-shadow-[0_0_15px_rgba(0,255,135,0.15)] hover:border-[#00FF87]/70 hover:drop-shadow-[0_0_22px_rgba(0,255,135,0.25)]"
             : "border-white/10 hover:border-[#00FF87]/30 hover:bg-white/[0.04]")}>
-          {live && <span aria-hidden="true" className="chal-scan pointer-events-none absolute inset-0" />}
           <div className="relative flex items-start justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-lg leading-none">{c.emoji}</span>
@@ -1338,26 +1330,16 @@
             </div>
             {c.createdByYou ? <span className="text-[10px] font-mono text-amber-glow inline-flex items-center gap-1"><Star className="w-3 h-3" /> Yours</span>
               : joined ? <span className="text-[10px] font-mono text-jade">SEATED ✓</span>
-              : rival ? <span className="text-[10px] font-mono text-amber-glow">⚔ your rivalry</span>
-              : c.days != null ? <span className="inline-flex items-center gap-1 text-[11px] text-ash font-mono"><Clock className="w-3 h-3" /> {c.days}d</span> : null}
+              : null}
           </div>
           <h3 className="relative mt-3 text-sm font-semibold text-bone leading-snug">{c.title}</h3>
-          <p className="relative mt-1 text-xs text-ash leading-relaxed">{c.subtitle}</p>
           {race && <RaceBar race={race} />}
           <div className="relative mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
             <span className={"inline-flex items-center gap-1.5 text-xs min-w-0 " + (live ? "text-[#00FF87]/90" : "text-jade")}>
               <Users className="w-3.5 h-3.5 shrink-0" /> <span className="truncate">{c.participants != null ? c.participants + " seated" : "Seats open"}</span>
             </span>
-            <span className="flex items-center gap-2 shrink-0">
-              {c.prize ? <span className="inline-flex items-center gap-1 rounded-full border border-amber-brand/30 bg-amber-brand/[0.07] px-2 py-0.5 text-[10px] text-amber-glow font-mono"><Trophy className="w-3 h-3" /> POT {c.prize}{c.split ? " · " + c.split : ""}</span>
-                : c.sponsor ? <span className="text-[11px] text-amber-glow/80 font-mono">{c.sponsor}</span> : null}
-              <span role="button" tabIndex={0} onClick={copySlack}
-                onKeyDown={(e) => { if (e.key === "Enter") copySlack(e); }}
-                className={"font-mono text-[10px] rounded-full border px-2 py-0.5 transition-colors " + (copied ? "border-jade/50 text-jade" : "border-white/15 text-ash hover:text-bone hover:border-white/30")}
-                title="Challenge a coworker — copies a Slack-ready snippet">
-                {copied ? "copied ✓" : "⚔ coworker"}
-              </span>
-            </span>
+            {c.prize ? <span className="inline-flex items-center gap-1 rounded-full border border-amber-brand/30 bg-amber-brand/[0.07] px-2 py-0.5 text-[10px] text-amber-glow font-mono shrink-0"><Trophy className="w-3 h-3" /> POT {c.prize}{c.split ? " · " + c.split : ""}</span>
+              : c.sponsor ? <span className="text-[11px] text-amber-glow/80 font-mono shrink-0">{c.sponsor}</span> : null}
           </div>
         </button>
       );
@@ -1510,6 +1492,9 @@
       /* ---- call the winner: free prediction, no buy-in — the opinion IS the hook.
              Locking a call requires a founding account (name+email) — the sign-up moment. ---- */
       const [call, setCall] = useState(() => { try { return readJSON("oriya:calls", {})[c.id] || null; } catch (e) { return null; } });
+      // prediction market starts collapsed (join loop is the screen's one ask) — but reopens for anyone with a call on record
+      const [callOpen, setCallOpen] = useState(() => { try { return !!readJSON("oriya:calls", {})[c.id]; } catch (e) { return false; } });
+      const [moreOpen, setMoreOpen] = useState(false); // coworker dare · pot backing · run-your-own
       const [account, setAccount] = useState(() => { try { return readJSON("oriya:account", null); } catch (e) { return null; } });
       const [pendingCall, setPendingCall] = useState(null);
       const [acctName, setAcctName] = useState("");
@@ -1559,8 +1544,11 @@
       const myRank = joined ? board.findIndex((r) => r.you) + 1 : null;
       const previewRank = board.filter((r) => r.score > me.oriya).length + 1;
       const medal = (i) => i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : (i + 1);
+      /* NO backdrop-filter on this overlay root: it would become the containing
+         block for the fixed join bar + Season1 modal, pinning them to the scroll
+         box instead of the viewport ("Pick your team" bar scrolling away). */
       return (
-        <div className="fixed inset-0 z-50 bg-void/95 backdrop-blur-sm overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-void overflow-y-auto">
           <div className="max-w-2xl mx-auto px-5 py-8 pb-32">
             <button onClick={onClose} className="inline-flex items-center gap-1.5 text-xs text-ash hover:text-bone font-mono mb-6">
               <ArrowLeft className="w-3.5 h-3.5" /> Back to Challenges
@@ -1599,10 +1587,12 @@
 
             {multi && (
               <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.02] p-4">
-                <div className="flex items-center justify-between gap-2">
+                <button onClick={() => setCallOpen((o) => !o)} className="w-full flex items-center justify-between gap-2 text-left">
                   <h3 className="text-sm font-semibold text-bone uppercase tracking-wider">Call the winner</h3>
-                  <span className="text-[10px] font-mono text-ash shrink-0">no buy-in · bragging rights</span>
-                </div>
+                  <span className="text-[10px] font-mono text-ash shrink-0">no buy-in · bragging rights {callOpen ? "▴" : "▸"}</span>
+                </button>
+                {callOpen && (
+                <React.Fragment>
                 <p className="text-xs text-ash mt-1">{call ? "The room so far — your call is locked in." : "Before you look at the board: which side takes it?"}</p>
                 <div className="mt-3 space-y-2">
                   {callPcts.map(({ t, pct }) => (
@@ -1637,9 +1627,10 @@
                     <button onClick={copyCall} className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-amber-glow hover:brightness-110">
                       <Copy className="w-4 h-4" /> Copy your call — make someone bet against you
                     </button>
-                    <p className="mt-2 text-[10px] font-mono text-ash/60">Founding season · sample split · your call is saved on this device</p>
-                    {!joined && <SubstackHook source="call_locked" />}
+                    <p className="mt-2 text-[10px] font-mono text-ash/60">Your call is saved on this device</p>
                   </React.Fragment>
+                )}
+                </React.Fragment>
                 )}
               </div>
             )}
@@ -1724,12 +1715,6 @@
               </ul>
             </div>
 
-            <div className="mt-7 flex flex-wrap gap-2">
-              {c.categories.map((cat) => (
-                <span key={cat} className="text-[11px] font-mono text-ash rounded-full border border-white/10 px-3 py-1">{cat}</span>
-              ))}
-            </div>
-
             <div className="mt-8 rounded-xl border border-jade/25 bg-jade/[0.04] p-5">
               <p className="text-sm text-bone font-medium">Enter by email — no sync needed.</p>
               <p className="text-xs text-ash mt-1">Founding season runs hands-on: email this morning's recovery screenshot and we normalize it ourselves, reply with your Oriya Index, and post you to this board{myTeam ? " on " + myTeam : ""}.</p>
@@ -1740,6 +1725,14 @@
               <p className="text-[10px] font-mono text-ash/60 mt-2">Want to flex anonymously? Send it from your work email — the board shows only ◒ anon + your @company.com.</p>
             </div>
 
+            {!moreOpen && (
+              <button onClick={() => { setMoreOpen(true); track("detail_more_opened", { challenge: c.id }); }}
+                className="mt-4 w-full rounded-xl border border-dashed border-white/12 py-3 text-[11px] font-mono text-ash hover:text-bone hover:border-white/25 transition">
+                More — challenge a coworker · back the pot · run one for your team ▸
+              </button>
+            )}
+            {moreOpen && (
+            <React.Fragment>
             <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] p-5">
               <p className="text-sm text-bone font-medium">Challenge a coworker ⚔</p>
               <p className="text-xs text-ash mt-1">Drop their email — we stage the invite and put the Slack-ready dare on your clipboard. One invite, used once to seat them on this board; never a mailing list.</p>
@@ -1761,13 +1754,16 @@
                 className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-amber-glow hover:brightness-110">
                 <Trophy className="w-4 h-4" /> Pledge to the purse → team@oriya.app
               </a>
+              <p className="text-[10px] font-mono text-ash/70 mt-2">Brand, gym, or community? <a href="partners.html" onClick={() => track("partners_page_click", { from: "pot_card", challenge: c.id })} className="text-amber-glow/90 border-b border-amber-brand/30">Oriya for partners →</a></p>
             </div>
 
             <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] p-5">
               <p className="text-sm text-bone font-medium">Want to run one for your team?</p>
               <p className="text-xs text-ash mt-1">We run the normalization, scoring, and payout. You bring the crew and the pool.</p>
-              <p className="text-xs font-mono mt-3"><a href="mailto:team@oriya.app" className="text-jade">team@oriya.app</a> <span className="text-ash">·</span> <a href="mailto:hello@oriya.app" className="text-jade">hello@oriya.app</a></p>
+              <p className="text-xs font-mono mt-3"><a href="mailto:team@oriya.app" className="text-jade">team@oriya.app</a></p>
             </div>
+            </React.Fragment>
+            )}
           </div>
 
           {/* sticky JOIN — the primary action */}
@@ -1851,7 +1847,7 @@
           </div>
 
           <div className="relative grid gap-5 sm:grid-cols-2 mt-10">
-            {MARKET_VOICES.map((v, i) => (
+            {MARKET_VOICES.slice(0, 2).map((v, i) => (
               <figure key={i} style={{ animationDelay: (i * 90) + "ms" }}
                 className="group relative rounded-2xl border border-white/10 bg-graphite/60 p-6 sm:p-7 hover:border-jade/40 hover:bg-white/[0.04] transition-all animate-fade-up overflow-hidden">
                 <span aria-hidden="true" className="display absolute -top-8 left-1 text-[7rem] leading-none text-jade/10 select-none pointer-events-none">&ldquo;</span>
@@ -1861,20 +1857,6 @@
                   <span className="text-ash">{v.meta}</span>
                 </figcaption>
                 <p className="relative z-10 mt-4 text-[13px] text-jade/90 leading-snug"><span className="text-jade/60">→ </span>{v.fix}</p>
-              </figure>
-            ))}
-          </div>
-
-          {/* market signal — the company-side pain (secondary tier, different ICP) */}
-          <div className="relative mt-6 grid gap-3 sm:grid-cols-2">
-            {MARKET_SIGNAL.map((v, i) => (
-              <figure key={i} style={{ animationDelay: (180 + i * 90) + "ms" }}
-                className="rounded-2xl border border-amber-brand/20 bg-amber-brand/[0.03] p-5 animate-fade-up">
-                <blockquote className="text-sm text-bone/85 leading-relaxed">&ldquo;{v.quote}&rdquo;</blockquote>
-                <figcaption className="mt-3 flex flex-wrap items-center gap-2 font-mono text-[10px]">
-                  <span className="rounded-full px-2 py-0.5 border uppercase tracking-wider text-amber-brand border-amber-brand/30 bg-amber-brand/[0.05]">Interview</span>
-                  <span className="text-ash">{v.role} · {v.org} · {v.meta}</span>
-                </figcaption>
               </figure>
             ))}
           </div>
@@ -1904,6 +1886,7 @@
       const [toast, setToast] = useState("");
       const [showSim, setShowSim] = useState(false);
       const [creating, setCreating] = useState(false);
+      const [squadOpen, setSquadOpen] = useState(false); // squad builder starts collapsed — the challenge grid is this page's main ask
       const [squadName, setSquadName] = useState("");
       const [squadEmoji, setSquadEmoji] = useState(SQUAD_EMOJIS[0]);
       const [squadPh, setSquadPh] = useState("Name your squad — e.g. Dawn Patrol RC");
@@ -1959,6 +1942,15 @@
       const sortedChallenges = CHALLENGES.slice().sort((a, b) =>
         ((a.status === "LIVE" ? 0 : 1) - (b.status === "LIVE" ? 0 : 1))
         || ((a.id === rivalId ? 0 : 1) - (b.id === rivalId ? 0 : 1)));
+      const liveChallenges = sortedChallenges.filter((c) => c.status === "LIVE");
+      const soonChallenges = sortedChallenges.filter((c) => c.status !== "LIVE");
+      // SOON boards collapse behind a toggle — but a deep link or rivalry match that
+      // targets one must never land on a grid where its card is hidden.
+      const [showSoon, setShowSoon] = useState(() => {
+        const d = CHALLENGES.find((x) => x.id === deepId);
+        const r = CHALLENGES.find((x) => x.id === rivalId);
+        return !!((d && d.status !== "LIVE") || (r && r.status !== "LIVE"));
+      });
 
       const shareUrl = "https://oriya.app/?ref=" + slug(passport.name) + "-" + passport.oriya + (passport.squad ? "&squad=" + encodeURIComponent(passport.squad) : "");
       const caption = (passport.squad ? "Running " + passport.squad + " on Oriya. " : "") + "My readiness normalizes to " + passport.oriya + " on the Oriya Index — same number on any wearable (" + DEVICE_MODEL[passport.deviceKey].tag + ")." + (igHandle ? " @" + igHandle : "") + " Squad's open, pull up 👇";
@@ -2061,24 +2053,6 @@
                   <span className="text-ash">{tierHint}</span>
                 </div>
               )}
-              <div className="mt-4 flex gap-2">
-                <button onClick={sharePassport} className="flex-1 rounded-full bg-jade py-3 font-semibold text-void hover:brightness-110 transition inline-flex items-center justify-center gap-2 shadow-[0_0_40px_-14px_rgba(127,183,158,0.8)]">
-                  <Share2 className="w-4 h-4" /> Share my Passport
-                </button>
-                {igHandle
-                  ? <span className="rounded-full border border-jade/40 bg-jade/[0.08] px-4 py-3 text-sm text-jade inline-flex items-center gap-2"><Instagram className="w-4 h-4" /> @{igHandle}</span>
-                  : <button onClick={() => setIgOpen((o) => !o)} className="rounded-full border border-white/12 bg-white/[0.03] px-4 py-3 text-sm text-bone hover:bg-white/[0.07] transition inline-flex items-center gap-2"><Instagram className="w-4 h-4" /> Connect</button>}
-              </div>
-              {igOpen && !igHandle && (
-                <div className="mt-2 flex gap-2 animate-fade-up">
-                  <input value={igInput} onChange={(e) => setIgInput(e.target.value)} placeholder="@yourhandle"
-                    onKeyDown={(e) => { if (e.key === "Enter") connectInstagram(); }}
-                    className="flex-1 rounded-full bg-white/[0.04] border border-white/10 px-4 py-2.5 text-sm text-bone outline-none focus:border-jade" />
-                  <button onClick={connectInstagram} className="rounded-full bg-jade px-4 py-2.5 text-sm font-semibold text-void">Link</button>
-                </div>
-              )}
-              <p className="text-center text-[11px] text-ash mt-2 font-mono">Post your Passport — your crew drops their own screenshot and lands on your board</p>
-
               {/* WHERE YOU'D LAND — surface the rank payoff before the user commits a side */}
               {hotChallenge && !alreadyJoinedHot && (
                 <button onClick={() => { setSelected(hotChallenge); track("rank_preview_clicked", { challenge: hotChallenge.id, rank: hotPreviewRank }); }}
@@ -2097,33 +2071,94 @@
                 </button>
               )}
 
+            </div>
+
+            {/* ============ LIVE CHALLENGES — the page's main ask, straight after the passport ============ */}
+            <div className="mt-10 mb-1 flex items-center gap-2">
+              <Flame className="w-4 h-4 text-amber-glow" />
+              <h2 className="font-mono font-extrabold italic uppercase tracking-tighter text-xl bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Live Challenges</h2>
+              <span className="text-[10px] font-mono text-ash uppercase tracking-wider mt-1.5">near you</span>
+            </div>
+            <p className="text-xs text-ash mb-4">Pick a side — your Oriya Index drops straight onto the leaderboard.</p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {userSquads.map((c) => <ChallengeCard key={c.id} c={c} joined={true} onOpen={setSelected} />)}
+              {liveChallenges.map((c) => <ChallengeCard key={c.id} c={c} joined={!!joined[c.id]} rival={c.id === rivalId} onOpen={setSelected} />)}
+            </div>
+            {soonChallenges.length > 0 && (
+              <button onClick={() => { const next = !showSoon; setShowSoon(next); track("soon_toggle", { open: next }); }}
+                className="mt-3 w-full rounded-xl border border-dashed border-white/12 py-2.5 text-[11px] font-mono text-ash hover:text-bone hover:border-white/25 transition">
+                {showSoon ? "hide the boards starting soon ▴" : "+" + soonChallenges.length + " starting soon ▾"}
+              </button>
+            )}
+            {showSoon && (
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 animate-fade-up">
+                {soonChallenges.map((c) => <ChallengeCard key={c.id} c={c} joined={!!joined[c.id]} rival={c.id === rivalId} onOpen={setSelected} />)}
+              </div>
+            )}
+            <p className="mt-3 text-[11px] font-mono text-ash">Boards are one thing to do with the number. <a href="builds.html" onClick={() => track("builds_page_click", { from: "challenges" })} className="text-jade hover:text-jade-glow border-b border-jade/30">See what people build with the exported data →</a></p>
+
+            {showSim && (
+              <button onClick={simulateFriend} className="mt-6 w-full rounded-xl border border-dashed border-jade/40 bg-jade/5 py-3 text-sm font-medium text-jade hover:bg-jade/10 transition inline-flex items-center justify-center gap-2 animate-fade-up">
+                <UserPlus className="w-4 h-4" /> Pull in a teammate — watch the average move <span className="text-jade/60 font-mono text-xs">(demo)</span>
+              </button>
+            )}
+
+            {/* share + how-the-number-works — demoted below the boards */}
+            <div className="max-w-md mx-auto">
+              <div className="mt-10 flex gap-2">
+                <button onClick={sharePassport} className="flex-1 rounded-full bg-jade py-3 font-semibold text-void hover:brightness-110 transition inline-flex items-center justify-center gap-2 shadow-[0_0_40px_-14px_rgba(127,183,158,0.8)]">
+                  <Share2 className="w-4 h-4" /> Share my Passport
+                </button>
+                {igHandle
+                  ? <span className="rounded-full border border-jade/40 bg-jade/[0.08] px-4 py-3 text-sm text-jade inline-flex items-center gap-2"><Instagram className="w-4 h-4" /> @{igHandle}</span>
+                  : <button onClick={() => setIgOpen((o) => !o)} className="rounded-full border border-white/12 bg-white/[0.03] px-4 py-3 text-sm text-bone hover:bg-white/[0.07] transition inline-flex items-center gap-2"><Instagram className="w-4 h-4" /> Connect</button>}
+              </div>
+              {igOpen && !igHandle && (
+                <div className="mt-2 flex gap-2 animate-fade-up">
+                  <input value={igInput} onChange={(e) => setIgInput(e.target.value)} placeholder="@yourhandle"
+                    onKeyDown={(e) => { if (e.key === "Enter") connectInstagram(); }}
+                    className="flex-1 rounded-full bg-white/[0.04] border border-white/10 px-4 py-2.5 text-sm text-bone outline-none focus:border-jade" />
+                  <button onClick={connectInstagram} className="rounded-full bg-jade px-4 py-2.5 text-sm font-semibold text-void">Link</button>
+                </div>
+              )}
+              <p className="text-center text-[11px] text-ash mt-2 font-mono">Post your Passport — your crew drops their own screenshot and lands on your board</p>
+
               <NormalizeExplainer />
             </div>
 
-            {/* ============ RECOVERY'S BETTER AS A TEAM SPORT — build your own crew ============ */}
+            {/* ============ RECOVERY'S BETTER AS A TEAM SPORT — collapsed; one button until opened ============ */}
             <div className="mt-12 relative rounded-3xl border border-jade/25 bg-gradient-to-br from-jade/[0.08] via-graphite/40 to-transparent p-6 sm:p-8 overflow-hidden">
-              <div className="absolute -top-16 -right-12 w-56 h-56 rounded-full bg-jade/10 blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-20 -left-12 w-56 h-56 rounded-full bg-amber-brand/[0.06] blur-3xl pointer-events-none" />
+              {(squadOpen || creating) && <div className="absolute -top-16 -right-12 w-56 h-56 rounded-full bg-jade/10 blur-3xl pointer-events-none" />}
+              {(squadOpen || creating) && <div className="absolute -bottom-20 -left-12 w-56 h-56 rounded-full bg-amber-brand/[0.06] blur-3xl pointer-events-none" />}
 
-              <span className="relative inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] font-mono text-jade mb-3"><Users className="w-3 h-3" /> Your squad · start here</span>
+              <span className="relative inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] font-mono text-jade mb-3"><Users className="w-3 h-3" /> Your squad</span>
               <h2 className="relative display text-[2.1rem] sm:text-[2.6rem] leading-[1.02] text-bone">Recovery's better<br/><span className="italic text-jade">as a team sport.</span></h2>
               <p className="relative text-sm text-ash mt-3 max-w-md leading-relaxed">Bring your run club, your team, your training partners — whatever they wear. Rank is against your own baseline, never a raw public number, so the board pushes the whole group without shaming a single red morning.</p>
 
-              {/* live crew avatars */}
-              <div className="relative mt-6 flex items-center gap-3">
-                <div className="flex items-center -space-x-2">
-                  <div className="w-9 h-9 rounded-full bg-jade/20 border-2 border-void ring-1 ring-jade/50 flex items-center justify-center text-[11px] font-semibold text-jade">{initials(passport.name)}</div>
-                  {teammates.map((t) => (
-                    <div key={t.key} title={t.name + " · " + t.score} className="w-9 h-9 rounded-full bg-white/8 border-2 border-void flex items-center justify-center text-[10px] font-semibold text-bone animate-pop-in">{initials(t.name)}</div>
-                  ))}
-                  {teammates.length < 3 && <div className="w-9 h-9 rounded-full border-2 border-dashed border-white/15 flex items-center justify-center text-ash"><Plus className="w-3.5 h-3.5" /></div>}
+              {/* live crew avatars — shown once the builder is open */}
+              {(squadOpen || creating) && (
+                <div className="relative mt-6 flex items-center gap-3">
+                  <div className="flex items-center -space-x-2">
+                    <div className="w-9 h-9 rounded-full bg-jade/20 border-2 border-void ring-1 ring-jade/50 flex items-center justify-center text-[11px] font-semibold text-jade">{initials(passport.name)}</div>
+                    {teammates.map((t) => (
+                      <div key={t.key} title={t.name + " · " + t.score} className="w-9 h-9 rounded-full bg-white/8 border-2 border-void flex items-center justify-center text-[10px] font-semibold text-bone animate-pop-in">{initials(t.name)}</div>
+                    ))}
+                    {teammates.length < 3 && <div className="w-9 h-9 rounded-full border-2 border-dashed border-white/15 flex items-center justify-center text-ash"><Plus className="w-3.5 h-3.5" /></div>}
+                  </div>
+                  <span className="text-xs text-ash">{passport.squad ? passport.squad + " · pull your crew in" : "an empty squad is a dead squad — start yours"}</span>
                 </div>
-                <span className="text-xs text-ash">{passport.squad ? passport.squad + " · pull your crew in" : "an empty squad is a dead squad — start yours"}</span>
-              </div>
+              )}
 
-              {/* team-type quick starts — anyone can build one */}
-              {!creating && (
-                <div className="relative mt-6">
+              {/* collapsed: one button. open: team-type quick starts. */}
+              {!creating && !squadOpen && (
+                <button onClick={() => { setSquadOpen(true); track("squad_builder_opened", {}); }}
+                  className="relative mt-6 w-full rounded-full bg-jade py-3 text-sm font-semibold text-void hover:brightness-110 transition inline-flex items-center justify-center gap-2 shadow-[0_0_40px_-14px_rgba(127,183,158,0.8)]">
+                  <Plus className="w-4 h-4" /> {userSquads.length ? "Start another squad" : "Build your squad"} <span className="font-mono text-[11px] text-void/70">· 30 sec</span>
+                </button>
+              )}
+              {!creating && squadOpen && (
+                <div className="relative mt-6 animate-fade-up">
                   <div className="grid grid-cols-3 gap-2.5">
                     {SQUAD_TYPES.map((t) => (
                       <button key={t.label} onClick={() => startSquadType(t)}
@@ -2161,27 +2196,9 @@
                 </div>
               )}
               {userSquads.length > 0 && !creating && (
-                <p className="relative mt-3 text-xs font-mono text-jade">Your squad <span className="text-bone">{userSquads[0].title}</span> is live below ↓ — share your Passport to grow it.</p>
+                <p className="relative mt-3 text-xs font-mono text-jade">Your squad <span className="text-bone">{userSquads[0].title}</span> is live above ↑ — share your Passport to grow it.</p>
               )}
             </div>
-
-            <div className="mt-10 mb-1 flex items-center gap-2">
-              <Flame className="w-4 h-4 text-amber-glow" />
-              <h2 className="font-mono font-extrabold italic uppercase tracking-tighter text-xl bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Live Challenges</h2>
-              <span className="text-[10px] font-mono text-ash uppercase tracking-wider mt-1.5">near you</span>
-            </div>
-            <p className="text-xs text-ash mb-4">Live boards first — real people already logging. Pick a side and your Oriya Index drops straight onto the leaderboard.</p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {userSquads.map((c) => <ChallengeCard key={c.id} c={c} joined={true} onOpen={setSelected} />)}
-              {sortedChallenges.map((c) => <ChallengeCard key={c.id} c={c} joined={!!joined[c.id]} rival={c.id === rivalId} onOpen={setSelected} />)}
-            </div>
-
-            {showSim && (
-              <button onClick={simulateFriend} className="mt-6 w-full rounded-xl border border-dashed border-jade/40 bg-jade/5 py-3 text-sm font-medium text-jade hover:bg-jade/10 transition inline-flex items-center justify-center gap-2 animate-fade-up">
-                <UserPlus className="w-4 h-4" /> Pull in a teammate — watch the average move <span className="text-jade/60 font-mono text-xs">(demo)</span>
-              </button>
-            )}
 
             <WeekUnlocks passport={passport} badges={badges} />
             <MarketVoices />

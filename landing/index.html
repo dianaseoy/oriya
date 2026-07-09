@@ -312,46 +312,6 @@
     .merge-btn.active { color:var(--jade); border-color:var(--jade-deep); background:rgba(127,183,158,0.06); }
 
     /* ============================================================
-       ACT 3 — COMPETITIVE RECOVERY / THE SQUAD (editorial ranking)
-       ============================================================ */
-    .squad { max-width:760px; margin:54px auto 0; }
-    .squad .rank-row {
-      display:grid; grid-template-columns:auto 32px minmax(0,1fr) auto auto; gap:18px; align-items:center;
-      padding:16px 8px; border-bottom:1px solid var(--hairline);
-    }
-    .squad .rank-row:first-of-type { border-top:1px solid var(--hairline); }
-    .squad .rank-num { font-family:var(--font-mono); font-size:clamp(22px,3vw,30px); color:var(--ash); font-weight:400; line-height:1; }
-    .squad .rank-row.lead .rank-num { color:var(--jade); }
-    .squad .mini-orb {
-      width:32px; height:32px; border-radius:50%;
-      background:radial-gradient(circle at 38% 32%, #2a3038, var(--graphite));
-      box-shadow:0 0 16px -4px var(--c, rgba(127,183,158,0.5));
-      animation:breathe 5s ease-in-out infinite;
-    }
-    .squad .rank-name { font-size:16px; color:var(--bone); line-height:1.25; min-width:0; }
-    .squad .rank-name span { display:block; font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--ash); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .squad .rank-score { font-family:var(--font-mono); font-variant-numeric:tabular-nums; font-size:15px; letter-spacing:.02em; color:var(--bone); white-space:nowrap; }
-    .squad .rank-delta { font-family:var(--font-mono); font-size:12px; color:var(--jade); min-width:32px; text-align:right; }
-    .squad .rank-delta.down { color:var(--ember); }
-    /* live-board vitality — rolling shimmer + staggered entrance so the squad board feels alive */
-    .squad-live { display:flex; align-items:center; justify-content:center; gap:8px; font-family:var(--font-mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ash); margin-bottom:16px; }
-    .squad-live .ld { width:6px; height:6px; border-radius:50%; background:var(--jade); box-shadow:0 0 8px var(--jade); animation:chalPulse 1.4s ease-in-out infinite; }
-    .squad .rank-row { position:relative; overflow:hidden; }
-    .squad .rank-row::after { content:""; position:absolute; inset:0; pointer-events:none;
-      background:linear-gradient(90deg,transparent,rgba(127,183,158,.10),transparent); opacity:0; animation:liveScan 8s ease-in-out infinite; }
-    .squad .rank-row:nth-child(2)::after { animation-delay:1.2s; }
-    .squad .rank-row:nth-child(3)::after { animation-delay:3.2s; }
-    .squad .rank-row:nth-child(4)::after { animation-delay:5.2s; }
-    .squad .rank-row:nth-child(5)::after { animation-delay:7.2s; }
-    @keyframes liveScan { 0%,100%{ opacity:0; transform:translateX(-35%); } 10%{ opacity:1; } 26%{ opacity:0; transform:translateX(35%); } }
-    .squad .rank-delta { animation:deltaPulse 3s ease-in-out infinite; }
-    @keyframes deltaPulse { 0%,100%{ opacity:.6; } 50%{ opacity:1; } }
-    @media (prefers-reduced-motion: reduce) {
-      .squad .rank-row { opacity:1; transform:none; animation:none; }
-      .squad .rank-row::after, .squad .rank-delta, .squad-live .ld { animation:none; }
-    }
-
-    /* ============================================================
        ACT 4 — THE BODY PASSPORT
        ============================================================ */
     .passport-act { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; }
@@ -413,15 +373,8 @@
     .pp-hint { font-family:var(--font-mono); font-size:10px; letter-spacing:0.03em; color:var(--ash); }
 
     /* ============================================================
-       ACT 5 — AMBIENT PRESENCE (squad ticker + coach pull-quote)
+       ACT 5 — AMBIENT PRESENCE (coach pull-quote, folded into #join)
        ============================================================ */
-    .ticker { position:relative; width:100%; overflow:hidden; padding:18px 0; mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent); }
-    .ticker-track { display:flex; gap:48px; width:max-content; animation:marquee 48s linear infinite; will-change:transform; }
-    .ticker:hover .ticker-track { animation-play-state:paused; }
-    .ticker-item { font-family:var(--font-mono); font-size:12px; letter-spacing:0.04em; color:var(--ash); opacity:0.6; white-space:nowrap; }
-    .ticker-item b { color:var(--jade); font-weight:500; }
-    .ticker-item .crew { color:var(--bone); }
-    @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
     .pullquote { max-width:880px; margin:90px auto 0; text-align:center; }
     .pullquote q { font-family:var(--font-display); font-size:clamp(1.8rem,4vw,3.4rem); line-height:1.1; color:var(--bone); quotes:none; }
     .pullquote q::before { content:"\201C"; } .pullquote q::after { content:"\201D"; }
@@ -475,9 +428,6 @@
     .proof-meta .ppl { color:var(--jade); } .proof-meta .prize { color:var(--amber-glow); }
     a.proof-card { display:flex; flex-direction:column; color:inherit; cursor:pointer; }
     a.proof-card .proof-meta { margin-top:auto; padding-top:14px; }
-    .proof-go { display:inline-flex; align-items:center; gap:6px; margin-top:12px; font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--amber-glow); opacity:0; transform:translateX(-4px); transition:opacity 0.3s, transform 0.3s var(--settle); }
-    .proof-card:hover .proof-go, .proof-card:focus-visible .proof-go { opacity:1; transform:none; }
-    @media (hover:none){ .proof-go { opacity:1; transform:none; } }
     .proof-note { text-align:center; font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.05em; color:var(--ash); opacity:0.65; margin-top:16px; }
     .proof-race { display:flex; height:6px; border-radius:999px; overflow:hidden; background:rgba(var(--wash),0.05); margin-top:14px; }
     .proof-race i { display:block; height:100%; background:rgba(var(--washb),0.16); }
@@ -1015,8 +965,6 @@
       .passport-act { grid-template-columns:1fr; gap:44px; }
       .footer-grid { grid-template-columns:1fr 1fr; gap:32px; }
       .nav-links { display:none; }
-      .squad .rank-row { grid-template-columns:auto 26px minmax(0,1fr) auto; gap:12px; padding:14px 4px; }
-      .squad .rank-delta { display:none; }
     }
     @media (max-width: 760px) {
       .how-steps { grid-template-columns:1fr; max-width:420px; }
@@ -1074,7 +1022,6 @@
       .reveal { filter:none; transform:none; }
       .reveal { opacity:0; transition:opacity 0.6s var(--circadian); }
       .reveal.awake { opacity:1; }
-      .ticker-track { animation:none !important; }
       .hero h1 .line > span { transform:none !important; }
       /* show the logo mark fully composed (dot resting on the ring), not mid-collapse */
       .om-ring, .om-core, .om-orbit, .om-seed, .om-halo { animation:none !important; }
@@ -1088,16 +1035,12 @@
     body.pf-out { opacity:0; transition:opacity 0.26s ease; }
     @keyframes pfIn { from { opacity:0; } to { opacity:1; } }
 
-    /* ---- The Long Game — Substack marquee ---- */
+    /* ---- The Long Game — static essay row (was a marquee at 6 cards; 3 read fine standing still) ---- */
     .reads-head { max-width:640px; margin:0 auto; text-align:center; }
     .reads-head .eyebrow { display:block; margin-bottom:18px; }
     .reads-head .lede { margin:18px auto 0; }
-    .reads-marquee { margin-top:44px; overflow:hidden;
-      -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
-              mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent); }
-    .reads-track { display:flex; gap:18px; width:max-content; animation:readsScroll 64s linear infinite; }
-    .reads-marquee:hover .reads-track, .reads-track:focus-within { animation-play-state:paused; }
-    @keyframes readsScroll { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+    .reads-marquee { margin-top:44px; }
+    .reads-track { display:flex; gap:18px; flex-wrap:wrap; justify-content:center; }
     .read-card { flex:0 0 300px; display:flex; flex-direction:column; gap:9px; padding:22px 22px 20px;
       border:1px solid var(--hairline); border-radius:16px; background:rgba(var(--wash),0.02);
       text-decoration:none; transition:border-color .3s var(--settle), transform .3s var(--settle), background .3s; }
@@ -1121,11 +1064,6 @@
       .reads-email { min-width:0; width:100%; }
       .reads-sub-form { width:100%; }
       .reads-sub-form .btn-primary { width:100%; }
-    }
-    /* reduced motion: the global rule freezes the scroll; show essays as a static, readable grid */
-    @media (prefers-reduced-motion: reduce){
-      .reads-marquee { overflow:visible; -webkit-mask-image:none; mask-image:none; }
-      .reads-track { width:auto; flex-wrap:wrap; justify-content:center; animation:none; }
     }
   </style>
 </head>
@@ -1173,6 +1111,7 @@
       <a href="#proof" class="nav-link">Live boards</a>
       <a href="#passport" class="nav-link">Body Passport</a>
       <a href="reads.html" class="nav-link">Reads</a>
+      <a href="partners.html" class="nav-link">Partners</a>
     </div>
     <div class="nav-right">
       <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark theme">☀</button>
@@ -1195,7 +1134,6 @@
       <p class="hero-sub lede">An Oura 62 isn't a Whoop 62 — so "I recovered better than you" never had an answer. Oriya hands every wearable a handicap, puts you both on one honest 0–100 index, and lets you settle it for real.</p>
       <div class="hero-actions">
         <a href="try.html" id="ctaPrimary" class="btn btn-primary" data-magnetic data-door="claim">Get your Body Passport →</a>
-        <a href="try.html" id="ctaCreate" class="btn-ghost" data-door="create">or build your Squad</a>
       </div>
       <a href="#handicap" class="btn-ghost" style="display:inline-block;margin-top:14px;opacity:0.7;">See how the Handicap works ↓</a>
     </div>
@@ -1525,8 +1463,7 @@
     </div>
 
     <div class="science-cta">
-      <a href="try.html" class="btn btn-primary" data-magnetic data-door="create">Get your normalized score →</a>
-      <a href="science.html" class="btn-ghost" style="opacity:0.85;">Read the full method →</a>
+      <a href="science.html" class="btn-ghost">Read the full method →</a>
     </div>
   </div>
 </section>
@@ -1537,7 +1474,7 @@
     <div class="act-head" style="margin:0 auto; text-align:center;">
       <span class="eyebrow">Already a competition · SF &amp; NYC</span>
       <h2 class="display display-l">Recovery's better<br>as a team sport.</h2>
-      <p class="lede" style="margin:18px auto 0;">Run clubs, founder crews and on-call eng teams are already on the board — bring yours, whatever they wear. Every device is normalized to the same index and ranked against each person's own baseline, so your Oura and my Whoop compete fairly and no one's shamed for a red morning.</p>
+      <p class="lede" style="margin:18px auto 0;">Run clubs, founder crews and on-call eng teams are already on the board — bring yours, whatever they wear.</p>
     </div>
 
     <div class="proof-grid">
@@ -1547,7 +1484,6 @@
         <p>Anthropic's red-team week vs OpenAI's alignment on-call vs Stripe's peak-traffic infra. Highest normalized readiness under load holds the lead.</p>
         <div class="proof-race" aria-hidden="true"><i class="lead" style="width:34.2%"></i><i style="width:33%"></i><i style="width:32.8%"></i></div>
         <div class="proof-race-key"><span class="lead">Anthropic 86 · leads</span><span>OpenAI 82.7</span><span>Stripe 82.5</span></div>
-        <span class="proof-go">See where you'd land →</span>
         <div class="proof-meta"><span class="ppl">53 logging</span><span class="prize">$1,200 · 1st $700</span></div>
       </a>
       <a class="proof-card" href="try.html?challenge=marina">
@@ -1556,7 +1492,6 @@
         <p>The Bay's oldest running rivalry, settled by a 7-day team recovery average — no more arguing about 10K splits.</p>
         <div class="proof-race" aria-hidden="true"><i style="width:48.9%"></i><i class="lead" style="width:51.1%"></i></div>
         <div class="proof-race-key"><span>Marina RC 77.8</span><span class="lead">Stanford 81.3 · leads</span></div>
-        <span class="proof-go">See where you'd land →</span>
         <div class="proof-meta"><span class="ppl">38 logging</span><span class="prize">$500 · $50/winner</span></div>
       </a>
       <a class="proof-card" href="try.html?challenge=founders">
@@ -1565,43 +1500,10 @@
         <p>Founders own the schedule. Operators run the machine. 21 days — and 71 athletes across five companies — to find out which one recovers better. Founders are currently losing.</p>
         <div class="proof-race" aria-hidden="true"><i style="width:49.9%"></i><i class="lead" style="width:50.1%"></i></div>
         <div class="proof-race-key"><span>Founders 73.0</span><span class="lead">Operators 73.3 · leads</span></div>
-        <span class="proof-go">See where you'd land →</span>
         <div class="proof-meta"><span class="ppl">71 logging</span><span class="prize">$2,000 · winner takes all</span></div>
       </a>
     </div>
     <p class="proof-note">Founding season — boards run with sample athletes until each side fills. Your score ranks against them for real, in about 45 seconds.</p>
-
-    <div class="squad">
-      <div class="squad-live"><span class="ld"></span> Live squad board · ranked vs each person's own baseline</div>
-      <div class="rank-row lead">
-        <span class="rank-num">01</span>
-        <span class="mini-orb" style="--c:rgba(127,183,158,0.7);"></span>
-        <span class="rank-name">Maya R.<span>Ridgeline RC · Oura</span></span>
-        <span class="rank-score">+9 vs base</span>
-        <span class="rank-delta">▲2</span>
-      </div>
-      <div class="rank-row">
-        <span class="rank-num">02</span>
-        <span class="mini-orb" style="--c:rgba(159,211,187,0.6);"></span>
-        <span class="rank-name">Dev K.<span>Eastside Barbell · Whoop</span></span>
-        <span class="rank-score">+7 vs base</span>
-        <span class="rank-delta">▲1</span>
-      </div>
-      <div class="rank-row">
-        <span class="rank-num">03</span>
-        <span class="mini-orb" style="--c:rgba(215,162,92,0.6);"></span>
-        <span class="rank-name">Talia S.<span>Mission Tri · Garmin</span></span>
-        <span class="rank-score">+4 vs base</span>
-        <span class="rank-delta down">▼1</span>
-      </div>
-      <div class="rank-row">
-        <span class="rank-num">04</span>
-        <span class="mini-orb" style="--c:rgba(185,106,74,0.5);"></span>
-        <span class="rank-name">Jordan P.<span>Ridgeline RC · Apple</span></span>
-        <span class="rank-score">+2 vs base</span>
-        <span class="rank-delta">▲3</span>
-      </div>
-    </div>
 
     <div class="proof-cta">
       <a href="try.html" id="ctaProof" class="btn btn-primary" data-magnetic data-door="create">See where you'd land →</a>
@@ -1671,23 +1573,11 @@
     <div class="act-head reads-head">
       <span class="eyebrow">The Long Game · our newsletter</span>
       <h2 class="display display-l">The thinking<br>behind the score.</h2>
-      <p class="lede">One essay a week on wearables, recovery, and the psychology of the morning number — the ideas Oriya is built on. Read a few, then get them in your inbox.</p>
+      <p class="lede">One essay a week on wearables, recovery, and the psychology of the morning number.</p>
     </div>
 
     <div class="reads-marquee" id="readsMarquee" aria-label="Recent essays from The Long Game">
       <div class="reads-track" id="readsTrack">
-        <a class="read-card" href="https://oriyaapp.substack.com/p/the-hidden-psychology-of-wearable" target="_blank" rel="noopener">
-          <span class="read-tag">The Long Game</span>
-          <span class="read-title">The Hidden Psychology of Wearable Anxiety</span>
-          <span class="read-sub">There's a word for being made sick by the device that was supposed to make you well.</span>
-          <span class="read-more">Read on Substack →</span>
-        </a>
-        <a class="read-card" href="https://oriyaapp.substack.com/p/why-the-next-status-symbol-is-preparedness" target="_blank" rel="noopener">
-          <span class="read-tag">The Long Game</span>
-          <span class="read-title">Why the Next Status Symbol Is Preparedness</span>
-          <span class="read-sub">For twenty years we signaled status by how depleted we were. The signal is about to invert.</span>
-          <span class="read-more">Read on Substack →</span>
-        </a>
         <a class="read-card" href="https://oriyaapp.substack.com/p/recovery-is-becoming-a-team-sport" target="_blank" rel="noopener">
           <span class="read-tag">The Long Game</span>
           <span class="read-title">Recovery Is Becoming a Team Sport</span>
@@ -1698,12 +1588,6 @@
           <span class="read-tag">The Long Game</span>
           <span class="read-title">Your Wearable Is Measuring You in a Private Language</span>
           <span class="read-sub">The reason your devices don't agree isn't that the problem is hard. It's that agreeing would cost them you.</span>
-          <span class="read-more">Read on Substack →</span>
-        </a>
-        <a class="read-card" href="https://oriyaapp.substack.com/p/the-5-morning-ritual-nobody-asked" target="_blank" rel="noopener">
-          <span class="read-tag">The Long Game</span>
-          <span class="read-title">The $5 Morning Ritual Nobody Asked For</span>
-          <span class="read-sub">Every morning, millions of us do unpaid data-integration work for four companies.</span>
           <span class="read-more">Read on Substack →</span>
         </a>
         <a class="read-card" href="https://oriyaapp.substack.com/p/an-oura-62-is-not-a-whoop-62" target="_blank" rel="noopener">
@@ -1729,32 +1613,29 @@
 <!-- ACT 6.5 — THE PRIVATE-LANGUAGE PROBLEM · Hypothesis B (builder/sovereignty ICP)
      Panel-agreed (dawn+sable+vera): single builder CTA, capture under source
      "builder_waitlist", placed BELOW #reads so the social funnel above stays
-     an unbiased test. Essay link is UTM'd; export copy stays roadmap-honest. -->
+     an unbiased test. The essay lives as a #reads card; the strip's one link
+     is builds.html. Export copy stays roadmap-honest. -->
 <section class="act" id="builder">
   <div class="wrap reveal">
     <span class="eyebrow">The private-language problem</span>
     <h2 class="display display-l" style="margin-top:14px;">Your devices disagree<br>on purpose.</h2>
-    <!-- v2 ladder (panel-agreed): confusion → lie → waste → lock → build → lapse.
-         One grievance per row, air between rows — six in a dense block reads as rant. -->
+    <!-- v2 ladder, focused (founder feedback: "too much going on"): one line per
+         ICP mood — confusion → build → lapse. One grievance per row, air between rows. -->
     <div class="pain-lines">
       <p>Readiness: 82. A year on your finger and you still can't say eighty-two what.</p>
-      <p>Recovery: 91%. Sleep: four hours. One of these numbers is lying.</p>
-      <p>Skin temp, HRV, every sleep stage — all of it collapsed into one number you can't open.</p>
-      <p>Your HRV belongs to you. The schema it's trapped in doesn't.</p>
       <p>You'd build the dashboard yourself this weekend — if the export were something you could actually query.</p>
       <p>The subscription was a gift — bank points, HR's wellness budget, a friend. When it lapses, the paywall is around your own history.</p>
     </div>
-    <a class="builder-essay" id="builderEssay" href="https://oriyaapp.substack.com/p/your-wearable-is-measuring-you-in?utm_source=oriya_landing&amp;utm_medium=builder_strip" target="_blank" rel="noopener">Your Wearable Is Measuring You in a Private Language →</a>
+    <a class="builder-essay" id="builderBuilds" href="builds.html">What people build once the export is readable →</a>
     <form class="builder-form" id="builderForm">
       <input type="email" required placeholder="you@yourco.com" id="builderEmail" aria-label="Email">
-      <!-- required enumerated intent (Vera): six pains feed one CTA, so the mood
+      <!-- required enumerated intent (Vera): three pains feed one CTA, so the mood
            must ride into the Tally label or the builder signal is uncountable -->
       <select required id="builderBreaks" aria-label="What is the actual pain">
         <option value="" disabled selected>what's the actual pain?</option>
         <option value="opaque_number">the number doesn't mean anything to me</option>
-        <option value="want_more">I want to do more with the data I already collect</option>
+        <option value="build_query">I want to build on / do more with the data I already collect</option>
         <option value="lapsed_sub">my free subscription lapses — history's paywalled</option>
-        <option value="build_query">I want to build on it / query it myself</option>
       </select>
       <button class="btn btn-primary" type="submit">I'd build on this</button>
     </form>
@@ -1822,6 +1703,7 @@
         <iframe id="tallyEmbed" class="tally-embed" width="100%" height="240" frameborder="0" title="Join the Oriya waitlist"></iframe>
       </div>
       <p class="form-note">Free · invite-only Season 1 · no credit card · your data is never sold</p>
+      <p class="form-note" style="margin-top:6px;">Running a gym, club, or brand? <a href="partners.html" style="color:var(--jade);">Oriya for partners →</a></p>
     </div>
 
     <div class="compat">
@@ -1984,8 +1866,8 @@
     if (sec) new IntersectionObserver(function (es, ob) {
       es.forEach(function (e) { if (e.isIntersecting) { window.oriyaTrack("builder_strip_view"); ob.disconnect(); } });
     }, { threshold: 0.35 }).observe(sec);
-    var essay = document.getElementById("builderEssay");
-    if (essay) essay.addEventListener("click", function () { window.oriyaTrack("builder_essay_click"); });
+    var builds = document.getElementById("builderBuilds");
+    if (builds) builds.addEventListener("click", function () { window.oriyaTrack("builder_builds_click"); });
     f.addEventListener("submit", function (ev) {
       ev.preventDefault();
       var em = document.getElementById("builderEmail").value;
@@ -2476,25 +2358,6 @@
     }, { threshold: 0.5 }).observe(wrap);
   })();
 
-  /* ========== ACT 5 — squad ticker (ambient presence) ========== */
-  (function () {
-    const track = document.getElementById("tickerTrack");
-    if (!track) return;
-    const events = [
-      ['RIDGELINE RC', 'maya woke green', '+4'],
-      ['EASTSIDE BARBELL', 'streak 31d', ''],
-      ['MISSION TRI', 'talia +6 vs base', '+6'],
-      ['DOLORES RUN CLUB', 'new squad record', ''],
-      ['NOE LIFTING CO', 'dev climbed to 02', '▲1'],
-      ['BAYVIEW MASTERS', 'first green week', ''],
-      ['PRESIDIO PACERS', 'jordan ▲3', '▲3'],
-      ['SOMA CROSSFIT', 'streak 12d', ''],
-    ];
-    const render = (e) => `<span class="ticker-item"><span class="crew">${e[0]}</span> · ${e[1]}${e[2] ? ' <b>' + e[2] + '</b>' : ''}</span>`;
-    // duplicate the track for a seamless -50% wrap
-    track.innerHTML = (events.map(render).join('') ).repeat(2);
-  })();
-
   /* ========== ACT 6 — dawn orb ignites amber when in view ========== */
   (function () {
     const orb = document.getElementById("dawnOrb");
@@ -2545,7 +2408,7 @@
      Default: primary = "Create your Squad" → try.html (door:create).
      If the visitor arrived via an invite (?squad= or ?ref=), the primary
      becomes "Join {name}'s Squad" → try.html (door:join), carrying the param
-     through. Secondary stays "or claim your Passport" → #join (door:claim). */
+     through. */
   (function wireHeroCtas() {
     var squad = getInboundSquad();
     var ref = getInboundRef();
@@ -2574,13 +2437,6 @@
         window.oriyaTrack("cta_click", { cta: ctaLabel, location: el.id });
         window.oriyaTrack("door_selected", { door: door, squad: invited ? name : null });
       });
-    });
-
-    // Secondary hero hook: "build your Squad" — tracked so the duel-vs-squad split is measurable.
-    var ctaCreate = document.getElementById("ctaCreate");
-    if (ctaCreate) ctaCreate.addEventListener("click", function () {
-      window.oriyaTrack("cta_click", { cta: "create_squad", location: "ctaCreate" });
-      window.oriyaTrack("door_selected", { door: "create", squad: invited ? name : null });
     });
 
     // Secondary "claim your Passport" links
@@ -2745,7 +2601,7 @@
   /* ========== Referral Liveboard ==========
      Gamified recruiter loop: top Season-1 referrers + YOUR live position + progress to the
      next tier (1 → priority, 3 → first cohort, 10 → Founding Athlete). Seed rows are illustrative
-     (same convention as the squad ranking/ticker); the YOU row is honest — it reads the real
+     (same convention as the challenge boards); the YOU row is honest — it reads the real
      referral count from storage (0 until a backend reports confirmed invites), never inflated. */
   const RB_SEED = [
     { n: "Maya R.", c: 14 }, { n: "Devin K.", c: 9 }, { n: "Priya S.", c: 6 },
@@ -2900,15 +2756,6 @@
     setTimeout(() => oriBubble("bot", "Nice — that's applied. 🎉 Drop your email and you're a Founding Athlete. Want me to take you there?<div class=\"ori-steps\"><div class=\"ori-step\"><a href=\"#\" onclick=\"focusSignup();return false;\">Claim your Passport →</a></div></div>"), 380);
   }
 
-  /* The Long Game marquee — duplicate the essay cards once for a seamless loop.
-     Skipped under reduced motion, where the CSS falls back to a static grid. */
-  (function () {
-    const track = document.getElementById("readsTrack");
-    if (!track) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const cards = Array.from(track.children);
-    cards.forEach((c) => { const clone = c.cloneNode(true); clone.setAttribute("aria-hidden", "true"); clone.tabIndex = -1; track.appendChild(clone); });
-  })();
 </script>
 </body>
 </html>
