@@ -505,6 +505,16 @@
       { key:"apple",  scope:"HRV + sleep + resting HR",  kind:"Recovery" },
     ];
 
+    /* Which screen to screenshot, per device — shown inside the dropzone so
+       nobody has to guess. Apple has no single native score, so its entry
+       points at the Health signals we compute from instead. */
+    const SHOT_GUIDE = [
+      { key:"oura",   shot:"Readiness tab" },
+      { key:"whoop",  shot:"Recovery % screen" },
+      { key:"garmin", shot:"Body Battery" },
+      { key:"apple",  shot:"Health app · HRV + sleep" },
+    ];
+
     function toOriyaStandard(raw, key) {
       const m = DEVICE_MODEL[key]; if (!m) return raw;
       return Math.max(1, Math.min(99, Math.round(raw * m.factor + m.offset)));
@@ -654,7 +664,7 @@
           {init:"PS",handle:"priya.s",team:"a16z",score:70,streak:"6d"},
           {init:"DM",handle:"drew.m",team:"Notion",score:71,streak:"3d"},
         ] },
-      { id:"devicewars", emoji:"⌚", icon:Sparkles, status:"SOON", startLabel:"Starts July 8", sponsor:null,
+      { id:"devicewars", emoji:"⌚", icon:Sparkles, status:"SOON", startLabel:"Starts July 11", sponsor:null,
         title:"Ring vs Band", subtitle:"Oura wearers vs Whoop wearers — same 7 days, same fair scoring. Which community actually holds recovery?",
         days:null, prize:null, payout:"Bragging rights settled on the leaderboard, not Twitter.",
         participants:null, avg:null, joinTeam:"Oura", categories:["Devices","Open","Community"],
@@ -931,14 +941,31 @@
               onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
               onDragLeave={() => setDragging(false)}
               onDrop={(e) => { e.preventDefault(); setDragging(false); readFile(e.dataTransfer.files[0]); }}
-              className={"cursor-pointer rounded-2xl border-2 border-dashed p-8 sm:p-10 text-center transition-all " +
+              className={"cursor-pointer rounded-2xl border-2 border-dashed p-6 sm:p-8 text-center transition-all " +
                 (dragging ? "border-jade bg-jade/5 scale-[1.01]" : "border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04]")}
             >
+              {/* sheet grabber — native-app affordance, purely visual */}
+              <div className="mx-auto w-10 h-1 rounded-full bg-white/15 mb-5" />
               <div className="mx-auto w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4">
                 <Upload className="w-5 h-5 text-jade" />
               </div>
-              <p className="text-bone font-medium">Drop your recovery screenshot</p>
-              <p className="text-ash text-xs mt-1">Samsung · Pixel · any app we don't sync yet — we read it for you</p>
+              <p className="text-bone font-medium">Add this morning's recovery screenshot</p>
+              <p className="text-ash text-xs mt-1">tap to pick from your photos · or drag it in</p>
+              <div className="grid grid-cols-2 gap-1.5 mt-4 text-left">
+                {SHOT_GUIDE.map((g) => {
+                  const m = DEVICE_MODEL[g.key];
+                  return (
+                    <div key={g.key} className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1.5 min-w-0">
+                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: BRAND[g.key] }} />
+                      <span className="min-w-0">
+                        <span className="block text-[11px] font-medium text-bone truncate">{m.tag}</span>
+                        <span className="block text-[10px] text-ash font-mono truncate">{g.shot}</span>
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-[10px] text-ash/70 mt-2.5 leading-relaxed">Apple Watch has no single score — we compute yours from the Health signals. Samsung · Pixel · anything else: drop it, we read it.</p>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => readFile(e.target.files[0])} />
             </div>
             <p className="text-center text-[11px] text-ash/70 mt-3 font-mono leading-relaxed">
@@ -1655,13 +1682,23 @@
                 <p className="text-xs text-ash mb-3">Your normalized {me.oriya} drops onto this board and gets stamped on your Passport. Pick the side you'll actually defend.</p>
                 <div className="flex flex-wrap gap-2">
                   {c.teams.map((t) => (
-                    <button key={t} onClick={() => setTeam(t)}
+                    <button key={t} onClick={() => { setTeam(t); track("side_picked", { challenge: c.id, team: t }); }}
                       className={"px-4 py-2 rounded-full text-sm font-medium border transition-all " + (t === team ? "bg-jade text-void border-jade" : "border-white/15 text-bone hover:border-jade/60")}>
                       {t}
                     </button>
                   ))}
                 </div>
-                {team && <p className="mt-3 text-xs font-mono text-jade">You'll enter {team} around #{previewRank} of {board.length + 1}.</p>}
+                {/* pop-up "what this means" — compresses the rules so nobody has to scroll to follow through */}
+                {team && (
+                  <div className="mt-3 rounded-lg border border-jade/30 bg-jade/[0.05] p-3 animate-fade-up">
+                    <p className="text-xs text-bone leading-relaxed">
+                      <span className="font-semibold text-jade">You're taking {team}'s side.</span> Your Oriya Index <span className="font-mono text-jade">{me.oriya}</span> lands around <span className="font-mono text-jade">#{previewRank} of {board.length + 1}</span> and counts toward {team}'s average every day you log.
+                    </p>
+                    <p className="text-[11px] text-ash mt-1.5 leading-relaxed">
+                      <span className="text-bone font-medium">How to win:</span> {c.days != null ? "when the " + c.days + " days are up, " : "when the round ends, "}the side with the higher team average takes it{c.prize ? " — " + c.prize + (c.split ? " (" + c.split + ")" : "") + ". The pot is sponsor-backed; only athletes are paid." : " — bragging rights, settled on the board."} Log daily — a missed day counts as 0.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 

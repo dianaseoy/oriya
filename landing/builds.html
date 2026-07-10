@@ -90,6 +90,42 @@
     .lnk { font-family:var(--font-mono); font-size:12px; color:var(--jade); border-bottom:1px solid rgba(127,183,158,.35); padding-bottom:2px; }
     .lnk:hover { color:var(--bone); border-color:var(--bone); }
 
+    /* ---- feature voting on the cards themselves (counts = this device's votes; no fake crowd numbers) ---- */
+    .vote-bar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px 18px; margin-top:38px; }
+    .vote-kicker { font-family:var(--font-mono); font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--jade); }
+    .fchips { display:flex; gap:8px; flex-wrap:wrap; }
+    .fchip { font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ash);
+      border:1px solid var(--hairline); border-radius:999px; background:rgba(var(--wash),.03); padding:6px 13px; cursor:pointer; transition:color .25s, border-color .25s, background .25s; }
+    .fchip:hover { color:var(--bone); border-color:var(--jade-deep); }
+    .fchip.on { color:var(--jade); border-color:rgba(127,183,158,.5); background:rgba(127,183,158,.07); }
+    .vote-note { font-family:var(--font-mono); font-size:10.5px; color:var(--ash); margin-top:10px; line-height:1.8; }
+    #buildsGrid { margin-top:16px; }
+    .card { transition:border-color .3s var(--settle), transform .45s var(--settle); }
+    .card-top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .card .vote-pain { font-size:12.5px; color:var(--ash); line-height:1.55; }
+    .card .vote-fix { font-size:13.5px; color:var(--bone); line-height:1.55; }
+    .card .vote-pain b, .card .vote-fix b { font-family:var(--font-mono); font-size:9px; letter-spacing:.13em; text-transform:uppercase; font-weight:500; margin-right:7px; }
+    .card .vote-pain b { color:var(--jade); }
+    .card .vote-fix b { color:var(--amber-glow); }
+    .vote-btn { display:inline-flex; align-items:center; gap:7px; flex:none; border:1px solid var(--hairline); border-radius:999px;
+      background:rgba(var(--wash),.03); color:var(--ash); font-family:var(--font-mono); font-size:11px; padding:6px 13px; cursor:pointer;
+      transition:border-color .25s, color .25s, background .25s; }
+    .vote-btn:hover { border-color:var(--jade); color:var(--bone); }
+    .vote-btn.voted { border-color:rgba(127,183,158,.5); color:var(--jade); background:rgba(127,183,158,.07); }
+    .vote-btn .arr { font-size:12px; line-height:1; }
+    .vote-btn.bump { animation:voteBump .3s var(--settle); }
+    @keyframes voteBump { 50% { transform:scale(1.12); } }
+    .lock-card { border-color:rgba(127,183,158,.4); }
+    .lock-card:hover { border-color:rgba(127,183,158,.6); }
+    .tag.lock { color:var(--amber-glow); border-color:rgba(215,162,92,.35); }
+    .vote-lock { display:flex; flex-wrap:wrap; gap:10px; margin-top:4px; }
+    .vote-lock .btn { border:0; cursor:pointer; font-family:inherit; }
+    .vote-email { flex:1; min-width:150px; padding:11px 14px; border-radius:10px; border:1px solid var(--hairline);
+      background:rgba(var(--wash),.03); color:var(--bone); font-size:13.5px; font-family:inherit; }
+    .vote-email::placeholder { color:var(--ash); }
+    .vote-email:focus { outline:none; border-color:rgba(127,183,158,.5); }
+    @media (prefers-reduced-motion: reduce){ .card { transition:border-color .3s var(--settle); } .vote-btn.bump { animation:none; } }
+
     .footer { margin-top:70px; border-top:1px solid var(--hairline); padding:26px 0 40px; display:flex; flex-wrap:wrap; gap:10px 24px;
       font-family:var(--font-mono); font-size:11px; color:var(--ash); }
     .footer a:hover { color:var(--bone); }
@@ -116,56 +152,18 @@
       <p class="prov"><span>Provenance:</span> the "seen in the wild" cards are recurring project genres from the builder community — r/QuantifiedSelf, Hacker News, the Home Assistant forums, GitHub. The "build idea" cards are our own wishlist. No affiliation, no endorsement, no made-up numbers.</p>
     </header>
 
-    <div class="grid">
-      <div class="card">
-        <span class="tag wild">Seen in the wild</span>
-        <h3>The recovery-aware home</h3>
-        <p>Home Assistant users pipe readiness into the house: a red morning dims the lights up slower, nudges the thermostat warmer, and flips on do-not-disturb before standup. The house knows before you do.</p>
-        <span class="src">genre: Home Assistant community integrations</span>
-      </div>
-      <div class="card">
-        <span class="tag wild">Seen in the wild</span>
-        <h3>The Apple Health excavation</h3>
-        <p>The rite of passage: export.zip → XML parser → SQLite → a Grafana wall. Years of resting heart rate you've technically owned and never once seen, finally in one queryable table.</p>
-        <span class="src">genre: r/QuantifiedSelf · personal dashboards</span>
-      </div>
-      <div class="card">
-        <span class="tag wild">Seen in the wild</span>
-        <h3>HRV-autoregulated training</h3>
-        <p>Scripts that read the morning HRV trend and rewrite today's programmed load — deload when the baseline dips, push when it holds. This loop has run in the HRV-training crowd for a decade; the bottleneck was never the idea, it was the export.</p>
-        <span class="src">genre: HRV4Training-style autoregulation</span>
-      </div>
-      <div class="card">
-        <span class="tag wild">Seen in the wild</span>
-        <h3>A Slack status that tells the truth</h3>
-        <p>Recovery API → webhook → Slack: "red day — async only." The wearable finally gets to talk back to the meeting culture that wrecked the sleep in the first place.</p>
-        <span class="src">genre: API + webhook side projects</span>
-      </div>
-      <div class="card">
-        <span class="tag wild">Seen in the wild</span>
-        <h3>The correlation notebook</h3>
-        <p>A Jupyter notebook, two CSVs, and one honest question: what does the third beer actually cost in deep sleep? It's n=1 science — but it's your n, and no app will ever run that query for you.</p>
-        <span class="src">genre: quantified-self notebooks</span>
-      </div>
-      <div class="card">
-        <span class="tag idea">Build idea</span>
-        <h3>The morning agent</h3>
-        <p>An LLM agent that reads last night's data and today's calendar, then drafts the day: when to book the deep work, which meeting to move, when to actually stop. The data exists. The door doesn't — yet.</p>
-        <span class="src">wishlist — custom agents on your own baseline</span>
-      </div>
-      <div class="card">
-        <span class="tag idea">Build idea</span>
-        <h3>The handoff file</h3>
-        <p>Switch hardware without resetting your body's story to zero: a portable baseline file any new device could calibrate against on day one. Three years of history should transfer like a phone number does.</p>
-        <span class="src">wishlist — portability, not just export</span>
-      </div>
-      <div class="card">
-        <span class="tag idea">Build idea</span>
-        <h3>Readiness webhooks for anything</h3>
-        <p>IFTTT-grade triggers on your own thresholds: HRV 20% under baseline three days running → text the coach, block the calendar, kill tomorrow's alarm. Your rules, firing on your numbers.</p>
-        <span class="src">wishlist — thresholds you define</span>
+    <div class="vote-bar">
+      <span class="vote-kicker">Pick what gets built first</span>
+      <div class="fchips">
+        <button type="button" class="fchip on" data-f="all">All</button>
+        <button type="button" class="fchip" data-f="wild">Seen in the wild</button>
+        <button type="button" class="fchip" data-f="idea">Wishlist</button>
       </div>
     </div>
+    <p class="vote-note">Tap ▲ on what you'd actually use — as many times as you mean it. Counts are your votes on this device, nothing crowd-faked; the list re-ranks live and your order rides into the build queue.</p>
+
+    <!-- Cards are rendered by the voting script below — one list, the cards ARE the ballot. -->
+    <div class="grid" id="buildsGrid"></div>
 
     <section class="door">
       <h2>The door we're building</h2>
@@ -174,9 +172,8 @@
 { "date": "2026-07-07", "oriya_index": 75, "par": 71,
   "source": "whoop", "native": { "recovery": 83 },
   "signals": { "hrv_ms": 62, "rhr": 51, "sleep_stages": … } }</div>
-      <p class="note">Roadmap-honest: this endpoint is not shipped. It's what the builder list is for — first access, and the list picks what gets built first.</p>
+      <p class="note">Roadmap-honest: this endpoint is not shipped. It's what the vote above is for — the list gets built in your order, and voters get the door first.</p>
       <div class="cta-row">
-        <a class="btn" href="index.html#builder">Lock first access — tell us what you'd build →</a>
         <a class="lnk" href="https://oriyaapp.substack.com/p/your-wearable-is-measuring-you-in?utm_source=oriya_builds&utm_medium=builds_page" target="_blank" rel="noopener">Why the door doesn't exist yet — the essay →</a>
       </div>
     </section>
@@ -190,6 +187,169 @@
   </div>
 
   <script>
+    /* Card voting — the showcase cards ARE the ballot; one list, no duplicate
+       ideas. Counts are this device's votes only (there is no backend, and
+       this page promises no made-up numbers) — multi-tap allowed, so the
+       counter still climbs. Initial order = our editorial call on predicted
+       popularity (breadth of the pain × how vivid the build is); votes
+       re-rank live. The lock-in card follows the visitor's top pick, and on
+       submit the ranked ids ride into the Tally source label (same form +
+       question ids as index/try/partners):
+       builder_waitlist · via:builds_vote · votes:excavation+handoff. */
+    (function () {
+      var BUILDS = [
+        { id: "excavation", kind: "wild", title: "The Apple Health excavation",
+          pain: "Years of resting heart rate are trapped in an export.zip XML no human can read.",
+          fix: "A normalized parser: export.zip → SQLite → a Grafana wall you can actually query.",
+          src: "genre: r/QuantifiedSelf · personal dashboards" },
+        { id: "handoff", kind: "idea", title: "The handoff file",
+          pain: "Switching tracker hardware resets your body's calibration history to zero.",
+          fix: "A portable baseline — GET /v1/me/export — any new device inherits on day one. Three years of history should transfer like a phone number.",
+          src: "wishlist — portability, not just export" },
+        { id: "home", kind: "wild", title: "The recovery-aware home",
+          pain: "Smart homes can't see raw physiology without hand-scraping a walled garden.",
+          fix: "A webhook pipes readiness in: a red morning dims the lights up slower, warms the thermostat, flips on do-not-disturb before standup.",
+          src: "genre: Home Assistant community integrations" },
+        { id: "webhooks", kind: "idea", title: "Readiness webhooks for anything",
+          pain: "Proprietary apps won't let you define your own threshold rules.",
+          fix: "IFTTT-grade triggers: HRV 20% under baseline three days running → text the coach, block the calendar, kill tomorrow's alarm.",
+          src: "wishlist — thresholds you define" },
+        { id: "autoreg", kind: "wild", title: "HRV-autoregulated training",
+          pain: "The bottleneck was never the coaching logic — it's getting the export out.",
+          fix: "A script reads the morning HRV trend and rewrites today's programmed load: deload when the baseline dips, push when it holds.",
+          src: "genre: HRV4Training-style autoregulation" },
+        { id: "agent", kind: "idea", title: "The morning agent",
+          pain: "The data exists; a door agents can read doesn't — yet.",
+          fix: "An LLM reads last night's data and today's calendar, then drafts the day: the deep work, the meeting to move, when to actually stop.",
+          src: "wishlist — custom agents on your own baseline" },
+        { id: "slack", kind: "wild", title: "A Slack status that tells the truth",
+          pain: "Meeting culture wrecked the sleep and never hears about it.",
+          fix: "Recovery API → webhook → Slack: “red day — async only.” The wearable finally talks back.",
+          src: "genre: API + webhook side projects" },
+        { id: "notebook", kind: "wild", title: "The correlation notebook",
+          pain: "No app will ever query what the third beer costs in deep sleep.",
+          fix: "Two CSVs into a Jupyter notebook — n=1 science, but it's your n.",
+          src: "genre: quantified-self notebooks" }
+      ];
+      var KEY = "oriya:buildVotes";
+      var grid = document.getElementById("buildsGrid");
+      if (!grid) return;
+      var votes = {};
+      try { votes = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) {}
+      var save = function () { try { localStorage.setItem(KEY, JSON.stringify(votes)); } catch (e) {} };
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var filter = "all", locked = false, lastTap = null;
+      var seed = {};
+      BUILDS.forEach(function (b, i) { seed[b.id] = i; });
+      var count = function (id) { return votes[id] || 0; };
+      var ranked = function () { return BUILDS.slice().sort(function (a, b) { return count(b.id) - count(a.id) || seed[a.id] - seed[b.id]; }); };
+      var anyVotes = function () { return BUILDS.some(function (b) { return count(b.id) > 0; }); };
+
+      function line(cls, label, text) {
+        var el = document.createElement("p"); el.className = cls;
+        var b = document.createElement("b"); b.textContent = label;
+        el.appendChild(b); el.appendChild(document.createTextNode(text));
+        return el;
+      }
+      function cardEl(b) {
+        var card = document.createElement("div"); card.className = "card"; card.dataset.id = b.id;
+        var top = document.createElement("div"); top.className = "card-top";
+        var tag = document.createElement("span"); tag.className = "tag " + b.kind;
+        tag.textContent = b.kind === "wild" ? "Seen in the wild" : "Build idea";
+        var btn = document.createElement("button"); btn.type = "button";
+        btn.className = "vote-btn" + (count(b.id) ? " voted" : "");
+        btn.setAttribute("aria-label", "Upvote: " + b.title);
+        var arr = document.createElement("span"); arr.className = "arr"; arr.textContent = "▲";
+        btn.appendChild(arr); btn.appendChild(document.createTextNode(" " + count(b.id)));
+        btn.onclick = function () { votes[b.id] = Math.min(99, count(b.id) + 1); save(); lastTap = b.id; render(); };
+        top.appendChild(tag); top.appendChild(btn);
+        var h = document.createElement("h3"); h.textContent = b.title;
+        card.appendChild(top); card.appendChild(h);
+        card.appendChild(line("vote-pain", "the pain", b.pain));
+        card.appendChild(line("vote-fix", "the fix", b.fix));
+        var src = document.createElement("span"); src.className = "src"; src.textContent = b.src;
+        card.appendChild(src);
+        return card;
+      }
+      function lockEl(top) {
+        var card = document.createElement("form"); card.className = "card lock-card"; card.dataset.id = "lock";
+        var tag = document.createElement("span"); tag.className = "tag lock"; tag.textContent = "First access";
+        card.appendChild(tag);
+        var h = document.createElement("h3");
+        var p = document.createElement("p"); p.className = "vote-pain";
+        if (locked) {
+          h.textContent = "On the list ✓";
+          p.textContent = "Your picks are in the build queue. Reply to any email to argue the order.";
+          card.appendChild(h); card.appendChild(p);
+          return card;
+        }
+        h.textContent = top ? "Your #1: " + top.title : "Lock first access";
+        p.textContent = top
+          ? "Confirm it — the list gets built in vote order, and you get the door first."
+          : "Tap ▲ on what you'd use — your order rides along with your email.";
+        card.appendChild(h); card.appendChild(p);
+        var row = document.createElement("div"); row.className = "vote-lock";
+        var inp = document.createElement("input");
+        inp.className = "vote-email"; inp.type = "email"; inp.required = true;
+        inp.placeholder = "you@yourco.com"; inp.setAttribute("aria-label", "Email for first access to the export");
+        var go = document.createElement("button"); go.className = "btn"; go.type = "submit"; go.textContent = "Lock it in →";
+        row.appendChild(inp); row.appendChild(go);
+        card.appendChild(row);
+        card.addEventListener("submit", function (ev) {
+          ev.preventDefault();
+          var email = String(inp.value || "").trim().toLowerCase();
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+          var picked = ranked().filter(function (b) { return count(b.id) > 0; }).map(function (b) { return b.id; });
+          var label = "builder_waitlist · via:builds_vote" + (picked.length ? " · votes:" + picked.join("+") : "");
+          var uid = function () { return window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(16).slice(2); };
+          var responses = {};
+          responses["37cd2a09-f318-438a-91f8-2ef0fa02d065"] = email;  // Email question
+          responses["84f96066-a5ad-4db1-8e79-75b7eef16231"] = label;  // source question
+          try {
+            fetch("https://api.tally.so/forms/xXB0xy/respond", { method: "POST", keepalive: true, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionUuid: uid(), respondentUuid: uid(), responses: responses, captchas: {}, isCompleted: true }) }).catch(function () {});
+          } catch (e) {}
+          locked = true; render();
+        });
+        return card;
+      }
+      function render() {
+        var before = {};
+        Array.prototype.forEach.call(grid.children, function (el) { before[el.dataset.id] = el.getBoundingClientRect().top; });
+        grid.innerHTML = "";
+        var top = anyVotes() ? ranked()[0] : null;
+        var lockPlaced = false;
+        ranked().forEach(function (b) {
+          if (filter !== "all" && b.kind !== filter) return;
+          grid.appendChild(cardEl(b));
+          if (top && b.id === top.id) { grid.appendChild(lockEl(top)); lockPlaced = true; }
+        });
+        if (!lockPlaced) grid.appendChild(lockEl(top));
+        if (lastTap && !reduce) {
+          var tapped = grid.querySelector('[data-id="' + lastTap + '"] .vote-btn');
+          if (tapped) tapped.classList.add("bump");
+        }
+        lastTap = null;
+        if (reduce) return;
+        /* FLIP: cards glide to their new rank instead of teleporting */
+        Array.prototype.forEach.call(grid.children, function (el) {
+          var prev = before[el.dataset.id];
+          if (prev == null) return;
+          var dy = prev - el.getBoundingClientRect().top;
+          if (!dy) return;
+          el.style.transition = "none"; el.style.transform = "translateY(" + dy + "px)";
+          requestAnimationFrame(function () { el.style.transition = ""; el.style.transform = ""; });
+        });
+      }
+      render();
+      Array.prototype.forEach.call(document.querySelectorAll(".fchip"), function (ch) {
+        ch.addEventListener("click", function () {
+          filter = ch.dataset.f;
+          Array.prototype.forEach.call(document.querySelectorAll(".fchip"), function (x) { x.classList.toggle("on", x === ch); });
+          render();
+        });
+      });
+    })();
+
     (function () {
       var btn = document.getElementById("themeToggle");
       if (!btn) return;

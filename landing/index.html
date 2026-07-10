@@ -1035,12 +1035,16 @@
     body.pf-out { opacity:0; transition:opacity 0.26s ease; }
     @keyframes pfIn { from { opacity:0; } to { opacity:1; } }
 
-    /* ---- The Long Game — static essay row (was a marquee at 6 cards; 3 read fine standing still) ---- */
+    /* ---- The Long Game — Substack marquee (leftward auto-scroll; pauses on hover/focus) ---- */
     .reads-head { max-width:640px; margin:0 auto; text-align:center; }
     .reads-head .eyebrow { display:block; margin-bottom:18px; }
     .reads-head .lede { margin:18px auto 0; }
-    .reads-marquee { margin-top:44px; }
-    .reads-track { display:flex; gap:18px; flex-wrap:wrap; justify-content:center; }
+    .reads-marquee { margin-top:44px; overflow:hidden;
+      -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+              mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent); }
+    .reads-track { display:flex; gap:18px; width:max-content; animation:readsScroll 64s linear infinite; }
+    .reads-marquee:hover .reads-track, .reads-track:focus-within { animation-play-state:paused; }
+    @keyframes readsScroll { from { transform:translateX(0); } to { transform:translateX(-50%); } }
     .read-card { flex:0 0 300px; display:flex; flex-direction:column; gap:9px; padding:22px 22px 20px;
       border:1px solid var(--hairline); border-radius:16px; background:rgba(var(--wash),0.02);
       text-decoration:none; transition:border-color .3s var(--settle), transform .3s var(--settle), background .3s; }
@@ -1064,6 +1068,11 @@
       .reads-email { min-width:0; width:100%; }
       .reads-sub-form { width:100%; }
       .reads-sub-form .btn-primary { width:100%; }
+    }
+    /* reduced motion: the global rule freezes the scroll; show essays as a static, readable grid */
+    @media (prefers-reduced-motion: reduce){
+      .reads-marquee { overflow:visible; -webkit-mask-image:none; mask-image:none; }
+      .reads-track { width:auto; flex-wrap:wrap; justify-content:center; animation:none; }
     }
   </style>
 </head>
@@ -1618,15 +1627,17 @@
 <section class="act" id="builder">
   <div class="wrap reveal">
     <span class="eyebrow">The private-language problem</span>
-    <h2 class="display display-l" style="margin-top:14px;">Your devices disagree<br>on purpose.</h2>
+    <h2 class="display display-l" style="margin-top:14px;">Your devices disagree on purpose.<br>Own your history anyway.</h2>
     <!-- v2 ladder, focused (founder feedback: "too much going on"): one line per
-         ICP mood — confusion → build → lapse. One grievance per row, air between rows. -->
+         ICP mood — confusion → build → lapse. One grievance per row, air between rows.
+         Panel-reviewed 2026-07-09: concrete Oura/Whoop contrast folded into line 1;
+         pain select KEPT (vera: recipe demand lives in builds.html — index measures pain). -->
     <div class="pain-lines">
-      <p>Readiness: 82. A year on your finger and you still can't say eighty-two what.</p>
-      <p>You'd build the dashboard yourself this weekend — if the export were something you could actually query.</p>
+      <p>Oura says 82. Whoop says 61. A year on your finger and you still can't say eighty-two what.</p>
+      <p>You'd build the dashboard this weekend — you shouldn't have to scrape XML by hand to do it.</p>
       <p>The subscription was a gift — bank points, HR's wellness budget, a friend. When it lapses, the paywall is around your own history.</p>
     </div>
-    <a class="builder-essay" id="builderBuilds" href="builds.html">What people build once the export is readable →</a>
+    <a class="builder-essay" id="builderBuilds" href="builds.html">Vote what gets built first — the recipe board →</a>
     <form class="builder-form" id="builderForm">
       <input type="email" required placeholder="you@yourco.com" id="builderEmail" aria-label="Email">
       <!-- required enumerated intent (Vera): three pains feed one CTA, so the mood
@@ -1637,9 +1648,9 @@
         <option value="build_query">I want to build on / do more with the data I already collect</option>
         <option value="lapsed_sub">my free subscription lapses — history's paywalled</option>
       </select>
-      <button class="btn btn-primary" type="submit">I'd build on this</button>
+      <button class="btn btn-primary" type="submit">Put me on the export list →</button>
     </form>
-    <p class="form-note" style="max-width:54ch;margin-left:auto;margin-right:auto;">Raw, normalized export — one schema, yours — is on the roadmap, not shipped yet. This list gets first access. Reply and tell us what you'd build; that's what we build first.</p>
+    <p class="form-note" style="max-width:54ch;margin-left:auto;margin-right:auto;">The normalized export — one schema, yours — is on the roadmap, not shipped yet. This list is first in line when the endpoint goes live, and the highest-voted recipe on the board gets built first.</p>
   </div>
 </section>
 
@@ -2688,22 +2699,40 @@
   }
 
   /* ============================================================
-     PRESERVED: Ori chatbot
+     Ori chatbot — site-wide router + sample-season walkthrough.
+     Every answer links to the page that proves it (try / science /
+     partners / privacy vault). `next` = follow-up chips, forming a
+     shallow decision tree; "menu" chip returns to all questions.
+     Honesty rails: Alex is explicitly a sample athlete; sponsors
+     fund pots, athletes win them; no invented device list.
      ============================================================ */
   const oriQA = {
-    walkthrough: { q: "Walk me through the app (4 steps)", a: "Perfect. 4 steps to get you competing. Tap each one to go there directly. 👇", steps: [
-      { t: "📊 1. Log your score daily", d: "Open the app every morning, tap Log Recovery, and sync from your Oura, Whoop, Garmin, or Apple Watch.", cta: "Log now →", href: "https://oriyachallenge.replit.app/dashboard" },
-      { t: "🏆 2. Check your leaderboard rank", d: "See how you stack up against everyone in SF. Updated every hour. Click any name to see their profile.", cta: "Open Leaderboard →", href: "https://oriyachallenge.replit.app/leaderboard" },
-      { t: "⚡ 3. Join a challenge", d: "Pick a team battle or individual sprint. Log every day or you cost your team points — it counts.", cta: "Browse Challenges →", href: "https://oriyachallenge.replit.app/challenges" },
-      { t: "🤝 4. Build your crew", d: "Join a corporate wellness team or a run club. Compete together — it's more fun when your employer is watching.", cta: "Find a Team →", href: "https://oriyachallenge.replit.app/teams" }
-    ] },
-    scoring: { q: "How is scoring calculated?", a: "Your Oriya Index is made of 3 components: 🌙 Deep Rest (40%), ⚡ Bounce-back (35%), 🏃 Move Output (25%). Every device is normalized via the Biometric Handicap — so Oura 85 and Whoop 85 are adjusted to be genuinely comparable." },
-    devices: { q: "Which devices work?", a: "We normalize across 12 devices: Oura, Whoop, Apple Watch, Garmin, Samsung Galaxy Watch, Fitbit, Polar, COROS, and more. Even manual entry is supported — just upload a screenshot and we'll OCR your score." },
-    beat: { q: "How do I beat someone?", a: "Rank is vs your own baseline, so the real game is beating yesterday's you. Log consistently for 5+ days — streaks matter. The fastest way to climb? Sleep by 10 PM for a week. Seriously." },
-    referral: { q: "I have a referral code", a: "Got an invite code? Drop it below — it unlocks your Founding Athlete access and credits the person who sent you.", ref: true },
-    company: { q: "Run a challenge for my company", a: "Email team@oriya.app with your company name, headcount, and any prize pool you have in mind. We handle all the logistics — leaderboard, normalization, prize distribution. Minimum 10 participants, 24-hour setup." }
+    walkthrough: { q: "Show me how a season plays (60 sec)", a: "Meet Alex — our sample athlete. Demo boards, real rules. His whole season in 4 taps 👇",
+      next: ["challenges", "scoring"],
+      steps: [
+        { t: "📲 1. One screenshot → one number", d: "Alex drops his Oura Readiness screenshot on /try. ~45 seconds later he has his Oriya Index — the score that finally compares across devices.", cta: "Get your Index →", href: "try.html" },
+        { t: "🧢 2. Squad up, any wearable", d: "He opens a Squad for his run club. The Whoop, Garmin and Apple Watch friends land on the same board — the device argument is over.", cta: "Build a Squad →", href: "try.html" },
+        { t: "⌚ 3. Pick a side in Ring vs Band", d: "Oura wearers vs Whoop wearers, 7 days, team average decides. He logs every morning — a missed day counts as 0.", cta: "See the board →", href: "try.html?challenge=devicewars" },
+        { t: "🏆 4. Higher average takes it", d: "Alex's side holds the better week and takes the board. On sponsor-backed boards there's a pot: sponsors fund it, athletes win it.", cta: "How the money moves →", href: "partners.html" }
+      ] },
+    challenges: { q: "What challenges are live?", a: "Run clubs, founder crews, on-call eng teams — live boards you can join today. Pick a side and your Index counts toward the team average every day you log. Some boards carry a sponsor-backed pot; others play for bragging rights. Founding season — sample athletes on the demo boards.",
+      next: ["walkthrough", "partners"],
+      steps: [{ t: "⚔️ Live challenges", d: "Three live now, more starting soon.", cta: "Pick a side →", href: "try.html" }] },
+    scoring: { q: "How is the Index scored?", a: "Sleep 40% + Recovery 35% + Activity 25%, then a per-device correction — the Biometric Handicap — so an Oura 85 and a Whoop 85 finally mean the same thing. You're ranked against your own 90-day baseline, never a raw public number.",
+      next: ["devices", "privacy"],
+      steps: [{ t: "🔬 The Science", d: "Every factor, every source, the whole method — nothing behind a curtain.", cta: "Read the full method →", href: "science.html" }] },
+    devices: { q: "Which devices work?", a: "Oura, Whoop, Garmin and Apple Watch connect read-only. Apple has no single native score, so we compute yours from Health signals — HRV, sleep, resting HR. Anything else (Samsung, Pixel, an app we don't sync yet): drop a screenshot, we read it.",
+      next: ["scoring", "walkthrough"],
+      steps: [{ t: "📲 Try it now", d: "Connect a device or drop this morning's screenshot — takes ~45 seconds.", cta: "Get your Index →", href: "try.html" }] },
+    privacy: { q: "What happens to my data?", a: "Your trial runs in your browser — saved locally, never sold or shared. On boards you can compete as ◒ anon · @yourco.com: the domain flexes, your name stays out. The vault spells out exactly what's walled off.",
+      next: ["devices", "scoring"],
+      steps: [{ t: "🔒 The privacy vault", d: "What we store, what we never see, and how to delete it.", cta: "Open the vault →", href: "try.html#privacy" }] },
+    partners: { q: "Sponsor a board / run one for my team", a: "Straight answer: there are no signed partners yet — founding season is where that starts. Gyms and communities run free. Sponsors back a pot as prize money: you fund it, athletes win it, and checkout only ever comes from team@oriya.app after we verify the board.",
+      next: ["challenges", "walkthrough"],
+      steps: [{ t: "🤝 Partners & sponsors", d: "Tracks, pledge form, and exactly how the money moves.", cta: "See the partner tracks →", href: "partners.html" }] },
+    referral: { q: "I have an invite code", a: "Got an invite code? Drop it below — it unlocks your Founding Athlete access and credits the person who sent you.", ref: true }
   };
-  const oriOrder = ["walkthrough", "scoring", "devices", "beat", "referral", "company"];
+  const oriOrder = ["walkthrough", "challenges", "scoring", "devices", "privacy", "partners", "referral"];
   let oriStarted = false;
 
   function escapeHtml(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
@@ -2712,7 +2741,7 @@
     if (open) { try { localStorage.setItem("oriSeen", "1"); } catch (e) {} clearTimeout(window.__oriAutoTimer); }
     document.getElementById("oriPanel").classList.toggle("open", open);
     document.getElementById("oriFab").classList.toggle("hidden", open);
-    if (open && !oriStarted) { oriStarted = true; oriBubble("bot", "Hey 👋 I'm Ori — your Oriya guide. New here? I can walk you through the app in 4 steps, or answer any question."); oriRenderChips(); }
+    if (open && !oriStarted) { oriStarted = true; oriBubble("bot", "Hey 👋 I'm Ori. Ask me anything about the boards, the science, or your data — or watch a full season play out in 60 seconds."); oriRenderChips(); }
   }
   (function () {
     let seen = true;
@@ -2728,25 +2757,28 @@
     body.appendChild(m);
     body.scrollTop = body.scrollHeight;
   }
-  function oriRenderChips() {
+  function oriRenderChips(keys) {
     const c = document.getElementById("oriChips");
     c.innerHTML = "";
-    oriOrder.forEach((k) => {
+    const list = keys ? keys.concat("menu") : oriOrder;
+    list.forEach((k) => {
       const b = document.createElement("button");
       b.className = "ori-chip";
-      b.textContent = oriQA[k].q;
-      b.onclick = () => oriAsk(k);
+      b.textContent = k === "menu" ? "☰ All questions" : oriQA[k].q;
+      b.onclick = () => (k === "menu" ? oriRenderChips() : oriAsk(k));
       c.appendChild(b);
     });
   }
   function oriAsk(key) {
     const item = oriQA[key];
+    window.oriyaTrack("ori_ask", { key });
     oriBubble("user", escapeHtml(item.q));
     setTimeout(() => {
       let html = item.a;
-      if (item.steps) html += '<div class="ori-steps">' + item.steps.map((s) => '<div class="ori-step"><div class="t">' + s.t + '</div><div class="d">' + s.d + '</div><a href="' + s.href + '" target="_blank" rel="noopener">' + s.cta + "</a></div>").join("") + "</div>";
+      if (item.steps) html += '<div class="ori-steps">' + item.steps.map((s) => '<div class="ori-step"><div class="t">' + s.t + '</div><div class="d">' + s.d + '</div><a href="' + s.href + '">' + s.cta + "</a></div>").join("") + "</div>";
       if (item.ref) html += '<div class="ori-ref"><input id="oriRefInput" placeholder="Your invite code" /><button onclick="oriSubmitRef()">Apply</button></div>';
       oriBubble("bot", html);
+      oriRenderChips(item.next);
     }, 380);
   }
   function oriSubmitRef() {
@@ -2756,6 +2788,20 @@
     setTimeout(() => oriBubble("bot", "Nice — that's applied. 🎉 Drop your email and you're a Founding Athlete. Want me to take you there?<div class=\"ori-steps\"><div class=\"ori-step\"><a href=\"#\" onclick=\"focusSignup();return false;\">Claim your Passport →</a></div></div>"), 380);
   }
 
+  /* The Long Game marquee — clone the essay-card set for a seamless -50% loop.
+     3 cards need 4 sets total so the half-track outruns wide viewports (the old
+     6-card row needed just 2). Skipped under reduced motion, where the CSS
+     falls back to a static grid. */
+  (function () {
+    const track = document.getElementById("readsTrack");
+    if (!track) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const cards = Array.from(track.children);
+    const copies = cards.length >= 6 ? 1 : 3;
+    for (let i = 0; i < copies; i++) {
+      cards.forEach((c) => { const clone = c.cloneNode(true); clone.setAttribute("aria-hidden", "true"); clone.tabIndex = -1; track.appendChild(clone); });
+    }
+  })();
 </script>
 </body>
 </html>
