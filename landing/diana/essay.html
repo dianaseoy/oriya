@@ -42,6 +42,9 @@
     .e-dek{font-size:18px;color:var(--text-2);font-style:italic;font-family:var(--serif);margin-bottom:30px;padding-bottom:26px;border-bottom:1px solid var(--line)}
 
     .e-body p{margin:0 0 20px;color:var(--text);font-size:16.5px}
+    /* inline citations — understated underline, never a button; the prose stays the object */
+    .e-body p a{color:inherit;text-decoration:underline;text-decoration-color:var(--accent-line);text-decoration-thickness:1px;text-underline-offset:3px;transition:color .2s var(--ease),text-decoration-color .2s var(--ease)}
+    .e-body p a:hover{color:var(--accent);text-decoration-color:var(--accent)}
     .e-body p:first-child::first-letter{font-family:var(--serif);font-size:54px;float:left;line-height:.82;padding:4px 12px 0 0;color:var(--accent)}
 
     .e-nav{margin-top:48px;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:14px}
@@ -182,10 +185,19 @@
       }).join("");
       return '<figure class="e-fig">'+label+'<table class="e-table"><tbody>'+rows+'</tbody></table>'+cap+'</figure>';
     }
+    /* markdown-style [text](url) links inside paragraphs — escape first, then linkify,
+       so body strings still can't carry raw HTML. External links open in a new tab. */
+    function para(s){
+      var h = esc(s).replace(/\[([^\]]+)\]\(([^()\s]+)\)/g, function(_, txt, href){
+        var ext = /^https?:\/\//.test(href);
+        return '<a href="'+href+'"'+(ext?' target="_blank" rel="noopener"':'')+'>'+txt+'</a>';
+      });
+      return "<p>"+h+"</p>";
+    }
     function blockHtml(b){
-      if(typeof b==="string") return "<p>"+esc(b)+"</p>";
+      if(typeof b==="string") return para(b);
       if(!b || !b.t) return "";
-      if(b.t==="p") return "<p>"+esc(b.text)+"</p>";
+      if(b.t==="p") return para(b.text);
       if(b.t==="quote") return '<blockquote class="e-quote">'+esc(b.text)+(b.by?'<cite>'+esc(b.by)+'</cite>':'')+'</blockquote>';
       if(b.t==="table") return tableFig(b);
       if(b.t==="svg") return '<figure class="e-fig">'+(b.svg||"")+(b.cap?'<figcaption class="e-cap">'+esc(b.cap)+'</figcaption>':'')+'</figure>';
