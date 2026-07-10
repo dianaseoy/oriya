@@ -6,3 +6,10 @@
 
 # Internal growth-ops content (drafts, outreach, strategy) — not deployed
 content/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
