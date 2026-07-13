@@ -10,3 +10,4 @@
 /squads      /mvp/squads.html      302
 /board       /mvp/                 302
 /p/*         /mvp/passport.html?u=:splat  302
+/foundersvsoperators  /try.html?challenge=founders  302

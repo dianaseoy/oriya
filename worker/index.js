@@ -147,6 +147,7 @@ const SHORTLINKS = {
   "/challenges": "/mvp/challenges.html",
   "/squads": "/mvp/squads.html",
   "/board": "/mvp/",
+  "/foundersvsoperators": "/try.html?challenge=founders",
 };
 
 export default {
