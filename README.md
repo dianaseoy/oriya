@@ -40,8 +40,22 @@ and the page offers retry / demo sync / screenshot instead.
 
 `/mvp/submit.html` posts to the Worker's `POST /api/manual-submit`, which
 forwards ONE email to team@oriya.app with the screenshot attached — your inbox
-is the pending queue; you type the raw score into `/mvp/admin.html` and publish
-the board. No storage, no accounts.
+is the pending queue; you type the raw score into the operator console and
+publish the board. No storage, no accounts.
+
+**Internal pages (unguessable filenames, never link these publicly):**
+
+- Operator console: `/mvp/ops-33a447.html` — scores, invite codes, publish.
+  The "Next invite codes" card shows the next unused code per source prefix
+  (RUN/IG/TW/GYM/REF/OP); you reply to each submission with one by hand.
+- Outreach workbench: `/mvp/outreach-03d56d.html` — the 4-stage email matrix.
+
+Both are `noindex` and unlinked, but that is obscurity, not auth — the
+filenames are visible in this repo, so if the GitHub repo is public anyone
+reading it can find them. For a real lock, put `/mvp/ops-*` and
+`/mvp/outreach-*` behind Cloudflare Access (Zero Trust → Applications,
+free for ≤50 users). Neither page holds secrets: contacts live only in the
+operator's browser localStorage, never in the deployed files.
 
 Setup:
 

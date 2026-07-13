@@ -112,8 +112,8 @@
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 18 }}>
               <div>
-                <div className="idx">{row.avg}</div>
-                <p className="xs dim" style={{ marginTop: 4 }}>Oriya Index · 7-day</p>
+                <div className="idx">{row.avg}<span style={{ fontSize: 15, color: "var(--dim)", fontWeight: 500 }}> / 100</span></div>
+                <p className="xs dim" style={{ marginTop: 4 }}>Oriya Index · 7-day avg · {row.logged}/7 logged</p>
               </div>
               <div style={{ textAlign: "right", maxWidth: "55%" }}>
                 {arch

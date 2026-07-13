@@ -9,8 +9,9 @@
        Spec asked for Next.js /app/partners/dashboard/page.tsx; this repo deploys
        build-less (Worker + static assets), so it ships as this page instead.
        Everything is mailto: drafts — nothing sends automatically, nothing is
-       stored, no contact list lives in the repo. Like admin.html this URL is
-       publicly reachable once deployed (noindex only) — rename if that matters. -->
+       stored, no contact list lives in the repo. Unguessable filename on
+       purpose (like the ops console) — noindex + unlinked, but that's
+       obscurity, not auth; Cloudflare Access is the real lock if needed. -->
   <style>
     :root { --bg:#0B0C0E; --panel:#101114; --line:#23252B; --text:#E6E7EA; --dim:#8A8F98; --accent:#7FB79E; --amber:#D7A25C; }
     * { box-sizing:border-box; margin:0; }

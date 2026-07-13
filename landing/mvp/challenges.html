@@ -5,9 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex">
   <title>Oriya · Challenges</title>
-  <!-- Two group standings computed LIVE from the same board.json — no second
+  <!-- The four named challenges (same list as submit.html's CHALLENGES) plus
+       the squad cup, all computed LIVE from the same board.json — no second
        data source, so a challenge can never disagree with the board. Sides:
-       device (via MVP.deviceTag) and acquisition squad (via MVP.codeSource). -->
+       Founders vs Operators via the participant's fvo field, Marina Run Club
+       via the RUN- code prefix, Ring vs Band via device, Open board = everyone,
+       squad cup via MVP.codeSource. -->
   <link rel="stylesheet" href="ui.css">
 </head>
 <body>
@@ -45,19 +48,49 @@
       );
     }
 
+    function RosterCard({ title, sub, rows }) {
+      return (
+        <div className="card" style={{ padding: "14px 4px 6px" }}>
+          <p className="sm" style={{ fontWeight: 600, padding: "0 14px" }}>{title}</p>
+          <p className="xs dim" style={{ padding: "0 14px", marginTop: 2 }}>{sub}</p>
+          <table style={{ marginTop: 8 }}>
+            <thead><tr><th>#</th><th>Athlete</th><th>Device</th><th>Today</th><th>7-day</th></tr></thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.p.code}>
+                  <td className="mono dim">{r.rank}</td>
+                  <td className={r.rank === 1 ? "lead" : ""}>{r.p.name} {r.p.handle && <span className="xs dim">{r.p.handle}</span>}</td>
+                  <td className="xs dim">{MVP.deviceTag(r.p.device)}</td>
+                  <td className="mono dim">{r.loggedToday ? r.today : "—"}</td>
+                  <td className="mono">{r.avg}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
     function App() {
       const [board, setBoard] = useState(null);
       useEffect(() => { STORE.fetchBoard().then(setBoard); }, []);
       if (!board) return <p className="dim sm">Loading…</p>;
-      const devices = MVP.groupBoard(board.participants, DAY, (p) => MVP.deviceTag(p.device));
-      const squads = MVP.groupBoard(board.participants, DAY, (p) => MVP.codeSource(p.code));
+      const ps = board.participants;
+      const fvo = MVP.groupBoard(ps.filter((p) => p.fvo), DAY, (p) => p.fvo);
+      const marina = MVP.rankBoard(ps.filter((p) => p.code.indexOf("RUN-") === 0), DAY);
+      const ring = MVP.groupBoard(ps, DAY, (p) => (p.device === "oura" ? "Ring (Oura)" : "Band (wrist)"));
+      const open = MVP.rankBoard(ps, DAY);
+      const squads = MVP.groupBoard(ps, DAY, (p) => MVP.codeSource(p.code));
       return (
         <React.Fragment>
           <span className="kicker">Oriya · challenges</span>
-          <h1>Two boards, same scores.</h1>
-          <p className="xs dim" style={{ marginTop: 6 }}>{board.season}{board.sample ? " · sample data" : ""} — both standings recompute from the 7-day board every time it updates.</p>
+          <h1>Four challenges, one board.</h1>
+          <p className="xs dim" style={{ marginTop: 6 }}>{board.season}{board.sample ? " · sample data" : ""} — every standing recomputes from the same 7-day board, so a challenge can never disagree with it.</p>
           <SubNavigation active="challenges" />
-          <GroupCard title="Device wars" sub="Each side's mean 7-day average, adjusted so the hardware doesn't decide it." rows={devices} />
+          {fvo.length > 0 && <GroupCard title="Founders vs Operators" sub="Build things vs run things — each side's mean 7-day average." rows={fvo} />}
+          {marina.length > 0 && <RosterCard title="Marina Run Club" sub="The run squad's own board — invite codes RUN-···." rows={marina} />}
+          <GroupCard title="Ring vs Band" sub="Oura ring vs wrist wearables, adjusted so the hardware doesn't decide it." rows={ring} />
+          <RosterCard title="Open board" sub="Every founding athlete, one list — no sides." rows={open} />
           <GroupCard title="Squad cup" sub="Where you came in is your squad — run club vs gym vs the internet." rows={squads} />
           <p className="xs dim" style={{ marginTop: 14 }}>A missed day counts 0 toward your side. Same rule for everyone.</p>
         </React.Fragment>

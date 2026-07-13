@@ -88,8 +88,35 @@
       );
     }
 
+    /* Which code to send with an invite reply: next unused number per source
+       prefix. Nothing is automated — you read the submission, pick the prefix
+       matching where they came from, and paste the code into your reply. */
+    function NextCodes({ board }) {
+      const [copied, setCopied] = useState("");
+      const next = Object.keys(MVP.SOURCES).map((pre) => {
+        let max = 0;
+        board.participants.forEach((p) => {
+          const m = /^([A-Z]{2,3})-(\d{3})$/.exec(p.code);
+          if (m && m[1] === pre) max = Math.max(max, Number(m[2]));
+        });
+        return { pre, source: MVP.SOURCES[pre], code: pre + "-" + String(max + 1).padStart(3, "0") };
+      });
+      const copy = (code) => { navigator.clipboard && navigator.clipboard.writeText(code).then(() => { setCopied(code); setTimeout(() => setCopied(""), 1400); }); };
+      return (
+        <div className="card">
+          <h2>Next invite codes <span className="xs dim">— reply to each submission with the code matching its source, by hand</span></h2>
+          <div className="row" style={{ marginTop: 10 }}>
+            {next.map((n) => (
+              <button key={n.pre} type="button" className="ghost sm mono" title={"Next unused " + n.source + " code"} onClick={() => copy(n.code)}>{copied === n.code ? "Copied ✓" : n.code + " · " + n.source}</button>
+            ))}
+          </div>
+          <p className="xs dim" style={{ marginTop: 8 }}>Tap to copy → paste into your reply email → add the athlete below with the same code. Prefix = acquisition source, so the funnel table stays honest.</p>
+        </div>
+      );
+    }
+
     function AddAthlete({ board, setBoard }) {
-      const [f, setF] = useState({ code: "", name: "", handle: "", device: "oura", contact: "" });
+      const [f, setF] = useState({ code: "", name: "", handle: "", device: "oura", contact: "", fvo: "" });
       const [err, setErr] = useState("");
       const add = () => {
         const code = MVP.cleanCode(f.code);
@@ -97,8 +124,10 @@
         if (board.participants.some((p) => p.code === code)) { setErr(code + " is taken."); return; }
         if (!f.name.trim()) { setErr("Name required."); return; }
         setErr("");
-        setBoard({ ...board, participants: board.participants.concat([{ code, name: f.name.trim(), handle: f.handle.trim(), device: f.device, contact: f.contact.trim(), scores: {} }]) });
-        setF({ code: "", name: "", handle: "", device: "oura", contact: "" });
+        const row = { code, name: f.name.trim(), handle: f.handle.trim(), device: f.device, contact: f.contact.trim(), scores: {} };
+        if (f.fvo) row.fvo = f.fvo;
+        setBoard({ ...board, participants: board.participants.concat([row]) });
+        setF({ code: "", name: "", handle: "", device: "oura", contact: "", fvo: "" });
       };
       return (
         <div className="card">
@@ -111,6 +140,11 @@
               {Object.keys(MVP.DEVICES).map((k) => <option key={k} value={k}>{MVP.DEVICES[k].tag}</option>)}
             </select>
             <input style={{ width: 160 }} placeholder="phone/email (private)" value={f.contact} onChange={(e) => setF({ ...f, contact: e.target.value })} />
+            <select value={f.fvo} onChange={(e) => setF({ ...f, fvo: e.target.value })}>
+              <option value="">FvO: none</option>
+              <option>Founders</option>
+              <option>Operators</option>
+            </select>
             <button className="btn" onClick={add}>Add</button>
           </div>
           {err && <p className="xs warn" style={{ marginTop: 8 }}>{err}</p>}
@@ -184,9 +218,12 @@
       const [board, setBoardState] = useState(null);
       const setBoard = (b) => { setBoardState(b); STORE.saveAdmin(b); };
       useEffect(() => {
+        // A REAL working copy (sample:false) always wins — it may hold scores
+        // not yet published. A cached sample working copy is worthless and
+        // goes stale, so prefer a fresh (re-anchored) fetch over it.
         const local = STORE.loadAdmin();
-        if (local) { setBoardState(local); return; }
-        STORE.fetchBoard().then((b) => setBoardState(b || { day: DAY, season: "Founding 7-Day", sample: false, participants: [] }));
+        if (local && !local.sample) { setBoardState(local); return; }
+        STORE.fetchBoard().then((b) => setBoardState(b || local || { day: DAY, season: "Founding 7-Day", sample: false, participants: [] }));
       }, []);
       if (!board) return <p className="dim sm">Loading…</p>;
       const logged = board.participants.filter((p) => MVP.loggedOn(p, DAY)).length;
@@ -196,6 +233,7 @@
           <h1>{DAY} — {logged}/{board.participants.length} logged{board.sample ? " · sample data" : ""}</h1>
           <p className="xs dim" style={{ marginTop: 4 }}>Read inbox → type raw scores → publish → send reminders. ~10 minutes a morning.</p>
           <ScoreTable board={board} setBoard={setBoard} />
+          <NextCodes board={board} />
           <AddAthlete board={board} setBoard={setBoard} />
           <Reminders board={board} />
           <Funnel board={board} />
