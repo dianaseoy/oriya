@@ -124,14 +124,16 @@
         if (board.participants.some((p) => p.code === code)) { setErr(code + " is taken."); return; }
         if (!f.name.trim()) { setErr("Name required."); return; }
         setErr("");
-        const row = { code, name: f.name.trim(), handle: f.handle.trim(), device: f.device, contact: f.contact.trim(), scores: {} };
+        // joined = today: their scoring window opens now, so a late joiner
+        // competes on their own days instead of dragging pre-join zeros.
+        const row = { code, name: f.name.trim(), handle: f.handle.trim(), device: f.device, contact: f.contact.trim(), scores: {}, joined: DAY };
         if (f.fvo) row.fvo = f.fvo;
         setBoard({ ...board, participants: board.participants.concat([row]) });
         setF({ code: "", name: "", handle: "", device: "oura", contact: "", fvo: "" });
       };
       return (
         <div className="card">
-          <h2>Add athlete <span className="xs dim">(when a claim email lands)</span></h2>
+          <h2>Add athlete <span className="xs dim">(when a claim email lands — their board window starts today, no pre-join zeros)</span></h2>
           <div className="row" style={{ marginTop: 10 }}>
             <input className="mono" style={{ width: 96 }} placeholder="RUN-014" value={f.code} onChange={(e) => setF({ ...f, code: e.target.value })} />
             <input style={{ width: 140 }} placeholder="Name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
@@ -190,20 +192,55 @@
     function PublishBar({ board, setBoard }) {
       const [showImport, setShowImport] = useState(false);
       const [raw, setRaw] = useState("");
+      const [gh, setGh] = useState(""); // "" | pushing | done | err
       const publish = () => STORE.downloadJSON(STORE.publicBoard(board), "board.json");
       const backup = () => STORE.downloadJSON(board, "board-full-backup.json");
       const doImport = () => {
         try { const b = JSON.parse(raw); if (!b.participants) throw 0; setBoard(b); setShowImport(false); setRaw(""); }
         catch (e) { alert("That didn't parse as a board JSON."); }
       };
+      /* One-tap live publish: commits the PUBLIC board (contacts stripped)
+         straight to main via the GitHub Contents API — the push-to-main build
+         redeploys it in ~1 min. The token lives ONLY in this browser's
+         localStorage; use a fine-grained PAT scoped to Contents:read/write on
+         dianaseoy/oriya and nothing else. */
+      const GH_API = "https://api.github.com/repos/dianaseoy/oriya/contents/landing/mvp/data/board.json";
+      const publishLive = async () => {
+        let token = "";
+        try { token = localStorage.getItem("oriya:mvp:ghtoken") || ""; } catch (e) {}
+        if (!token) {
+          token = (prompt("GitHub fine-grained token (Contents: read/write on dianaseoy/oriya only). Stored only in this browser.") || "").trim();
+          if (!token) return;
+          try { localStorage.setItem("oriya:mvp:ghtoken", token); } catch (e) {}
+        }
+        setGh("pushing");
+        try {
+          const H = { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" };
+          const cur = await fetch(GH_API, { headers: H }).then((r) => { if (!r.ok) throw new Error("read " + r.status); return r.json(); });
+          const json = JSON.stringify(STORE.publicBoard(board), null, 2) + "\n";
+          const content = btoa(unescape(encodeURIComponent(json)));
+          const res = await fetch(GH_API, { method: "PUT", headers: H, body: JSON.stringify({ message: "board: publish " + DAY + " from ops console", content: content, sha: cur.sha }) });
+          if (!res.ok) throw new Error("write " + res.status);
+          setGh("done"); setTimeout(() => setGh(""), 6000);
+        } catch (e) {
+          try { localStorage.removeItem("oriya:mvp:ghtoken"); } catch (x) {}
+          setGh("err");
+        }
+      };
       return (
         <div className="card">
           <div className="row">
-            <button className="btn" onClick={publish}>Publish → download board.json</button>
+            <button className="btn" disabled={gh === "pushing"} onClick={publishLive}>{gh === "pushing" ? "Publishing…" : gh === "done" ? "Live in ~1 min ✓" : "Publish LIVE → oriya.app board"}</button>
+            <button className="ghost sm" onClick={publish}>Download board.json</button>
             <button className="ghost sm" onClick={backup}>Full backup (private)</button>
             <button className="ghost sm" onClick={() => setShowImport(!showImport)}>Import</button>
+            <label className="xs dim" style={{ display: "flex", alignItems: "center", gap: 5, cursor: "pointer" }}>
+              <input type="checkbox" style={{ width: "auto" }} checked={!!board.sample} onChange={(e) => setBoard({ ...board, sample: e.target.checked })} />
+              sample data label
+            </label>
           </div>
-          <p className="xs dim" style={{ marginTop: 8 }}>Publishing = replace <span className="mono">landing/mvp/data/board.json</span> with the download, commit, push. Contacts never leave this browser.</p>
+          {gh === "err" && <p className="xs warn" style={{ marginTop: 8 }}>Publish failed — token cleared. Check it has Contents read/write on dianaseoy/oriya and try again (or use Download + git push).</p>}
+          <p className="xs dim" style={{ marginTop: 8 }}>LIVE commits the public board (contacts stripped) to main; the site rebuilds in ~1 min. Untick “sample data label” the day real athletes replace the demo roster. Download+push still works as the manual fallback.</p>
           {showImport && (
             <div style={{ marginTop: 10 }}>
               <textarea style={{ width: "100%", minHeight: 90 }} placeholder="Paste a board JSON (e.g. your full backup)" value={raw} onChange={(e) => setRaw(e.target.value)} />

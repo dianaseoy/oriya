@@ -4,18 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Oriya · How to play</title>
-  <meta name="description" content="The 7-Day Sprint Blueprint: pick a side, send a morning screenshot, get your Oriya Index, watch the board, win the pot.">
+  <meta name="description" content="The 7-Day Sprint Blueprint: pick a side, send a morning screenshot, get your Oriya Index, watch the board, top it.">
   <meta property="og:title" content="Oriya · The 7-Day Sprint Blueprint">
-  <meta property="og:description" content="Five steps, nothing to install. Pick a side, screenshot your wearable each morning, win the sponsor-backed pot.">
+  <meta property="og:description" content="Five steps, nothing to install. Pick a side, screenshot your wearable each morning, top the live board.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://oriya.app/play">
   <meta name="twitter:card" content="summary">
   <!-- THE outreach conversion link (send when a prospect says "I'm interested").
        Rules-of-the-game only — teaches the challenge, not the company. Figures
        mirror the live Founders vs Operators card on /try (Par 71, 73.0 vs 73.3
-       sample board, $2,000 sponsor-backed pot) — if that card changes, change
-       this page in the same commit. Mini Ask Ori: 3 chips, honest answers,
-       every card lands on /submit or /try. -->
+       sample board) — if that card changes, change this page in the same
+       commit. No sponsor signed yet (2026-07-13): no cash pot is claimed
+       anywhere on this page — see step 5. Mini Ask Ori: 3 chips, honest
+       answers, every card lands on /submit or /try. -->
   <style>
     :root { --bg:#0B0C0E; --panel:#101114; --line:#23252B; --text:#E6E7EA; --dim:#8A8F98; --accent:#7FB79E; --amber:#D7A25C; --void:#0B0C0E; }
     * { box-sizing:border-box; margin:0; }
@@ -127,13 +128,13 @@
 
       <div class="step" style="padding-bottom:6px" id="step5">
         <span class="stepn">5</span>
-        <h2>Win — and split the pot</h2>
-        <p><b>$2,000 sponsor-backed pot.</b> Higher team average takes it. The winning side votes how:</p>
+        <h2>Win — the board is the prize (for now)</h2>
+        <p>No sponsor has signed yet, so there's no cash pot to claim — <b>the win is topping the board.</b> If a sponsor backs this challenge, the winning side votes how the pot splits:</p>
         <div class="pill-row" id="payoutPills">
           <button class="pill" data-v="dinner">🍽 Team dinner</button>
           <button class="pill" data-v="charity">🎗 Charity donation</button>
         </div>
-        <p class="xs dim" id="pillNote" style="margin-top:6px">Straw poll on this device — the binding vote belongs to the winning side.</p>
+        <p class="xs dim" id="pillNote" style="margin-top:6px">Straw poll on this device, for if a pot opens — the binding vote would belong to the winning side.</p>
         <p style="margin-top:12px">🏅 Top your 7-day board and you're seeded for the <b>Oriya Olympics</b> — the SF bracket where the season's highest sustained Index takes the title. No bracket has run yet: the first one forms the week the founding boards fill.</p>
       </div>
     </div>
@@ -150,8 +151,8 @@
       <div><b>Miss a morning?</b> <span>Counts 0 that day. You're never removed from the board.</span></div>
       <div><b>Bad score?</b> <span>A logged red morning outranks a forgotten green one. The board scores the log, not the flex.</span></div>
       <div><b>Who sees my data?</b> <span>Name/handle, device, adjusted score. Anon mode shows only your company domain.</span></div>
-      <div><b>Cost?</b> <span>Free. The pot is prize sponsorship — backers fund it, athletes win it, backers are never paid out. Payment only via verified Airwallex links from team@oriya.app. It's <b style="display:inline;color:var(--text)">not a wager</b>.</span></div>
-      <div><b>Getting paid?</b> <span>Prize distributed within 7 days of challenge end via the sponsor.</span></div>
+      <div><b>Cost?</b> <span>Free either way. If a sponsor backs a pot, backers fund it, athletes win it, backers are never paid out. Payment only via verified Airwallex links from team@oriya.app. It's <b style="display:inline;color:var(--text)">not a wager</b>.</span></div>
+      <div><b>Getting paid?</b> <span>No sponsor yet, so nothing to pay out. If one signs, prize distributed within 7 days of challenge end via the sponsor.</span></div>
     </div>
 
     <p class="fine">Founding season — boards show clearly-labeled sample athletes until each side fills with real entries. Pots open once a board holds real, verified athletes. Built in the open by a solo founder.</p>
@@ -186,7 +187,7 @@
       });
 
       /* mini Ask Ori — canned honest answers, zero typing. Copy mirrors the
-         page; the "$2,000 / not a wager / Oura-only live sync" rails hold. */
+         page; the "no sponsor yet / not a wager / Oura-only live sync" rails hold. */
       var ORI = {
         enter: { q: "🏃 How do I enter?",
           a: "Pick a side, then send one morning screenshot. That's the whole entry — free, nothing to install.",
@@ -195,7 +196,7 @@
             { t: "Submit Proof Now →", href: "mvp/submit.html?challenge=Founders%20vs%20Operators&back=founders" }
           ] },
         win: { q: "🏆 What can I win?",
-          a: "Founders vs Operators carries a $2,000 sponsor-backed pot — higher team average takes it, and the winning side votes team dinner vs charity. Backers fund it and are never paid out; entering costs nothing.",
+          a: "No sponsor has signed yet, so there's no cash pot — the win is topping the board and a seed for the Oriya Olympics. If a sponsor backs it, higher team average takes the pot and the winning side votes team dinner vs charity. Backers would never be paid out; entering costs nothing either way.",
           cards: [
             { t: "See how the pot splits ↓", scroll: "#step5" },
             { t: "Pick your side →", href: "try.html?challenge=founders" }

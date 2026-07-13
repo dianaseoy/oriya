@@ -29,6 +29,10 @@ var STORE = (function () {
         shifted[MVP.todayKey(new Date(kp[0], kp[1] - 1, kp[2] + delta))] = p.scores[k];
       });
       p.scores = shifted;
+      if (p.joined) {
+        var jp = p.joined.split("-").map(Number);
+        p.joined = MVP.todayKey(new Date(jp[0], jp[1] - 1, jp[2] + delta));
+      }
     });
     b.day = today;
     return b;
@@ -69,6 +73,7 @@ var STORE = (function () {
       participants: board.participants.map(function (p) {
         var row = { code: p.code, name: p.name, handle: p.handle || "", device: p.device, scores: p.scores || {} };
         if (p.fvo) row.fvo = p.fvo; // Founders-vs-Operators side — public, it's on the challenge board
+        if (p.joined) row.joined = p.joined; // join date — public, it sets their scoring window
         return row;
       }),
     };

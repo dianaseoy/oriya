@@ -61,27 +61,65 @@
     // Every body is honest about today's product: screenshot IS the entry (no
     // sync promise), /play is the canonical conversion link, and the B2B count
     // is typed in by hand — this page never invents a traction number.
+    // Launch set (sable pass, 2026-07-13, revised same day — no sponsor is
+    // signed yet, so no template claims a $ pot; the ask is the board itself,
+    // an Oriya Olympics seed, and — if a sponsor signs later — a pot that
+    // opens then). Founders vs Operators ships FIRST: two identity doors, a
+    // bump, a confirm carrying the join-window rule, and a recruit
+    // talk-trigger. Two sponsor asks (S1 VC, S2 community) pitch logo
+    // placement or a sponsor-mediated warm intro — never a raw contact
+    // export; consent stays with the sponsor's own list. The retired generic
+    // "Season 1 Pass" + confirm templates are archived in the comment at the
+    // bottom of this script for the day two sprints run concurrently.
     function seqs(c) {
       const n = c.n || "there", co = c.co || "your studio";
       return [
-        { id: "list", tag: "01 · COLD — LIST BUILDER", title: "Audience & list builder",
-          obj: "Advertise the concept, grow the list. The only ask is one weekly email.",
-          s: "Morning recovery scores, as a team sport (SF)",
-          b: "Hi " + n + ",\n\nI'm Diana, founder of Oriya. The recovery score you already check every morning (Oura / Whoop / Garmin / Apple) becomes a team game — squads, 7-day sprints, one live board.\n\nWe're hand-picking the founding SF group right now. The build-in-public email is one a week, unsubscribe anytime: oriya.app/reads\n\nRather just see the game? oriya.app/play" + SIGN },
-        { id: "pass", tag: "02 · CONVERT — SEASON 1 PASS", title: "The Season 1 Pass pitch",
-          obj: "They showed interest — convert to a Season 1 seat + a chosen sprint. /play is the link.",
-          s: "Your Season 1 seat — pick a side",
-          b: "Hi " + n + ",\n\nSeason 1 of Oriya is a 7-day sprint: pick a side, send one morning screenshot — that's the whole entry — and your score counts toward your team's average every day you log.\n\nThe game in 5 steps (2-minute read): oriya.app/play\nPick your sprint and your side: oriya.app/try\n\nFounding-season athletes get the FOUNDING 50 stamp on their public Body Passport, and every sprint runs on a live team board.\n\nWin your 7-day board and you hold a seed for the Oriya Olympics — the SF bracket that crowns the season's highest sustained recovery Index. It's a founder commitment, not a running event: the first bracket forms the week the founding boards fill.\n\nThis is a closed-out 7-day sprint — sample athlete, the real card format: oriya.app/p/mayaruns\n\nWhich side are you taking?" + SIGN },
-        { id: "confirm", tag: "03 · ONBOARD — SPRINT CONFIRMED", title: "The sprint confirmation",
-          obj: "Send the moment they confirm a sprint. Day-1 mechanics only, nothing new to decide.",
-          s: "You're in — Day 1 is tomorrow morning",
-          b: "Hi " + n + ",\n\nYou're on the board. Here's Day 1:\n\n1. Tomorrow morning, screenshot your recovery score (any device — device sync isn't wired up yet, the screenshot IS the entry).\n2. Send it in about 60 seconds: oriya.app/submit\n3. A person reads it and posts your Oriya Index, usually within the hour. Your athlete-board code comes back by email — it opens your 7-day board at oriya.app/board.\n\nYour public Body Passport lives at oriya.app/p/ + your code — share it or don't, your call (anonymous mode included).\n\nMiss a morning and it counts 0 for your squad. The streak is the game." + SIGN },
+        { id: "fvo_f", g: "L", tag: "L1 · COLD — THE FOUNDER DOOR", title: "Cold: founders",
+          obj: "Triggers the founder identity (owns the calendar — prove it buys recovery). Ask = Founders side.",
+          s: "Founders own the schedule. Do they recover better?",
+          b: "Hi " + n + ",\n\nDiana here, founder of Oriya. Founder to founder.\n\nEvery founder tells themselves the same story: I control my calendar, so I sleep on my terms, so I recover better than the operators grinding on-call at 2am. Oriya put a board in SF to settle it. No sponsor's signed yet, so there's no pot on the line -- just the board and the claim.\n\nIt's Founders vs Operators. Pick the Founders side, send one morning recovery screenshot (Oura / Whoop / Garmin / Apple), and a person normalizes it to your Oriya Index so every wearable competes fairly. Your Index feeds the Founders' side average every morning you log. Higher side average wins the board -- and if a sponsor backs it later, the winning side votes how the pot splits.\n\nThe part that kills the excuse to wait: late joiners aren't punished. Your board starts the day you start -- your average only counts mornings since you entered. Founder schedule vs operator grind, on the clock from your first screenshot.\n\nTwo-minute rundown: oriya.app/play\nTake the Founders side: oriya.app/try?challenge=founders\n\nProve the autonomy actually buys you recovery -- or find out the operators have been out-sleeping you the whole time." + SIGN },
+        { id: "fvo_o", g: "L", tag: "L2 · COLD — THE OPERATOR DOOR", title: "Cold: operators",
+          obj: "Triggers the operator identity (runs the machine, eats the 2am pages). Ask = Operators side.",
+          s: "The founders think their calendar beats your discipline",
+          b: "Hi " + n + ",\n\nDiana here, founder of Oriya. This one's for the person who actually keeps the machine running.\n\nFounders love to claim they recover better because they own their schedule. Meanwhile the ops leads, chiefs of staff, and EMs are the ones eating the on-call pages, the context-switching, the 4-hour fragmented-REM nights when something's on fire -- and still shipping the morning after. Oriya built an SF board to test the claim. No sponsor's signed yet, so there's no pot riding on it -- just the board and the claim.\n\nIt's Founders vs Operators. Take the Operators side, send one morning recovery screenshot (Oura / Whoop / Garmin / Apple), and a person normalizes it to your Oriya Index so no wearable gets a hardware advantage. Your Index feeds the Operators' side average every morning you log. Higher side average wins the board -- and if a sponsor backs it later, the winning side votes team dinner or charity. Nobody bets a thing either way.\n\nAnd late entry isn't a penalty anymore: your board starts the day you start -- your average only counts mornings since you joined. You're never playing catch-up on days you missed.\n\nTwo-minute rundown: oriya.app/play\nTake the Operators side: oriya.app/try?challenge=founders\n\nThe people who run the machine usually out-recover the people who own it. Put it on the board." + SIGN },
+        { id: "fvo_bump", g: "L", tag: "L3 · BUMP", title: "Follow-up nudge",
+          obj: "No reply after 3-4 days. The join-window rule removes the stall excuse. Four lines, either side.",
+          s: "re: Founders vs Operators",
+          b: "Hi " + n + ",\n\nQuick nudge -- the SF board is open and filling now, and with the new rule your average only starts counting the day you enter, so joining later costs you nothing. Pick a side and send one morning screenshot: oriya.app/try?challenge=founders\n\nWant the rules first? Two minutes: oriya.app/play" + SIGN },
+        { id: "fvo_confirmed", g: "L", tag: "L4 · CONFIRM — DAY 1", title: "You're in — Day 1",
+          obj: "Send the moment they pick a side. Day-1 mechanics only, plus the join-window rule so a late start never reads as a penalty.",
+          s: "You're in — here's Day 1",
+          b: "Hi " + n + ",\n\nYou're in. Here's the whole mechanic, once:\n\n1. Next morning you wake up, screenshot your recovery screen (Oura / Whoop / Garmin / Apple -- device sync isn't wired up yet, the screenshot IS the entry).\n2. Send it in about 60 seconds: oriya.app/submit\n3. A person reads it and normalizes it to your Oriya Index -- usually within the hour. Your board code comes back by email and opens your side of the Founders vs Operators board.\n\nHow your window works: your board starts the day you start. Your side average only counts mornings from your first drop forward -- you're not carrying any days you weren't in for. Log every morning and it compounds; miss one and it counts 0 for your side that day. The streak is the whole game.\n\nTop your board and you're seeded for the Oriya Olympics -- the SF bracket where the season's highest sustained Index takes the title. No bracket has run yet: the first one forms the week the founding boards fill.\n\nSee you on the board." + SIGN },
+        { id: "fvo_recruit", g: "L", tag: "L5 · RECRUIT — TALK TRIGGER", title: "Recruit your side",
+          obj: "Send once they're logging. The math (empty seat = a zero for your side) is the entire pitch; includes a forwardable Slack/text line.",
+          s: "Every empty seat on your side logs a 0",
+          b: "Hi " + n + ",\n\nYou're on the board -- now the math. Your side's score is the average of everyone logging that morning. Every person you pull onto your side is another reading holding the average up. Every colleague who sits out is a zero you're carrying.\n\nSo the move is obvious: bring the people who'd actually show up every morning. Two or three disciplined teammates move your side more than any single big score you can post.\n\nAnd there's no penalty for them starting now -- their board starts the day they start, average only counts from their first drop. \"Join late\" isn't a thing anymore.\n\nHere's a line you can paste straight into Slack or a text:\n\n\"Pulling a few of us onto our side in this SF recovery thing -- Oriya's Founders vs Operators board. No sponsor yet so no cash pot, but the board is live and bragging rights (plus an Oriya Olympics seed) are real. Our side's score is the group average, so every morning you log counts and every no-show is a zero we carry. Entry is one screenshot of your recovery score, and your board starts the day you join -- no catch-up. Rules: oriya.app/play  Pick our side: oriya.app/try?challenge=founders\"\n\nThat's it. Go stack your side." + SIGN },
+        { id: "vc_sponsor", g: "S", tag: "S1 · SPONSOR — VC ASK", title: "VC sponsor pitch",
+          obj: "Ask a fund to back the pot. Payment is logo placement or a sponsor-sent intro to their portfolio — never a raw contact export.",
+          s: "Sponsor Founders vs Operators — logo on the board or a portfolio intro",
+          b: "Hi " + n + ",\n\nDiana here, founder of Oriya. I'm running Founders vs Operators -- an SF challenge where founders and operators log a morning wearable screenshot every day and get scored on a live board. It's filling now.\n\nI'd like " + co + " to back it. Two ways, pick whichever is actually useful to you:\n\n1. Logo placement -- " + co + "'s name on the challenge board and in every outreach email for the length of the sprint. No cash required beyond backing the pot.\n2. A warm intro -- forward this to your portfolio's founders/operators Slack, or send me a short list of names, and I'll invite them personally under your name. I'm not asking you to hand over a raw contact export -- an intro from you converts far better than a cold email from me anyway, and your list stays yours.\n\nBacking is prize sponsorship, not a wager: you fund the pot, athletes win it, you're never paid out. Every dollar is verified and invoiced through Airwallex -- we never take a wire against a cold email.\n\nWorth 15 minutes this week?" + SIGN },
+        { id: "community_sponsor", g: "S", tag: "S2 · SPONSOR — COMMUNITY ASK", title: "Community sponsor pitch",
+          obj: "Same ask for run clubs / gyms / Slack communities — logo or a sponsor-sent post to their own channel, never their member list handed to us.",
+          s: "Get " + co + " in front of SF's recovery-obsessed operators",
+          b: "Hi " + n + ",\n\nDiana here, founder of Oriya. I'm running Founders vs Operators -- a 7-day recovery challenge live in SF right now: pick a side, send a morning wearable screenshot, get a normalized Oriya Index, watch a live team board.\n\nI'd like " + co + " to sponsor it. Two low-lift ways:\n\n1. Logo on the board -- " + co + " shows up on the challenge page and every outreach email for the sprint, in exchange for backing the prize pot.\n2. You send it, not us -- one post to your own list or channel, your framing. I'll never ask for your members' contacts directly; it converts better coming from you anyway, and your list stays yours.\n\nSponsorship funds the pot; athletes win it, you're never paid out -- this is prize backing, not a wager. Every dollar moves through a verified Airwallex link, never a wire off a cold email.\n\nWant " + co + "'s name on a live SF board this week?" + SIGN },
         { id: "b2b", tag: "04 · SCALE — B2B PARTNER PIVOT", title: "The B2B partner pivot",
           obj: "Send at 20 / 30 / 50 active locals. Social proof into the 3-tier pitch — real count only.",
           s: (c.x || "[X]") + " athletes on a live SF board — Oriya × " + co,
           b: "Hi " + n + ",\n\nI run Oriya — SF athletes logging their morning recovery scores onto live squad boards. We have " + (c.x || "[X]") + " active athletes sprinting in SF right now — let's get " + co + " on the board they check every morning.\n\nThree ways in:\n· Seed ($0) — a named " + co + " squad + live board. Pilot, no cost.\n· Sponsor ($300–500) — your brand funds a squad's prize pot for a season. Athletes win the pot; sponsors are never paid out — prize sponsorship, not a wager.\n· Enterprise ($1k–2k) — a branded season across multiple squads, aggregate recovery reporting only (never individual data).\n\nWorth 15 minutes this week?" + SIGN },
       ];
     }
+    /* Archived (2026-07-13) — retired the day Founders vs Operators became the
+       sole active sprint. Restore into seqs() the day a second concurrent
+       sprint needs a generic (non-FvO) convert/confirm pair:
+    { id: "pass", tag: "02 · CONVERT — SEASON 1 PASS", title: "The Season 1 Pass pitch",
+      obj: "They showed interest — convert to a Season 1 seat + a chosen sprint. /play is the link.",
+      s: "Your Season 1 seat — pick a side",
+      b: "Hi " + n + ",\n\nSeason 1 of Oriya is a 7-day sprint: pick a side, send one morning screenshot — that's the whole entry — and your score counts toward your team's average every day you log.\n\nThe game in 5 steps (2-minute read): oriya.app/play\nPick your sprint and your side: oriya.app/try\n\nFounding-season athletes get the FOUNDING 50 stamp on their public Body Passport, and every sprint runs on a live team board.\n\nWin your 7-day board and you hold a seed for the Oriya Olympics — the SF bracket that crowns the season's highest sustained recovery Index. It's a founder commitment, not a running event: the first bracket forms the week the founding boards fill.\n\nThis is a closed-out 7-day sprint — sample athlete, the real card format: oriya.app/p/mayaruns\n\nWhich side are you taking?" + SIGN },
+    { id: "confirm", tag: "03 · ONBOARD — SPRINT CONFIRMED", title: "The sprint confirmation",
+      obj: "Send the moment they confirm a sprint. Day-1 mechanics only, nothing new to decide.",
+      s: "You're in — Day 1 is tomorrow morning",
+      b: "Hi " + n + ",\n\nYou're on the board. Here's Day 1:\n\n1. Tomorrow morning, screenshot your recovery score (any device — device sync isn't wired up yet, the screenshot IS the entry).\n2. Send it in about 60 seconds: oriya.app/submit\n3. A person reads it and posts your Oriya Index, usually within the hour. Your athlete-board code comes back by email — it opens your 7-day board at oriya.app/board.\n\nYour public Body Passport lives at oriya.app/p/ + your code — share it or don't, your call (anonymous mode included).\n\nMiss a morning and it counts 0 for your squad. The streak is the game." + SIGN },
+    */
 
     const PRIVACY = "Privacy as architecture: corporate partners get aggregate squad averages only — no individual recovery data appears in any partner report. Athletes control their own public passports (anonymous mode included), so there is no employee health file for anyone to review.";
 
@@ -109,7 +147,7 @@
               <p className="mono" style={{ fontSize: 15 }}>Index {s.avg} / 100 · {s.stamps} stamps · {s.logged}/7 mornings · #{s.rank} on the board</p>
               <a className="btn" href="passport.html?u=mayaruns" target="_blank" rel="noopener">Open the live sample card →</a>
               <div className="spacer"></div>
-              <p className="xs dim">These numbers render from the same board.json the public card uses. Paste-ready, pre-disclosed line (already baked into the Season 1 Pass template; paste selectively elsewhere):</p>
+              <p className="xs dim">These numbers render from the same board.json the public card uses. Paste-ready, pre-disclosed line — drop it into any template above:</p>
               <button className="ghost" onClick={() => copy("win", line)}>{copied === "win" ? "Copied ✓" : "Copy sample-card line"}</button>
             </React.Fragment>
           ) : <p className="sm dim">Loading the live sample card…</p>}
@@ -125,7 +163,7 @@
       return (
         <div className="wrap">
           <span className="kicker">Oriya · outreach workbench — internal</span>
-          <h1>Four sequences. One inbox at a time.</h1>
+          <h1>Founders vs Operators launch set. One inbox at a time.</h1>
           <p className="sm dim" style={{ marginTop: 4 }}>Drafts open in your own mail client (mailto:) — nothing sends automatically, nothing is stored, no contact list lives on this page.</p>
           <div className="bar">
             <div><label>Target email</label><input type="email" placeholder="alex@barrys.com" value={c.email} onChange={set("email")} /></div>

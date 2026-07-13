@@ -654,9 +654,9 @@
           {init:"DH",handle:"dana.h",team:"Anthropic",score:80,streak:"7d"},
           {init:"RA",handle:"river.a",team:"OpenAI",score:79,streak:"4d"},
         ] },
-      { id:"founders", emoji:"⚡", icon:Zap, status:"LIVE", sponsor:"Sequoia Capital",
+      { id:"founders", emoji:"⚡", icon:Zap, status:"LIVE", sponsor:null,
         title:"Founders vs Operators", subtitle:"Founders own the schedule. Operators run the machine. 21 days to find out which one recovers better.",
-        days:14, prize:"$2,000", split:"winning side takes $2k", projectedPayout:200, payout:"Top company wins $2k. Winner distributes as team dinner or charity donation. Vote decided by team.",
+        days:14, prize:null, split:null, payout:"No sponsor signed yet — no cash pot. Founding season is bragging rights, settled on the board.",
         participants:71, avg:72, joinTeam:"YC Founders", categories:["Founders","Corporate","Epic"],
         race:[{ t:"Founders", v:73.0 }, { t:"Operators", v:73.3 }],
         description:"Do founders actually sleep better because they control their schedule? Or are operators more disciplined? The biggest cross-company challenge of the season. 5 teams, 71 athletes, 21 days. Founders are currently losing.",
@@ -2161,7 +2161,7 @@
                         Your Oriya <span className="font-mono text-amber-glow font-semibold">{passport.oriya}</span> drops in around
                         <span className="font-mono text-amber-glow font-semibold"> #{hotPreviewRank}</span> of {hotField} in <span className="font-semibold">{hotChallenge.title}</span>.
                       </div>
-                      <div className="text-xs text-ash mt-1">{hotChallenge.participants} already logging · {hotChallenge.sponsor}</div>
+                      <div className="text-xs text-ash mt-1">{hotChallenge.participants} already logging{hotChallenge.sponsor ? " · " + hotChallenge.sponsor : ""}</div>
                     </div>
                     <span className="shrink-0 inline-flex items-center gap-1 text-xs font-semibold text-amber-glow group-hover:translate-x-0.5 transition-transform">Drop in <ChevronRight className="w-4 h-4" /></span>
                   </div>

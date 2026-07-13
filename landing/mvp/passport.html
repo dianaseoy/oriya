@@ -113,7 +113,7 @@
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 18 }}>
               <div>
                 <div className="idx">{row.avg}<span style={{ fontSize: 15, color: "var(--dim)", fontWeight: 500 }}> / 100</span></div>
-                <p className="xs dim" style={{ marginTop: 4 }}>Oriya Index · 7-day avg · {row.logged}/7 logged</p>
+                <p className="xs dim" style={{ marginTop: 4 }}>Oriya Index · {row.window < 7 ? "day " + row.window + " of your first week" : "7-day avg"} · {row.logged}/{row.window} logged</p>
               </div>
               <div style={{ textAlign: "right", maxWidth: "55%" }}>
                 {arch
@@ -127,7 +127,10 @@
               <div className="stat"><b>{row.streak}d</b><span className="xs dim">streak</span></div>
             </div>
             <div className="bars" style={{ height: 40 }}>
-              {days.map((d) => <div key={d.k} className={"bar" + (d.k === DAY && d.v != null ? " hot" : "")} style={{ height: (d.v == null ? 2 : d.v) + "%" }} title={d.k.slice(5) + " · " + (d.v == null ? "missed" : d.v)} />)}
+              {days.map((d) => {
+                const pre = me.joined && d.k < me.joined; // before their window opened — not a miss
+                return <div key={d.k} className={"bar" + (d.k === DAY && d.v != null ? " hot" : "")} style={{ height: (d.v == null ? 2 : d.v) + "%", opacity: pre ? 0.25 : 1 }} title={d.k.slice(5) + " · " + (pre ? "before you joined" : d.v == null ? "missed" : d.v)} />;
+              })}
             </div>
             <div className="stamp-row">
               {stamps.map((s) => <span key={s.short} className={"stamp" + (s.earned ? "" : " lock")} title={s.hint}>{s.emoji} {s.short}</span>)}

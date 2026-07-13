@@ -48,6 +48,14 @@ publish the board. No storage, no accounts.
 - Operator console: `/mvp/ops-33a447.html` — scores, invite codes, publish.
   The "Next invite codes" card shows the next unused code per source prefix
   (RUN/IG/TW/GYM/REF/OP); you reply to each submission with one by hand.
+  **Publish LIVE** commits the public board (contacts stripped) straight to
+  main via the GitHub Contents API and the site rebuilds in ~1 min. It asks
+  once for a token — create a **fine-grained PAT** at github.com/settings/
+  personal-access-tokens scoped to **this repo only, Contents: read/write**;
+  it is stored in that browser's localStorage and nowhere else. Athletes
+  added in the console get `joined: <today>`, which caps their scoring
+  window at days-since-joining (no pre-join zeros for late joiners). Untick
+  "sample data label" the day real athletes replace the demo roster.
 - Outreach workbench: `/mvp/outreach-03d56d.html` — the 4-stage email matrix.
 
 Both are `noindex` and unlinked, but that is obscurity, not auth — the

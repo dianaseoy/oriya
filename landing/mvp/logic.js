@@ -48,14 +48,29 @@ var MVP = (function () {
 
   function normalizedOn(p, day) { return loggedOn(p, day) ? normalize(p.scores[day], p.device) : null; }
 
-  // 7-day average of normalized scores; missed days count as 0 (the rule).
+  // Days from a to b (both "YYYY-MM-DD", local), 0 when equal.
+  function daysBetween(a, b) {
+    var ap = a.split("-").map(Number), bp = b.split("-").map(Number);
+    return Math.round((new Date(bp[0], bp[1] - 1, bp[2]) - new Date(ap[0], ap[1] - 1, ap[2])) / 86400000);
+  }
+
+  // 7-day average of normalized scores; a missed day counts 0 (the rule) —
+  // but only days since the athlete JOINED can be missed. Without p.joined a
+  // Day-5 joiner dragged five pre-join zeros, which punished exactly the
+  // people we want to pull in fast. Window = days since joining, capped at 7;
+  // athletes without a joined date (the original samples) keep the full week.
   function avg7(p, day) {
+    var window = 7;
+    if (p.joined) {
+      var since = daysBetween(p.joined, day) + 1; // joining day counts
+      if (since >= 1 && since < 7) window = since;
+    }
     var sum = 0, logged = 0;
-    for (var i = 0; i < 7; i++) {
+    for (var i = 0; i < window; i++) {
       var k = dayOffset(day, i);
       if (loggedOn(p, k)) { sum += normalizedOn(p, k); logged++; }
     }
-    return { avg: Math.round((sum / 7) * 10) / 10, logged: logged };
+    return { avg: Math.round((sum / window) * 10) / 10, logged: logged, window: window };
   }
 
   function streak(p, day) {
@@ -71,7 +86,7 @@ var MVP = (function () {
   function rankBoard(participants, day) {
     var rows = participants.map(function (p) {
       var a = avg7(p, day);
-      return { p: p, today: normalizedOn(p, day), avg: a.avg, logged: a.logged, streak: streak(p, day), loggedToday: loggedOn(p, day) };
+      return { p: p, today: normalizedOn(p, day), avg: a.avg, logged: a.logged, window: a.window, streak: streak(p, day), loggedToday: loggedOn(p, day) };
     });
     rows.sort(function (x, y) { return y.avg - x.avg || (y.today || 0) - (x.today || 0); });
     rows.forEach(function (r, i) { r.rank = i + 1; });

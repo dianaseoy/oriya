@@ -57,19 +57,31 @@
     const CHALLENGES = ["Founders vs Operators", "Marina Run Club", "Ring vs Band", "Open board"];
     // Exact-title map to the /try board details (no entry for Open board on purpose)
     const TRY_ID = { "Founders vs Operators": "founders", "Marina Run Club": "marina", "Ring vs Band": "devicewars" };
+    // Two-sided challenges get an in-form picker (panel, 2026-07-13) — Marina's
+    // sides ("Marina RC"/"Stanford") don't match this page's shorter title, so
+    // it keeps the outbound "see the live board" link instead of a picker.
+    const SIDES = { "Founders vs Operators": ["Founders", "Operators"], "Ring vs Band": ["Oura", "Whoop"] };
     const params = new URLSearchParams(location.search);
-    // /try deep-links arbitrary challenge titles ("…?challenge=Ring vs Band — Oura") —
-    // surface them as the first option instead of silently snapping to the default.
-    const paramChallenge = (params.get("challenge") || "").slice(0, 80);
+    // /try deep-links "Title — Side" (side already picked there) — split it so
+    // the side lands in its own field instead of riding inside the title string.
+    const paramRaw = (params.get("challenge") || "").slice(0, 80);
+    let paramChallenge = paramRaw, paramSide = "";
+    const dash = paramRaw.indexOf(" — ");
+    if (dash > 0) {
+      const base = paramRaw.slice(0, dash), side = paramRaw.slice(dash + 3);
+      if (SIDES[base] && SIDES[base].indexOf(side) >= 0) { paramChallenge = base; paramSide = side; }
+    }
+    // surface unrecognized challenge titles as the first option instead of silently snapping to the default.
     const CHALLENGE_OPTIONS = paramChallenge && CHALLENGES.indexOf(paramChallenge) < 0
       ? [paramChallenge].concat(CHALLENGES) : CHALLENGES;
 
     // Fallback = the one-click email draft (attachment added by the user; a
     // mailto: can never attach files, so we say that plainly).
     function mailDraft(f) {
+      const challengeLabel = f.side ? f.challenge + " — " + f.side : f.challenge;
       return "mailto:team@oriya.app?subject=" + encodeURIComponent("Oriya Challenge Submission")
         + "&body=" + encodeURIComponent("Email:\n" + f.email + "\n\nDevice:\n" + f.device + "\n\nRaw Score:\n" + f.score
-          + (f.challenge ? "\n\nChallenge:\n" + f.challenge : "") + (f.code ? "\n\nInvite code:\n" + f.code : "")
+          + (f.challenge ? "\n\nChallenge:\n" + challengeLabel : "") + (f.code ? "\n\nInvite code:\n" + f.code : "")
           + "\n\nSubmitted:\n" + new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
           + "\n\n(Attach your recovery screenshot before sending.)");
     }
@@ -77,7 +89,7 @@
     function ManualProofUpload() {
       const [f, setF] = useState({
         email: "", device: params.get("device") || "", score: "",
-        challenge: paramChallenge || CHALLENGES[0], code: params.get("code") || "",
+        challenge: paramChallenge || CHALLENGES[0], side: paramSide, code: params.get("code") || "",
       });
       const [img, setImg] = useState(null);          // dataURL for POST + preview
       const [drag, setDrag] = useState(false);
@@ -93,16 +105,19 @@
         r.readAsDataURL(file);
       };
 
+      const needsSide = !!SIDES[f.challenge];
       const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email) && DEVICES.indexOf(f.device) >= 0
-        && f.score !== "" && Number(f.score) >= 0 && Number(f.score) <= 100 && !!img;
+        && f.score !== "" && Number(f.score) >= 0 && Number(f.score) <= 100 && !!img
+        && (!needsSide || !!f.side);
 
       const submit = async () => {
-        if (!valid) { setErr("Fill everything in — email, device, score, screenshot."); return; }
+        if (!valid) { setErr(needsSide && !f.side ? "Pick a side before you submit." : "Fill everything in — email, device, score, screenshot."); return; }
         setState("sending"); setErr("");
+        const challengeLabel = f.side ? f.challenge + " — " + f.side : f.challenge;
         try {
           const res = await fetch("/api/manual-submit", {
             method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: f.email, device: f.device, score: Number(f.score), challenge: f.challenge, code: f.code, image: img }),
+            body: JSON.stringify({ email: f.email, device: f.device, score: Number(f.score), challenge: challengeLabel, code: f.code, image: img }),
           });
           const out = await res.json();
           if (out.ok) { setState("done"); return; }
@@ -142,14 +157,21 @@
           <label>This morning's raw score</label>
           <input className="mono" type="number" min="0" max="100" placeholder="84" value={f.score} onChange={(e) => setF({ ...f, score: e.target.value })} />
           <label>Challenge</label>
-          <select value={f.challenge} onChange={(e) => setF({ ...f, challenge: e.target.value })}>
+          <select value={f.challenge} onChange={(e) => setF({ ...f, challenge: e.target.value, side: SIDES[e.target.value] && SIDES[e.target.value].indexOf(f.side) >= 0 ? f.side : "" })}>
             {CHALLENGE_OPTIONS.map((c) => <option key={c}>{c}</option>)}
           </select>
-          {/* Side-gap fix (panel 2026-07-13): dropdown picks carry no side, so
-              offer the board BEFORE commitment only — new tab (this form has no
-              persistence), hidden once a screenshot is attached, and never for
-              deep-linked "title — side" strings (side already baked in). */}
-          {TRY_ID[f.challenge] && !img && (
+          {needsSide ? (
+            <React.Fragment>
+              <label>Pick your side</label>
+              <div className="devices">
+                {SIDES[f.challenge].map((s) => (
+                  <button key={s} type="button" className={"dev" + (f.side === s ? " on" : "")} onClick={() => setF({ ...f, side: s })}>{s}</button>
+                ))}
+              </div>
+            </React.Fragment>
+          ) : TRY_ID[f.challenge] && !img && (
+            /* Marina's sides don't map to this page's title — offer the board
+               before commitment instead: new tab, form stays put. */
             <p className="xs dim" style={{ marginTop: 6 }}>Not sure which side? <a href={"../try.html?challenge=" + TRY_ID[f.challenge]} target="_blank" rel="noopener" style={{ color: "var(--accent)" }}>See the live board →</a> — opens a new tab, your form stays put.</p>
           )}
           <label>Recovery screenshot</label>
