@@ -55,6 +55,8 @@
     const { useState, useRef } = React;
     const DEVICES = ["Oura", "Whoop", "Garmin", "Apple Health"];
     const CHALLENGES = ["Founders vs Operators", "Marina Run Club", "Ring vs Band", "Open board"];
+    // Exact-title map to the /try board details (no entry for Open board on purpose)
+    const TRY_ID = { "Founders vs Operators": "founders", "Marina Run Club": "marina", "Ring vs Band": "devicewars" };
     const params = new URLSearchParams(location.search);
     // /try deep-links arbitrary challenge titles ("…?challenge=Ring vs Band — Oura") —
     // surface them as the first option instead of silently snapping to the default.
@@ -143,6 +145,13 @@
           <select value={f.challenge} onChange={(e) => setF({ ...f, challenge: e.target.value })}>
             {CHALLENGE_OPTIONS.map((c) => <option key={c}>{c}</option>)}
           </select>
+          {/* Side-gap fix (panel 2026-07-13): dropdown picks carry no side, so
+              offer the board BEFORE commitment only — new tab (this form has no
+              persistence), hidden once a screenshot is attached, and never for
+              deep-linked "title — side" strings (side already baked in). */}
+          {TRY_ID[f.challenge] && !img && (
+            <p className="xs dim" style={{ marginTop: 6 }}>Not sure which side? <a href={"../try.html?challenge=" + TRY_ID[f.challenge]} target="_blank" rel="noopener" style={{ color: "var(--accent)" }}>See the live board →</a> — opens a new tab, your form stays put.</p>
+          )}
           <label>Recovery screenshot</label>
           <div
             className={"drop" + (drag ? " over" : "")}

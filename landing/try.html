@@ -494,14 +494,15 @@
     const PRESET_KEYS = ["oura", "whoop", "garmin", "apple"];
 
     /* Tap-to-connect sync flow (mobile-first path, an alternative to the
-       screenshot dropzone). Oura (live:true) is a REAL read-only OAuth sync —
-       the Cloudflare Worker at /auth/oura/* does the token exchange and hands
-       the scores back in the URL fragment (see worker/index.js; the privacy
-       contract is mirrored in PrivacyVault). The others are still SIMULATED
-       previews and are labeled "demo" wherever they render. */
+       screenshot dropzone). ALL syncs are SIMULATED previews, labeled "demo"
+       wherever they render. A real Oura OAuth worker exists (worker/index.js)
+       but is NOT deployed — until the Cloudflare build actually ships the
+       Worker, adding live:true to Oura sends users to /auth/oura/start, which
+       falls through to the homepage and strands them (2026-07-13 mobile bug).
+       Re-enable live:true ONLY after /auth/oura/start verifiably 302s. */
     const CONNECT = [
       { key:"strava", scope:"activities + resting HR",  kind:"Training load → provisional readiness" },
-      { key:"oura",   scope:"Readiness + HRV",          kind:"Recovery", live:true },
+      { key:"oura",   scope:"Readiness + HRV",          kind:"Recovery" },
       { key:"whoop",  scope:"Recovery % + strain",      kind:"Recovery" },
       { key:"garmin", scope:"Body Battery + sleep",     kind:"Recovery" },
       { key:"apple",  scope:"HRV + sleep + resting HR",  kind:"Recovery" },
@@ -810,12 +811,11 @@
     }
 
     /* =============================== Connect sheet (tap-to-sync) ===============================
-       Two modes. LIVE (CONNECT[].live, currently Oura only): the authorize
-       button leaves for the real OAuth flow at /auth/oura/start — the Worker
-       exchanges the code and returns the scores in a URL fragment; the
-       authorized/completed events fire on the return leg in App. DEMO (all
-       others, or forceDemo after an OAuth failure): the original simulated
-       handshake, labeled as such. */
+       Two modes. LIVE (CONNECT[].live — currently NONE; see the CONNECT
+       comment: the OAuth worker isn't deployed, so no device sets live) would
+       leave for /auth/oura/start. DEMO (everything today): the simulated
+       handshake, labeled as such. The live branch is kept so re-enabling is
+       one flag once the Worker actually serves. */
     const BRAND = { strava:"#FC4C02", oura:"#8B7BF0", whoop:"#12E29A", garmin:"#0B7CC1", apple:"#C7CAD0" };
     function ConnectSheet({ deviceKey, onConnected, onClose, forceDemo }) {
       const m = DEVICE_MODEL[deviceKey];
@@ -865,7 +865,7 @@
     }
 
     /* =============================== Hook view =============================== */
-    function Hook({ onPreset, onScreenshot, onConnect, resume, onResume, deep, oauthError, onRetryDemo }) {
+    function Hook({ onPreset, onScreenshot, onConnect, resume, onResume, deep, oauthError, onRetryDemo, onBrowse }) {
       const [dragging, setDragging] = useState(false);
       const fileRef = useRef(null);
       const readFile = (file) => {
@@ -913,9 +913,8 @@
               <div className="mb-4 rounded-xl border border-amber-brand/40 bg-amber-brand/[0.07] px-4 py-3 text-left animate-fade-up">
                 <p className="text-xs text-bone leading-relaxed"><span className="font-semibold text-amber-glow">Oura didn't complete</span> — nothing was read{oauthError === "denied" ? " (you declined on Oura's page)" : ""}.</p>
                 <p className="text-[11px] text-ash mt-1">
-                  <a href="/auth/oura/start" className="text-jade underline decoration-dotted underline-offset-2">Try again</a>
-                  {" · "}
-                  <button type="button" onClick={onRetryDemo} className="text-jade underline decoration-dotted underline-offset-2">use the demo sync</button>
+                  {/* no "Try again" link while the OAuth worker is undeployed — it would strand people on the homepage */}
+                  <button type="button" onClick={onRetryDemo} className="text-jade underline decoration-dotted underline-offset-2">Use the demo sync</button>
                   {" · or drop a screenshot below"}
                 </p>
               </div>
@@ -931,7 +930,7 @@
               {CONNECT.map((item) => {
                 const m = DEVICE_MODEL[item.key];
                 const brand = BRAND[item.key];
-                const hot = !!item.live; // the real OAuth integration is the featured one
+                const hot = !!item.live; // no live integrations today (worker undeployed) — pill renders only when one ships
                 return (
                   <button key={item.key}
                     onClick={() => onConnect(item.key)}
@@ -947,7 +946,7 @@
                 );
               })}
             </div>
-            <p className="text-center text-[11px] text-ash/70 mt-3 font-mono leading-relaxed">Oura: live read-only sync — we fetch your score once, keep nothing on our server. Others: simulated demo, saved to this browser only.</p>
+            <p className="text-center text-[11px] text-ash/70 mt-3 font-mono leading-relaxed">Every sync here is a simulated demo — no real account is touched, and it saves to this browser only. The real path today is a screenshot below.</p>
 
             <div className="flex items-center gap-3 my-6">
               <div className="h-px flex-1 bg-white/10" />
@@ -990,6 +989,32 @@
             <p className="text-center text-[11px] text-ash/70 mt-3 font-mono leading-relaxed">
               No screenshot handy? Email your recovery screen to <a href="mailto:team@oriya.app?subject=My%20recovery%20screenshot%20%E2%80%94%20normalize%20me" className="text-jade hover:underline" onClick={() => track("email_proof_clicked", { from: "hook" })}>team@oriya.app</a> — we reply with your Index and your board spot.
             </p>
+
+            {/* Cold-visitor path to the boards (panel 2026-07-13): read a
+                challenge and pick a side BEFORE building any passport — each
+                row opens the same me=null ChallengeDetail the deep links use.
+                Placed BELOW the device grid + dropzone on purpose (Vera): the
+                reveal stays the above-the-fold hook; this catches the scroller
+                it didn't convert. */}
+            <div className="flex items-center gap-3 my-6">
+              <div className="h-px flex-1 bg-white/10" />
+              <span className="text-xs text-ash font-mono">or just read the boards first</span>
+              <div className="h-px flex-1 bg-white/10" />
+            </div>
+            <div className="space-y-2">
+              {CHALLENGES.filter((c) => c.status === "LIVE").slice(0, 3).map((c) => (
+                <button key={c.id} type="button" onClick={() => onBrowse(c)}
+                  className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left transition-all hover:border-jade/50 hover:bg-white/[0.05]">
+                  <span className="text-lg shrink-0">{c.emoji}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-medium text-bone truncate">{c.title}</span>
+                    <span className="block text-[10.5px] text-ash font-mono truncate">{"live now" + (c.prize ? " · " + c.prize + " pot" : "") + " · pick a side, enter by screenshot"}</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-ash/60 shrink-0" />
+                </button>
+              ))}
+              <p className="text-center text-[10px] text-ash/60 font-mono">Reading is free — no passport needed. Boards show labeled sample athletes until sides fill.</p>
+            </div>
 
             <PreviewTour />
 
@@ -1787,6 +1812,7 @@
                 <Upload className="w-4 h-4" /> Submit this morning's proof →
               </a>
               <p className="text-[10px] font-mono text-ash/60 mt-2">Want to flex anonymously? Use your work email — the board shows only ◒ anon + your @company.com. Prefer plain email? <a href={proofMail} onClick={() => track("challenge_email_proof", { challenge: c.id, team: myTeam || null, method: "mailto" })} className="underline hover:text-bone">team@oriya.app</a> works too.</p>
+              <p className="text-[11px] text-ash mt-3 pt-3 border-t border-white/10">🏅 Top this board and you're seeded for the <span className="text-bone font-medium">Oriya Olympics</span> — the SF bracket where the season's highest sustained Index takes the title. No bracket has run yet: the first one forms the week the founding boards fill.</p>
             </div>
 
             {/* Seat-lock demoted below the entry (panel spine, 2026-07-12): the
@@ -2353,7 +2379,7 @@
             </div>
             <div className="mt-3 rounded-2xl border border-jade/20 bg-jade/[0.03] p-4 flex gap-3">
               <span className="text-lg">📡</span>
-              <p className="text-[12px] text-ash leading-relaxed"><b className="text-bone">Live Oura sync is a pass-through.</b> Our server exchanges the OAuth code, reads your last 7 readiness scores, hands them to this browser in the URL fragment, and keeps nothing — no accounts, no database, no token storage. Revoke anytime at cloud.ouraring.com. Demo syncs for other devices never leave this browser at all.</p>
+              <p className="text-[12px] text-ash leading-relaxed"><b className="text-bone">No live syncs yet — every connect on this page is a simulated demo</b> that never leaves this browser. The real Oura sync we're shipping is built as a pass-through: our server exchanges the OAuth code, hands your scores to this browser in the URL fragment, and keeps nothing — no accounts, no database, no token storage. When it goes live, this line will say so.</p>
             </div>
             <p className="mt-3 text-[11px] text-ash/60 font-mono leading-relaxed">This is the privacy architecture we're building to. Oriya is pre-launch and founder-built; items marked "targeted" (e.g. SOC 2) are commitments on the roadmap, not audited certifications yet. Only the live Oura hand-off touches our server, and it stores nothing.</p>
           </div>
@@ -2381,6 +2407,8 @@
       // Spine (2026-07-12): a deep-linked challenge opens BEFORE any passport —
       // the entry needs a screenshot, not the demo toy. Closing it lands on the Hook.
       const [preDetail, setPreDetail] = useState(true);
+      // Hook "read the boards first" strip (panel 2026-07-13) — same me=null detail, no deep link needed
+      const [browseC, setBrowseC] = useState(null);
 
       // Live Oura return leg: /auth/oura/callback lands here with the scores in
       // the URL FRAGMENT (fragments never ride requests, so no server sees them).
@@ -2462,16 +2490,16 @@
       // confirms the OCR read before it becomes their number; presets/sync skip it.
       const handleResolved = (r) => { if (r.from === "screenshot" || !r.confident) { setPrefill(r); setView("confirm"); return; } finalize(r.deviceKey, r.native, r.name, r.via); };
 
-      const screen = view === "hook" ? <Hook onScreenshot={startScreenshot} onConnect={startConnect} resume={resume} onResume={doResume} deep={deepChallenge} oauthError={oauthError} onRetryDemo={retryDemo} />
+      const screen = view === "hook" ? <Hook onScreenshot={startScreenshot} onConnect={startConnect} resume={resume} onResume={doResume} deep={deepChallenge} oauthError={oauthError} onRetryDemo={retryDemo} onBrowse={(c) => { track("challenge_browse", { challenge: c.id, from: "hook" }); setBrowseC(c); }} />
         : view === "normalizing" ? <Normalizing pending={pending} onDone={handleResolved} />
         : view === "confirm" ? <Confirm prefill={prefill} onConfirm={(d) => finalize(d.deviceKey, d.native, d.name, "manual")} onBack={() => setView("hook")} />
         : <Dashboard passport={passport} setPassport={setPassport} deepId={deepId} />;
       return (
         <React.Fragment>
           {screen}
-          {view === "hook" && preDetail && deepChallenge && (
-            <ChallengeDetail c={deepChallenge} joined={false} joinedTeam={null} me={null}
-              onJoin={() => {}} onClose={() => setPreDetail(false)} onShare={() => {}} onToast={() => {}} />
+          {view === "hook" && ((preDetail && deepChallenge) || browseC) && (
+            <ChallengeDetail c={browseC || deepChallenge} joined={false} joinedTeam={null} me={null}
+              onJoin={() => {}} onClose={() => { setPreDetail(false); setBrowseC(null); }} onShare={() => {}} onToast={() => {}} />
           )}
           {connectKey && <ConnectSheet deviceKey={connectKey} onConnected={onConnected} onClose={() => setConnectKey(null)} forceDemo={forceDemo} />}
           {privacy && <PrivacyVault onClose={() => setPrivacy(false)} />}

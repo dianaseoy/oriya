@@ -52,8 +52,10 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="logic.js"></script>
+  <script src="store.js"></script>
   <script type="text/babel">
-    const { useState } = React;
+    const { useState, useEffect } = React;
     const SIGN = "\n\n— Diana · founder, Oriya (oriya.app)";
 
     // Every body is honest about today's product: screenshot IS the entry (no
@@ -69,7 +71,7 @@
         { id: "pass", tag: "02 · CONVERT — SEASON 1 PASS", title: "The Season 1 Pass pitch",
           obj: "They showed interest — convert to a Season 1 seat + a chosen sprint. /play is the link.",
           s: "Your Season 1 seat — pick a side",
-          b: "Hi " + n + ",\n\nSeason 1 of Oriya is a 7-day sprint: pick a side, send one morning screenshot — that's the whole entry — and your score counts toward your team's average every day you log.\n\nThe game in 5 steps (2-minute read): oriya.app/play\nPick your sprint and your side: oriya.app/try\n\nFounding-season athletes get the FOUNDING 50 stamp on their public Body Passport, and every sprint runs on a live team board.\n\nWhich side are you taking?" + SIGN },
+          b: "Hi " + n + ",\n\nSeason 1 of Oriya is a 7-day sprint: pick a side, send one morning screenshot — that's the whole entry — and your score counts toward your team's average every day you log.\n\nThe game in 5 steps (2-minute read): oriya.app/play\nPick your sprint and your side: oriya.app/try\n\nFounding-season athletes get the FOUNDING 50 stamp on their public Body Passport, and every sprint runs on a live team board.\n\nWin your 7-day board and you hold a seed for the Oriya Olympics — the SF bracket that crowns the season's highest sustained recovery Index. It's a founder commitment, not a running event: the first bracket forms the week the founding boards fill.\n\nThis is a closed-out 7-day sprint — sample athlete, the real card format: oriya.app/p/mayaruns\n\nWhich side are you taking?" + SIGN },
         { id: "confirm", tag: "03 · ONBOARD — SPRINT CONFIRMED", title: "The sprint confirmation",
           obj: "Send the moment they confirm a sprint. Day-1 mechanics only, nothing new to decide.",
           s: "You're in — Day 1 is tomorrow morning",
@@ -82,6 +84,38 @@
     }
 
     const PRIVACY = "Privacy as architecture: corporate partners get aggregate squad averages only — no individual recovery data appears in any partner report. Athletes control their own public passports (anonymous mode included), so there is no employee health file for anyone to review.";
+
+    /* "What seven mornings buys you" — numbers computed live from the same
+       board.json the public card renders (panel rule: generated, never lore).
+       Headline deliberately avoids "win": passports prove logged mornings and
+       rank, not pot money. */
+    function WinPanel({ copied, copy }) {
+      const [s, setS] = useState(null);
+      useEffect(() => {
+        STORE.fetchBoard().then((b) => {
+          if (!b) return;
+          const day = MVP.todayKey();
+          const r = MVP.rankBoard(b.participants, day).find((x) => (x.p.handle || "").toLowerCase() === "@mayaruns");
+          if (r) setS({ avg: r.avg, logged: r.logged, rank: r.rank, stamps: MVP.stamps(r.p, day, r.rank).filter((x) => x.earned).length });
+        });
+      }, []);
+      const line = "This is a closed-out 7-day sprint — sample athlete, the real card format: oriya.app/p/mayaruns";
+      return (
+        <div className="card">
+          <span className="tag">WHAT SEVEN MORNINGS BUYS YOU</span>
+          {s ? (
+            <React.Fragment>
+              <p className="sm">End of a 7-day sprint, an athlete walks away with a card like this:</p>
+              <p className="mono" style={{ fontSize: 15 }}>Index {s.avg} / 100 · {s.stamps} stamps · {s.logged}/7 mornings · #{s.rank} on the board</p>
+              <a className="btn" href="passport.html?u=mayaruns" target="_blank" rel="noopener">Open the live sample card →</a>
+              <div className="spacer"></div>
+              <p className="xs dim">These numbers render from the same board.json the public card uses. Paste-ready, pre-disclosed line (already baked into the Season 1 Pass template; paste selectively elsewhere):</p>
+              <button className="ghost" onClick={() => copy("win", line)}>{copied === "win" ? "Copied ✓" : "Copy sample-card line"}</button>
+            </React.Fragment>
+          ) : <p className="sm dim">Loading the live sample card…</p>}
+        </div>
+      );
+    }
 
     function App() {
       const [c, setC] = useState({ email: "", n: "", co: "", x: "" });
@@ -117,6 +151,7 @@
             })}
           </div>
           <div className="panels">
+            <WinPanel copied={copied} copy={copy} />
             <div className="card">
               <span className="tag">COMMERCIAL MATRIX — REFERENCE</span>
               <div className="krow"><span>Tier 1 · Seed</span><span className="mono">$0</span></div>
