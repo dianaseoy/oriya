@@ -1,0 +1,12 @@
+# Shortlinks — static mirror of worker/index.js SHORTLINKS, because the
+# live deploy currently serves assets only (the Worker's `main` is not being
+# deployed by the push-to-main build; see README "Confirm deploy wiring").
+# Honored by both Cloudflare Pages and Workers static assets, so the short
+# routes work either way. If the Worker ever runs, assets (incl. this file)
+# match first — keep the two maps in sync.
+/submit      /mvp/submit.html      302
+/passport    /mvp/passport.html    302
+/challenges  /mvp/challenges.html  302
+/squads      /mvp/squads.html      302
+/board       /mvp/                 302
+/p/*         /mvp/passport.html?u=:splat  302
