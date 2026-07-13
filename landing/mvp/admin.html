@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Oriya · Ops</title>
+  <!-- Operator console. Workflow, once a morning with coffee:
+       1) open inbox, read screenshots  2) type raw scores here
+       3) Publish → download board.json → replace landing/mvp/data/board.json → push
+       4) copy the reminder list into WhatsApp for whoever hasn't logged.
+       Working copy lives in THIS browser's localStorage (contacts included);
+       the published file strips contacts. UI only — logic.js / store.js do the work. -->
+  <style>
+    :root { --bg:#0B0C0E; --panel:#101114; --line:#23252B; --text:#E6E7EA; --dim:#8A8F98; --accent:#7FB79E; --amber:#D7A25C; }
+    * { box-sizing:border-box; margin:0; }
+    body { background:var(--bg); color:var(--text); font:14px/1.5 "Inter",system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+    .wrap { max-width:860px; margin:0 auto; padding:26px 18px 90px; }
+    .mono { font-family:ui-monospace,"JetBrains Mono",monospace; }
+    .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; margin-top:14px; }
+    .kicker { font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); }
+    h1 { font-size:20px; font-weight:600; letter-spacing:-0.02em; margin-top:6px; }
+    h2 { font-size:13px; font-weight:600; }
+    .dim { color:var(--dim); } .sm { font-size:12.5px; } .xs { font-size:11px; }
+    input, select, textarea, button { font:inherit; color:var(--text); }
+    input, select, textarea { background:#0D0E11; border:1px solid var(--line); border-radius:7px; padding:7px 9px; outline:none; }
+    input:focus, textarea:focus { border-color:var(--accent); }
+    .btn { background:var(--accent); color:#0B0C0E; border:0; border-radius:8px; padding:9px 14px; font-weight:600; cursor:pointer; }
+    .ghost { background:transparent; color:var(--dim); border:1px solid var(--line); }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th { text-align:left; color:var(--dim); font-weight:500; font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; padding:7px 7px; border-bottom:1px solid var(--line); }
+    td { padding:7px; border-bottom:1px solid #17181C; }
+    td input { width:64px; text-align:center; }
+    .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .warn { color:var(--amber); }
+    .ok { color:var(--accent); }
+    pre { background:#0D0E11; border:1px solid var(--line); border-radius:8px; padding:10px; font-size:11.5px; white-space:pre-wrap; }
+  </style>
+</head>
+<body>
+  <div id="root" class="wrap"><p class="dim sm">Loading…</p></div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="logic.js"></script>
+  <script src="store.js"></script>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const DAY = MVP.todayKey();
+
+    function ScoreTable({ board, setBoard }) {
+      const setScore = (code, val) => {
+        const next = { ...board, participants: board.participants.map((p) => {
+          if (p.code !== code) return p;
+          const scores = { ...(p.scores || {}) };
+          if (val === "") delete scores[DAY]; else scores[DAY] = Math.max(0, Math.min(100, Number(val)));
+          return { ...p, scores };
+        }) };
+        setBoard(next);
+      };
+      const drop = (code) => {
+        if (!confirm("Remove " + code + " from the board?")) return;
+        setBoard({ ...board, participants: board.participants.filter((p) => p.code !== code) });
+      };
+      return (
+        <div className="card" style={{ padding: "6px 4px" }}>
+          <table>
+            <thead><tr><th>Code</th><th>Athlete</th><th>Source</th><th>Device</th><th>Raw today</th><th>→ Board</th><th>7-day</th><th></th></tr></thead>
+            <tbody>
+              {board.participants.map((p) => {
+                const raw = p.scores && p.scores[DAY] != null ? p.scores[DAY] : "";
+                return (
+                  <tr key={p.code}>
+                    <td className="mono dim">{p.code}</td>
+                    <td>{p.name} {p.contact && <span className="xs dim">{p.contact}</span>}</td>
+                    <td className="xs dim">{MVP.codeSource(p.code)}</td>
+                    <td className="xs dim">{MVP.deviceTag(p.device)}</td>
+                    <td><input className="mono" type="number" min="0" max="100" value={raw} onChange={(e) => setScore(p.code, e.target.value)} /></td>
+                    <td className="mono">{raw === "" ? <span className="dim">—</span> : <span className="ok">{MVP.normalize(Number(raw), p.device)}</span>}</td>
+                    <td className="mono dim">{MVP.avg7(p, DAY).avg}</td>
+                    <td><button className="ghost xs" onClick={() => drop(p.code)}>✕</button></td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    function AddAthlete({ board, setBoard }) {
+      const [f, setF] = useState({ code: "", name: "", handle: "", device: "oura", contact: "" });
+      const [err, setErr] = useState("");
+      const add = () => {
+        const code = MVP.cleanCode(f.code);
+        if (!MVP.codeValid(code)) { setErr("Code must look like RUN-014 (prefix = acquisition source)."); return; }
+        if (board.participants.some((p) => p.code === code)) { setErr(code + " is taken."); return; }
+        if (!f.name.trim()) { setErr("Name required."); return; }
+        setErr("");
+        setBoard({ ...board, participants: board.participants.concat([{ code, name: f.name.trim(), handle: f.handle.trim(), device: f.device, contact: f.contact.trim(), scores: {} }]) });
+        setF({ code: "", name: "", handle: "", device: "oura", contact: "" });
+      };
+      return (
+        <div className="card">
+          <h2>Add athlete <span className="xs dim">(when a claim email lands)</span></h2>
+          <div className="row" style={{ marginTop: 10 }}>
+            <input className="mono" style={{ width: 96 }} placeholder="RUN-014" value={f.code} onChange={(e) => setF({ ...f, code: e.target.value })} />
+            <input style={{ width: 140 }} placeholder="Name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
+            <input style={{ width: 120 }} placeholder="@handle (opt)" value={f.handle} onChange={(e) => setF({ ...f, handle: e.target.value })} />
+            <select value={f.device} onChange={(e) => setF({ ...f, device: e.target.value })}>
+              {Object.keys(MVP.DEVICES).map((k) => <option key={k} value={k}>{MVP.DEVICES[k].tag}</option>)}
+            </select>
+            <input style={{ width: 160 }} placeholder="phone/email (private)" value={f.contact} onChange={(e) => setF({ ...f, contact: e.target.value })} />
+            <button className="btn" onClick={add}>Add</button>
+          </div>
+          {err && <p className="xs warn" style={{ marginTop: 8 }}>{err}</p>}
+        </div>
+      );
+    }
+
+    function Reminders({ board }) {
+      const [copied, setCopied] = useState(false);
+      const missing = MVP.reminderList(board.participants, DAY);
+      const text = missing.map((p) => (p.contact || p.handle || p.name) + ":\n" + MVP.reminderMessage(p, DAY)).join("\n\n");
+      const copy = () => { navigator.clipboard && navigator.clipboard.writeText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); }); };
+      return (
+        <div className="card">
+          <h2>Reminders <span className="xs dim">— {missing.length} not logged today (send by hand, that's the point)</span></h2>
+          {missing.length === 0 ? <p className="sm ok" style={{ marginTop: 8 }}>Everyone logged. Screenshot the board and post it.</p> : (
+            <React.Fragment>
+              <pre style={{ marginTop: 10 }}>{text}</pre>
+              <button className="btn ghost sm" style={{ marginTop: 8 }} onClick={copy}>{copied ? "Copied ✓" : "Copy all"}</button>
+            </React.Fragment>
+          )}
+        </div>
+      );
+    }
+
+    function Funnel({ board }) {
+      const stats = MVP.sourceStats(board.participants, DAY);
+      return (
+        <div className="card">
+          <h2>Acquisition <span className="xs dim">— code prefix = source</span></h2>
+          <table style={{ marginTop: 8 }}>
+            <thead><tr><th>Source</th><th>Athletes</th><th>Logged today</th><th>Rate</th></tr></thead>
+            <tbody>
+              {stats.map((s) => (
+                <tr key={s.source}><td>{s.source}</td><td className="mono">{s.count}</td><td className="mono">{s.loggedToday}</td><td className="mono" style={{ color: s.rate >= 60 ? "var(--accent)" : "var(--amber)" }}>{s.rate}%</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    function PublishBar({ board, setBoard }) {
+      const [showImport, setShowImport] = useState(false);
+      const [raw, setRaw] = useState("");
+      const publish = () => STORE.downloadJSON(STORE.publicBoard(board), "board.json");
+      const backup = () => STORE.downloadJSON(board, "board-full-backup.json");
+      const doImport = () => {
+        try { const b = JSON.parse(raw); if (!b.participants) throw 0; setBoard(b); setShowImport(false); setRaw(""); }
+        catch (e) { alert("That didn't parse as a board JSON."); }
+      };
+      return (
+        <div className="card">
+          <div className="row">
+            <button className="btn" onClick={publish}>Publish → download board.json</button>
+            <button className="ghost sm" onClick={backup}>Full backup (private)</button>
+            <button className="ghost sm" onClick={() => setShowImport(!showImport)}>Import</button>
+          </div>
+          <p className="xs dim" style={{ marginTop: 8 }}>Publishing = replace <span className="mono">landing/mvp/data/board.json</span> with the download, commit, push. Contacts never leave this browser.</p>
+          {showImport && (
+            <div style={{ marginTop: 10 }}>
+              <textarea style={{ width: "100%", minHeight: 90 }} placeholder="Paste a board JSON (e.g. your full backup)" value={raw} onChange={(e) => setRaw(e.target.value)} />
+              <button className="btn ghost sm" style={{ marginTop: 6 }} onClick={doImport}>Load it</button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function App() {
+      const [board, setBoardState] = useState(null);
+      const setBoard = (b) => { setBoardState(b); STORE.saveAdmin(b); };
+      useEffect(() => {
+        const local = STORE.loadAdmin();
+        if (local) { setBoardState(local); return; }
+        STORE.fetchBoard().then((b) => setBoardState(b || { day: DAY, season: "Founding 7-Day", sample: false, participants: [] }));
+      }, []);
+      if (!board) return <p className="dim sm">Loading…</p>;
+      const logged = board.participants.filter((p) => MVP.loggedOn(p, DAY)).length;
+      return (
+        <React.Fragment>
+          <span className="kicker">Oriya · operator console</span>
+          <h1>{DAY} — {logged}/{board.participants.length} logged{board.sample ? " · sample data" : ""}</h1>
+          <p className="xs dim" style={{ marginTop: 4 }}>Read inbox → type raw scores → publish → send reminders. ~10 minutes a morning.</p>
+          <ScoreTable board={board} setBoard={setBoard} />
+          <AddAthlete board={board} setBoard={setBoard} />
+          <Reminders board={board} />
+          <Funnel board={board} />
+          <PublishBar board={board} setBoard={setBoard} />
+        </React.Fragment>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>

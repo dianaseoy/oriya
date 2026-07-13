@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oriya · How to play</title>
+  <meta name="description" content="The 7-Day Sprint Blueprint: pick a side, send a morning screenshot, get your Oriya Index, watch the board, win the pot.">
+  <meta property="og:title" content="Oriya · The 7-Day Sprint Blueprint">
+  <meta property="og:description" content="Five steps, nothing to install. Pick a side, screenshot your wearable each morning, win the sponsor-backed pot.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://oriya.app/play">
+  <meta name="twitter:card" content="summary">
+  <!-- THE outreach conversion link (send when a prospect says "I'm interested").
+       Rules-of-the-game only — teaches the challenge, not the company. Figures
+       mirror the live Founders vs Operators card on /try (Par 71, 73.0 vs 73.3
+       sample board, $2,000 sponsor-backed pot) — if that card changes, change
+       this page in the same commit. Mini Ask Ori: 3 chips, honest answers,
+       every card lands on /submit or /try. -->
+  <style>
+    :root { --bg:#0B0C0E; --panel:#101114; --line:#23252B; --text:#E6E7EA; --dim:#8A8F98; --accent:#7FB79E; --amber:#D7A25C; --void:#0B0C0E; }
+    * { box-sizing:border-box; margin:0; }
+    body { background:var(--bg); color:var(--text); font:15px/1.55 "Inter",system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+    .wrap { max-width:560px; margin:0 auto; padding:32px 18px 110px; }
+    .mono { font-family:ui-monospace,"JetBrains Mono",monospace; }
+    .kicker { font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); }
+    h1 { font-size:26px; font-weight:600; letter-spacing:-0.02em; margin-top:8px; }
+    .dim { color:var(--dim); } .sm { font-size:12.5px; } .xs { font-size:11px; }
+    a { color:var(--accent); }
+    .steps { position:relative; margin-top:30px; }
+    .steps::before { content:""; position:absolute; left:15px; top:10px; bottom:10px; width:1px; background:linear-gradient(var(--line), rgba(127,183,158,.45)); }
+    .step { position:relative; padding:0 0 24px 48px; }
+    .stepn { position:absolute; left:0; top:0; width:32px; height:32px; border-radius:50%; background:var(--panel); border:1px solid var(--line); color:var(--accent); font:600 13px/30px ui-monospace,monospace; text-align:center; transition:all .2s ease; }
+    .step h2 { font-size:15.5px; font-weight:600; letter-spacing:-0.01em; padding-top:5px; }
+    .step p { font-size:13px; color:var(--dim); margin-top:5px; }
+    .step p b { color:var(--text); font-weight:600; }
+    .acc { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-top:10px; }
+    .race { display:flex; flex-direction:column; gap:7px; }
+    .race .row { display:flex; align-items:center; gap:10px; font-size:12px; }
+    .race .name { width:86px; color:var(--text); }
+    .race .track { flex:1; height:6px; border-radius:99px; background:#17181C; overflow:hidden; }
+    .race .fill { height:100%; border-radius:99px; background:rgba(127,183,158,.45); }
+    .race .fill.hot { background:var(--accent); }
+    .race .val { width:52px; text-align:right; color:var(--dim); }
+    .lead-tag { font-size:9px; letter-spacing:.08em; color:var(--accent); border:1px solid rgba(127,183,158,.4); border-radius:99px; padding:1px 6px; margin-left:6px; }
+    .pill-row { display:flex; gap:8px; margin-top:10px; }
+    .pill { flex:1; background:#0D0E11; border:1px solid var(--line); color:var(--text); border-radius:10px; padding:10px 8px; font:inherit; font-size:13px; cursor:pointer; transition:all .2s ease; }
+    .pill:hover { border-color:#3A3D45; }
+    .pill.on { border-color:var(--accent); background:rgba(127,183,158,.08); }
+    .cta { display:inline-block; position:relative; overflow:hidden; background:var(--accent); color:var(--void); border-radius:10px; padding:12px 18px; font-weight:600; text-decoration:none; text-align:center; transition:all .2s ease; }
+    .cta:hover { filter:brightness(1.08); }
+    .cta::after { content:""; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(110deg, transparent 35%, rgba(255,255,255,.22) 50%, transparent 65%); background-size:220% 100%; background-position:200% 0; opacity:0; transition:opacity .2s ease; pointer-events:none; }
+    .cta:hover::after { opacity:1; animation:shimmer 1.4s linear infinite; }
+    .cta.ghost { background:transparent; color:var(--text); border:1px solid var(--line); }
+    .cta.ghost:hover { border-color:#3A3D45; filter:none; }
+    .cta.ghost::after { display:none; }
+    @keyframes shimmer { to { background-position:-200% 0; } }
+    .qa { margin-top:30px; }
+    .qa h3 { font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); font-weight:600; }
+    .qa div { padding:10px 0; border-bottom:1px solid #17181C; font-size:13px; }
+    .qa b { display:block; font-weight:600; font-size:13px; }
+    .qa span { color:var(--dim); }
+    .foot { margin-top:28px; display:flex; flex-direction:column; gap:10px; }
+    .fine { font-size:10.5px; font-family:ui-monospace,monospace; color:#5A5F68; margin-top:22px; line-height:1.6; }
+    /* ---- mini Ask Ori ---- */
+    .ori-fab { position:fixed; right:16px; bottom:16px; width:48px; height:48px; border-radius:50%; background:var(--accent); color:var(--void); border:0; font:700 18px/1 "Inter",system-ui,sans-serif; cursor:pointer; box-shadow:0 6px 24px rgba(0,0,0,.5); transition:all .2s ease; z-index:40; }
+    .ori-fab:hover { transform:translateY(-2px); }
+    .ori-fab.hide { opacity:0; pointer-events:none; }
+    .ori-panel { position:fixed; right:16px; bottom:16px; width:min(340px, calc(100vw - 32px)); background:var(--panel); border:1px solid var(--line); border-radius:16px; box-shadow:0 12px 40px rgba(0,0,0,.6); z-index:41; opacity:0; transform:translateY(8px); pointer-events:none; transition:all .2s ease; }
+    .ori-panel.open { opacity:1; transform:none; pointer-events:auto; }
+    .ori-head { display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-bottom:1px solid var(--line); }
+    .ori-head b { font-size:13px; }
+    .ori-head button { background:none; border:0; color:var(--dim); font:inherit; cursor:pointer; transition:all .2s ease; }
+    .ori-head button:hover { color:var(--text); }
+    .ori-body { max-height:280px; overflow-y:auto; padding:12px 14px; display:flex; flex-direction:column; gap:8px; }
+    .ori-msg { font-size:12.5px; line-height:1.5; border-radius:12px; padding:9px 11px; max-width:92%; }
+    .ori-msg.bot { background:#0D0E11; border:1px solid var(--line); align-self:flex-start; color:var(--text); }
+    .ori-msg.user { background:rgba(127,183,158,.12); align-self:flex-end; }
+    .ori-cards { display:flex; flex-direction:column; gap:6px; align-self:stretch; }
+    .ori-cards a { display:block; border:1px solid rgba(127,183,158,.4); background:rgba(127,183,158,.06); color:var(--accent); border-radius:10px; padding:9px 11px; font-size:12.5px; font-weight:600; text-decoration:none; transition:all .2s ease; }
+    .ori-cards a:hover { border-color:var(--accent); background:rgba(127,183,158,.12); }
+    .ori-chips { display:flex; flex-wrap:wrap; gap:6px; padding:10px 14px 14px; border-top:1px solid var(--line); }
+    .ori-chip { background:#0D0E11; border:1px solid var(--line); color:var(--text); border-radius:99px; padding:6px 11px; font:inherit; font-size:11.5px; cursor:pointer; transition:all .2s ease; }
+    .ori-chip:hover { border-color:var(--accent); }
+    @media (prefers-reduced-motion: reduce) {
+      .cta:hover::after { animation:none; opacity:0; }
+      .ori-fab:hover { transform:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="xs mono dim" href="index.html" style="text-decoration:none">← oriya.app</a>
+    <p class="kicker" style="margin-top:20px">Oriya · The 7-Day Sprint Blueprint</p>
+    <h1>Five steps. One board.<br>Nothing to install.</h1>
+    <p class="sm dim" style="margin-top:8px">Read this once — you know everything a player knows.</p>
+
+    <div class="steps" id="blueprint">
+      <div class="step">
+        <span class="stepn">1</span>
+        <h2>Pick your side</h2>
+        <p><b>Founders or Operators.</b> Everyone starts against the same baseline — <b>Par 71</b>. No fitness test, no minimum score.</p>
+        <div class="acc race">
+          <div class="row"><span class="name">Founders</span><div class="track"><div class="fill" style="width:73%"></div></div><span class="val mono">73.0</span></div>
+          <div class="row"><span class="name">Operators<span class="lead-tag">LEADS</span></span><div class="track"><div class="fill hot" style="width:73.3%"></div></div><span class="val mono">73.3</span></div>
+          <p class="xs dim" style="margin-top:2px">Founding-season sample board — fills with real athletes as they enter.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="stepn">2</span>
+        <h2>The morning drop</h2>
+        <p>Wake up → screenshot your recovery screen (<b>Oura, Whoop, Garmin, Apple Watch</b>) → send. <b>~60 seconds.</b></p>
+        <p class="xs dim" style="margin-top:6px">Anon mode: send from your work email — the board shows only ◒ anon + @company.com.</p>
+      </div>
+
+      <div class="step">
+        <span class="stepn">3</span>
+        <h2>Get your Oriya Index</h2>
+        <p>A person adjusts your raw score for your device — <b>Whoop 80 → Index 73</b> — so every wearable competes fairly. Posted, usually within the hour.</p>
+      </div>
+
+      <div class="step">
+        <span class="stepn">4</span>
+        <h2>Watch the board — or call it</h2>
+        <p>Your side's average moves every morning. Not competing yet? <b>Call the winner</b> — a free prediction, no buy-in.</p>
+      </div>
+
+      <div class="step" style="padding-bottom:6px" id="step5">
+        <span class="stepn">5</span>
+        <h2>Win — and split the pot</h2>
+        <p><b>$2,000 sponsor-backed pot.</b> Higher team average takes it. The winning side votes how:</p>
+        <div class="pill-row" id="payoutPills">
+          <button class="pill" data-v="dinner">🍽 Team dinner</button>
+          <button class="pill" data-v="charity">🎗 Charity donation</button>
+        </div>
+        <p class="xs dim" id="pillNote" style="margin-top:6px">Straw poll on this device — the binding vote belongs to the winning side.</p>
+      </div>
+    </div>
+
+    <div class="foot">
+      <a class="cta" href="mvp/submit.html?challenge=Founders%20vs%20Operators&amp;back=founders">Submit this morning's proof →</a>
+      <a class="cta ghost" href="try.html?challenge=founders">Pick your side on the board →</a>
+      <p class="xs dim" style="text-align:center">Every athlete gets a live, shareable Body Passport — <a href="mvp/passport.html?u=mayaruns">see a sample →</a></p>
+    </div>
+
+    <div class="qa">
+      <h3>Quick answers</h3>
+      <div><b>Connect my device?</b> <span>No — a screenshot is enough. Oura owners get optional live read-only sync.</span></div>
+      <div><b>Miss a morning?</b> <span>Counts 0 that day. You're never removed from the board.</span></div>
+      <div><b>Bad score?</b> <span>A logged red morning outranks a forgotten green one. The board scores the log, not the flex.</span></div>
+      <div><b>Who sees my data?</b> <span>Name/handle, device, adjusted score. Anon mode shows only your company domain.</span></div>
+      <div><b>Cost?</b> <span>Free. The pot is prize sponsorship — backers fund it, athletes win it, backers are never paid out. Payment only via verified Airwallex links from team@oriya.app. It's <b style="display:inline;color:var(--text)">not a wager</b>.</span></div>
+      <div><b>Getting paid?</b> <span>Prize distributed within 7 days of challenge end via the sponsor.</span></div>
+    </div>
+
+    <p class="fine">Founding season — boards show clearly-labeled sample athletes until each side fills with real entries. Pots open once a board holds real, verified athletes. Built in the open by a solo founder.</p>
+  </div>
+
+  <button class="ori-fab" id="oriFab" aria-label="Ask Ori">O</button>
+  <div class="ori-panel" id="oriPanel" role="dialog" aria-label="Ask Ori">
+    <div class="ori-head"><b>Ori · quick answers</b><button id="oriClose" aria-label="Close">✕</button></div>
+    <div class="ori-body" id="oriBody"></div>
+    <div class="ori-chips" id="oriChips"></div>
+  </div>
+
+  <script>
+    (function () {
+      /* payout straw poll */
+      var KEY = "oriya:play:payoutVote";
+      var pills = document.querySelectorAll("#payoutPills .pill");
+      function paint(v) {
+        pills.forEach(function (p) { p.classList.toggle("on", p.getAttribute("data-v") === v); });
+        if (v) document.getElementById("pillNote").textContent =
+          "Noted on this device ✓ — the binding vote belongs to the winning side.";
+      }
+      var saved = null;
+      try { saved = localStorage.getItem(KEY); } catch (e) {}
+      if (saved) paint(saved);
+      pills.forEach(function (p) {
+        p.addEventListener("click", function () {
+          var v = p.getAttribute("data-v");
+          try { localStorage.setItem(KEY, v); } catch (e) {}
+          paint(v);
+        });
+      });
+
+      /* mini Ask Ori — canned honest answers, zero typing. Copy mirrors the
+         page; the "$2,000 / not a wager / Oura-only live sync" rails hold. */
+      var ORI = {
+        enter: { q: "🏃 How do I enter?",
+          a: "Pick a side, then send one morning screenshot. That's the whole entry — free, nothing to install.",
+          cards: [
+            { t: "View 7-Day Blueprint ↓", scroll: "#blueprint" },
+            { t: "Submit Proof Now →", href: "mvp/submit.html?challenge=Founders%20vs%20Operators&back=founders" }
+          ] },
+        win: { q: "🏆 What can I win?",
+          a: "Founders vs Operators carries a $2,000 sponsor-backed pot — higher team average takes it, and the winning side votes team dinner vs charity. Backers fund it and are never paid out; entering costs nothing.",
+          cards: [
+            { t: "See how the pot splits ↓", scroll: "#step5" },
+            { t: "Pick your side →", href: "try.html?challenge=founders" }
+          ] },
+        connect: { q: "🔌 Connect my wearable",
+          a: "You don't have to — a screenshot works for every device. Own an Oura? Live read-only sync is on /try. Everything else runs screenshot-first for now.",
+          cards: [
+            { t: "Send a screenshot →", href: "mvp/submit.html?challenge=Founders%20vs%20Operators&back=founders" },
+            { t: "Try Oura live sync →", href: "try.html" }
+          ] }
+      };
+      var fab = document.getElementById("oriFab");
+      var panel = document.getElementById("oriPanel");
+      var body = document.getElementById("oriBody");
+      var chips = document.getElementById("oriChips");
+      var started = false;
+
+      function toggle(open) {
+        panel.classList.toggle("open", open);
+        fab.classList.toggle("hide", open);
+        if (open && !started) {
+          started = true;
+          bubble("bot", "Hey — I'm Ori. Three taps cover everything on this page:");
+        }
+      }
+      function bubble(role, text) {
+        var m = document.createElement("div");
+        m.className = "ori-msg " + role;
+        m.textContent = text;
+        body.appendChild(m);
+        body.scrollTop = body.scrollHeight;
+      }
+      function cardsFor(list) {
+        var box = document.createElement("div");
+        box.className = "ori-cards";
+        list.forEach(function (c) {
+          var a = document.createElement("a");
+          a.textContent = c.t;
+          a.href = c.href || c.scroll;
+          if (c.scroll) a.addEventListener("click", function (e) {
+            e.preventDefault();
+            toggle(false);
+            var el = document.querySelector(c.scroll);
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+          box.appendChild(a);
+        });
+        body.appendChild(box);
+        body.scrollTop = body.scrollHeight;
+      }
+      Object.keys(ORI).forEach(function (k) {
+        var b = document.createElement("button");
+        b.className = "ori-chip";
+        b.textContent = ORI[k].q;
+        b.addEventListener("click", function () {
+          bubble("user", ORI[k].q);
+          bubble("bot", ORI[k].a);
+          cardsFor(ORI[k].cards);
+        });
+        chips.appendChild(b);
+      });
+      fab.addEventListener("click", function () { toggle(true); });
+      document.getElementById("oriClose").addEventListener("click", function () { toggle(false); });
+    })();
+  </script>
+</body>
+</html>

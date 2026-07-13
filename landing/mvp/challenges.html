@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Oriya · Challenges</title>
+  <!-- Two group standings computed LIVE from the same board.json — no second
+       data source, so a challenge can never disagree with the board. Sides:
+       device (via MVP.deviceTag) and acquisition squad (via MVP.codeSource). -->
+  <link rel="stylesheet" href="ui.css">
+</head>
+<body>
+  <div id="root" class="wrap"><p class="dim sm">Loading…</p></div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="logic.js"></script>
+  <script src="store.js"></script>
+  <script src="nav.js"></script>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const DAY = MVP.todayKey();
+
+    function GroupCard({ title, sub, rows }) {
+      return (
+        <div className="card" style={{ padding: "14px 4px 6px" }}>
+          <p className="sm" style={{ fontWeight: 600, padding: "0 14px" }}>{title}</p>
+          <p className="xs dim" style={{ padding: "0 14px", marginTop: 2 }}>{sub}</p>
+          <table style={{ marginTop: 8 }}>
+            <thead><tr><th>#</th><th>Side</th><th>Athletes</th><th>Today</th><th>7-day</th></tr></thead>
+            <tbody>
+              {rows.map((g, i) => (
+                <tr key={g.key}>
+                  <td className="mono dim">{i + 1}</td>
+                  <td className={i === 0 ? "lead" : ""}>{g.key}</td>
+                  <td className="mono dim">{g.members.length}</td>
+                  <td className="mono dim">{g.loggedToday}/{g.members.length}</td>
+                  <td className="mono">{g.avg}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    function App() {
+      const [board, setBoard] = useState(null);
+      useEffect(() => { STORE.fetchBoard().then(setBoard); }, []);
+      if (!board) return <p className="dim sm">Loading…</p>;
+      const devices = MVP.groupBoard(board.participants, DAY, (p) => MVP.deviceTag(p.device));
+      const squads = MVP.groupBoard(board.participants, DAY, (p) => MVP.codeSource(p.code));
+      return (
+        <React.Fragment>
+          <span className="kicker">Oriya · challenges</span>
+          <h1>Two boards, same scores.</h1>
+          <p className="xs dim" style={{ marginTop: 6 }}>{board.season}{board.sample ? " · sample data" : ""} — both standings recompute from the 7-day board every time it updates.</p>
+          <SubNavigation active="challenges" />
+          <GroupCard title="Device wars" sub="Each side's mean 7-day average, adjusted so the hardware doesn't decide it." rows={devices} />
+          <GroupCard title="Squad cup" sub="Where you came in is your squad — run club vs gym vs the internet." rows={squads} />
+          <p className="xs dim" style={{ marginTop: 14 }}>A missed day counts 0 toward your side. Same rule for everyone.</p>
+        </React.Fragment>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>

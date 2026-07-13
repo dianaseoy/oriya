@@ -360,7 +360,7 @@
     });
   })();
   </script>
-  <div id="root"><div class="boot"><div class="boot-card"></div><div class="boot-t"><span class="boot-dot"></span>Warming up your Body Passport…</div></div></div>
+  <div id="root"><div class="boot"><div class="boot-card"></div><div class="boot-t"><span class="boot-dot"></span>Waking up the boards…</div></div></div>
 
   <script type="text/babel" data-presets="react">
     const { useState, useEffect, useRef, useCallback } = React;
@@ -493,13 +493,15 @@
     };
     const PRESET_KEYS = ["oura", "whoop", "garmin", "apple"];
 
-    /* The "main ones" for the tap-to-connect sync flow (mobile-first path, an
-       alternative to the screenshot dropzone). Each connection here is a
-       SIMULATED read-only sync for preview — live OAuth is gated to beta and
-       needs the backend token-exchange described in the integration spec. */
+    /* Tap-to-connect sync flow (mobile-first path, an alternative to the
+       screenshot dropzone). Oura (live:true) is a REAL read-only OAuth sync —
+       the Cloudflare Worker at /auth/oura/* does the token exchange and hands
+       the scores back in the URL fragment (see worker/index.js; the privacy
+       contract is mirrored in PrivacyVault). The others are still SIMULATED
+       previews and are labeled "demo" wherever they render. */
     const CONNECT = [
       { key:"strava", scope:"activities + resting HR",  kind:"Training load → provisional readiness" },
-      { key:"oura",   scope:"Readiness + HRV",          kind:"Recovery" },
+      { key:"oura",   scope:"Readiness + HRV",          kind:"Recovery", live:true },
       { key:"whoop",  scope:"Recovery % + strain",      kind:"Recovery" },
       { key:"garmin", scope:"Body Battery + sleep",     kind:"Recovery" },
       { key:"apple",  scope:"HRV + sleep + resting HR",  kind:"Recovery" },
@@ -608,7 +610,7 @@
     /* =================== Challenge data (from oriya challenge app) =================== */
     const BASE_RULES = [
       "Log your recovery score every day — missed days count as 0",
-      "All device scores are normalized to the Oriya Index (Oura 83 ≠ Whoop 83, but we make them comparable)",
+      "Any wearable counts — every score is adjusted to be fair across devices",
       "Team average is calculated from all active participants who logged that day",
       "Prize distributed within 7 days of challenge end via the sponsor",
     ];
@@ -799,7 +801,7 @@
               <div className="tour-step">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-jade font-mono">step 3 · you're on the board</div>
                 <div className="tour-row"><span className="text-ash">#4</span><span className="text-jade">you</span><span className="text-bone">75</span></div>
-                <div className="text-[11px] text-ash">instantly ranked — the "you're #4" moment</div>
+                <div className="text-[11px] text-ash">your side sees you land — the "you're #4" moment</div>
               </div>
             </div>
           </div>
@@ -808,17 +810,21 @@
     }
 
     /* =============================== Connect sheet (tap-to-sync) ===============================
-       Mobile-first alternative to the screenshot dropzone: a simulated read-only
-       OAuth handshake that pulls a recovery/readiness number and hands it to the
-       normalize flow. Clearly labeled as a preview simulation — the live version
-       is gated behind the backend token-exchange (see integration spec). */
+       Two modes. LIVE (CONNECT[].live, currently Oura only): the authorize
+       button leaves for the real OAuth flow at /auth/oura/start — the Worker
+       exchanges the code and returns the scores in a URL fragment; the
+       authorized/completed events fire on the return leg in App. DEMO (all
+       others, or forceDemo after an OAuth failure): the original simulated
+       handshake, labeled as such. */
     const BRAND = { strava:"#FC4C02", oura:"#8B7BF0", whoop:"#12E29A", garmin:"#0B7CC1", apple:"#C7CAD0" };
-    function ConnectSheet({ deviceKey, onConnected, onClose }) {
+    function ConnectSheet({ deviceKey, onConnected, onClose, forceDemo }) {
       const m = DEVICE_MODEL[deviceKey];
       const c = CONNECT.find((x) => x.key === deviceKey) || { scope: m.metric, kind: "Recovery" };
       const brand = BRAND[deviceKey] || "#7FB79E";
+      const live = !!c.live && !forceDemo;
       const [stage, setStage] = useState("prompt"); // prompt | connecting | pulling
       const authorize = () => {
+        if (live) { location.href = "/auth/oura/start"; return; }
         track("device_connect_authorized", { device: m.tag, method: "sync_demo" });
         setStage("connecting");
         setTimeout(() => setStage("pulling"), 950);
@@ -832,7 +838,7 @@
               <div className="w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-lg text-void shrink-0" style={{ background: brand }}>{m.tag[0]}</div>
               <div className="min-w-0">
                 <div className="text-bone font-semibold leading-tight truncate">{m.tag}</div>
-                <div className="text-[11px] text-ash font-mono">Read-only · demo sync</div>
+                <div className="text-[11px] text-ash font-mono">{live ? "Read-only · live OAuth" : "Read-only · demo sync"}</div>
               </div>
               {stage === "prompt" && <button onClick={onClose} aria-label="Close" className="ml-auto text-ash hover:text-bone text-lg leading-none p-2 -m-2 shrink-0">✕</button>}
             </div>
@@ -843,8 +849,8 @@
                   <div className="text-sm text-bone">{c.scope}</div>
                   <div className="text-[11px] text-ash font-mono mt-0.5">{c.kind} · never posts, never writes back</div>
                 </div>
-                <button onClick={authorize} className="w-full rounded-xl py-3.5 font-semibold text-void active:scale-[.99] transition" style={{ background: brand }}>Authorize read-only access</button>
-                <p className="text-center text-[11px] text-ash/70 mt-3 font-mono leading-relaxed">Simulated for preview — no live account is connected. Live sync is in private beta.</p>
+                <button onClick={authorize} className="w-full rounded-xl py-3.5 font-semibold text-void active:scale-[.99] transition" style={{ background: brand }}>{live ? "Continue to Oura →" : "Authorize read-only access"}</button>
+                <p className="text-center text-[11px] text-ash/70 mt-3 font-mono leading-relaxed">{live ? "You'll approve on Oura's page. Your score passes through our server once and is never stored." : "Simulated demo — no live account is connected."}</p>
               </React.Fragment>
             ) : (
               <div className="py-7 text-center">
@@ -859,7 +865,7 @@
     }
 
     /* =============================== Hook view =============================== */
-    function Hook({ onPreset, onScreenshot, onConnect, resume, onResume, deep }) {
+    function Hook({ onPreset, onScreenshot, onConnect, resume, onResume, deep, oauthError, onRetryDemo }) {
       const [dragging, setDragging] = useState(false);
       const fileRef = useRef(null);
       const readFile = (file) => {
@@ -874,7 +880,7 @@
           <div className="w-full max-w-md animate-fade-up">
             <div className="flex items-center justify-center gap-2 mb-5">
               <Sparkles className="w-4 h-4 text-jade" />
-              <span className="text-xs uppercase tracking-[0.22em] text-ash font-mono">Oriya · Body Passport</span>
+              <span className="text-xs uppercase tracking-[0.22em] text-ash font-mono">Oriya · The Recovery Network</span>
             </div>
             {deep && (
               <div className="mb-6 max-w-md mx-auto rounded-2xl border border-amber-brand/40 bg-gradient-to-br from-amber-brand/[0.10] to-transparent px-4 py-3.5 text-left animate-fade-up">
@@ -894,14 +900,26 @@
               <span className="text-jade italic">Keep your score.</span>
             </h1>
             <p className="text-center text-ash mt-4 mb-5 text-sm sm:text-base max-w-md mx-auto">
-              An Oura 62 isn't a Whoop 62. Connect a device or drop a screenshot — we normalize it to the
-              <span className="text-bone"> Oriya Index</span> and put you on a board where the numbers finally compare.
+              An Oura 62 isn't a Whoop 62. Connect a device or drop a screenshot — we make it
+              <span className="text-bone"> one fair score</span> and drop you onto a live board.
             </p>
 
             <div className="flex items-center gap-2.5 max-w-md mx-auto mb-7 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2.5">
               <span className="font-mono text-[9px] uppercase tracking-wider text-jade border border-jade/30 rounded-full px-2 py-0.5 shrink-0">r/whoop</span>
               <span className="text-[12px] text-ash leading-snug min-w-0 truncate">"…we can't compare a single number across devices." <span className="text-ash/50">1.2K upvotes</span></span>
             </div>
+
+            {oauthError && (
+              <div className="mb-4 rounded-xl border border-amber-brand/40 bg-amber-brand/[0.07] px-4 py-3 text-left animate-fade-up">
+                <p className="text-xs text-bone leading-relaxed"><span className="font-semibold text-amber-glow">Oura didn't complete</span> — nothing was read{oauthError === "denied" ? " (you declined on Oura's page)" : ""}.</p>
+                <p className="text-[11px] text-ash mt-1">
+                  <a href="/auth/oura/start" className="text-jade underline decoration-dotted underline-offset-2">Try again</a>
+                  {" · "}
+                  <button type="button" onClick={onRetryDemo} className="text-jade underline decoration-dotted underline-offset-2">use the demo sync</button>
+                  {" · or drop a screenshot below"}
+                </p>
+              </div>
+            )}
 
             {/* Primary path (mobile-first): tap to connect a device read-only */}
             <div className="flex items-center gap-3 mb-3">
@@ -910,25 +928,26 @@
               <div className="h-px flex-1 bg-white/10" />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              {CONNECT.map((item, i) => {
+              {CONNECT.map((item) => {
                 const m = DEVICE_MODEL[item.key];
                 const brand = BRAND[item.key];
+                const hot = !!item.live; // the real OAuth integration is the featured one
                 return (
                   <button key={item.key}
                     onClick={() => onConnect(item.key)}
-                    className={"group relative flex items-center gap-3 rounded-xl border bg-white/[0.03] px-4 py-3 text-left transition-all min-h-[58px] " + (i === 0 ? "border-jade/50 qt-pulse hover:border-jade" : "border-white/10 hover:border-jade/60 hover:bg-white/[0.06]")}>
-                    {i === 0 && <span className="absolute -top-2 left-3 font-mono text-[8px] uppercase tracking-wider text-void bg-jade rounded-full px-1.5 py-0.5">try me</span>}
+                    className={"group relative flex items-center gap-3 rounded-xl border bg-white/[0.03] px-4 py-3 text-left transition-all min-h-[58px] " + (hot ? "border-jade/50 qt-pulse hover:border-jade" : "border-white/10 hover:border-jade/60 hover:bg-white/[0.06]")}>
+                    {hot && <span className="absolute -top-2 left-3 font-mono text-[8px] uppercase tracking-wider text-void bg-jade rounded-full px-1.5 py-0.5">● live</span>}
                     <span className="w-8 h-8 rounded-lg flex items-center justify-center text-void font-bold text-sm shrink-0" style={{ background: brand }}>{m.tag[0]}</span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-medium text-bone truncate">{m.tag}</span>
-                      <span className="block text-[10.5px] text-ash font-mono truncate">{item.scope}</span>
+                      <span className="block text-[10.5px] text-ash font-mono truncate">{item.scope + (item.live ? "" : " · demo")}</span>
                     </span>
-                    <ChevronRight className={"w-4 h-4 shrink-0 transition-colors " + (i === 0 ? "text-jade" : "text-ash/60 group-hover:text-jade")} />
+                    <ChevronRight className={"w-4 h-4 shrink-0 transition-colors " + (hot ? "text-jade" : "text-ash/60 group-hover:text-jade")} />
                   </button>
                 );
               })}
             </div>
-            <p className="text-center text-[11px] text-ash/70 mt-3 font-mono leading-relaxed">Read-only · simulated preview · saved to this browser, never sent to a server</p>
+            <p className="text-center text-[11px] text-ash/70 mt-3 font-mono leading-relaxed">Oura: live read-only sync — we fetch your score once, keep nothing on our server. Others: simulated demo, saved to this browser only.</p>
 
             <div className="flex items-center gap-3 my-6">
               <div className="h-px flex-1 bg-white/10" />
@@ -999,7 +1018,7 @@
             const steps = ["Reading your " + m.tag + " score…", "Applying " + m.tag + " correction (×" + m.factor + ")…", "Computing Oriya Index…"];
             for (let i = 0; i < steps.length; i++) { if (cancelled) return; setMsg(steps[i]); setProgress((i + 1) / steps.length * 0.92); await wait(440); }
             if (cancelled) return; setProgress(1);
-            onDone({ deviceKey: pending.deviceKey, native: pending.native, name: null, confident: true, from: "preset" });
+            onDone({ deviceKey: pending.deviceKey, native: pending.native, name: null, confident: true, from: "preset", via: pending.via });
             return;
           }
           // screenshot → OCR
@@ -1276,6 +1295,7 @@
               <p className="text-xs text-ash">+ Athlytic, Bevel, Cora Health, Gentler Streak, Ultrahuman & Vora supported.</p>
               <p className="text-xs font-mono text-bone/80">Example · Whoop 83 → 83 × 0.92 + (−1.0) = 75.36 → <span className="text-jade">75 Oriya Index</span></p>
               <p className="text-[11px] text-ash leading-relaxed">Source: Doherty C, Baldwin M, Lambe R, Burke D, Altini M — "Readiness, recovery, and strain: an evaluation of composite health scores in consumer wearables," <span className="italic">Translational Exercise Biomedicine</span>, Apr 2025. Directionally useful, not diagnostically precise — a social context layer, not a medical report.</p>
+              <a href="science.html" className="inline-block text-xs font-mono text-jade hover:underline">Read the full method →</a>
             </div>
           )}
         </div>
@@ -1346,24 +1366,24 @@
       return (
         <button onClick={() => onOpen(c)}
           className={"dark-pin relative overflow-hidden text-left rounded-xl border bg-[#0B0F19] p-4 transition-all flex flex-col " + (live
-            ? "border-[#00FF87]/40 drop-shadow-[0_0_15px_rgba(0,255,135,0.15)] hover:border-[#00FF87]/70 hover:drop-shadow-[0_0_22px_rgba(0,255,135,0.25)]"
-            : "border-white/10 hover:border-[#00FF87]/30 hover:bg-white/[0.04]")}>
+            ? "border-jade/40 drop-shadow-[0_0_15px_rgba(127,183,158,0.18)] hover:border-jade/70 hover:drop-shadow-[0_0_22px_rgba(127,183,158,0.28)]"
+            : "border-white/10 hover:border-jade/30 hover:bg-white/[0.04]")}>
           <div className="relative flex items-start justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-lg leading-none">{c.emoji}</span>
               {live
-                ? <span className="text-[10px] uppercase tracking-wider font-mono text-[#00FF87] inline-flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[#00FF87] live-ring" /> Live table</span>
+                ? <span className="text-[10px] uppercase tracking-wider font-mono text-[#00FF87] inline-flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[#00FF87] live-ring" /> Live board</span>
                 : <span className="text-[10px] uppercase tracking-wider font-mono text-ash">{c.startLabel}</span>}
             </div>
             {c.createdByYou ? <span className="text-[10px] font-mono text-amber-glow inline-flex items-center gap-1"><Star className="w-3 h-3" /> Yours</span>
-              : joined ? <span className="text-[10px] font-mono text-jade">SEATED ✓</span>
+              : joined ? <span className="text-[10px] font-mono text-jade">ON THE BOARD ✓</span>
               : null}
           </div>
           <h3 className="relative mt-3 text-sm font-semibold text-bone leading-snug">{c.title}</h3>
           {race && <RaceBar race={race} />}
           <div className="relative mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
             <span className={"inline-flex items-center gap-1.5 text-xs min-w-0 " + (live ? "text-[#00FF87]/90" : "text-jade")}>
-              <Users className="w-3.5 h-3.5 shrink-0" /> <span className="truncate">{c.participants != null ? c.participants + " seated" : "Seats open"}</span>
+              <Users className="w-3.5 h-3.5 shrink-0" /> <span className="truncate">{c.participants != null ? c.participants + " on the board" : "Board open"}</span>
             </span>
             {c.prize ? <span className="inline-flex items-center gap-1 rounded-full border border-amber-brand/30 bg-amber-brand/[0.07] px-2 py-0.5 text-[10px] text-amber-glow font-mono shrink-0"><Trophy className="w-3 h-3" /> POT {c.prize}{c.split ? " · " + c.split : ""}</span>
               : c.sponsor ? <span className="text-[11px] text-amber-glow/80 font-mono shrink-0">{c.sponsor}</span> : null}
@@ -1446,7 +1466,7 @@
       return (
         <React.Fragment>
           {done
-            ? <p className="mt-3 font-mono text-[11px] text-jade">SEASON 1 · seat locked ✓ — we email your seat number when this board opens with real athletes</p>
+            ? <p className="mt-3 font-mono text-[11px] text-jade">SEASON 1 · seat locked ✓ — we email your seat number when this board opens with real athletes. Sending a morning screenshot is what fills it.</p>
             : <button onClick={() => { setOpen(true); track("season1_lock_opened", { challenge: c.id }); }}
                 className="mt-3 w-full rounded-xl border border-amber-brand/40 bg-amber-brand/[0.07] py-3 text-sm font-semibold text-amber-glow hover:bg-amber-brand/[0.12] transition inline-flex items-center justify-center gap-2">
                 Lock your spot for Season 1 <ChevronRight className="w-4 h-4" />
@@ -1510,6 +1530,11 @@
       const challengeLink = "https://oriya.app/try.html?challenge=" + c.id;
       const proofMail = "mailto:team@oriya.app?subject=" + encodeURIComponent("Entering " + c.title + (myTeam ? " — " + myTeam : "") + " (screenshot proof)")
         + "&body=" + encodeURIComponent("Name / IG handle:\nDevice (Oura / Whoop / Garmin / Apple / other):\nThis morning's score:\nSide I'm joining: " + (myTeam || "(tell us which)") + "\nAnonymous on the board? (yes/no — send from your work email and we show only ◒ anon + your @company.com)\n\nAttach this morning's recovery screenshot and hit send — we normalize it by hand and reply with your Oriya Index and where you land on this board.");
+      // Primary entry path: the /mvp submission form, challenge + side + device prefilled.
+      const proofDev = { oura: "Oura", whoop: "Whoop", garmin: "Garmin", apple: "Apple Health" }[me && me.deviceKey];
+      const proofForm = "mvp/submit.html?challenge=" + encodeURIComponent(c.title + (myTeam ? " — " + myTeam : ""))
+        + "&back=" + encodeURIComponent(c.id)
+        + (proofDev ? "&device=" + encodeURIComponent(proofDev) : "");
       const copyRally = () => {
         const msg = "I'm holding " + (myTeam || "my side") + " down in " + c.title + " on Oriya — my normalized recovery score is on the board. Where would yours land? " + challengeLink;
         try { navigator.clipboard.writeText(msg); } catch (e) {}
@@ -1569,7 +1594,8 @@
       if (joined && me && !board.some((r) => r.you)) board.push({ you: true, init: initials(me.name), handle: me.name || "you", team: myTeam, score: me.oriya, streak: "1d" });
       board.sort((a, b) => b.score - a.score);
       const myRank = joined ? board.findIndex((r) => r.you) + 1 : null;
-      const previewRank = board.filter((r) => r.score > me.oriya).length + 1;
+      // me can be null: deep-linked visitors see this detail before any passport
+      const previewRank = me ? board.filter((r) => r.score > me.oriya).length + 1 : null;
       const medal = (i) => i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : (i + 1);
       /* NO backdrop-filter on this overlay root: it would become the containing
          block for the fixed join bar + Season1 modal, pinning them to the scroll
@@ -1584,7 +1610,7 @@
             <div className="flex items-center gap-3 mb-3">
               <span className="text-3xl">{c.emoji}</span>
               {c.status === "LIVE"
-                ? <span className="text-[10px] uppercase tracking-wider font-mono text-jade inline-flex items-center gap-1.5 rounded-full border border-jade/40 px-2.5 py-1"><span className="w-1.5 h-1.5 rounded-full bg-jade animate-pulse" /> Live</span>
+                ? <span className="text-[10px] uppercase tracking-wider font-mono text-[#00FF87] inline-flex items-center gap-1.5 rounded-full border border-[#00FF87]/40 px-2.5 py-1"><span className="w-1.5 h-1.5 rounded-full bg-[#00FF87] animate-pulse" /> Live</span>
                 : <span className="text-[10px] uppercase tracking-wider font-mono text-ash rounded-full border border-white/15 px-2.5 py-1">{c.startLabel}</span>}
             </div>
             {c.sponsor && <p className="text-[11px] font-mono text-amber-glow/90 mb-2">Sponsored by {c.sponsor}</p>}
@@ -1603,11 +1629,10 @@
                 : <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3"><div className="text-[10px] uppercase tracking-wider font-mono text-ash">Avg score</div><div className="text-lg font-semibold text-bone">{c.avg != null ? c.avg : "—"}</div></div>}
             </div>
             {c.payout && <p className="text-xs text-ash mt-3 font-mono">{c.payout}</p>}
-            <Season1Lock c={c} onToast={onToast} />
             <p className="text-sm text-bone/80 leading-relaxed mt-5">{c.description}</p>
             {raceFor(c) && (
               <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.02] p-4">
-                <div className="text-[10px] uppercase tracking-wider font-mono text-ash mb-1">The table right now</div>
+                <div className="text-[10px] uppercase tracking-wider font-mono text-ash mb-1">The board right now</div>
                 <RaceBar race={raceFor(c)} />
               </div>
             )}
@@ -1620,7 +1645,7 @@
                 </button>
                 {callOpen && (
                 <React.Fragment>
-                <p className="text-xs text-ash mt-1">{call ? "The room so far — your call is locked in." : "Before you look at the board: which side takes it?"}</p>
+                <p className="text-xs text-ash mt-1">{call ? "Your call is locked in. Split shown is a sample — real percentages once real calls land." : "Before you look at the board: which side takes it?"}</p>
                 <div className="mt-3 space-y-2">
                   {callPcts.map(({ t, pct }) => (
                     <button key={t} onClick={() => makeCall(t)} disabled={!!call}
@@ -1679,7 +1704,7 @@
             {!joined && (
               <div className="mt-6 animate-fade-up">
                 <h3 className="text-sm font-semibold text-bone uppercase tracking-wider mb-1">{multi ? "Pick your side" : "Your team"}</h3>
-                <p className="text-xs text-ash mb-3">Your normalized {me.oriya} drops onto this board and gets stamped on your Passport. Pick the side you'll actually defend.</p>
+                <p className="text-xs text-ash mb-3">{me ? "Your " + me.oriya + " drops onto this board tomorrow morning." : "Your first screenshot drops onto this board tomorrow morning."} Pick the side you'll actually show up for.</p>
                 <div className="flex flex-wrap gap-2">
                   {c.teams.map((t) => (
                     <button key={t} onClick={() => { setTeam(t); track("side_picked", { challenge: c.id, team: t }); }}
@@ -1692,10 +1717,12 @@
                 {team && (
                   <div className="mt-3 rounded-lg border border-jade/30 bg-jade/[0.05] p-3 animate-fade-up">
                     <p className="text-xs text-bone leading-relaxed">
-                      <span className="font-semibold text-jade">You're taking {team}'s side.</span> Your Oriya Index <span className="font-mono text-jade">{me.oriya}</span> lands around <span className="font-mono text-jade">#{previewRank} of {board.length + 1}</span> and counts toward {team}'s average every day you log.
+                      <span className="font-semibold text-jade">You're taking {team}'s side.</span>{me
+                        ? <React.Fragment> Your Oriya Index <span className="font-mono text-jade">{me.oriya}</span> lands around <span className="font-mono text-jade">#{previewRank} of {board.length + 1}</span> and counts toward {team}'s average every day you log.</React.Fragment>
+                        : <React.Fragment> Send this morning's screenshot below and your Oriya Index lands on this board — counting toward {team}'s average every day you log.</React.Fragment>}
                     </p>
                     <p className="text-[11px] text-ash mt-1.5 leading-relaxed">
-                      <span className="text-bone font-medium">How to win:</span> {c.days != null ? "when the " + c.days + " days are up, " : "when the round ends, "}the side with the higher team average takes it{c.prize ? " — " + c.prize + (c.split ? " (" + c.split + ")" : "") + ". The pot is sponsor-backed; only athletes are paid." : " — bragging rights, settled on the board."} Log daily — a missed day counts as 0.
+                      <span className="text-bone font-medium">How to win:</span> {c.days != null ? "when the " + c.days + " days are up, " : "when the round ends, "}the side with the higher team average takes it{c.prize ? " — " + c.prize + (c.split ? " (" + c.split + ")" : "") + ". The pot is sponsor-backed; only athletes are paid." : " — bragging rights, settled on the board."} Your side counts you every morning — a missed day scores 0 for the team.
                     </p>
                   </div>
                 )}
@@ -1753,13 +1780,20 @@
             </div>
 
             <div className="mt-8 rounded-xl border border-jade/25 bg-jade/[0.04] p-5">
-              <p className="text-sm text-bone font-medium">Enter by email — no sync needed.</p>
-              <p className="text-xs text-ash mt-1">Founding season runs hands-on: email this morning's recovery screenshot and we normalize it ourselves, reply with your Oriya Index, and post you to this board{myTeam ? " on " + myTeam : ""}.</p>
-              <a href={proofMail} onClick={() => track("challenge_email_proof", { challenge: c.id, team: myTeam || null })}
-                className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-jade hover:text-jade-glow">
-                <Upload className="w-4 h-4" /> Email your proof → team@oriya.app
+              <p className="text-sm text-bone font-medium">Enter in 60 seconds — no sync needed.</p>
+              <p className="text-xs text-ash mt-1">Founding season runs hands-on: send this morning's recovery screenshot and we normalize it ourselves, reply with your Oriya Index, and post you to this board{myTeam ? " on " + myTeam : ""}.</p>
+              <a href={proofForm} onClick={() => track("challenge_email_proof", { challenge: c.id, team: myTeam || null, method: "form" })}
+                className="mt-3 inline-flex items-center gap-2 rounded-lg bg-jade px-4 py-2.5 text-sm font-semibold text-void hover:bg-jade-glow transition">
+                <Upload className="w-4 h-4" /> Submit this morning's proof →
               </a>
-              <p className="text-[10px] font-mono text-ash/60 mt-2">Want to flex anonymously? Send it from your work email — the board shows only ◒ anon + your @company.com.</p>
+              <p className="text-[10px] font-mono text-ash/60 mt-2">Want to flex anonymously? Use your work email — the board shows only ◒ anon + your @company.com. Prefer plain email? <a href={proofMail} onClick={() => track("challenge_email_proof", { challenge: c.id, team: myTeam || null, method: "mailto" })} className="underline hover:text-bone">team@oriya.app</a> works too.</p>
+            </div>
+
+            {/* Seat-lock demoted below the entry (panel spine, 2026-07-12): the
+                screenshot IS the join; locking a seat is the not-this-morning fallback. */}
+            <div className="mt-4">
+              <p className="text-[11px] font-mono text-ash">Not this morning? Hold a seat and enter when you're ready:</p>
+              <Season1Lock c={c} onToast={onToast} />
             </div>
 
             {!moreOpen && (
@@ -1807,9 +1841,9 @@
           {!joined && (
             <div className="fixed bottom-0 inset-x-0 z-50 border-t border-white/10 bg-void/90 backdrop-blur-xl">
               <div className="max-w-2xl mx-auto px-5 py-4">
-                <button onClick={() => team && onJoin(c, team)} disabled={!team}
+                <button onClick={() => { if (!team) return; if (me) { onJoin(c, team); } else { track("challenge_email_proof", { challenge: c.id, team: team, method: "form", via: "join_bar" }); location.href = proofForm; } }} disabled={!team}
                   className={"w-full rounded-full py-3.5 font-semibold transition inline-flex items-center justify-center gap-2 " + (team ? "bg-jade text-void hover:brightness-110 shadow-[0_0_50px_-12px_rgba(127,183,158,0.7)]" : "bg-white/10 text-ash cursor-not-allowed")}>
-                  <UserPlus className="w-4 h-4" /> {!team ? "Pick your team above" : c.status === "LIVE" ? "Join " + team : "Notify me — " + team}
+                  <UserPlus className="w-4 h-4" /> {!team ? "Pick your team above" : !me ? "Enter as " + team + " — send this morning's proof" : c.status === "LIVE" ? "Join " + team : "Notify me — " + team}
                 </button>
               </div>
             </div>
@@ -1917,7 +1951,7 @@
         const c = CHALLENGES.find((x) => x.id === deepId);
         if (c) { setSelected(c); track("challenge_deeplink_opened", { challenge: deepId }); }
       }, []);
-      const [joined, setJoined] = useState({});
+      const [joined, setJoined] = useState(() => readJSON("oriya:joined", {})); // survives refresh — a picked side is remembered
       const [userSquads, setUserSquads] = useState([]);
       const [teammates, setTeammates] = useState([]);
       const [toast, setToast] = useState("");
@@ -2016,13 +2050,13 @@
 
       const joinChallenge = (c, team) => {
         const t = team || c.joinTeam;
-        setJoined((j) => ({ ...j, [c.id]: t }));
+        setJoined((j) => { const nj = { ...j, [c.id]: t }; try { writeJSON("oriya:joined", nj); } catch (e) {} return nj; });
         setPassport((p) => ({ ...p, squad: t }));
         track("door_selected", { door: "join" });
         track("squad_joined", { challenge: c.id, team: t });
         if (c.projectedPayout) track("ledger_unlocked", { challenge: c.id, amount: c.projectedPayout });
         setShowSim(true);
-        flashToast("You joined " + t + " — you're on the board!");
+        flashToast("Side picked: " + t + " — now put a score on it");
       };
 
       const createNamedSquad = () => {
@@ -2114,9 +2148,8 @@
             <div className="mt-10 mb-1 flex items-center gap-2">
               <Flame className="w-4 h-4 text-amber-glow" />
               <h2 className="font-mono font-extrabold italic uppercase tracking-tighter text-xl bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Live Challenges</h2>
-              <span className="text-[10px] font-mono text-ash uppercase tracking-wider mt-1.5">near you</span>
             </div>
-            <p className="text-xs text-ash mb-4">Pick a side — your Oriya Index drops straight onto the leaderboard.</p>
+            <p className="text-xs text-ash mb-4">Pick a side, send this morning's screenshot — that's the whole entry. From tomorrow, your team is waiting on your score. <a href="play.html" className="text-jade hover:text-jade-glow whitespace-nowrap">New here? The game in 5 steps →</a></p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {userSquads.map((c) => <ChallengeCard key={c.id} c={c} joined={true} onOpen={setSelected} />)}
@@ -2309,7 +2342,7 @@
             </div>
 
             <div className="mt-5 flex flex-wrap gap-2">
-              {["AES-256 at rest", "Read-only OAuth", "Revoke anytime", "SOC 2 · targeted", "15-min sync"].map((t) => (
+              {["AES-256 at rest", "Read-only OAuth (Oura · live)", "Revoke anytime", "SOC 2 · targeted", "15-min sync"].map((t) => (
                 <span key={t} className="font-mono text-[10px] text-ash rounded-full border border-white/12 bg-white/[0.03] px-2.5 py-1">{t}</span>
               ))}
             </div>
@@ -2318,7 +2351,11 @@
               <span className="text-lg">🔒</span>
               <p className="text-[12px] text-ash leading-relaxed"><b className="text-bone">No advertising. No data brokers.</b> The plan: revenue from subscriptions + B2B licensing only, and an HR view locked to a team average with ≥5 participants — privacy defaults modeled on <b className="text-bone">FTC Docket C-4747</b> (Flo Health, 2021).</p>
             </div>
-            <p className="mt-3 text-[11px] text-ash/60 font-mono leading-relaxed">This is the privacy architecture we're building to. Oriya is pre-launch and founder-built; items marked "targeted" (e.g. SOC 2) are commitments on the roadmap, not audited certifications yet.</p>
+            <div className="mt-3 rounded-2xl border border-jade/20 bg-jade/[0.03] p-4 flex gap-3">
+              <span className="text-lg">📡</span>
+              <p className="text-[12px] text-ash leading-relaxed"><b className="text-bone">Live Oura sync is a pass-through.</b> Our server exchanges the OAuth code, reads your last 7 readiness scores, hands them to this browser in the URL fragment, and keeps nothing — no accounts, no database, no token storage. Revoke anytime at cloud.ouraring.com. Demo syncs for other devices never leave this browser at all.</p>
+            </div>
+            <p className="mt-3 text-[11px] text-ash/60 font-mono leading-relaxed">This is the privacy architecture we're building to. Oriya is pre-launch and founder-built; items marked "targeted" (e.g. SOC 2) are commitments on the roadmap, not audited certifications yet. Only the live Oura hand-off touches our server, and it stores nothing.</p>
           </div>
         </div>
       );
@@ -2341,6 +2378,47 @@
         } catch (e) { return null; }
       });
       const deepChallenge = deepId ? CHALLENGES.find((x) => x.id === deepId) : null;
+      // Spine (2026-07-12): a deep-linked challenge opens BEFORE any passport —
+      // the entry needs a screenshot, not the demo toy. Closing it lands on the Hook.
+      const [preDetail, setPreDetail] = useState(true);
+
+      // Live Oura return leg: /auth/oura/callback lands here with the scores in
+      // the URL FRAGMENT (fragments never ride requests, so no server sees them).
+      // Parse once before first paint, strip from the address bar, forget.
+      const [ouraReturn] = useState(() => {
+        const strip = () => { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} };
+        try {
+          const h = location.hash || "";
+          if (h.indexOf("#oura=") === 0) {
+            let b64 = h.slice(6).replace(/-/g, "+").replace(/_/g, "/");
+            while (b64.length % 4) b64 += "=";
+            const p = JSON.parse(atob(b64));
+            strip();
+            const fresh = typeof p.ts === "number" && Date.now() - p.ts < 5 * 60 * 1000; // stale = replayed/bookmarked
+            if (p && p.v === 1 && typeof p.score === "number" && p.score >= 0 && p.score <= 100 && fresh) return { ok: true, payload: p };
+            return { ok: false, code: "stale" };
+          }
+          if (h.indexOf("#oura-error=") === 0) {
+            const code = h.slice(12);
+            strip();
+            return { ok: false, code: code || "unknown" };
+          }
+        } catch (e) { strip(); return { ok: false, code: "parse" }; }
+        return null;
+      });
+      const [oauthError, setOauthError] = useState(ouraReturn && !ouraReturn.ok ? ouraReturn.code : null);
+      const [forceDemo, setForceDemo] = useState(false);
+      useEffect(() => {
+        if (!ouraReturn) return;
+        if (ouraReturn.ok) {
+          const p = ouraReturn.payload;
+          track("device_connect_authorized", { device: "Oura", method: "oauth" });
+          try { saveTrial({ ouraBaseline: p.baseline || [] }); } catch (e) {}
+          beginNormalize("oura", p.score, "oauth");
+        } else {
+          track("device_connect_failed", { device: "Oura", code: ouraReturn.code });
+        }
+      }, []);
 
       useEffect(() => {
         try {
@@ -2357,10 +2435,16 @@
         return () => window.removeEventListener("oriya:privacy", open);
       }, []);
 
-      const beginNormalize = (deviceKey, native) => { setPending({ type: "preset", deviceKey, native }); setView("normalizing"); };
+      const beginNormalize = (deviceKey, native, via) => { setPending({ type: "preset", deviceKey, native, via }); setView("normalizing"); };
       const startScreenshot = (dataUrl) => { track("device_connect_started", { method: "screenshot" }); setPending({ type: "screenshot", dataUrl }); setView("normalizing"); };
-      const startConnect = (key) => { track("device_connect_started", { method: "sync_demo", device: DEVICE_MODEL[key].tag }); setConnectKey(key); };
-      const onConnected = (native) => { const key = connectKey; setConnectKey(null); if (key) beginNormalize(key, native); };
+      const startConnect = (key) => {
+        const item = CONNECT.find((x) => x.key === key);
+        setForceDemo(false);
+        track("device_connect_started", { method: item && item.live ? "oauth" : "sync_demo", device: DEVICE_MODEL[key].tag });
+        setConnectKey(key);
+      };
+      const retryDemo = () => { setOauthError(null); setForceDemo(true); track("device_connect_started", { method: "sync_demo", device: "Oura", after: "oauth_fail" }); setConnectKey("oura"); };
+      const onConnected = (native) => { const key = connectKey; setConnectKey(null); if (key) beginNormalize(key, native, "sync_demo"); };
       const doResume = () => { track("trial_resumed", { oriya: resume && resume.oriya }); setPassport(resume); setView("dashboard"); };
 
       const finalize = (deviceKey, native, name, via) => {
@@ -2376,16 +2460,20 @@
       };
       // screenshots ALWAYS pass through the verify step (editable, pre-filled) — the user
       // confirms the OCR read before it becomes their number; presets/sync skip it.
-      const handleResolved = (r) => { if (r.from === "screenshot" || !r.confident) { setPrefill(r); setView("confirm"); return; } finalize(r.deviceKey, r.native, r.name); };
+      const handleResolved = (r) => { if (r.from === "screenshot" || !r.confident) { setPrefill(r); setView("confirm"); return; } finalize(r.deviceKey, r.native, r.name, r.via); };
 
-      const screen = view === "hook" ? <Hook onScreenshot={startScreenshot} onConnect={startConnect} resume={resume} onResume={doResume} deep={deepChallenge} />
+      const screen = view === "hook" ? <Hook onScreenshot={startScreenshot} onConnect={startConnect} resume={resume} onResume={doResume} deep={deepChallenge} oauthError={oauthError} onRetryDemo={retryDemo} />
         : view === "normalizing" ? <Normalizing pending={pending} onDone={handleResolved} />
         : view === "confirm" ? <Confirm prefill={prefill} onConfirm={(d) => finalize(d.deviceKey, d.native, d.name, "manual")} onBack={() => setView("hook")} />
         : <Dashboard passport={passport} setPassport={setPassport} deepId={deepId} />;
       return (
         <React.Fragment>
           {screen}
-          {connectKey && <ConnectSheet deviceKey={connectKey} onConnected={onConnected} onClose={() => setConnectKey(null)} />}
+          {view === "hook" && preDetail && deepChallenge && (
+            <ChallengeDetail c={deepChallenge} joined={false} joinedTeam={null} me={null}
+              onJoin={() => {}} onClose={() => setPreDetail(false)} onShare={() => {}} onToast={() => {}} />
+          )}
+          {connectKey && <ConnectSheet deviceKey={connectKey} onConnected={onConnected} onClose={() => setConnectKey(null)} forceDemo={forceDemo} />}
           {privacy && <PrivacyVault onClose={() => setPrivacy(false)} />}
         </React.Fragment>
       );

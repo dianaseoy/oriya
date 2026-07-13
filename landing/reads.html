@@ -56,8 +56,6 @@
     .sub-form input::placeholder{ color:var(--ash); }
     .sub-form input:focus{ outline:none; border-color:rgba(127,183,158,.5); }
     .sub-note{ margin-top:12px; font-family:var(--font-mono); font-size:11px; color:var(--ash); }
-    .sub-embed{ margin-top:18px; }
-    .sub-embed iframe{ width:100%; max-width:480px; height:88px; border:1px solid var(--hairline); border-radius:12px; background:#0a0d14; }
 
     /* essays */
     .essays{ padding:56px 0 24px; }
@@ -116,9 +114,9 @@
           <button type="submit" class="btn btn-primary">Subscribe free →</button>
         </form>
         <p class="sub-note">Free · one email a week · unsubscribe anytime</p>
-        <div class="sub-embed">
-          <iframe src="https://oriyaapp.substack.com/embed" title="Subscribe to The Long Game" loading="lazy" frameborder="0" scrolling="no"></iframe>
-        </div>
+        <!-- Substack /embed iframe removed: it ships Substack's own (light)
+             theme and rendered as a broken white box here. The form above
+             posts to the same /subscribe endpoint — one path, ours. -->
       </div>
     </div>
   </header>

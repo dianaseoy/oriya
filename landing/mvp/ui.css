@@ -1,0 +1,76 @@
+/* Shared MVP look — Linear-dark, one file so every screen matches.
+   Pages: index (board), passport, challenges, squads. submit.html keeps its
+   own inline styles (standalone flow page, narrower wrap). */
+:root { --bg:#0B0C0E; --panel:#101114; --line:#23252B; --text:#E6E7EA; --dim:#8A8F98; --accent:#7FB79E; --amber:#D7A25C; }
+* { box-sizing:border-box; margin:0; }
+body { background:var(--bg); color:var(--text); font:15px/1.55 "Inter",system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+.wrap { max-width:560px; margin:0 auto; padding:28px 18px 80px; }
+.mono { font-family:ui-monospace,"JetBrains Mono",monospace; }
+.card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px; margin-top:14px; }
+.kicker { font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); }
+h1 { font-size:22px; font-weight:600; letter-spacing:-0.02em; margin-top:6px; }
+.dim { color:var(--dim); } .sm { font-size:12.5px; } .xs { font-size:11px; }
+input, button { font:inherit; }
+input { width:100%; background:#0D0E11; border:1px solid var(--line); border-radius:8px; color:var(--text); padding:10px 12px; outline:none; }
+input:focus { border-color:var(--accent); }
+.btn { display:inline-block; position:relative; overflow:hidden; background:var(--accent); color:#0B0C0E; border:0; border-radius:8px; padding:10px 16px; font-weight:600; cursor:pointer; text-decoration:none; transition:all .2s ease; }
+.btn:hover { filter:brightness(1.08); }
+/* micro-shimmer border sweep on primary actions — ghosts stay crisp monochrome */
+.btn::after { content:""; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(110deg, transparent 35%, rgba(255,255,255,.22) 50%, transparent 65%); background-size:220% 100%; background-position:200% 0; opacity:0; transition:opacity .2s ease; pointer-events:none; }
+.btn:hover::after { opacity:1; animation:shimmer 1.4s linear infinite; }
+.ghost { background:transparent; color:var(--dim); border:1px solid var(--line); }
+.ghost:hover { color:var(--text); border-color:#3A3D45; filter:none; }
+.ghost::after { display:none; }
+@keyframes shimmer { to { background-position:-200% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .btn:hover::after { animation:none; opacity:0; }
+}
+table { width:100%; border-collapse:collapse; font-size:13.5px; }
+th { text-align:left; color:var(--dim); font-weight:500; font-size:11px; text-transform:uppercase; letter-spacing:.08em; padding:8px 8px; border-bottom:1px solid var(--line); }
+td { padding:9px 8px; border-bottom:1px solid #17181C; }
+.me { background:rgba(127,183,158,.06); }
+.dot { display:inline-block; width:7px; height:7px; border-radius:50%; }
+.on { background:var(--accent); } .off { background:#3A3D45; }
+.banner { border-radius:10px; padding:12px 14px; font-size:13.5px; margin-top:14px; border:1px solid; }
+.b-wait { border-color:rgba(215,162,92,.4); background:rgba(215,162,92,.08); }
+.b-done { border-color:rgba(127,183,158,.35); background:rgba(127,183,158,.07); }
+.tag { font-size:10px; border:1px solid var(--line); border-radius:99px; padding:2px 8px; color:var(--dim); }
+
+/* Sub-navigation tabs (nav.js) */
+.subnav { display:flex; gap:4px; margin-top:18px; border:1px solid var(--line); border-radius:10px; padding:4px; background:var(--panel); }
+.subnav .tab { flex:1; text-align:center; font-size:12.5px; color:var(--dim); text-decoration:none; padding:7px 4px; border-radius:7px; transition:all .2s ease; }
+.subnav .tab:hover { color:var(--text); }
+.subnav .tab.active { color:var(--text); background:#17181C; }
+
+/* Passport stat blocks + 7-day bars */
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:14px; }
+.stat { background:#0D0E11; border:1px solid var(--line); border-radius:10px; padding:10px 6px; text-align:center; }
+.stat b { display:block; font-size:18px; font-weight:600; letter-spacing:-0.02em; }
+.bars { display:flex; gap:5px; align-items:flex-end; height:56px; margin-top:14px; }
+.bar { flex:1; background:rgba(127,183,158,.28); border-radius:3px 3px 0 0; min-height:2px; }
+.bar.hot { background:var(--accent); }
+.lead { color:var(--accent); font-weight:600; }
+
+/* ViralPassportCard — the screenshot-worthy one. Gradient rim + soft glow,
+   Apple-Wallet proportions; everything on it comes from board.json. */
+.pass-wrap { margin-top:16px; border-radius:18px; padding:1px; background:linear-gradient(135deg, rgba(127,183,158,.6), rgba(127,183,158,.08) 42%, rgba(215,162,92,.4)); }
+.pass { border-radius:17px; background:linear-gradient(160deg, #101114, #0B0C0E 72%); padding:20px; position:relative; overflow:hidden; }
+.pass::after { content:""; position:absolute; inset:0; background:radial-gradient(120% 60% at 85% -10%, rgba(127,183,158,.14), transparent 60%); pointer-events:none; }
+.pass > * { position:relative; z-index:1; }
+.idx { font-size:46px; font-weight:650; letter-spacing:-0.035em; line-height:1; }
+.arch { color:var(--accent); font-size:13px; font-weight:600; }
+.stamp-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; }
+.stamp { font-family:ui-monospace,"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.07em; border:1px solid rgba(127,183,158,.45); color:var(--accent); border-radius:6px; padding:3px 8px; white-space:nowrap; }
+.stamp.lock { border-color:var(--line); color:#4A4E57; }
+.serial { display:flex; justify-content:space-between; align-items:baseline; margin-top:16px; padding-top:12px; border-top:1px solid rgba(255,255,255,.06); }
+.share-row { display:flex; gap:8px; margin-top:12px; }
+.share-btn { flex:1; background:rgba(255,255,255,.03); border:1px solid var(--line); color:var(--text); border-radius:9px; padding:9px 6px; font:inherit; font-size:12px; cursor:pointer; text-decoration:none; text-align:center; transition:all .2s ease; }
+.share-btn:hover { border-color:var(--accent); }
+
+/* QR + public-profile ledger (passport /p/ view) */
+.qr { width:74px; height:74px; flex-shrink:0; border-radius:8px; overflow:hidden; }
+.qr svg { display:block; width:100%; height:100%; }
+.ledger .lkey { font-size:10.5px; text-transform:uppercase; letter-spacing:.1em; color:var(--dim); font-weight:600; }
+.ledger .lrow { display:flex; gap:12px; padding:13px 0; border-bottom:1px solid #17181C; }
+.ledger .lrow:last-child { border-bottom:0; padding-bottom:2px; }
+.ledger .ldot { width:8px; height:8px; border-radius:50%; background:var(--accent); margin-top:4px; flex-shrink:0; }

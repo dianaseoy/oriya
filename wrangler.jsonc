@@ -2,11 +2,16 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "oriya",
   "compatibility_date": "2026-07-10",
+  // Worker handles /auth/oura/* only; assets are matched FIRST, so the static
+  // site keeps serving even if the worker breaks. Secrets via `wrangler secret
+  // put OURA_CLIENT_ID / OURA_CLIENT_SECRET / OURA_STATE_SECRET` (never files).
+  "main": "worker/index.js",
   "observability": {
     "enabled": true
   },
   "assets": {
-    "directory": "landing"
+    "directory": "landing",
+    "binding": "ASSETS"
   },
   "compatibility_flags": [
     "nodejs_compat"

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Oriya · Squads</title>
+  <!-- The accountability screen: who on your squad has logged this morning
+       and who everyone is still waiting on. Squads are the acquisition-code
+       groups (MVP.codeSource) — the people who actually know each other. -->
+  <link rel="stylesheet" href="ui.css">
+</head>
+<body>
+  <div id="root" class="wrap"><p class="dim sm">Loading…</p></div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="logic.js"></script>
+  <script src="store.js"></script>
+  <script src="nav.js"></script>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const DAY = MVP.todayKey();
+
+    function SquadCard({ g, myCode }) {
+      const mine = g.members.some((p) => p.code === myCode);
+      const waiting = g.members.filter((p) => !MVP.loggedOn(p, DAY));
+      return (
+        <div className={"card" + (mine ? " me" : "")}>
+          <p className="sm" style={{ fontWeight: 600 }}>{g.key} {mine && <span className="tag">your squad</span>}</p>
+          <p className="xs dim" style={{ marginTop: 2 }}>{g.members.length} athlete{g.members.length === 1 ? "" : "s"} · squad 7-day {g.avg}</p>
+          <div style={{ marginTop: 10 }}>
+            {g.members.map((p) => (
+              <p key={p.code} className="sm" style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid #17181C" }}>
+                <span>{p.name} {p.code === myCode && <span className="xs dim">(you)</span>}</span>
+                <span className="mono xs" style={{ color: MVP.loggedOn(p, DAY) ? "var(--accent)" : "var(--dim)" }}>{MVP.loggedOn(p, DAY) ? MVP.normalizedOn(p, DAY) : "waiting"}</span>
+              </p>
+            ))}
+          </div>
+          {waiting.length > 0 && <p className="xs" style={{ marginTop: 10, color: "var(--amber)" }}>Still waiting on {waiting.map((p) => p.name.split(" ")[0]).join(", ")} — a missed day counts 0 for the squad.</p>}
+        </div>
+      );
+    }
+
+    function App() {
+      const [board, setBoard] = useState(null);
+      useEffect(() => { STORE.fetchBoard().then(setBoard); }, []);
+      if (!board) return <p className="dim sm">Loading…</p>;
+      const myCode = STORE.loadMe();
+      const squads = MVP.groupBoard(board.participants, DAY, (p) => MVP.codeSource(p.code));
+      return (
+        <React.Fragment>
+          <span className="kicker">Oriya · squads</span>
+          <h1>Your squad sees your morning.</h1>
+          <p className="xs dim" style={{ marginTop: 6 }}>{board.season}{board.sample ? " · sample data" : ""}</p>
+          <SubNavigation active="squads" />
+          {squads.map((g) => <SquadCard key={g.key} g={g} myCode={myCode} />)}
+        </React.Fragment>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>

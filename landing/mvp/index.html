@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Oriya · 7-Day Board</title>
+  <!-- Manual-ops MVP, athlete side. Invite code in, board out. The board is
+       data/board.json — the founder updates it by hand from screenshots sent
+       by email; nothing here talks to a backend. UI only; logic in logic.js,
+       IO in store.js. -->
+  <link rel="stylesheet" href="ui.css">
+</head>
+<body>
+  <div id="root" class="wrap"><p class="dim sm">Loading the board…</p></div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="logic.js"></script>
+  <script src="store.js"></script>
+  <script src="nav.js"></script>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const DAY = MVP.todayKey();
+
+    function Gate({ onEnter }) {
+      const [code, setCode] = useState("");
+      const [err, setErr] = useState("");
+      const submit = () => {
+        const c = MVP.cleanCode(code);
+        if (!MVP.codeValid(c)) { setErr("Codes look like RUN-014 — check your invite message."); return; }
+        STORE.saveMe(c); onEnter(c);
+      };
+      return (
+        <div className="card">
+          <p className="sm">This board is invite-only. Enter the code from your invite.</p>
+          <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+            <input className="mono" placeholder="RUN-014" value={code} onChange={(e) => setCode(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submit()} />
+            <button className="btn" onClick={submit}>Enter</button>
+          </div>
+          {err && <p className="xs" style={{ color: "var(--amber)", marginTop: 8 }}>{err}</p>}
+          <p className="xs dim" style={{ marginTop: 10 }}>No code? Ask the person who told you about this — every athlete is invited by hand.</p>
+        </div>
+      );
+    }
+
+    function ReminderBanner({ me }) {
+      const state = MVP.reminderState(me, DAY, new Date().getHours());
+      if (state === "done") return <div className="banner b-done">✓ Logged for today. Your team has your number — same time tomorrow.</div>;
+      return (
+        <div className="banner b-wait">
+          {state === "late" ? "Evening already — the board still shows a blank next to your name." : "Your team is waiting on your score for today."} A missed day counts 0. Send it below ↓
+        </div>
+      );
+    }
+
+    function UploadCard({ me }) {
+      // submit.html speaks display names; our "apple" key reads "Apple Watch"
+      // there the option is "Apple Health" — translate at the boundary.
+      const dev = me.device === "apple" ? "Apple Health" : MVP.deviceTag(me.device);
+      const href = "submit.html?code=" + encodeURIComponent(me.code) + "&device=" + encodeURIComponent(dev);
+      return (
+        <div className="card">
+          <p className="sm" style={{ fontWeight: 600 }}>Send today's screenshot</p>
+          <p className="xs dim" style={{ marginTop: 4 }}>Screenshot your {MVP.deviceTag(me.device)} recovery screen and send it — a human reads it and posts your number, usually within the hour.</p>
+          <a className="btn" style={{ marginTop: 12 }} href={href}>Submit today's score →</a>
+        </div>
+      );
+    }
+
+    function Board({ rows, myCode }) {
+      return (
+        <div className="card" style={{ padding: "6px 4px" }}>
+          <table>
+            <thead><tr><th>#</th><th>Athlete</th><th>Device</th><th>Today</th><th>7-day</th><th>Streak</th></tr></thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.p.code} className={r.p.code === myCode ? "me" : ""}>
+                  <td className="mono dim">{r.rank}</td>
+                  <td>{r.p.name} {r.p.handle && <span className="xs dim">{r.p.handle}</span>}</td>
+                  <td className="xs dim">{MVP.deviceTag(r.p.device)}</td>
+                  <td className="mono">{r.loggedToday ? r.today : <span className="dot off" title="not logged yet" />}</td>
+                  <td className="mono">{r.avg}</td>
+                  <td className="mono dim">{r.streak}d</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    function App() {
+      const [board, setBoard] = useState(null);
+      const [code, setCode] = useState(STORE.loadMe());
+      useEffect(() => { STORE.fetchBoard().then(setBoard); }, []);
+      if (!board) return <p className="dim sm">Loading the board…</p>;
+      const me = code ? board.participants.find((p) => p.code === code) : null;
+      const rows = MVP.rankBoard(board.participants, DAY);
+      return (
+        <React.Fragment>
+          <span className="kicker">Oriya · 7-day recovery board</span>
+          <h1>One score a morning.<br />Your team sees it.</h1>
+          <p className="xs dim" style={{ marginTop: 6 }}>{board.season} · updated {board.updated}{board.sample ? " · sample data" : ""}</p>
+          <SubNavigation active="board" />
+          {!code && <Gate onEnter={setCode} />}
+          {code && !me && (
+            <div className="card">
+              <p className="sm">Code <span className="mono" style={{ color: "var(--accent)" }}>{code}</span> accepted — you're not on the board yet.</p>
+              <a className="btn" style={{ marginTop: 10 }} href={"submit.html?code=" + encodeURIComponent(code)}>Send your first screenshot →</a>
+              <p className="xs dim" style={{ marginTop: 8 }}>Prefer email? <a href={"mailto:team@oriya.app?subject=" + encodeURIComponent("Claim my slot · " + code)} style={{ color: "var(--accent)" }}>team@oriya.app</a> works too — you'll appear the same day.</p>
+              <button className="btn ghost sm" style={{ marginTop: 10 }} onClick={() => { STORE.saveMe(null); setCode(null); }}>Use a different code</button>
+            </div>
+          )}
+          {me && <ReminderBanner me={me} />}
+          {me && <UploadCard me={me} />}
+          <Board rows={rows} myCode={code} />
+          <p className="xs dim" style={{ marginTop: 14 }}>Scores are adjusted so every device competes fairly. Run by a human, on purpose — reply to any email with questions.</p>
+        </React.Fragment>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>

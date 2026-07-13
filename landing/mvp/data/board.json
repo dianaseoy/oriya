@@ -1,0 +1,16 @@
+{
+  "updated": "2026-07-10 08:00",
+  "day": "2026-07-10",
+  "season": "Founding 7-Day · manual ops validation",
+  "sample": true,
+  "participants": [
+    { "code": "RUN-001", "name": "Maya R.",   "handle": "@mayaruns",  "device": "oura",   "scores": { "2026-07-08": 84, "2026-07-09": 79, "2026-07-10": 86 } },
+    { "code": "RUN-002", "name": "Dev K.",    "handle": "@devk",      "device": "whoop",  "scores": { "2026-07-08": 88, "2026-07-09": 91 } },
+    { "code": "IG-001",  "name": "Talia S.",  "handle": "@talia.s",   "device": "garmin", "scores": { "2026-07-08": 76, "2026-07-09": 81, "2026-07-10": 78 } },
+    { "code": "IG-002",  "name": "Jordan P.", "handle": "",           "device": "apple",  "scores": { "2026-07-09": 72 } },
+    { "code": "GYM-001", "name": "Sam W.",    "handle": "@samlifts",  "device": "whoop",  "scores": { "2026-07-08": 69, "2026-07-09": 74, "2026-07-10": 81 } },
+    { "code": "REF-001", "name": "Ana L.",    "handle": "",           "device": "oura",   "scores": { "2026-07-08": 90, "2026-07-10": 87 } },
+    { "code": "TW-001",  "name": "Chris B.",  "handle": "@cbuilds",   "device": "garmin", "scores": {} },
+    { "code": "OP-001",  "name": "Diana Y.",  "handle": "@oriya",     "device": "oura",   "scores": { "2026-07-08": 77, "2026-07-09": 82, "2026-07-10": 80 } }
+  ]
+}

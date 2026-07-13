@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Oriya · Submit your score</title>
+  <!-- ManualProofUpload — the whole submission pipeline's front end.
+       POST /api/manual-submit forwards one email (screenshot attached) to
+       team@oriya.app; the founder normalizes by hand. If the endpoint isn't
+       configured yet it falls back to a prefilled mail draft. No OCR, no AI,
+       no accounts — premium chrome over a deliberately manual workflow. -->
+  <style>
+    :root { --bg:#0B0C0E; --panel:#101114; --line:#23252B; --text:#E6E7EA; --dim:#8A8F98; --accent:#7FB79E; --amber:#D7A25C; }
+    * { box-sizing:border-box; margin:0; }
+    body { background:var(--bg); color:var(--text); font:15px/1.55 "Inter",system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+    .wrap { max-width:440px; margin:0 auto; padding:32px 18px 80px; }
+    .mono { font-family:ui-monospace,"JetBrains Mono",monospace; }
+    .kicker { font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); }
+    h1 { font-size:22px; font-weight:600; letter-spacing:-0.02em; margin-top:6px; }
+    .dim { color:var(--dim); } .sm { font-size:12.5px; } .xs { font-size:11px; }
+    .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px; margin-top:16px; }
+    label { display:block; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); margin:16px 0 6px; }
+    input, select { width:100%; font:inherit; background:#0D0E11; border:1px solid var(--line); border-radius:9px; color:var(--text); padding:11px 12px; outline:none; }
+    input:focus, select:focus { border-color:var(--accent); }
+    .devices { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .dev { border:1px solid var(--line); border-radius:10px; background:#0D0E11; color:var(--text); padding:11px 12px; font:inherit; font-size:13.5px; cursor:pointer; text-align:left; transition:all .2s ease; }
+    .dev:hover { border-color:#3A3D45; }
+    .dev.on { border-color:var(--accent); background:rgba(127,183,158,.07); }
+    .drop { border:1.5px dashed var(--line); border-radius:10px; padding:18px; text-align:center; cursor:pointer; transition:all .2s ease; }
+    .drop:hover, .drop.over { border-color:var(--accent); }
+    .drop.over { background:rgba(127,183,158,.05); }
+    .drop img { max-width:100%; max-height:160px; border-radius:8px; }
+    .rm { display:block; margin:10px auto 0; background:transparent; border:1px solid var(--line); color:var(--dim); border-radius:7px; padding:5px 14px; font:inherit; font-size:12px; cursor:pointer; }
+    .rm:hover { color:var(--text); border-color:#3A3D45; }
+    .banner { border:1px solid rgba(215,162,92,.4); background:rgba(215,162,92,.08); border-radius:10px; padding:12px 14px; font-size:13px; margin-top:16px; }
+    .btn { width:100%; margin-top:20px; position:relative; overflow:hidden; background:var(--accent); color:#0B0C0E; border:0; border-radius:10px; padding:13px; font:inherit; font-weight:600; cursor:pointer; transition:all .2s ease; }
+    .btn:hover { filter:brightness(1.08); }
+    .btn::after { content:""; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(110deg, transparent 35%, rgba(255,255,255,.22) 50%, transparent 65%); background-size:220% 100%; background-position:200% 0; opacity:0; transition:opacity .2s ease; pointer-events:none; }
+    .btn:hover::after { opacity:1; animation:shimmer 1.4s linear infinite; }
+    @keyframes shimmer { to { background-position:-200% 0; } }
+    @media (prefers-reduced-motion: reduce) { .btn:hover::after { animation:none; opacity:0; } }
+    .btn:disabled { opacity:.5; cursor:default; }
+    .rm { transition:all .2s ease; }
+    .err { color:var(--amber); font-size:12px; margin-top:10px; }
+    .success h2 { font-size:24px; font-weight:600; letter-spacing:-0.02em; }
+  </style>
+</head>
+<body>
+  <div id="root" class="wrap"></div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel">
+    const { useState, useRef } = React;
+    const DEVICES = ["Oura", "Whoop", "Garmin", "Apple Health"];
+    const CHALLENGES = ["Founders vs Operators", "Marina Run Club", "Ring vs Band", "Open board"];
+    const params = new URLSearchParams(location.search);
+    // /try deep-links arbitrary challenge titles ("…?challenge=Ring vs Band — Oura") —
+    // surface them as the first option instead of silently snapping to the default.
+    const paramChallenge = (params.get("challenge") || "").slice(0, 80);
+    const CHALLENGE_OPTIONS = paramChallenge && CHALLENGES.indexOf(paramChallenge) < 0
+      ? [paramChallenge].concat(CHALLENGES) : CHALLENGES;
+
+    // Fallback = the one-click email draft (attachment added by the user; a
+    // mailto: can never attach files, so we say that plainly).
+    function mailDraft(f) {
+      return "mailto:team@oriya.app?subject=" + encodeURIComponent("Oriya Challenge Submission")
+        + "&body=" + encodeURIComponent("Email:\n" + f.email + "\n\nDevice:\n" + f.device + "\n\nRaw Score:\n" + f.score
+          + (f.challenge ? "\n\nChallenge:\n" + f.challenge : "") + (f.code ? "\n\nInvite code:\n" + f.code : "")
+          + "\n\nSubmitted:\n" + new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+          + "\n\n(Attach your recovery screenshot before sending.)");
+    }
+
+    function ManualProofUpload() {
+      const [f, setF] = useState({
+        email: "", device: params.get("device") || "", score: "",
+        challenge: paramChallenge || CHALLENGES[0], code: params.get("code") || "",
+      });
+      const [img, setImg] = useState(null);          // dataURL for POST + preview
+      const [drag, setDrag] = useState(false);
+      const [state, setState] = useState("form");    // form | sending | done | fallback
+      const [err, setErr] = useState("");
+      const fileRef = useRef(null);
+
+      const pick = (file) => {
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { setErr("Keep the screenshot under 5MB — a phone screenshot is fine."); return; }
+        const r = new FileReader();
+        r.onload = () => { setImg(r.result); setErr(""); };
+        r.readAsDataURL(file);
+      };
+
+      const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email) && DEVICES.indexOf(f.device) >= 0
+        && f.score !== "" && Number(f.score) >= 0 && Number(f.score) <= 100 && !!img;
+
+      const submit = async () => {
+        if (!valid) { setErr("Fill everything in — email, device, score, screenshot."); return; }
+        setState("sending"); setErr("");
+        try {
+          const res = await fetch("/api/manual-submit", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: f.email, device: f.device, score: Number(f.score), challenge: f.challenge, code: f.code, image: img }),
+          });
+          const out = await res.json();
+          if (out.ok) { setState("done"); return; }
+          if (out.code === "config") { setState("fallback"); location.href = mailDraft(f); return; }
+          setErr("That didn't go through (" + (out.code || res.status) + "). Try again, or email it instead below.");
+          setState("form");
+        } catch (e) { setState("fallback"); location.href = mailDraft(f); }
+      };
+
+      if (state === "done") {
+        // Loop closure (panel, 2026-07-11): peak-intent moment gets a live tap
+        // back to the exact board they entered — never "go wait in your inbox".
+        const back = params.get("back");
+        return (
+          <div className="card success">
+            <h2>You're in.</h2>
+            <p className="sm" style={{ marginTop: 10 }}>A person reads your screenshot and posts your Oriya Index — usually within the hour.</p>
+            <a className="btn" style={{ display: "block", textAlign: "center", marginTop: 16 }}
+              href={back ? "../try.html?challenge=" + encodeURIComponent(back) : "index.html"}>
+              <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: 99, background: "#00FF87", marginRight: 8, verticalAlign: "middle" }}></span>Watch your board move →
+            </a>
+            <p className="xs dim" style={{ marginTop: 10 }}>Your Index, where you land, and your athlete-board code arrive by email — the code opens your 7-day board at oriya.app/board.</p>
+          </div>
+        );
+      }
+
+      return (
+        <div className="card">
+          <label>Email</label>
+          <input type="email" placeholder="alex@example.com" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
+          <label>Device</label>
+          <div className="devices">
+            {DEVICES.map((d) => (
+              <button key={d} type="button" className={"dev" + (f.device === d ? " on" : "")} onClick={() => setF({ ...f, device: d })}>{d}</button>
+            ))}
+          </div>
+          <label>This morning's raw score</label>
+          <input className="mono" type="number" min="0" max="100" placeholder="84" value={f.score} onChange={(e) => setF({ ...f, score: e.target.value })} />
+          <label>Challenge</label>
+          <select value={f.challenge} onChange={(e) => setF({ ...f, challenge: e.target.value })}>
+            {CHALLENGE_OPTIONS.map((c) => <option key={c}>{c}</option>)}
+          </select>
+          <label>Recovery screenshot</label>
+          <div
+            className={"drop" + (drag ? " over" : "")}
+            onClick={() => fileRef.current && fileRef.current.click()}
+            onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
+            onDragLeave={() => setDrag(false)}
+            onDrop={(e) => { e.preventDefault(); setDrag(false); pick(e.dataTransfer.files[0]); }}
+          >
+            {img ? (
+              <React.Fragment>
+                <img src={img} alt="your screenshot" />
+                <button type="button" className="rm" onClick={(e) => { e.stopPropagation(); setImg(null); if (fileRef.current) fileRef.current.value = ""; }}>Remove</button>
+              </React.Fragment>
+            ) : (
+              <p className="sm dim">Tap — or drop — the screenshot you already took</p>
+            )}
+            <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => pick(e.target.files[0])} />
+          </div>
+          {err && <p className="err">{err}</p>}
+          <button className="btn" disabled={state === "sending"} onClick={submit}>{state === "sending" ? "Sending…" : "Submit"}</button>
+          {state === "fallback" && <p className="xs dim" style={{ marginTop: 10 }}>We opened an email draft instead — attach your screenshot and hit send. Same result, one extra tap.</p>}
+          <p className="xs dim" style={{ marginTop: 12 }}>Thanks. Your Oriya Index will be calculated within the hour — a person reads every screenshot during the founding sprint.</p>
+        </div>
+      );
+    }
+
+    function App() {
+      return (
+        <React.Fragment>
+          <span className="kicker">Oriya · daily submission</span>
+          <h1>Send this morning's score.</h1>
+          <div className="banner">Launch crunch — device sync isn't wired up yet. Your morning screenshot claims your spot on today's board; a person posts your number, usually within the hour.</div>
+          <ManualProofUpload />
+        </React.Fragment>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>

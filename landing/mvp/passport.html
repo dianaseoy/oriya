@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Oriya · Passport</title>
+  <!-- ViralPassportCard — the screenshot-worthy card. Every field is computed
+       from data/board.json (index, archetype, squad, rank, streak, stamps);
+       ?code= / ?u=<handle> make any athlete's card shareable (the worker maps
+       /p/<username> here), and a shared link exposes nothing the public board
+       doesn't already show. The QR points at the /p/ URL: a screenshot can go
+       stale or be doctored — this link renders live from the board. -->
+  <link rel="stylesheet" href="ui.css">
+</head>
+<body>
+  <div id="root" class="wrap"><p class="dim sm">Loading…</p></div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="logic.js"></script>
+  <script src="store.js"></script>
+  <script src="nav.js"></script>
+  <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js" crossorigin></script>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const DAY = MVP.todayKey();
+    const slugOf = (p) => (p.handle ? p.handle.replace("@", "") : p.code);
+
+    /* QR → the /p/ live link. Rendered as our own SVG (bone quiet zone, void
+       modules — dark-on-light stays scannable; inverted QRs aren't). Falls
+       back to the plain URL if the CDN lib didn't load. */
+    function QRBlock({ url }) {
+      const [svg, setSvg] = useState("");
+      useEffect(() => {
+        if (typeof qrcode === "undefined") { setSvg(""); return; }
+        try {
+          const qr = qrcode(0, "M");
+          qr.addData(url); qr.make();
+          const n = qr.getModuleCount();
+          let rects = "";
+          for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+            if (qr.isDark(r, c)) rects += '<rect x="' + (c + 2) + '" y="' + (r + 2) + '" width="1" height="1"/>';
+          }
+          setSvg('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (n + 4) + ' ' + (n + 4) + '" shape-rendering="crispEdges" role="img" aria-label="QR link to this passport"><rect width="100%" height="100%" fill="#E6E7EA" rx="3"/><g fill="#0B0C0E">' + rects + "</g></svg>");
+        } catch (e) { setSvg(""); }
+      }, [url]);
+      if (!svg) return <p className="mono xs dim" style={{ wordBreak: "break-all" }}>{url}</p>;
+      return <div className="qr" dangerouslySetInnerHTML={{ __html: svg }} />;
+    }
+
+    /* Public ledger — squads, badges, earnings. Honest zero: no pots have
+       settled in the founding season, so every balance is $0.00. */
+    function Ledger({ board, me, row }) {
+      const squads = MVP.groupBoard(board.participants, DAY, (p) => MVP.codeSource(p.code));
+      const mySquad = squads.find((g) => g.members.some((p) => p.code === me.code));
+      const devs = MVP.groupBoard(board.participants, DAY, (p) => MVP.deviceTag(p.device));
+      const myDev = devs.find((g) => g.members.some((p) => p.code === me.code));
+      const earned = MVP.stamps(me, DAY, row.rank).filter((s) => s.earned);
+      return (
+        <div className="card ledger">
+          <p className="lkey">Passport ledger</p>
+          <div className="lrow">
+            <span className="ldot"></span>
+            <div>
+              <p className="lkey">Active squads</p>
+              <p className="sm" style={{ marginTop: 3 }}>{mySquad.key} <span className="xs dim">· {mySquad.members.length} athletes · squad 7-day {mySquad.avg}</span></p>
+              <p className="sm" style={{ marginTop: 2 }}>Device wars — {MVP.deviceTag(me.device)} side <span className="xs dim">· side 7-day {myDev.avg}</span></p>
+            </div>
+          </div>
+          <div className="lrow">
+            <span className="ldot"></span>
+            <div>
+              <p className="lkey">Badges</p>
+              <div className="stamp-row" style={{ marginTop: 6 }}>
+                {MVP.stamps(me, DAY, row.rank).map((s) => <span key={s.short} className={"stamp" + (s.earned ? "" : " lock")} title={s.hint}>{s.emoji} {s.short}</span>)}
+              </div>
+              <p className="xs dim" style={{ marginTop: 6 }}>{earned.length}/4 earned — locked ones show what unlocks them.</p>
+            </div>
+          </div>
+          <div className="lrow">
+            <span className="ldot" style={{ background: "var(--amber)" }}></span>
+            <div>
+              <p className="lkey">Earnings balance</p>
+              <p className="mono" style={{ marginTop: 3, fontSize: 16 }}>$0.00 USD</p>
+              <p className="xs dim" style={{ marginTop: 2 }}>Founding season — no pots settled yet. Pots are sponsor-funded; athletes win them.</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function ViralPassportCard({ board, me, row, own }) {
+      const arch = MVP.archetype(me, DAY);
+      const stamps = MVP.stamps(me, DAY, row.rank);
+      const days = [0, 1, 2, 3, 4, 5, 6].map((i) => {
+        const k = MVP.dayOffset(DAY, 6 - i);
+        return { k: k, v: MVP.normalizedOn(me, k) };
+      });
+      const url = location.origin + "/p/" + encodeURIComponent(slugOf(me));
+      const [copied, setCopied] = useState(false);
+      const copy = () => {
+        try { navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1600); } catch (e) {}
+      };
+      const wa = "https://wa.me/?text=" + encodeURIComponent((own ? "My" : me.name.split(" ")[0] + "'s") + " Oriya passport — Index " + row.avg + ", " + row.streak + "d streak, #" + row.rank + " on the founding board. " + url);
+      return (
+        <div className="pass-wrap">
+          <div className="pass">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+              <span className="kicker">Oriya · Body Passport</span>
+              <span className="mono xs dim">{MVP.deviceTag(me.device)}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 18 }}>
+              <div>
+                <div className="idx">{row.avg}</div>
+                <p className="xs dim" style={{ marginTop: 4 }}>Oriya Index · 7-day</p>
+              </div>
+              <div style={{ textAlign: "right", maxWidth: "55%" }}>
+                {arch
+                  ? <React.Fragment><p className="arch">{arch.type}</p><p className="xs dim" style={{ marginTop: 2 }}>{arch.note}</p></React.Fragment>
+                  : <React.Fragment><p className="arch" style={{ color: "var(--dim)" }}>Archetype emerging</p><p className="xs dim" style={{ marginTop: 2 }}>3+ logged mornings reveal it</p></React.Fragment>}
+              </div>
+            </div>
+            <div className="stats" style={{ gridTemplateColumns: "repeat(3,1fr)" }}>
+              <div className="stat"><b style={{ fontSize: 14, paddingTop: 3 }}>{MVP.codeSource(me.code)}</b><span className="xs dim">squad</span></div>
+              <div className="stat"><b>#{row.rank}</b><span className="xs dim">rank</span></div>
+              <div className="stat"><b>{row.streak}d</b><span className="xs dim">streak</span></div>
+            </div>
+            <div className="bars" style={{ height: 40 }}>
+              {days.map((d) => <div key={d.k} className={"bar" + (d.k === DAY && d.v != null ? " hot" : "")} style={{ height: (d.v == null ? 2 : d.v) + "%" }} title={d.k.slice(5) + " · " + (d.v == null ? "missed" : d.v)} />)}
+            </div>
+            <div className="stamp-row">
+              {stamps.map((s) => <span key={s.short} className={"stamp" + (s.earned ? "" : " lock")} title={s.hint}>{s.emoji} {s.short}</span>)}
+            </div>
+            <div className="serial">
+              <span className="sm" style={{ fontWeight: 600 }}>{me.name} {me.handle && <span className="xs dim">{me.handle}</span>}</span>
+              <span className="mono xs dim">{me.code} · {board.season.split(" · ")[0]}</span>
+            </div>
+            <div style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 14 }}>
+              <QRBlock url={url} />
+              <p className="xs dim">Scan for the live card. A screenshot goes stale — this link renders straight from the board, so what it shows is what the board says.</p>
+            </div>
+            <div className="share-row">
+              <button type="button" className="share-btn" onClick={copy}>{copied ? "Copied ✓" : "Copy shareable link"}</button>
+              <a className="share-btn" href={wa} target="_blank" rel="noopener">Share to WhatsApp squad</a>
+            </div>
+            <p className="xs dim" style={{ marginTop: 10 }}>Computed from the last 7 mornings — the link shows only what the public board already shows.</p>
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [board, setBoard] = useState(null);
+      useEffect(() => { STORE.fetchBoard().then(setBoard); }, []);
+      if (!board) return <p className="dim sm">Loading…</p>;
+      const myCode = STORE.loadMe();
+      const params = new URLSearchParams(location.search);
+      const raw = params.get("u") || params.get("code") || myCode;
+      const me = raw ? board.participants.find((p) => {
+        const h = String(raw).replace(/^@/, "").toLowerCase();
+        return p.code === MVP.cleanCode(raw) || (p.handle || "").replace("@", "").toLowerCase() === h;
+      }) : null;
+      const own = !!me && me.code === myCode;
+      const row = me ? MVP.rankBoard(board.participants, DAY).find((r) => r.p.code === me.code) : null;
+      const dev = me ? (me.device === "apple" ? "Apple Health" : MVP.deviceTag(me.device)) : "";
+      return (
+        <React.Fragment>
+          <span className="kicker">Oriya · passport</span>
+          <h1>{own || !me ? "Your seven mornings." : me.name.split(" ")[0] + "'s seven mornings."}</h1>
+          <p className="xs dim" style={{ marginTop: 6 }}>{board.season}{board.sample ? " · sample data" : ""}</p>
+          <SubNavigation active="passport" />
+          {!me && (
+            <div className="card">
+              <p className="sm">No passport on this device yet.</p>
+              <p className="xs dim" style={{ marginTop: 6 }}>Enter your invite code on the <a href="index.html" style={{ color: "var(--accent)" }}>board</a> — your passport builds itself from the scores you send.</p>
+            </div>
+          )}
+          {me && <ViralPassportCard board={board} me={me} row={row} own={own} />}
+          {me && <Ledger board={board} me={me} row={row} />}
+          {me && own && !row.loggedToday && (
+            <a className="btn" style={{ marginTop: 14 }} href={"submit.html?code=" + encodeURIComponent(me.code) + "&device=" + encodeURIComponent(dev)}>Send today's score →</a>
+          )}
+          {me && !own && (
+            <div className="card">
+              <p className="sm">Want one of these?</p>
+              <p className="xs dim" style={{ marginTop: 6 }}>Every athlete is invited by hand during the founding sprint. Got a code? <a href="index.html" style={{ color: "var(--accent)" }}>Claim your slot</a>. No code? Email <a href="mailto:team@oriya.app" style={{ color: "var(--accent)" }}>team@oriya.app</a>.</p>
+            </div>
+          )}
+        </React.Fragment>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
