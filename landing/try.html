@@ -712,6 +712,19 @@
     CHALLENGES.forEach((c) => { c.teams = CHALLENGE_TEAMS[c.id] || [c.joinTeam]; });
     // sample-athlete company domains (illustrative — the bracket is a culture reference, not an enrollment)
     const TEAM_DOMAINS = { Anthropic:"anthropic.com", OpenAI:"openai.com", Stripe:"stripe.com" };
+    // the flagship challenge gets a clean, memorable share link (worker SHORTLINKS
+    // + _redirects both point /play/foundersvsoperators at this same URL) instead
+    // of the raw ?challenge= query string everywhere it's copied or displayed.
+    function challengeUrl(id) {
+      return id === "founders" ? "https://oriya.app/play/foundersvsoperators" : "https://oriya.app/try.html?challenge=" + id;
+    }
+    // fixed side colors for the Founders vs Operators rivalry — distinct from
+    // RaceBar's dynamic leader/trailer tones, which flip with the standings.
+    // Founders red, Operators green, so "pick your side" reads at a glance.
+    const SIDE_TONE = {
+      Founders:  { on:"bg-[#FF5A36] text-void border-[#FF5A36] shadow-[0_0_22px_rgba(255,90,54,0.4)]", off:"border-[#FF5A36]/50 text-[#FF5A36] hover:bg-[#FF5A36]/10 hover:border-[#FF5A36]" },
+      Operators: { on:"bg-[#00FF87] text-void border-[#00FF87] shadow-[0_0_22px_rgba(0,255,135,0.35)]", off:"border-[#00FF87]/50 text-[#00FF87] hover:bg-[#00FF87]/10 hover:border-[#00FF87]" },
+    };
     /* dynamic rivalry matching — if the founding account's email is on a tech
        domain, elevate the board that pits their company against its natural
        rival. Purely presentational (ordering + a flag); no enrollment implied. */
@@ -1370,7 +1383,7 @@
        because the margin is the line people paste to their team channel.
        Board figures are founding-season samples, so the snippet says so. */
     function slackSnippet(c, race) {
-      const link = "https://oriya.app/try.html?challenge=" + c.id;
+      const link = challengeUrl(c.id);
       let live = "";
       if (race && race.length > 1) {
         const s = race.slice().sort((a, b) => b.v - a.v);
@@ -1552,7 +1565,7 @@
       const multi = c.teams && c.teams.length > 1;
       const [team, setTeam] = useState(multi ? null : (c.teams ? c.teams[0] : c.joinTeam));
       const myTeam = joined ? (joinedTeam || c.joinTeam) : team;
-      const challengeLink = "https://oriya.app/try.html?challenge=" + c.id;
+      const challengeLink = challengeUrl(c.id);
       const proofMail = "mailto:team@oriya.app?subject=" + encodeURIComponent("Entering " + c.title + (myTeam ? " — " + myTeam : "") + " (screenshot proof)")
         + "&body=" + encodeURIComponent("Name / IG handle:\nDevice (Oura / Whoop / Garmin / Apple / other):\nThis morning's score:\nSide I'm joining: " + (myTeam || "(tell us which)") + "\nAnonymous on the board? (yes/no — send from your work email and we show only ◒ anon + your @company.com)\n\nAttach this morning's recovery screenshot and hit send — we normalize it by hand and reply with your Oriya Index and where you land on this board.");
       // Primary entry path: the /mvp submission form, challenge + side + device prefilled.
@@ -1662,6 +1675,55 @@
               </div>
             )}
 
+            {joined && (
+              <div className="mt-5 rounded-xl border border-jade/40 bg-jade/[0.08] p-4 animate-fade-up">
+                <p className="text-sm text-bone">You're in. <span className="text-jade font-semibold">Ranked #{myRank}</span> with an Oriya Index of <span className="text-jade font-semibold">{me.oriya}</span> on <span className="text-bone">{myTeam}</span>.</p>
+                <button onClick={onShare} className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-jade hover:text-jade-glow">
+                  <Share2 className="w-4 h-4" /> Share your Passport — pull a teammate onto the board before tomorrow's sync
+                </button>
+                <button onClick={copyRally} className="mt-2 flex items-start gap-2 text-left text-sm font-medium text-amber-glow hover:brightness-110">
+                  <Copy className="w-4 h-4 shrink-0 mt-0.5" /> Copy the call-out — send it to the rival side and make them post a number
+                </button>
+                <p className="mt-3 text-[11px] text-ash font-mono leading-relaxed">When your side takes the pot, the win is stamped on your Body Passport — that stamp is your claim, verified by us before anything is paid out.</p>
+                <SubstackHook source="joined" />
+              </div>
+            )}
+
+            {!joined && (
+              <div className="mt-6 animate-fade-up">
+                <h3 className="text-base font-bold text-bone tracking-wide mb-1">{multi ? "Pick your side →" : "Your team"}</h3>
+                <p className="text-xs text-ash mb-3">{me ? "Your " + me.oriya + " drops onto this board tomorrow morning." : "Your first screenshot drops onto this board tomorrow morning."} Pick the side you'll actually show up for.</p>
+                <div className="flex flex-wrap gap-2.5">
+                  {c.teams.map((t) => {
+                    const tone = SIDE_TONE[t];
+                    const active = t === team;
+                    return (
+                      <button key={t} onClick={() => { setTeam(t); track("side_picked", { challenge: c.id, team: t }); }}
+                        className={"flex-1 min-w-[140px] px-5 py-4 rounded-xl text-base font-bold border-2 transition-all " +
+                          (active
+                            ? (tone ? tone.on : "bg-jade text-void border-jade shadow-[0_0_22px_rgba(127,183,158,0.35)]")
+                            : (tone ? tone.off : "border-white/15 text-bone hover:border-jade/60 hover:bg-white/[0.04]"))}>
+                        {t}
+                      </button>
+                    );
+                  })}
+                </div>
+                {/* pop-up "what this means" — compresses the rules so nobody has to scroll to follow through */}
+                {team && (
+                  <div className="mt-3 rounded-lg border border-jade/30 bg-jade/[0.05] p-3 animate-fade-up">
+                    <p className="text-xs text-bone leading-relaxed">
+                      <span className="font-semibold text-jade">You're taking {team}'s side.</span>{me
+                        ? <React.Fragment> Your Oriya Index <span className="font-mono text-jade">{me.oriya}</span> lands around <span className="font-mono text-jade">#{previewRank} of {board.length + 1}</span> and counts toward {team}'s average every day you log.</React.Fragment>
+                        : <React.Fragment> Send this morning's screenshot below and your Oriya Index lands on this board — counting toward {team}'s average every day you log.</React.Fragment>}
+                    </p>
+                    <p className="text-[11px] text-ash mt-1.5 leading-relaxed">
+                      <span className="text-bone font-medium">How to win:</span> {c.days != null ? "when the " + c.days + " days are up, " : "when the round ends, "}the side with the higher team average takes it{c.prize ? " — " + c.prize + (c.split ? " (" + c.split + ")" : "") + ". The pot is sponsor-backed; only athletes are paid." : " — bragging rights, settled on the board."} Your side counts you every morning — a missed day scores 0 for the team.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
             {multi && (
               <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.02] p-4">
                 <button onClick={() => setCallOpen((o) => !o)} className="w-full flex items-center justify-between gap-2 text-left">
@@ -1708,48 +1770,6 @@
                   </React.Fragment>
                 )}
                 </React.Fragment>
-                )}
-              </div>
-            )}
-
-            {joined && (
-              <div className="mt-5 rounded-xl border border-jade/40 bg-jade/[0.08] p-4 animate-fade-up">
-                <p className="text-sm text-bone">You're in. <span className="text-jade font-semibold">Ranked #{myRank}</span> with an Oriya Index of <span className="text-jade font-semibold">{me.oriya}</span> on <span className="text-bone">{myTeam}</span>.</p>
-                <button onClick={onShare} className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-jade hover:text-jade-glow">
-                  <Share2 className="w-4 h-4" /> Share your Passport — pull a teammate onto the board before tomorrow's sync
-                </button>
-                <button onClick={copyRally} className="mt-2 flex items-start gap-2 text-left text-sm font-medium text-amber-glow hover:brightness-110">
-                  <Copy className="w-4 h-4 shrink-0 mt-0.5" /> Copy the call-out — send it to the rival side and make them post a number
-                </button>
-                <p className="mt-3 text-[11px] text-ash font-mono leading-relaxed">When your side takes the pot, the win is stamped on your Body Passport — that stamp is your claim, verified by us before anything is paid out.</p>
-                <SubstackHook source="joined" />
-              </div>
-            )}
-
-            {!joined && (
-              <div className="mt-6 animate-fade-up">
-                <h3 className="text-sm font-semibold text-bone uppercase tracking-wider mb-1">{multi ? "Pick your side" : "Your team"}</h3>
-                <p className="text-xs text-ash mb-3">{me ? "Your " + me.oriya + " drops onto this board tomorrow morning." : "Your first screenshot drops onto this board tomorrow morning."} Pick the side you'll actually show up for.</p>
-                <div className="flex flex-wrap gap-2">
-                  {c.teams.map((t) => (
-                    <button key={t} onClick={() => { setTeam(t); track("side_picked", { challenge: c.id, team: t }); }}
-                      className={"px-4 py-2 rounded-full text-sm font-medium border transition-all " + (t === team ? "bg-jade text-void border-jade" : "border-white/15 text-bone hover:border-jade/60")}>
-                      {t}
-                    </button>
-                  ))}
-                </div>
-                {/* pop-up "what this means" — compresses the rules so nobody has to scroll to follow through */}
-                {team && (
-                  <div className="mt-3 rounded-lg border border-jade/30 bg-jade/[0.05] p-3 animate-fade-up">
-                    <p className="text-xs text-bone leading-relaxed">
-                      <span className="font-semibold text-jade">You're taking {team}'s side.</span>{me
-                        ? <React.Fragment> Your Oriya Index <span className="font-mono text-jade">{me.oriya}</span> lands around <span className="font-mono text-jade">#{previewRank} of {board.length + 1}</span> and counts toward {team}'s average every day you log.</React.Fragment>
-                        : <React.Fragment> Send this morning's screenshot below and your Oriya Index lands on this board — counting toward {team}'s average every day you log.</React.Fragment>}
-                    </p>
-                    <p className="text-[11px] text-ash mt-1.5 leading-relaxed">
-                      <span className="text-bone font-medium">How to win:</span> {c.days != null ? "when the " + c.days + " days are up, " : "when the round ends, "}the side with the higher team average takes it{c.prize ? " — " + c.prize + (c.split ? " (" + c.split + ")" : "") + ". The pot is sponsor-backed; only athletes are paid." : " — bragging rights, settled on the board."} Your side counts you every morning — a missed day scores 0 for the team.
-                    </p>
-                  </div>
                 )}
               </div>
             )}

@@ -900,15 +900,16 @@
     @media (max-width:900px){
       .scrolly { display:block; }
       .scrolly-stage { position:sticky; top:6px; z-index:2; background:linear-gradient(180deg, var(--void) 86%, transparent); padding-bottom:8px; }
-      /* Overlap fix: the sticky stage (phone + caption + tabs) runs ~600-630px
-         tall on mobile, which is routinely MORE than 68vh/62vh of a real
-         mobile viewport (browser chrome eats the rest) — so the step-card
-         used to render its text on top of the phone. --stage-h is the stage's
-         real measured height (set in JS, ACT 1.5), with a floor fallback for
-         the instant before JS runs; max() keeps the old generous vh pacing
-         on tall viewports while guaranteeing clearance on short ones. */
-      .scrolly-step { min-height:max(68vh, calc(var(--stage-h, 620px) + 56px)); align-items:flex-end; padding-bottom:5vh; position:relative; z-index:3; }
-      .scrolly-step:first-child { min-height:max(56vh, calc(var(--stage-h, 620px) + 32px)); }
+      /* Overlap fix v2: v1 reserved a flat 56px below the sticky phone, but the
+         step-card itself (heading + 3-line paragraph) is ~200-280px tall — far
+         more than 56px — so the card, anchored to the bottom of a too-short
+         box, still grew up into the phone. --stage-h and --card-h are both
+         measured live in JS (ACT 1.5): stage-h is the sticky phone's real
+         height, card-h is THIS step's own card height, so the box always has
+         exactly phone + card + a real gap, on every viewport and every
+         caption length. Floor fallbacks cover the instant before JS runs. */
+      .scrolly-step { min-height:max(68vh, calc(var(--stage-h, 620px) + var(--card-h, 260px) + 48px)); align-items:flex-end; padding-bottom:6vh; position:relative; z-index:3; }
+      .scrolly-step:first-child { min-height:max(56vh, calc(var(--stage-h, 620px) + var(--card-h, 220px) + 32px)); }
       .step-card { margin:0 auto; background:rgba(2,6,23,.94); }
     }
     /* passport screen: holographic shimmer sweep + anon identity chip */
@@ -1463,7 +1464,7 @@
         <div class="proof-race-key"><span>Marina RC 77.8</span><span class="lead">Stanford 81.3 · leads</span></div>
         <div class="proof-meta"><span class="ppl">38 logging</span><span class="prize">$500 · $50/winner</span></div>
       </a>
-      <a class="proof-card" href="try.html?challenge=founders">
+      <a class="proof-card" href="/play/foundersvsoperators">
         <span class="proof-live"><span class="dot"></span> Live</span>
         <h4>Founders vs Operators</h4>
         <p>Founders own the schedule. Operators run the machine. 21 days — and 71 athletes across five companies — to find out which one recovers better. Founders are currently losing.</p>
@@ -2220,6 +2221,19 @@
     syncStageHeight();
     window.addEventListener("resize", syncStageHeight);
     if (window.ResizeObserver) new ResizeObserver(syncStageHeight).observe(root);
+
+    // Each step's own card height feeds --card-h on that step (see CSS): the
+    // fixed-phone + fixed-gap guess used to be shorter than a real 3-line
+    // caption, so the card grew up into the phone. Measuring per-card, per-step
+    // means the fix holds regardless of copy length or viewport.
+    document.querySelectorAll("#howSteps .scrolly-step").forEach((step) => {
+      const card = step.querySelector(".step-card");
+      if (!card) return;
+      const syncCardHeight = () => step.style.setProperty("--card-h", card.offsetHeight + "px");
+      syncCardHeight();
+      window.addEventListener("resize", syncCardHeight);
+      if (window.ResizeObserver) new ResizeObserver(syncCardHeight).observe(card);
+    });
 
     const phone = root.querySelector(".phone");
     const scrUpload = root.querySelector('[data-scr="upload"]');
