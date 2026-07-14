@@ -930,7 +930,7 @@
          so it's forced off in favor of plain, immediately-visible text. */
       .scrolly-steps { display:flex; flex-direction:column; gap:22px; margin-top:20px; }
       .scrolly-step { min-height:0; display:block; position:static; padding-top:22px; border-top:1px solid var(--hairline); }
-      .scrolly-step:first-child { padding-top:0; border-top:none; }
+      .scrolly-step:first-child { min-height:0; padding-top:0; border-top:none; }
       .step-card { margin:0; max-width:none; background:none; border:none; backdrop-filter:none; padding:0; border-radius:0; opacity:1; transform:none; }
       .step-card > * { opacity:1; transform:none; }
       .demo-tabs-hint .dth-desktop { display:none; }
