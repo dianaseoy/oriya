@@ -900,42 +900,27 @@
     .step-card h4 { font-family:var(--font-display); font-size:25px; line-height:1.15; color:var(--bone); margin:10px 0 9px; }
     .step-card p { font-family:var(--font-sans); font-size:14.5px; line-height:1.65; color:var(--ash); }
     @media (max-width:900px){
-      /* Overlap fix v4: v1-v3 all tried to make the phone (sticky) and the
-         caption (bottom-anchored, then sticky-too) share the same small
-         mobile viewport — but the phone alone runs ~600-630px tall, which is
-         most of a real mobile viewport once browser chrome is subtracted.
-         There is no pairing of "sticky phone" + "legible caption" that fits
-         in that space without one covering the other — v3's sibling sticky
-         cards even ended up stacked on top of EACH OTHER (not just the
-         phone), ghosting through the translucent card background, because
-         sticky siblings with an identical top all stay stuck simultaneously
-         until the shared parent's bottom, not just until their own bottom.
-         Fix: stop pairing them at all on mobile. Show the phone once, full
-         size, playing its own loop (unSTICKY, un-pinned) — then the four
-         story beats as a plain stacked list below it, each just a normal
-         block that fades in as it scrolls past, no sticky/min-height tricks,
-         no way for two elements to ever occupy the same space. The JS
-         scroll→screen sync (which only matters for the desktop side-by-side
-         layout) is skipped on mobile so the demo keeps looping instead of
-         freezing on whatever step you last scrolled past. */
+      /* Boardy.ai pass: v1-v4 kept trying to fit the phone AND a four-card
+         prose explainer into one small mobile viewport — the real fix isn't
+         better pairing, it's not needing the second thing at all. Boardy's
+         own mobile demo is one static screenshot with almost no surrounding
+         copy; the screenshot carries the meaning. Our phone already has that
+         — each state has its own short caption (#demoCap: "Every device →
+         one comparable number.", etc.) and the tabs let you jump to
+         Passport/Stakes/Devices directly. The four "01 The read / 02 The
+         squad / ..." cards were restating in paragraphs what the phone
+         already shows on-screen, which is exactly the "explaining instead of
+         showing" the redesign is meant to cut. So on mobile: just the phone,
+         full size, playing its own loop, un-pinned — no competing text block
+         at all, nothing that can gap or overlap because there's only one
+         thing on screen. Desktop's side-by-side sticky-narrative layout
+         (where the four cards earn their keep as scroll-driven copy) is
+         unchanged. */
       .scrolly { display:block; }
       .scrolly-stage { position:static; }
-      /* Plain list, not floating cards: the border/blur/opaque-bg "glass card"
-         treatment was designed to float over the demo on desktop — carried
-         unchanged into a stacked mobile list it just reads as heavy. A thin
-         divider between entries does the separation job instead. And since
-         nothing here is scroll-paired to the phone anymore, the entrance fade
-         (opacity:0 until 50% scrolled into view) has no payoff to time
-         against — it just reads as an awkward blank gap before text pops in,
-         so it's forced off in favor of plain, immediately-visible text. */
-      .scrolly-steps { display:flex; flex-direction:column; gap:22px; margin-top:20px; }
-      .scrolly-step { min-height:0; display:block; position:static; padding-top:22px; border-top:1px solid var(--hairline); }
-      .scrolly-step:first-child { min-height:0; padding-top:0; border-top:none; }
-      .step-card { margin:0; max-width:none; background:none; border:none; backdrop-filter:none; padding:0; border-radius:0; opacity:1; transform:none; }
-      .step-card > * { opacity:1; transform:none; }
+      .steps-mobile-kicker, .scrolly-steps { display:none; }
       .demo-tabs-hint .dth-desktop { display:none; }
       .demo-tabs-hint .dth-mobile { display:inline; }
-      .steps-mobile-kicker { display:block; text-align:center; font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--ash); opacity:.65; margin-top:36px; }
     }
     /* passport screen: holographic shimmer sweep + anon identity chip */
     .scr-pass { overflow:hidden; }
