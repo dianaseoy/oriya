@@ -880,6 +880,8 @@
     .demo-tab.live { color:var(--jade); }
     .demo-tab.live.active { color:var(--void); }
     .demo-tabs-hint { text-align:center; font-family:var(--font-mono); font-size:9px; letter-spacing:.05em; color:var(--ash); opacity:.6; margin-top:7px; }
+    .demo-tabs-hint .dth-mobile { display:none; }
+    .steps-mobile-kicker { display:none; }
     /* ---- scroll-driven narrative: sticky phone, steps scroll past and drive the screen ---- */
     .scrolly { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px 56px; align-items:start; margin-top:34px; }
     .scrolly-stage { position:sticky; top:52px; order:2; }
@@ -898,20 +900,32 @@
     .step-card h4 { font-family:var(--font-display); font-size:25px; line-height:1.15; color:var(--bone); margin:10px 0 9px; }
     .step-card p { font-family:var(--font-sans); font-size:14.5px; line-height:1.65; color:var(--ash); }
     @media (max-width:900px){
+      /* Overlap fix v4: v1-v3 all tried to make the phone (sticky) and the
+         caption (bottom-anchored, then sticky-too) share the same small
+         mobile viewport — but the phone alone runs ~600-630px tall, which is
+         most of a real mobile viewport once browser chrome is subtracted.
+         There is no pairing of "sticky phone" + "legible caption" that fits
+         in that space without one covering the other — v3's sibling sticky
+         cards even ended up stacked on top of EACH OTHER (not just the
+         phone), ghosting through the translucent card background, because
+         sticky siblings with an identical top all stay stuck simultaneously
+         until the shared parent's bottom, not just until their own bottom.
+         Fix: stop pairing them at all on mobile. Show the phone once, full
+         size, playing its own loop (unSTICKY, un-pinned) — then the four
+         story beats as a plain stacked list below it, each just a normal
+         block that fades in as it scrolls past, no sticky/min-height tricks,
+         no way for two elements to ever occupy the same space. The JS
+         scroll→screen sync (which only matters for the desktop side-by-side
+         layout) is skipped on mobile so the demo keeps looping instead of
+         freezing on whatever step you last scrolled past. */
       .scrolly { display:block; }
-      .scrolly-stage { position:sticky; top:6px; z-index:2; background:linear-gradient(180deg, var(--void) 86%, transparent); padding-bottom:8px; }
-      /* Overlap fix v3: v1/v2 tried to reserve enough scroll-room below the
-         sticky phone for a normal-flow, bottom-anchored card — but that card
-         keeps sliding upward for as long as the user keeps scrolling, no
-         matter how much room is reserved, and inevitably passes behind the
-         fixed phone at rest. Reserving more room only postpones the overlap,
-         it can't remove it. Fix: make the card sticky too, pinned at a fixed
-         viewport offset just below the phone (--stage-h, measured live in JS)
-         — a stationary target can never slide into another stationary target,
-         so the two can never overlap regardless of scroll position. */
-      .scrolly-step { min-height:max(72vh, calc(var(--stage-h, 620px) + 240px)); display:block; position:sticky; top:calc(var(--stage-h, 620px) + 40px); z-index:3; }
-      .scrolly-step:first-child { min-height:max(58vh, calc(var(--stage-h, 620px) + 180px)); }
+      .scrolly-stage { position:static; }
+      .scrolly-steps { display:flex; flex-direction:column; gap:14px; margin-top:14px; }
+      .scrolly-step { min-height:0; display:block; position:static; }
       .step-card { margin:0 auto; background:rgba(2,6,23,.94); }
+      .demo-tabs-hint .dth-desktop { display:none; }
+      .demo-tabs-hint .dth-mobile { display:inline; }
+      .steps-mobile-kicker { display:block; text-align:center; font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--ash); opacity:.65; margin-top:36px; }
     }
     /* passport screen: holographic shimmer sweep + anon identity chip */
     .scr-pass { overflow:hidden; }
@@ -1387,12 +1401,15 @@
         <button class="demo-tab" data-tab="stakes">Stakes</button>
         <button class="demo-tab" data-tab="devices">Devices</button>
       </div>
-      <p class="demo-tabs-hint">tabs follow your scroll — or tap to jump</p>
+      <p class="demo-tabs-hint"><span class="dth-desktop">tabs follow your scroll — or tap to jump</span><span class="dth-mobile">tap a tab to jump to that screen</span></p>
     </div>
     </div><!-- /scrolly-stage -->
 
-    <!-- Scroll-driven narrative: each step pins the phone and switches its screen.
-         The old static how-steps stack was folded into these four captions. -->
+    <!-- Scroll-driven narrative: each step pins the phone and switches its screen
+         (desktop only — see CSS/JS "Overlap fix v4" for why mobile decouples
+         the two instead of pairing them). The old static how-steps stack was
+         folded into these four captions. -->
+    <p class="steps-mobile-kicker">Same walkthrough, one beat at a time ↓</p>
     <div class="scrolly-steps" id="howSteps">
       <div class="scrolly-step" data-step="live">
         <div class="step-card">
@@ -2209,19 +2226,14 @@
     const root = document.getElementById("appDemo");
     if (!root) return;
 
-    // Mobile overlap fix: feed the stage's real height to .scrolly-step's
-    // min-height floor (see CSS) so scrolling text can never render on top
-    // of the phone — a static vh guess drifts as the tab row wraps or the
-    // caption changes length. ResizeObserver catches both width- and
-    // content-driven changes; resize covers orientation flips.
-    const scrolly = document.getElementById("howScrolly");
-    function syncStageHeight() {
-      if (!scrolly) return;
-      scrolly.style.setProperty("--stage-h", root.offsetHeight + "px");
-    }
-    syncStageHeight();
-    window.addEventListener("resize", syncStageHeight);
-    if (window.ResizeObserver) new ResizeObserver(syncStageHeight).observe(root);
+    // The phone/steps pairing below (sticky phone, scroll swaps the active
+    // screen) is a desktop-only layout — on mobile the two are stacked and
+    // independent (see CSS "Overlap fix v4"), so the scroll→screen sync is
+    // gated off there; a matchMedia listener keeps it correct across resize
+    // and orientation changes instead of freezing at load-time width.
+    const desktopScrollyMq = window.matchMedia("(min-width:901px)");
+    let desktopScrolly = desktopScrollyMq.matches;
+    desktopScrollyMq.addEventListener("change", (e) => { desktopScrolly = e.matches; });
 
     const phone = root.querySelector(".phone");
     const scrUpload = root.querySelector('[data-scr="upload"]');
@@ -2317,11 +2329,11 @@
         demoTabs.querySelectorAll(".demo-tab").forEach((x) => x.classList.toggle("active", x === b));
         show(t === "live" ? "board" : t);
       });
-      // Reduced motion still gets the scroll-driven screen switch — just no animation.
+      // Reduced motion still gets the scroll-driven screen switch on desktop — just no animation.
       document.querySelectorAll("#howSteps .scrolly-step").forEach((s) => {
         new IntersectionObserver((es) => es.forEach((en) => {
           en.target.classList.toggle("in", en.isIntersecting);
-          if (!en.isIntersecting) return;
+          if (!en.isIntersecting || !desktopScrolly) return;
           const t = en.target.dataset.step;
           show(t === "live" ? "board" : t);
           if (demoTabs) demoTabs.querySelectorAll(".demo-tab").forEach((x) => x.classList.toggle("active", x.dataset.tab === t));
@@ -2405,12 +2417,14 @@
     });
 
     // Scroll-driven narrative: each step pins the matching screen as it crosses
-    // mid-viewport; scrolling back to step 01 resumes the live loop.
+    // mid-viewport; scrolling back to step 01 resumes the live loop. Desktop
+    // only — on mobile the phone and steps are stacked and independent, so
+    // scrolling past a step must never pause or redirect the live loop.
     let curStep = "live";
     document.querySelectorAll("#howSteps .scrolly-step").forEach((s) => {
       new IntersectionObserver((es) => es.forEach((en) => {
         en.target.classList.toggle("in", en.isIntersecting);
-        if (!en.isIntersecting) return;
+        if (!en.isIntersecting || !desktopScrolly) return;
         const t = en.target.dataset.step;
         if (t === curStep) return;
         curStep = t;
