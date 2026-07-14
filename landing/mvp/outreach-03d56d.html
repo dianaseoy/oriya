@@ -58,6 +58,7 @@
     const { useState, useEffect } = React;
     const SIGN = "\n\n— Diana · founder, Oriya (oriya.app)";
     const JOIN_LINK = "oriya.app/play/foundersvsoperators"; // clean alias for oriya.app/try?challenge=founders — /_redirects + worker SHORTLINKS both point it there
+    const BOARD_LINK = "oriya.app/board"; // clean alias → /mvp/ live rankings + scores (worker SHORTLINKS + _redirects both point it there)
 
     // Live side standing, no invented numbers (panel rule, still holds): a
     // fragment computed from the same board.json the live board renders, only
@@ -176,6 +177,34 @@
           obj: "CrossFit boxes and run clubs alike. Talk to the coach, not the owner or front desk — the coach is the trust layer. Bring a live leaderboard already open on your phone; demonstrate, don't pitch. Offer a free 2-week squad pilot for their next training block.",
           s: "Your athletes check their recovery score alone every morning",
           b: "[Say this, phone in hand, leaderboard already open]\n\n\"Your athletes check their recovery score alone every morning. What if the whole box competed on it together -- fairly, even across different devices?\"\n\n[Show the live board. Let them scroll it themselves.]\n\n\"Takes about five minutes to set up. I'll run a free two-week pilot for your next training block -- I handle the normalization, you just share one link in the group chat.\"\n\n[Get their number. Follow up same day: " + JOIN_LINK + "]" },
+        // ---- WhatsApp auto-flow (Boardy.ai inversion: the system opens the
+        //   thread, the athlete only ever responds — one tap or one screenshot,
+        //   zero compose friction). These are the bot's scripts, not sends from
+        //   this page, so they're copy-only (wa:true drops the "Subject:" prefix
+        //   and the mailto). Every number is a [TOKEN] the automation fills live
+        //   per athlete from the real board at send time — the same
+        //   no-invented-stat rule the email templates follow; nothing here is a
+        //   hardcoded standing. Live rankings link is BOARD_LINK (→ /mvp/).
+        { id: "wa_welcome", g: "WA", wa: true, post: true, tag: "WA1 · AUTO — WELCOME (SYSTEM OPENS)", title: "WhatsApp: welcome + pick a side",
+          obj: "Fires the instant they drop their phone number on oriya.app. Boardy inversion — the system opens so there's no \"what do I write?\" load; their whole reply is 1 or 2. First commitment is the side. No numbers here to get wrong.",
+          s: "TRIGGER · right after phone number entered on oriya.app",
+          b: "Hey [NAME] 👋 You're in the Oriya founding cohort — Founders vs Operators, Season 1.\n\nEvery morning: screenshot your recovery score → send it here. ~45 seconds. I normalize it and drop you onto the board.\n\nWhich side are you on?\n1️⃣ Founders\n2️⃣ Operators" },
+        { id: "wa_locked", g: "WA", wa: true, post: true, tag: "WA2 · AUTO — SIDE LOCKED", title: "WhatsApp: side locked + first action",
+          obj: "Fires when they reply 1/2. Confirms the side, states the live stakes, gives exactly one next action. The standing line is filled from the live board at send time — or the honest \"board just opened\" fallback when it's too early — never a hardcoded number.",
+          s: "TRIGGER · they reply 1 or 2",
+          b: "[SIDE] side locked 🏴\n\n[LIVE STANDING — e.g. \"Operators lead [X]–[Y] right now\", or \"The board just opened — nobody's ahead yet\" when too early.] Your first morning score moves it.\n\nDrop your recovery screenshot whenever you wake up — Oura, Whoop, Garmin, Apple Watch all work. I normalize it and put you on the board.\n\nSample Passport: oriya.app/p/mayaruns" },
+        { id: "wa_score", g: "WA", wa: true, post: true, tag: "WA3 · AUTO — SCORE DELIVERED (~60s)", title: "WhatsApp: normalized score + rank + streak",
+          obj: "The retention moment. Fires ~60s after they send a screenshot: normalized Oriya Index, exact rank on their side, side average, and streak — every [TOKEN] computed live per athlete from the real board, nothing typed or invented. Ends on the live rankings link so scoring pulls them to the board.",
+          s: "TRIGGER · they send a morning screenshot",
+          b: "[DEVICE] [RAW] → Oriya Index [INDEX] 🎯\n\nYou're #[RANK] of [FIELD] on the [SIDE] side.\n[SIDE] avg: [SIDE_AVG] ([±Δ] vs yesterday)\nOther side leads: [LEAD_AVG]\n\n🔥 Day [STREAK] streak.\n\nLive rankings + every score: " + BOARD_LINK + "\nYour Passport is live: oriya.app/p/[HANDLE]\nReply BOARD for the full leaderboard." },
+        { id: "wa_board", g: "WA", wa: true, post: true, tag: "WA4 · AUTO — BOARD (ON DEMAND)", title: "WhatsApp: live board + invite hook",
+          obj: "Fires when they reply BOARD — keeps the thread alive without daily push spam, and every board view ends on a recruit action (a side's score is its group average, so pulling one teammate in literally moves it). Numbers live-filled; the invite uses the canonical join link.",
+          s: "TRIGGER · they reply BOARD",
+          b: "Founders vs Operators · Day [N]\n\nFounders 🏴 avg [F_AVG] ([±Δ])\nOperators 🏳️ avg [O_AVG] ([±Δ])\n\nYour rank: #[RANK] of [FIELD] [SIDE]\nTop today: [HANDLE] · [INDEX] 🔥[STREAK]d\n\nGap to close: [GAP] pts.\n\nFull live board: " + BOARD_LINK + "\nPull a teammate onto your side → " + JOIN_LINK },
+        { id: "wa_nudge", g: "WA", wa: true, post: true, tag: "WA5 · AUTO — 08:25 NUDGE (IF NOT LOGGED)", title: "WhatsApp: morning accountability nudge",
+          obj: "The Day-7 retention lever — fires ~08:25 local only if they haven't logged. Leads with the creed so a rough morning still gets logged instead of skipped, and states the real mechanic (a blank counts 0 for your side). A prompt, not a report — no numbers to invent. Deliberately no \"board closes at 09:00\" claim; that cutoff isn't built.",
+          s: "TRIGGER · 08:25 local, no screenshot logged yet today",
+          b: "Morning 🌅 Quick one — you haven't logged today yet.\n\nA logged 61 outranks a forgotten 90. The board scores the log, not the flex — your side carries every blank as a 0.\n\nDrop your screenshot now → oriya.app/submit" },
       ];
     }
     /* Archived (2026-07-13) — retired the day Founders vs Operators became the
@@ -260,6 +289,7 @@
           <span className="kicker">Oriya · outreach workbench — internal</span>
           <h1>Founders vs Operators launch set. One inbox at a time.</h1>
           <p className="sm dim" style={{ marginTop: 4 }}>Drafts open in your own mail client (mailto:) — nothing sends automatically, nothing is stored, no contact list lives on this page.</p>
+          <p className="xs dim" style={{ marginTop: 6 }}>The <span className="mono" style={{ color: "var(--accent)" }}>WA1–WA5</span> cards are the WhatsApp auto-reply scripts for the bot (copy-only). Every number is a live-filled <span className="mono">[TOKEN]</span> — computed per athlete from the real board at send time, never hardcoded here.</p>
           <p className="xs dim" style={{ marginTop: 6 }}>Live standing baked into every template below: <span className="mono" style={{ color: "var(--accent)" }}>{standingLine(standing)}</span>{standing === "none" && " (sample data or too early — no outbound claim made)"}</p>
           <div className="bar">
             <div><label>Target email</label><input type="email" placeholder="alex@barrys.com" value={c.email} onChange={set("email")} /></div>
@@ -279,7 +309,7 @@
                   {t.id === "b2b" && <p className="note">Launch unlocks once “Active athletes” is filled — and only with the real number off the live board. An invented stat kills the pitch and the brand.</p>}
                   {(t.id === "reddit_post" || t.id === "linkedin_post") && !c.x && <p className="note">Headcount line stays off until “Active athletes” holds a real number.</p>}
                   <div className="spacer"></div>
-                  <button className="ghost" onClick={() => copy(t.id, "Subject: " + t.s + "\n\n" + t.b)}>{copied === t.id ? "Copied ✓" : "Copy template"}</button>
+                  <button className="ghost" onClick={() => copy(t.id, t.wa ? t.b : "Subject: " + t.s + "\n\n" + t.b)}>{copied === t.id ? "Copied ✓" : (t.wa ? "Copy message" : "Copy template")}</button>
                   {!t.post && <a className={"btn" + (ok ? "" : " off")} href={"mailto:" + c.email + "?subject=" + encodeURIComponent(t.s) + "&body=" + encodeURIComponent(t.b)}>Launch email →</a>}
                 </div>
               );
