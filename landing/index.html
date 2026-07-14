@@ -198,6 +198,19 @@
     .nav-link:hover { color:var(--bone); }
     .nav-right { display:flex; align-items:center; gap:18px; }
     .nav-right .btn { padding:10px 22px; font-size:13.5px; }
+    .nav-right .btn .short { display:none; }
+    /* Overflow fix: below ~480px, logo + theme toggle + "Sign in" + the full
+       CTA label no longer fit .nav-inner's flex row (no wrap set), so the
+       button text was running past the viewport edge and getting clipped by
+       html{overflow-x:hidden} — invisible, not just tight. Tighten spacing
+       and swap to a short CTA label instead of letting it truncate. */
+    @media (max-width:480px) {
+      .nav-inner { padding:0 16px; }
+      .nav-right { gap:9px; }
+      .nav-right .btn { padding:9px 13px; font-size:12.5px; }
+      .nav-right .btn .full { display:none; }
+      .nav-right .btn .short { display:inline; }
+    }
 
     /* ============================================================
        ACT 0 — PRE-LOAD : jade HRV waveform draws, collapses to a point.
@@ -371,6 +384,7 @@
     .pp-dev:hover { color:var(--bone); border-color:var(--jade-deep); }
     .pp-dev.active { color:var(--void); background:var(--jade); border-color:var(--jade); }
     .pp-hint { font-family:var(--font-mono); font-size:10px; letter-spacing:0.03em; color:var(--ash); }
+    .pp-badges { display:flex; gap:6px; flex-wrap:wrap; }
 
     /* ============================================================
        ACT 5 — AMBIENT PRESENCE (coach pull-quote, folded into #join)
@@ -838,6 +852,17 @@
     .pd-ins { display:flex; flex-direction:column; gap:5px; margin-top:3px; }
     .pd-i { font-family:var(--font-mono); font-size:8.5px; color:var(--bone); line-height:1.4; display:flex; gap:5px; }
     .pd-ik { color:var(--jade); }
+    /* passport screen upgrade: 7-day streak bars + earned/locked badges —
+       mirrors the real product's passport page (mvp/passport.html bar chart
+       + stamp row) so the marketing demo shows the actual feature, not a
+       simplified stand-in. Reuses .bdg/.bdg.sm/.bdg.locked from board-strip. */
+    .pd-days { display:flex; gap:3px; margin-top:6px; }
+    .pd-day { flex:1; height:18px; border-radius:3px; background:rgba(var(--wash),.06); }
+    .pd-day.on { background:var(--jade-deep); }
+    .pd-day.on.hot { background:var(--jade); box-shadow:0 0 7px rgba(127,183,158,.5); }
+    .pd-daysline { text-align:center; font-family:var(--font-mono); font-size:7.5px; letter-spacing:.05em; color:var(--ash); margin-top:5px; }
+    .pd-daysline b { color:var(--jade); font-weight:500; }
+    .pd-badges { display:flex; gap:5px; flex-wrap:wrap; justify-content:center; margin-top:2px; }
     .stk-row { display:flex; justify-content:space-between; align-items:center; padding:7px 10px; border:1px solid var(--hairline); border-radius:8px; font-family:var(--font-mono); font-size:9px; }
     .stk-n { color:var(--ash); } .stk-v { color:var(--bone); } .stk-v.pos { color:var(--jade); } .stk-v.neg { color:var(--amber); }
     .stk-open { display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:8px; color:var(--amber-glow); padding:6px 10px; border:1px dashed var(--amber-deep); border-radius:8px; }
@@ -875,7 +900,15 @@
     @media (max-width:900px){
       .scrolly { display:block; }
       .scrolly-stage { position:sticky; top:6px; z-index:2; background:linear-gradient(180deg, var(--void) 86%, transparent); padding-bottom:8px; }
-      .scrolly-step { min-height:68vh; align-items:flex-end; padding-bottom:5vh; position:relative; z-index:3; }
+      /* Overlap fix: the sticky stage (phone + caption + tabs) runs ~600-630px
+         tall on mobile, which is routinely MORE than 68vh/62vh of a real
+         mobile viewport (browser chrome eats the rest) — so the step-card
+         used to render its text on top of the phone. --stage-h is the stage's
+         real measured height (set in JS, ACT 1.5), with a floor fallback for
+         the instant before JS runs; max() keeps the old generous vh pacing
+         on tall viewports while guaranteeing clearance on short ones. */
+      .scrolly-step { min-height:max(68vh, calc(var(--stage-h, 620px) + 56px)); align-items:flex-end; padding-bottom:5vh; position:relative; z-index:3; }
+      .scrolly-step:first-child { min-height:max(56vh, calc(var(--stage-h, 620px) + 32px)); }
       .step-card { margin:0 auto; background:rgba(2,6,23,.94); }
     }
     /* passport screen: holographic shimmer sweep + anon identity chip */
@@ -906,6 +939,9 @@
     .scr-pass.on .pd-ins .pd-i { opacity:0; animation:exFadeUp .5s ease forwards; }
     .scr-pass.on .pd-ins .pd-i:nth-child(1){ animation-delay:.55s; }
     .scr-pass.on .pd-ins .pd-i:nth-child(2){ animation-delay:.7s; }
+    .scr-pass.on .pd-days .pd-day { opacity:0; animation:exFadeUp .4s ease forwards; animation-delay:calc(.95s + var(--i) * .05s); }
+    .scr-pass.on .pd-daysline { opacity:0; animation:exFadeUp .5s ease 1.3s forwards; }
+    .scr-pass.on .pd-badges { opacity:0; animation:exFadeUp .5s ease 1.42s forwards; }
     /* stakes */
     .scr-stakes.on .pd-num { animation:exIdxPop .7s var(--circadian) both, exGlow 3.2s ease-in-out 1s infinite; }
     .scr-stakes.on .stk-row { opacity:0; animation:exFadeUp .5s ease forwards; }
@@ -924,6 +960,7 @@
     .dev-tok.on .dev-s::before { content:""; position:absolute; left:0; top:50%; width:5px; height:5px; margin-top:-2.5px; border-radius:50%; background:var(--jade); box-shadow:0 0 6px var(--jade); animation:chalPulse 1.4s ease-in-out infinite; }
     @media (prefers-reduced-motion: reduce) {
       .scr-pass.on .pd-num, .scr-pass.on .pd-pct, .scr-pass.on .pd-mark, .scr-pass.on .pd-i,
+      .scr-pass.on .pd-days .pd-day, .scr-pass.on .pd-daysline, .scr-pass.on .pd-badges,
       .scr-stakes.on .pd-num, .scr-stakes.on .stk-row, .scr-stakes.on .stk-open,
       .scr-dev.on .dev-tok, .dev-tok.on .dev-s::before { animation:none; opacity:1; transform:none; }
       .scr-pass.on::after, .scr-pass.on .pd-anon, .scr-stakes.on .stk-feed .sf { animation:none; opacity:1; transform:none; }
@@ -1126,7 +1163,7 @@
     <div class="nav-right">
       <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark theme">☀</button>
       <a href="#join" class="nav-link">Sign in</a>
-      <a href="try.html" id="ctaNav" class="btn btn-primary" data-magnetic data-door="create">Create your Squad</a>
+      <a href="try.html" id="ctaNav" class="btn btn-primary" data-magnetic data-door="create"><span class="full">Create your Squad</span><span class="short">Join free</span></a>
     </div>
   </div>
 </nav>
@@ -1288,6 +1325,21 @@
             <div class="pd-ins">
               <div class="pd-i"><span class="pd-ik">◆</span> Deep rest carried today — 40% of the lift came from sleep.</div>
               <div class="pd-i"><span class="pd-ik">◆</span> HRV up 3 days running; hold the 10pm lights-out to clear debt.</div>
+            </div>
+            <div class="pd-days" aria-hidden="true">
+              <span class="pd-day on" style="--i:0"></span>
+              <span class="pd-day on" style="--i:1"></span>
+              <span class="pd-day on" style="--i:2"></span>
+              <span class="pd-day on" style="--i:3"></span>
+              <span class="pd-day on" style="--i:4"></span>
+              <span class="pd-day on" style="--i:5"></span>
+              <span class="pd-day on hot" style="--i:6"></span>
+            </div>
+            <div class="pd-daysline">7/7 mornings logged · <b>🔥 7-day streak</b></div>
+            <div class="pd-badges">
+              <span class="bdg sm">🔥 7-Day Streak</span>
+              <span class="bdg sm">◆ Multi-Device</span>
+              <span class="bdg sm locked">🏅 Podium</span>
             </div>
             <div class="chal-foot">Calibrated against your own 90-day history · demo</div>
           </div>
@@ -1570,6 +1622,12 @@
           <button class="pp-dev" data-src="WHOOP 5.0">Whoop</button>
         </div>
         <p class="pp-hint">Tap a device — the source sensor swaps, the score &amp; squad stay put.</p>
+        <div class="pp-badges">
+          <span class="bdg sm">🔥 7-Day Streak</span>
+          <span class="bdg sm">◆ Multi-Device</span>
+          <span class="bdg sm locked">🏅 Podium</span>
+        </div>
+        <p class="pp-hint">Shareable at <span style="color:var(--jade)">oriya.app/p/you</span> — a QR that renders live from the board, not a screenshot that goes stale.</p>
       </div>
       <div class="act-head">
         <span class="eyebrow">The Body Passport</span>
@@ -2148,6 +2206,21 @@
   (function () {
     const root = document.getElementById("appDemo");
     if (!root) return;
+
+    // Mobile overlap fix: feed the stage's real height to .scrolly-step's
+    // min-height floor (see CSS) so scrolling text can never render on top
+    // of the phone — a static vh guess drifts as the tab row wraps or the
+    // caption changes length. ResizeObserver catches both width- and
+    // content-driven changes; resize covers orientation flips.
+    const scrolly = document.getElementById("howScrolly");
+    function syncStageHeight() {
+      if (!scrolly) return;
+      scrolly.style.setProperty("--stage-h", root.offsetHeight + "px");
+    }
+    syncStageHeight();
+    window.addEventListener("resize", syncStageHeight);
+    if (window.ResizeObserver) new ResizeObserver(syncStageHeight).observe(root);
+
     const phone = root.querySelector(".phone");
     const scrUpload = root.querySelector('[data-scr="upload"]');
     const scrSync = root.querySelector('[data-scr="sync"]');
@@ -2441,7 +2514,14 @@
 
     primaries.forEach(function (el) {
       if (invited) {
-        el.textContent = "Join " + name + (squad ? "" : "'s") + " Squad";
+        var label = "Join " + name + (squad ? "" : "'s") + " Squad";
+        // ctaNav carries responsive .full/.short spans (mobile nav overflow
+        // fix) — fill those instead of nuking them with textContent, or the
+        // long invite label re-breaks the exact overflow this was meant to
+        // prevent. Other CTAs (no spans) fall through to textContent as before.
+        var full = el.querySelector(".full"), short = el.querySelector(".short");
+        if (full && short) { full.textContent = label; short.textContent = "Join " + (squad || name.split(" ")[0] || "now"); }
+        else { el.textContent = label; }
         el.dataset.door = "join";
         // carry the invite context into the prototype
         var qs = new URLSearchParams();
