@@ -250,17 +250,23 @@
       .tour-step:nth-of-type(1){ opacity:1 } .tour-step:nth-of-type(2),.tour-step:nth-of-type(3){ display:none }
       html.pf body{ animation:none } }
     /* ---- boot skeleton (shown while Babel compiles; React replaces it on mount) ---- */
-    .boot{ min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:24px; }
-    .boot-card{ width:300px; max-width:80vw; aspect-ratio:1.586/1; border-radius:20px; border:1px solid var(--hairline);
-      background:linear-gradient(155deg,#16191F,#0c0e12); box-shadow:0 40px 80px -34px rgba(0,0,0,.85); position:relative; overflow:hidden; }
-    .boot-card::after{ content:""; position:absolute; inset:0; transform:translateX(-100%);
-      background:linear-gradient(90deg,transparent,rgba(236,234,228,.09),transparent); animation:bootSheen 1.15s infinite; }
-    @keyframes bootSheen{ to{ transform:translateX(100%); } }
+    .boot{ min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:20px; padding:13vh 24px 24px; }
+    .boot-hook{ width:100%; max-width:440px; display:flex; flex-direction:column; align-items:center; gap:12px; }
+    .sk{ background:linear-gradient(90deg,rgba(236,234,228,.04) 25%,rgba(236,234,228,.10) 37%,rgba(236,234,228,.04) 63%);
+      background-size:400% 100%; animation:skShimmer 1.4s ease infinite; border-radius:9px; }
+    .sk-h1{ height:34px; width:80%; }
+    .sk-h1.b{ width:56%; }
+    .sk-sub{ height:13px; width:68%; margin-top:4px; border-radius:6px; }
+    .sk-grid{ width:100%; display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px; }
+    .sk-dev{ height:58px; border-radius:12px; }
+    .sk-drop{ width:100%; height:118px; border-radius:16px; border:2px dashed var(--hairline);
+      background:rgba(236,234,228,.02); margin-top:6px; }
+    @keyframes skShimmer{ 0%{background-position:100% 0} 100%{background-position:0 0} }
     .boot-t{ font-family:var(--font-mono); font-size:12px; letter-spacing:.05em; color:var(--ash); }
     .boot-dot{ display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--jade); margin-right:8px;
       box-shadow:0 0 8px var(--jade); animation:bootPulse 1s infinite; vertical-align:middle; }
     @keyframes bootPulse{ 0%,100%{opacity:.35} 50%{opacity:1} }
-    @media (prefers-reduced-motion: reduce){ .boot-card::after,.boot-dot{ animation:none } }
+    @media (prefers-reduced-motion: reduce){ .sk,.boot-dot{ animation:none } }
     /* pulsed default preset on the hook */
     .qt-pulse{ animation:qtPulse 2.4s ease-in-out infinite; }
     @keyframes qtPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(127,183,158,0); } 50%{ box-shadow:0 0 22px -5px rgba(127,183,158,.5); } }
@@ -360,7 +366,7 @@
     });
   })();
   </script>
-  <div id="root"><div class="boot"><div class="boot-card"></div><div class="boot-t"><span class="boot-dot"></span>Waking up the boards…</div></div></div>
+  <div id="root"><div class="boot" aria-hidden="true"><div class="boot-hook"><div class="sk sk-h1"></div><div class="sk sk-h1 b"></div><div class="sk sk-sub"></div><div class="sk-grid"><div class="sk sk-dev"></div><div class="sk sk-dev"></div><div class="sk sk-dev"></div><div class="sk sk-dev"></div></div><div class="sk-drop"></div></div><div class="boot-t"><span class="boot-dot"></span>Building your board…</div></div></div>
 
   <script type="text/babel" data-presets="react">
     const { useState, useEffect, useRef, useCallback } = React;
