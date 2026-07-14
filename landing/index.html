@@ -900,16 +900,17 @@
     @media (max-width:900px){
       .scrolly { display:block; }
       .scrolly-stage { position:sticky; top:6px; z-index:2; background:linear-gradient(180deg, var(--void) 86%, transparent); padding-bottom:8px; }
-      /* Overlap fix v2: v1 reserved a flat 56px below the sticky phone, but the
-         step-card itself (heading + 3-line paragraph) is ~200-280px tall — far
-         more than 56px — so the card, anchored to the bottom of a too-short
-         box, still grew up into the phone. --stage-h and --card-h are both
-         measured live in JS (ACT 1.5): stage-h is the sticky phone's real
-         height, card-h is THIS step's own card height, so the box always has
-         exactly phone + card + a real gap, on every viewport and every
-         caption length. Floor fallbacks cover the instant before JS runs. */
-      .scrolly-step { min-height:max(68vh, calc(var(--stage-h, 620px) + var(--card-h, 260px) + 48px)); align-items:flex-end; padding-bottom:6vh; position:relative; z-index:3; }
-      .scrolly-step:first-child { min-height:max(56vh, calc(var(--stage-h, 620px) + var(--card-h, 220px) + 32px)); }
+      /* Overlap fix v3: v1/v2 tried to reserve enough scroll-room below the
+         sticky phone for a normal-flow, bottom-anchored card — but that card
+         keeps sliding upward for as long as the user keeps scrolling, no
+         matter how much room is reserved, and inevitably passes behind the
+         fixed phone at rest. Reserving more room only postpones the overlap,
+         it can't remove it. Fix: make the card sticky too, pinned at a fixed
+         viewport offset just below the phone (--stage-h, measured live in JS)
+         — a stationary target can never slide into another stationary target,
+         so the two can never overlap regardless of scroll position. */
+      .scrolly-step { min-height:max(72vh, calc(var(--stage-h, 620px) + 240px)); display:block; position:sticky; top:calc(var(--stage-h, 620px) + 40px); z-index:3; }
+      .scrolly-step:first-child { min-height:max(58vh, calc(var(--stage-h, 620px) + 180px)); }
       .step-card { margin:0 auto; background:rgba(2,6,23,.94); }
     }
     /* passport screen: holographic shimmer sweep + anon identity chip */
@@ -2221,19 +2222,6 @@
     syncStageHeight();
     window.addEventListener("resize", syncStageHeight);
     if (window.ResizeObserver) new ResizeObserver(syncStageHeight).observe(root);
-
-    // Each step's own card height feeds --card-h on that step (see CSS): the
-    // fixed-phone + fixed-gap guess used to be shorter than a real 3-line
-    // caption, so the card grew up into the phone. Measuring per-card, per-step
-    // means the fix holds regardless of copy length or viewport.
-    document.querySelectorAll("#howSteps .scrolly-step").forEach((step) => {
-      const card = step.querySelector(".step-card");
-      if (!card) return;
-      const syncCardHeight = () => step.style.setProperty("--card-h", card.offsetHeight + "px");
-      syncCardHeight();
-      window.addEventListener("resize", syncCardHeight);
-      if (window.ResizeObserver) new ResizeObserver(syncCardHeight).observe(card);
-    });
 
     const phone = root.querySelector(".phone");
     const scrUpload = root.querySelector('[data-scr="upload"]');
