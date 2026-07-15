@@ -13,6 +13,21 @@
 var DEVICES = ["Oura", "Whoop", "Garmin", "Apple Health"];
 var MAX_B64 = 7 * 1024 * 1024; // ~5MB image after base64 inflation
 
+// Cross-device normalization — the same correction factors as landing/mvp/logic.js
+// (keep in sync). Raw device score → one comparable 0-100 Oriya Index. This is
+// deterministic math, computed instantly; the only human step is confirming the
+// screenshot is a real device capture, which never changes the number.
+var MODEL = {
+  "Oura":         { factor: 0.97, offset: 2.5 },
+  "Whoop":        { factor: 0.92, offset: -1.0 },
+  "Garmin":       { factor: 0.95, offset: 0.0 },
+  "Apple Health": { factor: 0.90, offset: 1.0 },
+};
+function oriyaIndex(raw, device) {
+  var m = MODEL[device] || { factor: 1.0, offset: 0.0 };
+  return Math.max(0, Math.min(100, Math.round(raw * m.factor + m.offset)));
+}
+
 function json(obj, status) {
   return new Response(JSON.stringify(obj), { status: status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
 }
@@ -32,6 +47,7 @@ export async function manualSubmit(request, env) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ ok: false, code: "email" }, 400);
   if (DEVICES.indexOf(device) < 0) return json({ ok: false, code: "device" }, 400);
   if (!(score >= 0 && score <= 100)) return json({ ok: false, code: "score" }, 400);
+  var index = oriyaIndex(score, device);
 
   var m = String(body.image || "").match(/^data:(image\/(?:png|jpeg|jpg|webp));base64,([A-Za-z0-9+/=]+)$/);
   if (!m || m[2].length > MAX_B64) return json({ ok: false, code: "image" }, 400);
@@ -43,6 +59,7 @@ export async function manualSubmit(request, env) {
   }) + " PT";
   var text = "New Oriya submission\n\nEmail:\n" + email + "\n\nDevice:\n" + device +
     "\n\nRaw score:\n" + score +
+    "\n\nOriya Index (auto-normalized):\n" + index + "  ← posted to the athlete instantly; verify the screenshot is a real device capture" +
     (code ? "\n\nInvite code:\n" + code : "") +
     (challenge ? "\n\nChallenge:\n" + challenge : "") +
     "\n\nTimestamp:\n" + when + "\n";
@@ -61,13 +78,14 @@ export async function manualSubmit(request, env) {
   });
   if (!res.ok) return json({ ok: false, code: "send" }, 502);
 
-  // E1 — the submission-confirmation receipt to the participant. Best-effort:
-  // the team email above is the real record, so a failed receipt never fails
-  // the submission. Board voice (discloses the human); reply routes to the
-  // founder. Device + raw score are real (typed into the form), not tokens.
-  // Keep this copy in sync with the E1 card on the outreach workbench.
+  // E1 — the instant-score receipt to the participant. Normalization is
+  // deterministic math (computed above), so the number is real and immediate —
+  // no "wait an hour". Best-effort: the team email above is the real record, so
+  // a failed receipt never fails the submission. Board voice discloses the
+  // human; reply routes to the founder. Keep this copy in sync with the E1 card
+  // on the outreach workbench.
   try {
-    var lock = challenge ? "\n\nYou're locked in: " + challenge + "." : "";
+    var lock = challenge ? " You're in on " + challenge + "." : "";
     await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { "Authorization": "Bearer " + env.RESEND_API_KEY, "Content-Type": "application/json" },
@@ -75,11 +93,12 @@ export async function manualSubmit(request, env) {
         from: env.SUBMIT_FROM || "Oriya Board <board@oriya.app>",
         to: [email],
         reply_to: "team@oriya.app",
-        subject: "Got it — your Oriya Index is on the way",
-        text: "Got it — your " + device + " " + score + " screenshot landed." + lock +
-          "\n\nEvery score is read and normalized by hand right now, so give it a beat: your Oriya Index and your athlete-board code post to this inbox, usually within the hour during the founding sprint." +
-          "\n\nThat code opens your 7-day board at oriya.app/board — you'll watch your side move the moment you're on it." +
-          "\n\nNothing else to do now. Same screenshot tomorrow keeps your streak — a logged red morning still beats a skipped green one." +
+        subject: "Your Oriya Index is " + index + " — you're on the board",
+        text: "Your Oriya Index is " + index + "." + lock +
+          "\n\n" + device + " " + score + " → Oriya Index " + index + ". Every wearable normalizes to the same 0–100 index instantly, so your number sits on the exact same scale as every Oura, Whoop, Garmin and Apple Watch on the board." +
+          "\n\nThe only human in the loop is a quick check that your screenshot is a real device capture — that keeps the board honest, and it never changes your number." +
+          "\n\nWatch your side move → oriya.app/board" +
+          "\nSame screenshot tomorrow keeps your streak — a rough morning logged still beats a great one skipped." +
           "\n\n— Ori, the Oriya board\nReply to this email and it reaches Diana directly.",
       }),
     });

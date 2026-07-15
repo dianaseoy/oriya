@@ -54,6 +54,13 @@
   <script type="text/babel">
     const { useState, useRef } = React;
     const DEVICES = ["Oura", "Whoop", "Garmin", "Apple Health"];
+    // Instant normalization — same factors as landing/mvp/logic.js + worker/submit.js.
+    // Raw device score → one comparable 0-100 Oriya Index, computed on the spot.
+    const MODEL = { "Oura": [0.97, 2.5], "Whoop": [0.92, -1.0], "Garmin": [0.95, 0.0], "Apple Health": [0.90, 1.0] };
+    const oriyaIndex = (raw, device) => {
+      const [factor, offset] = MODEL[device] || [1.0, 0.0];
+      return Math.max(0, Math.min(100, Math.round(raw * factor + offset)));
+    };
     const CHALLENGES = ["Founders vs Operators", "Marina Run Club", "Ring vs Band", "Open board"];
     // Exact-title map to the /try board details (no entry for Open board on purpose)
     const TRY_ID = { "Founders vs Operators": "founders", "Marina Run Club": "marina", "Ring vs Band": "devicewars" };
@@ -134,12 +141,16 @@
         return (
           <div className="card success">
             <h2>You're in.</h2>
-            <p className="sm" style={{ marginTop: 10 }}>Ori will get back to you — reads your screenshot and posts your Oriya Index, usually within the hour.</p>
+            <p className="sm" style={{ marginTop: 10 }}><b>{f.device} {f.score}</b> normalized onto the shared 0–100 scale, instantly:</p>
+            <div style={{ margin: "16px 0 2px", textAlign: "center" }}>
+              <span className="mono" style={{ fontSize: 56, fontWeight: 700, lineHeight: 1, color: "#00FF87" }}>{oriyaIndex(Number(f.score), f.device)}</span>
+              <span className="xs dim" style={{ display: "block", marginTop: 8 }}>your Oriya Index — the same scale as every Oura, Whoop, Garmin &amp; Apple Watch on the board</span>
+            </div>
             <a className="btn" style={{ display: "block", textAlign: "center", marginTop: 16 }}
               href={back ? "../try.html?challenge=" + encodeURIComponent(back) : "index.html"}>
               <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: 99, background: "#00FF87", marginRight: 8, verticalAlign: "middle" }}></span>Watch your board move →
             </a>
-            <p className="xs dim" style={{ marginTop: 10 }}>Your Index, where you land, and your athlete-board code arrive by email — the code opens your 7-day board at oriya.app/board.</p>
+            <p className="xs dim" style={{ marginTop: 12 }}>The only human step is a quick check that your screenshot is a real device capture — it keeps the board honest and never changes your number. Log the same screenshot tomorrow to keep your streak.</p>
           </div>
         );
       }
@@ -195,7 +206,7 @@
           {err && <p className="err">{err}</p>}
           <button className="btn" disabled={state === "sending"} onClick={submit}>{state === "sending" ? "Sending…" : "Submit"}</button>
           {state === "fallback" && <p className="xs dim" style={{ marginTop: 10 }}>We opened an email draft instead — attach your screenshot and hit send. Same result, one extra tap.</p>}
-          <p className="xs dim" style={{ marginTop: 12 }}>Thanks. Ori will get back to you — your Oriya Index posts to the board within the hour during the founding sprint.</p>
+          <p className="xs dim" style={{ marginTop: 12 }}>Your Oriya Index is calculated the instant you submit — one fair 0–100 scale across every wearable. We only check your screenshot is a real device capture; that keeps the board honest and never changes your number.</p>
         </div>
       );
     }
@@ -205,7 +216,7 @@
         <React.Fragment>
           <span className="kicker">Oriya · daily submission</span>
           <h1>Send this morning's score.</h1>
-          <div className="banner">Launch crunch — device sync isn't wired up yet. Your morning screenshot claims your spot on today's board; Ori posts your number, usually within the hour.</div>
+          <div className="banner">Device sync isn't wired up yet — your morning screenshot is the entry. Your Oriya Index normalizes instantly the moment you submit; we only confirm the screenshot's a real device capture to keep the board honest.</div>
           <ManualProofUpload />
         </React.Fragment>
       );
