@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Science — Oriya | How we normalize every wearable onto one fair score</title>
-  <meta name="description" content="How Oriya normalizes Oura, Whoop, Garmin, Apple, Samsung and more onto one comparable 0–100 recovery index — the device-specific correction model, validation, and the research it's grounded in.">
+  <meta name="description" content="You can't convert an Oura score to a Whoop score — nobody can. Here's the honest way Oriya puts every wearable on one 0–100 board: we compare each person to their own baseline, and we're building the dual-wearer dataset to publish real cross-device constants.">
+
   <meta property="og:title" content="The Science behind Oriya's recovery score">
   <meta property="og:description" content="A Whoop 83 isn't an Oura 83. Here's the per-device correction model that puts every wearable on one honest scale.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 78 22 A 40 40 0 1 0 79 23' stroke='%237FB79E' stroke-width='5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='50' cy='55' r='14' fill='%237FB79E'/%3E%3Ccircle cx='78' cy='22' r='7' fill='%23D7A25C'/%3E%3C/svg%3E">
@@ -217,6 +218,32 @@
     body.pf-out{opacity:0;transition:opacity .26s ease;}
     @keyframes pfIn{from{opacity:0;}to{opacity:1;}}
     @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto;}*{animation:none!important;transition:none!important;}}
+
+    /* what-it-buys / what-it-costs */
+    .buyscost{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:30px;}
+    .bc{border:1px solid var(--hairline);border-radius:14px;padding:20px 22px;background:rgba(26,30,36,.45);}
+    .bc-k{display:block;font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--jade);margin-bottom:9px;}
+    .bc p{font-size:14px;color:var(--ash);line-height:1.6;}
+
+    /* provisional first-screenshot factors (de-emphasized, collapsible) */
+    details.provisional{margin-top:30px;border:1px solid var(--hairline);border-radius:14px;background:rgba(26,30,36,.35);overflow:hidden;}
+    details.provisional summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:16px 20px;font-size:13.5px;color:var(--ash);}
+    details.provisional summary::-webkit-details-marker{display:none;}
+    details.provisional summary .chev{margin-left:auto;transition:transform .3s var(--circadian);color:var(--ash);}
+    details.provisional[open] summary .chev{transform:rotate(90deg);}
+    .prov-badge{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;font-weight:700;color:var(--ember);border:1px solid rgba(185,106,74,.5);border-radius:6px;padding:3px 8px;background:rgba(185,106,74,.08);}
+    .prov-body{padding:0 20px 20px;}
+    .prov-lead{font-size:13px;color:var(--ash);line-height:1.6;margin-bottom:16px;}
+    /* provisional table stays visible regardless of scroll-in animation (it's behind a click) */
+    details.provisional table.dev tbody tr{opacity:1!important;transform:none!important;}
+    details.provisional table.dev td{font-variant-numeric:tabular-nums;}
+
+    /* check-our-work milestone */
+    .milestone{margin-top:6px;border:1px solid var(--jade-deep);border-radius:16px;padding:26px 24px;background:linear-gradient(155deg,rgba(62,111,94,.14),rgba(26,30,36,.3));}
+    .milestone .ms-k{display:block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--jade);margin-bottom:12px;}
+    .milestone p{font-size:15px;color:var(--ash);line-height:1.65;}
+    .milestone p b{color:var(--bone);}
+    @media (max-width:680px){ .buyscost{grid-template-columns:1fr;} }
   </style>
 </head>
 <body>
@@ -254,9 +281,9 @@
 <section class="hero">
   <div class="wrap">
     <span class="eyebrow">The Science · for Season 1 athletes</span>
-    <h1 class="display">One fair number, across every wearable.</h1>
-    <p class="lede">Oura reads Readiness. Whoop reads Recovery. Garmin rolls a Body Battery. Each is built on a different sensor, a different model, and a different validation standard — so the raw numbers were never comparable. Here's exactly how we make them comparable.</p>
-    <div class="credit">Grounded in peer-reviewed research · 12 devices supported</div>
+    <h1 class="display">You can't convert an Oura score to a Whoop score.</h1>
+    <p class="lede">Nobody can — the brands don't publish the formula, and anyone who says they've cracked it is guessing. So Oriya doesn't fake a conversion. Here's the honest way we put every wearable on one fair board: we compare each person to themselves.</p>
+    <div class="credit">Grounded in peer-reviewed research · honest about the limits</div>
   </div>
 </section>
 
@@ -288,21 +315,43 @@
   </div>
 </section>
 
-<!-- THE MODEL -->
+<!-- THE REAL MECHANISM -->
 <section class="blk">
   <div class="wrap">
     <div class="blk-head">
-      <span class="eyebrow">The model</span>
-      <h2>A calibrated correction, per device.</h2>
-      <p>Every device's native score is converted to the Oriya Standard with a simple, transparent linear correction — a factor and an offset tuned for that specific sensor. Devices with weaker independent validation get a larger correction. The result is clamped to a 1–99 scale.</p>
+      <span class="eyebrow">The honest answer</span>
+      <h2>So we don't guess a conversion — we compare you to yourself.</h2>
+      <p>There's no public constant that turns an Oura score into a Whoop score: the brands don't publish their weights, and anyone who claims to have the formula is guessing. So Oriya doesn't convert between brands. It reads your own recent history and finds <b style="color:var(--bone)">your personal floor, par and ceiling</b> — then today's score becomes a percentile inside <em>your</em> distribution, and that percentile maps onto the shared 0–100 index.</p>
     </div>
 
     <div class="formula">
-      <div class="eq">Oriya = round( <span class="var">native</span> × factor + offset )</div>
-      <div class="note">clamped to 1–99 · factor and offset are calibrated per device</div>
+      <div class="eq">your score today → <span class="var">percentile in your own 90 days</span> → shared 0–100</div>
+      <div class="note">your device's quirks sit in both the reading and the baseline — so they cancel</div>
     </div>
 
-    <div class="flipwrap" id="eqflip" tabindex="0" role="button" aria-label="Flip the card to reveal the Oriya Standard">
+    <div class="buyscost">
+      <div class="bc">
+        <span class="bc-k">What it buys you</span>
+        <p>A Whoop wearer and an Oura wearer on the same board — where rank means <b style="color:var(--bone)">“who's closest to their own best,”</b> not “whose algorithm is more generous.”</p>
+      </div>
+      <div class="bc">
+        <span class="bc-k">What it costs</span>
+        <p>You need about <b style="color:var(--bone)">14 days of history</b> before your number is honest. We show a provisional score before then — and we label it provisional.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THE PROVISIONAL PATH -->
+<section class="blk">
+  <div class="wrap">
+    <div class="blk-head">
+      <span class="eyebrow">Before we know your baseline</span>
+      <h2>Your very first screenshot.</h2>
+      <p>On day one there's no history to rank against — so a single screenshot can't be a real baseline percentile yet. To get you on the board immediately, we apply a rough, per-device correction and mark it clearly. It's a starting estimate, not the science.</p>
+    </div>
+
+    <div class="flipwrap" id="eqflip" tabindex="0" role="button" aria-label="Flip the card to reveal the provisional Index">
       <div class="flipcard">
         <div class="flip-face front">
           <span class="ff-lbl">Whoop · Recovery 83</span>
@@ -310,35 +359,33 @@
           <span class="ff-hint">hover to reveal →</span>
         </div>
         <div class="flip-face back">
-          <span class="ff-lbl">Oriya Standard</span>
+          <span class="ff-lbl">Provisional Index</span>
           <span class="ff-res">75</span>
-          <span class="ff-hint">= 75.36, rounded</span>
+          <span class="ff-hint">= 75.36, rounded · provisional</span>
         </div>
       </div>
     </div>
 
-    <div class="tablewrap"><div class="scroll">
-      <table class="dev">
-        <thead>
-          <tr><th>Device</th><th>Native metric</th><th>Factor</th><th>Offset</th><th>Validation</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Oura</td><td class="metric">Readiness</td><td><span class="tick" data-to="0.97" data-dec="2">0.97</span></td><td><span class="tick" data-to="2.5" data-dec="1" data-signed="1">+2.5</span></td><td><span class="val High">High</span></td></tr>
-          <tr><td>Whoop</td><td class="metric">Recovery %</td><td><span class="tick" data-to="0.92" data-dec="2">0.92</span></td><td><span class="tick" data-to="-1.0" data-dec="1" data-signed="1">−1.0</span></td><td><span class="val Med">Med</span></td></tr>
-          <tr><td>Garmin</td><td class="metric">Body Battery</td><td><span class="tick" data-to="0.95" data-dec="2">0.95</span></td><td><span class="tick" data-to="0.0" data-dec="1" data-signed="1">0.0</span></td><td><span class="val Med">Med</span></td></tr>
-          <tr><td>Apple Watch<span style="color:var(--amber-glow)">*</span></td><td class="metric">HRV + sleep (computed)</td><td><span class="tick" data-to="0.90" data-dec="2">0.90</span></td><td><span class="tick" data-to="1.0" data-dec="1" data-signed="1">+1.0</span></td><td><span class="val Med">Med</span></td></tr>
-          <tr><td>Samsung</td><td class="metric">Energy Score</td><td><span class="tick" data-to="0.88" data-dec="2">0.88</span></td><td><span class="tick" data-to="2.0" data-dec="1" data-signed="1">+2.0</span></td><td><span class="val Low">Low</span></td></tr>
-          <tr><td>Pixel Watch</td><td class="metric">Recovery</td><td><span class="tick" data-to="0.91" data-dec="2">0.91</span></td><td><span class="tick" data-to="1.5" data-dec="1" data-signed="1">+1.5</span></td><td><span class="val Low">Low</span></td></tr>
-          <tr><td>Ultrahuman</td><td class="metric">Movement Index</td><td><span class="tick" data-to="0.94" data-dec="2">0.94</span></td><td><span class="tick" data-to="1.0" data-dec="1" data-signed="1">+1.0</span></td><td><span class="val Med">Med</span></td></tr>
-          <tr><td>Athlytic</td><td class="metric">Recovery</td><td><span class="tick" data-to="0.96" data-dec="2">0.96</span></td><td><span class="tick" data-to="1.0" data-dec="1" data-signed="1">+1.0</span></td><td><span class="val Med">Med</span></td></tr>
-          <tr><td>Bevel</td><td class="metric">Recovery</td><td><span class="tick" data-to="0.95" data-dec="2">0.95</span></td><td><span class="tick" data-to="0.5" data-dec="1" data-signed="1">+0.5</span></td><td><span class="val Med">Med</span></td></tr>
-          <tr><td>Cora Health</td><td class="metric">Readiness</td><td><span class="tick" data-to="0.94" data-dec="2">0.94</span></td><td><span class="tick" data-to="1.0" data-dec="1" data-signed="1">+1.0</span></td><td><span class="val Med">Med</span></td></tr>
-          <tr><td>Gentler Streak</td><td class="metric">Readiness</td><td><span class="tick" data-to="0.97" data-dec="2">0.97</span></td><td><span class="tick" data-to="0.5" data-dec="1" data-signed="1">+0.5</span></td><td><span class="val Med">Med</span></td></tr>
-          <tr><td>Vora</td><td class="metric">Recovery</td><td><span class="tick" data-to="0.96" data-dec="2">0.96</span></td><td><span class="tick" data-to="0.5" data-dec="1" data-signed="1">+0.5</span></td><td><span class="val Med">Med</span></td></tr>
-        </tbody>
-      </table>
-    </div></div>
-    <p class="tnote"><span style="color:var(--amber-glow)">*</span>Apple Watch ships no native composite score — Oriya (like recovery apps such as Athlytic or Bevel) computes one from Apple Health's raw signals. <b style="color:var(--bone)">Two ways in:</b> devices <em>with</em> a native score (Oura, Whoop, Garmin, Samsung, Fitbit, Polar) are normalized with the factor + offset above; devices <em>without</em> one are computed from raw HRV, resting heart rate and sleep, so they arrive already on-scale. The factors here are Oriya's own calibration — illustrative single-screenshot approximations informed by the research below, <b style="color:var(--bone)">not published constants</b>. Connected directly via read-only API, the full model weights the underlying components rather than a single composite.</p>
+    <details class="provisional">
+      <summary><span class="prov-badge">PROVISIONAL</span> See the current first-screenshot factors <span class="chev">▸</span></summary>
+      <div class="prov-body">
+        <p class="prov-lead">These are Oriya's own working constants for the single-screenshot estimate — <b style="color:var(--bone)">rough approximations, not published or independently validated</b>. They exist only to place a first score before your real baseline does, and they're replaced by your personal percentile the moment you have enough history.</p>
+        <div class="tablewrap"><div class="scroll">
+          <table class="dev">
+            <thead>
+              <tr><th>Device</th><th>Native metric</th><th>Factor ≈</th><th>Offset ≈</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Oura</td><td class="metric">Readiness</td><td>0.97</td><td>+2.5</td></tr>
+              <tr><td>Whoop</td><td class="metric">Recovery %</td><td>0.92</td><td>−1.0</td></tr>
+              <tr><td>Garmin</td><td class="metric">Body Battery*</td><td>0.95</td><td>0.0</td></tr>
+              <tr><td>Apple Watch†</td><td class="metric">HRV + sleep (computed)</td><td>0.90</td><td>+1.0</td></tr>
+            </tbody>
+          </table>
+        </div></div>
+        <p class="tnote"><b style="color:var(--bone)">*</b> Garmin's Body Battery is a depletion gauge that drains through the day, so a single reading is the roughest of the four — we treat it as directional only until we can read the underlying signals. <b style="color:var(--bone)">†</b> Apple ships no native recovery score; Oriya computes one from Apple Health's HRV, resting heart rate and sleep. Recovery apps like Athlytic, Bevel or Gentler Streak read that <em>same</em> Apple Health data — so they run through this one Apple path, not a separate per-app calibration.</p>
+      </div>
+    </details>
   </div>
 </section>
 
@@ -351,7 +398,7 @@
     </div>
     <div class="steps">
       <div class="step s1"><div class="n">01</div><h4>Read the raw score</h4><p>Pulled straight from your screenshot and OCR-verified against the device's own metric label, or read directly through a read-only connection.</p></div>
-      <div class="step s2"><div class="n">02</div><h4>Apply the device correction</h4><p>The calibrated factor and offset for your specific sensor translate the native score onto the shared scale.</p></div>
+      <div class="step s2"><div class="n">02</div><h4>Rank it against your own baseline</h4><p>With ~14 days of history, your score becomes a percentile inside your own floor-to-ceiling range. On a first screenshot, a provisional per-device estimate stands in — clearly labelled until your baseline exists.</p></div>
       <div class="step s3"><div class="n">03</div><h4>Weight the full signal</h4><p>Connected directly, Oriya's own weighting blends sleep, recovery (HRV + resting HR) and activity — the same contributors the research finds in every brand's score — instead of trusting one opaque composite.</p></div>
       <div class="step s4"><div class="n">04</div><h4>Post to the board</h4><p>Your normalized number joins the squad leaderboard — ranked against your own baseline, never a raw public score.</p>
         <div class="launch">
@@ -363,23 +410,36 @@
   </div>
 </section>
 
+<!-- CHECK OUR WORK -->
+<section class="blk">
+  <div class="wrap">
+    <div class="blk-head">
+      <span class="eyebrow">How you can check our work</span>
+      <h2>The one dataset that would let us publish real constants.</h2>
+    </div>
+    <div class="milestone">
+      <span class="ms-k">The dual-wearer calibration</span>
+      <p>The only honest way to publish a cross-device conversion is data from people wearing <b>two devices at once</b> — same body, two numbers, every morning. We're recruiting the first dual-wearers now. At <b>500</b>, we publish the empirical mapping: the actual factors, their confidence intervals, and the sample size behind each one — and you get to tell us we're wrong.</p>
+    </div>
+  </div>
+</section>
+
 <!-- VALIDATION & SOURCE -->
 <section class="blk">
   <div class="wrap">
     <div class="blk-head">
       <span class="eyebrow">Where it comes from</span>
       <h2>Grounded in the research.</h2>
-      <p>The correction factors are informed by independent evaluations of how consumer wearables' composite recovery scores relate to each other and to the underlying physiology.</p>
+      <p>The research doesn't hand us a conversion formula — it explains why one can't exist. That's the whole reason we compare you to your own baseline instead of converting between brands.</p>
     </div>
     <div class="source">
-      <p><b>1 · Composite scores aren't comparable.</b> Doherty C, Baldwin M, Lambe R, Burke D, Altini M. <em>"Readiness, recovery, and strain: an evaluation of composite health scores in consumer wearables."</em> Translational Exercise Biomedicine, 2025;2(2):128–144.<span class="cnote">14 scores across 10 brands. HRV (86%), resting HR (79%), activity and sleep are the common inputs — but weightings and formulas are undisclosed, and the scores are rarely validated against a reference.</span></p>
-      <p><b>2 · Devices measure the body differently.</b> Miller DJ, Sargent C, Roach GD. <em>"A Validation of Six Wearable Devices for Estimating Sleep, Heart Rate and Heart Rate Variability in Healthy Adults."</em> Sensors, 2022;22(16):6317.<span class="cnote">Measuring the same heartbeats, HRV agreement ran from excellent (ICC 0.99, ±4.7 ms on Whoop) to poor (ICC 0.24, ±33.1 ms on Garmin); sleep-stage accuracy spanned 50–65%.</span></p>
+      <p><b>1 · You can't derive a conversion from these scores.</b> Doherty C, Baldwin M, Lambe R, Burke D, Altini M. <em>"Readiness, recovery, and strain: an evaluation of composite health scores in consumer wearables."</em> Translational Exercise Biomedicine, 2025;2(2):128–144.<span class="cnote">14 scores across 10 brands: the common inputs are HRV (86%) and resting HR (79%), but the weightings and formulas are undisclosed and the scores are rarely validated against a reference. There is no published constant to look up — so we don't pretend to have one.</span></p>
+      <p><b>2 · Devices don't even agree on the raw signal.</b> Miller DJ, Sargent C, Roach GD. <em>"A Validation of Six Wearable Devices for Estimating Sleep, Heart Rate and Heart Rate Variability in Healthy Adults."</em> Sensors, 2022;22(16):6317.<span class="cnote">Measuring the same heartbeats, HRV agreement ran from excellent (ICC 0.99) to poor (ICC 0.24), and sleep-stage accuracy spanned 50–65%. When devices disagree on the underlying physiology, converting one brand's composite into another's only compounds the error — one more reason to rank you against yourself.</span></p>
       <p><b>3 · HRV metrics aren't interchangeable.</b> Shaffer F, Ginsberg JP. <em>"An Overview of Heart Rate Variability Metrics and Norms."</em> Frontiers in Public Health, 2017;5:258.<span class="cnote">RMSSD and SDNN are distinct measures (healthy SDNN ≈ 50 ms) — a value on one scale can't be read off as the other.</span></p>
-      <p><b>4 · Privacy by design.</b> U.S. Federal Trade Commission, <em>In re Flo Health, Inc.</em>, Docket No. C-4747 (final order, June 22, 2021).<span class="cnote">A health app that shared data without clear consent drew FTC enforcement — which is why Oriya defaults to affirmative opt-in and read-only access.</span></p>
-      <p><b>5 · Against orthosomnia.</b> Baron KG, Abbott S, Jao N, Manalo N, Mullen R. <em>"Orthosomnia: Are Some Patients Taking the Quantified Self Too Far?"</em> Journal of Clinical Sleep Medicine, 2017;13(2):351–354.<span class="cnote">Fixating on a tracker number can worsen the very thing it measures — so rank is against your own baseline, and a red morning is never a public failure.</span></p>
+      <p><b>4 · Against orthosomnia.</b> Baron KG, Abbott S, Jao N, Manalo N, Mullen R. <em>"Orthosomnia: Are Some Patients Taking the Quantified Self Too Far?"</em> Journal of Clinical Sleep Medicine, 2017;13(2):351–354.<span class="cnote">Fixating on a tracker number can worsen the very thing it measures — so rank is against your own baseline, and a red morning is never a public failure.</span></p>
     </div>
     <div class="honesty">
-      <b>Honest about the limits.</b> The research above is candid that these scores are proprietary, inconsistently weighted, and seldom validated — which is exactly why comparing them raw fails, and why we publish our correction openly instead of hiding it. The Oriya Standard is built to be directionally useful for fair comparison, not diagnostically precise. It is a social context layer, not a medical device, and is no substitute for clinical assessment. And we won't weaponize it: rank is measured against your own baseline, so a hard night never becomes a public failure.
+      <b>Honest about the limits.</b> The research above is candid that these scores are proprietary, inconsistently weighted, and seldom validated — which is exactly why we don't convert between them. Comparing you to your own baseline is the fair mechanism; the single-screenshot factors are a provisional stand-in, labelled as such, until your history exists. The Oriya Index is built to be directionally useful for fair comparison, not diagnostically precise — a social context layer, not a medical device, and no substitute for clinical assessment. And we won't weaponize it: rank is measured against your own baseline, so a hard night never becomes a public failure.
     </div>
   </div>
 </section>
