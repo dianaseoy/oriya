@@ -134,7 +134,7 @@
         return (
           <div className="card success">
             <h2>You're in.</h2>
-            <p className="sm" style={{ marginTop: 10 }}>A person reads your screenshot and posts your Oriya Index — usually within the hour.</p>
+            <p className="sm" style={{ marginTop: 10 }}>Ori will get back to you — reads your screenshot and posts your Oriya Index, usually within the hour.</p>
             <a className="btn" style={{ display: "block", textAlign: "center", marginTop: 16 }}
               href={back ? "../try.html?challenge=" + encodeURIComponent(back) : "index.html"}>
               <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: 99, background: "#00FF87", marginRight: 8, verticalAlign: "middle" }}></span>Watch your board move →
@@ -195,7 +195,7 @@
           {err && <p className="err">{err}</p>}
           <button className="btn" disabled={state === "sending"} onClick={submit}>{state === "sending" ? "Sending…" : "Submit"}</button>
           {state === "fallback" && <p className="xs dim" style={{ marginTop: 10 }}>We opened an email draft instead — attach your screenshot and hit send. Same result, one extra tap.</p>}
-          <p className="xs dim" style={{ marginTop: 12 }}>Thanks. Your Oriya Index will be calculated within the hour — a person reads every screenshot during the founding sprint.</p>
+          <p className="xs dim" style={{ marginTop: 12 }}>Thanks. Ori will get back to you — your Oriya Index posts to the board within the hour during the founding sprint.</p>
         </div>
       );
     }
@@ -205,7 +205,7 @@
         <React.Fragment>
           <span className="kicker">Oriya · daily submission</span>
           <h1>Send this morning's score.</h1>
-          <div className="banner">Launch crunch — device sync isn't wired up yet. Your morning screenshot claims your spot on today's board; a person posts your number, usually within the hour.</div>
+          <div className="banner">Launch crunch — device sync isn't wired up yet. Your morning screenshot claims your spot on today's board; Ori posts your number, usually within the hour.</div>
           <ManualProofUpload />
         </React.Fragment>
       );
