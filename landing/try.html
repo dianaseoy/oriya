@@ -339,6 +339,7 @@
       </a>
       <div class="lnks">
         <a href="science.html" class="sci">The Science</a>
+        <a href="manifesto.html" class="sci">Manifesto</a>
         <a href="partners.html" class="sci">Partners</a>
         <a href="#privacy" class="sci" onclick="window.dispatchEvent(new CustomEvent('oriya:privacy'));return false;">Privacy</a>
         <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark theme">☀</button>
@@ -445,6 +446,7 @@
     /* =================== lazy CDN loader =================== */
     const TESS_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
     const HTI_URL  = "https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js";
+    const QR_URL   = "https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js";
     function loadScript(src) {
       return new Promise((res, rej) => {
         if (document.querySelector('script[data-lazy="' + src + '"]')) return res();
@@ -1032,7 +1034,7 @@
                   <ChevronRight className="w-4 h-4 text-ash/60 shrink-0" />
                 </button>
               ))}
-              <p className="text-center text-[10px] text-ash/60 font-mono">Reading is free — no passport needed. Boards show labeled sample athletes until sides fill.</p>
+              <p className="text-center text-[10px] text-ash/60 font-mono">Reading is free — no passport needed. These are sample demos of the format; the real boards run in person at <a href="partners.html" className="text-jade/80 border-b border-jade/20">partner gyms &amp; events →</a></p>
             </div>
 
             <PreviewTour />
@@ -1300,6 +1302,61 @@
             {passport.native} {m.metric} ({m.tag}) → {passport.native}×{m.factor}{fmtOffset(m.offset)} = <span className="text-jade">{passport.oriya} Oriya</span>
             <span className="text-ash/50"> · tap card to flip ⟳</span>
           </p>
+        </div>
+      );
+    }
+
+    /* =============================== Shareable public Passport (QR) ===============================
+       The offline-event connector. At a gym / café / Luma activation a host runs
+       a board, everyone drops a screenshot, and each athlete gets a public Body
+       Passport at oriya.app/p/<handle>. Scanning this QR is how two people on the
+       same board connect in the room. Same qrcode-generator lib + bone/void
+       render as landing/mvp/passport.html; lazy-loaded, no external QR service.
+       Honesty gate: the public card renders live from the board, so until a real
+       screenshot is in this is a labeled PREVIEW of that link, not a live card. */
+    function PassportQR({ passport, onToast }) {
+      const handle = slug(passport.name);
+      const url = "https://oriya.app/p/" + handle;
+      const [svg, setSvg] = useState("");
+      const [copied, setCopied] = useState(false);
+      useEffect(() => {
+        let cancelled = false;
+        (async () => {
+          try {
+            await loadScript(QR_URL);
+            if (cancelled || typeof window.qrcode === "undefined") return;
+            const qr = window.qrcode(0, "M");
+            qr.addData(url); qr.make();
+            const n = qr.getModuleCount();
+            let rects = "";
+            for (let r = 0; r < n; r++) for (let col = 0; col < n; col++) {
+              if (qr.isDark(r, col)) rects += '<rect x="' + (col + 2) + '" y="' + (r + 2) + '" width="1" height="1"/>';
+            }
+            if (!cancelled) setSvg('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (n + 4) + ' ' + (n + 4) + '" shape-rendering="crispEdges" role="img" aria-label="QR to your public Body Passport"><rect width="100%" height="100%" fill="#ECEAE4" rx="3"/><g fill="#0B0C0E">' + rects + '</g></svg>');
+          } catch (e) {}
+        })();
+        return () => { cancelled = true; };
+      }, [url]);
+      const copyLink = () => {
+        try { navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1600); } catch (e) {}
+        track("passport_qr_copied", { handle });
+        if (onToast) onToast("Passport link copied — drop it in your squad chat");
+      };
+      return (
+        <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.02] p-4 animate-fade-up">
+          <div className="flex gap-4 items-center">
+            {svg
+              ? <div className="w-24 h-24 shrink-0 rounded-xl overflow-hidden" dangerouslySetInnerHTML={{ __html: svg }} />
+              : <div className="w-24 h-24 shrink-0 rounded-xl border border-white/10 bg-white/[0.03] grid place-items-center"><span className="font-mono text-[9px] text-ash">QR…</span></div>}
+            <div className="min-w-0">
+              <div className="text-sm font-semibold text-bone">Your public Passport — by QR</div>
+              <p className="text-[11px] text-ash mt-1 leading-relaxed">At an in-person activation, someone scans this to pull up your live card and land on the same board. <span className="text-ash/70">oriya.app/p/{handle}</span></p>
+              <button onClick={copyLink} className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-jade hover:text-jade-glow">
+                <Copy className="w-3.5 h-3.5" /> {copied ? "Copied ✓" : "Copy passport link"}
+              </button>
+            </div>
+          </div>
+          <p className="text-[10px] font-mono text-ash/60 mt-3">Preview · your public card renders live from the board once your first real screenshot is in.</p>
         </div>
       );
     }
@@ -1840,8 +1897,8 @@
             </div>
 
             <div className="mt-8 rounded-xl border border-jade/25 bg-jade/[0.04] p-5">
-              <p className="text-sm text-bone font-medium">Enter in 60 seconds — no sync needed.</p>
-              <p className="text-xs text-ash mt-1">Founding season runs hands-on: send this morning's recovery screenshot and we normalize it ourselves, reply with your Oriya Index, and post you to this board{myTeam ? " on " + myTeam : ""}.</p>
+              <p className="text-sm text-bone font-medium">Get your Oriya Index in 60 seconds — no sync needed.</p>
+              <p className="text-xs text-ash mt-1">Drop this morning's recovery screenshot and it's normalized <span className="text-jade">on the spot</span> — one fair 0–100 score across every wearable — and you're posted to this board{myTeam ? " on " + myTeam : ""}. The only human step is a quick check it's a real device capture, and that never changes your number.</p>
               <a href={proofForm} onClick={() => track("challenge_email_proof", { challenge: c.id, team: myTeam || null, method: "form" })}
                 className="mt-3 inline-flex items-center gap-2 rounded-lg bg-jade px-4 py-2.5 text-sm font-semibold text-void hover:bg-jade-glow transition">
                 <Upload className="w-4 h-4" /> Submit this morning's proof →
@@ -2205,12 +2262,29 @@
 
             </div>
 
-            {/* ============ LIVE CHALLENGES — the page's main ask, straight after the passport ============ */}
-            <div className="mt-10 mb-1 flex items-center gap-2">
-              <Flame className="w-4 h-4 text-amber-glow" />
-              <h2 className="font-mono font-extrabold italic uppercase tracking-tighter text-xl bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Live Challenges</h2>
+            {/* Offline-first reframe (founder, 2026-07-14): the boards below are
+                illustrative demos of the format. The real activation right now is
+                hands-on and in person — gyms, cafés, Luma events — where a host
+                runs the board and every screenshot is normalized by hand. */}
+            <div className="mt-10 rounded-2xl border border-amber-brand/30 bg-gradient-to-br from-amber-brand/[0.08] to-transparent p-4">
+              <div className="flex items-start gap-3">
+                <span className="text-lg leading-none mt-0.5">📍</span>
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-bone">Right now, Oriya runs in person.</div>
+                  <p className="text-xs text-ash mt-1 leading-relaxed">The boards below are sample demos of the format. Today the real thing is hands-on — we run recovery boards live at gyms, cafés and Luma events, normalizing every screenshot ourselves. The cards show you what a board feels like; the action is in the room.</p>
+                  <a href="partners.html" onClick={() => track("partners_page_click", { from: "offline_reframe" })} className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-amber-glow hover:brightness-110">
+                    Host one at your gym, café or event <ChevronRight className="w-4 h-4" />
+                  </a>
+                </div>
+              </div>
             </div>
-            <p className="text-xs text-ash mb-4">Pick a side, send this morning's screenshot — that's the whole entry. From tomorrow, your team is waiting on your score. <a href="play.html" className="text-jade hover:text-jade-glow whitespace-nowrap">New here? The game in 5 steps →</a></p>
+
+            {/* ============ SAMPLE BOARDS — what a board looks like; the real entry is a screenshot ============ */}
+            <div className="mt-8 mb-1 flex items-center gap-2">
+              <Flame className="w-4 h-4 text-amber-glow" />
+              <h2 className="font-mono font-extrabold italic uppercase tracking-tighter text-xl bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Sample boards</h2>
+            </div>
+            <p className="text-xs text-ash mb-4">Illustrative demos of the format. Drop this morning's screenshot on any of them and your Oriya Index comes back <span className="text-jade">on the spot</span> — that's the whole entry, and from tomorrow your side is waiting on your score. <a href="play.html" className="text-jade hover:text-jade-glow whitespace-nowrap">New here? The game in 5 steps →</a></p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {userSquads.map((c) => <ChallengeCard key={c.id} c={c} joined={true} onOpen={setSelected} />)}
@@ -2254,6 +2328,8 @@
                 </div>
               )}
               <p className="text-center text-[11px] text-ash mt-2 font-mono">Post your Passport — your crew drops their own screenshot and lands on your board</p>
+
+              <PassportQR passport={passport} onToast={flashToast} />
 
               <NormalizeExplainer />
             </div>
