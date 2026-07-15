@@ -193,18 +193,38 @@
           obj: "Fires when they reply 1/2. Confirms the side, states the live stakes, gives exactly one next action. The standing line is filled from the live board at send time — or the honest \"board just opened\" fallback when it's too early — never a hardcoded number.",
           s: "TRIGGER · they reply 1 or 2",
           b: "[SIDE] side locked 🏴\n\n[LIVE STANDING — e.g. \"Operators lead [X]–[Y] right now\", or \"The board just opened — nobody's ahead yet\" when too early.] Your first morning score moves it.\n\nDrop your recovery screenshot whenever you wake up — Oura, Whoop, Garmin, Apple Watch all work. I normalize it and put you on the board.\n\nSample Passport: oriya.app/p/mayaruns" },
-        { id: "wa_score", g: "WA", wa: true, post: true, tag: "WA3 · AUTO — SCORE DELIVERED (~60s)", title: "WhatsApp: normalized score + rank + streak",
-          obj: "The retention moment. Fires ~60s after they send a screenshot: normalized Oriya Index, exact rank on their side, side average, and streak — every [TOKEN] computed live per athlete from the real board, nothing typed or invented. Ends on the live rankings link so scoring pulls them to the board.",
+        { id: "wa_gotit", g: "WA", wa: true, post: true, tag: "WA3 · AUTO — GOT IT (SCREENSHOT IN)", title: "WhatsApp: got it + within-the-hour expectation",
+          obj: "Fires the instant a morning screenshot lands, so the thread never goes silent while the score is normalized by hand — the WhatsApp mirror of the E1 email receipt. No score yet (nobody's read the image), so nothing to invent: it just confirms and sets the honest within-the-hour expectation. WA4 delivers the number.",
           s: "TRIGGER · they send a morning screenshot",
+          b: "Got it 📸 — reading your screenshot now.\n\nI normalize every score by hand right now, so give it a beat: your Oriya Index lands right here, usually within the hour. I'll ping you the second you're on the board." },
+        { id: "wa_score", g: "WA", wa: true, post: true, tag: "WA4 · AUTO — SCORE DELIVERED", title: "WhatsApp: normalized score + rank + streak",
+          obj: "The retention moment. Fires when the hand-normalized Index is ready — usually within the hour of the screenshot, not instant (the 60-second version isn't built, so don't imply it): normalized Oriya Index, exact rank on their side, side average, and streak — every [TOKEN] computed live per athlete from the real board, nothing typed or invented. Ends on the live rankings link so scoring pulls them to the board.",
+          s: "TRIGGER · Index posted (usually within the hour of the screenshot)",
           b: "[DEVICE] [RAW] → Oriya Index [INDEX] 🎯\n\nYou're #[RANK] of [FIELD] on the [SIDE] side.\n[SIDE] avg: [SIDE_AVG] ([±Δ] vs yesterday)\nOther side leads: [LEAD_AVG]\n\n🔥 Day [STREAK] streak.\n\nLive rankings + every score: " + BOARD_LINK + "\nYour Passport is live: oriya.app/p/[HANDLE]\nReply BOARD for the full leaderboard." },
-        { id: "wa_board", g: "WA", wa: true, post: true, tag: "WA4 · AUTO — BOARD (ON DEMAND)", title: "WhatsApp: live board + invite hook",
+        { id: "wa_board", g: "WA", wa: true, post: true, tag: "WA5 · AUTO — BOARD (ON DEMAND)", title: "WhatsApp: live board + invite hook",
           obj: "Fires when they reply BOARD — keeps the thread alive without daily push spam, and every board view ends on a recruit action (a side's score is its group average, so pulling one teammate in literally moves it). Numbers live-filled; the invite uses the canonical join link.",
           s: "TRIGGER · they reply BOARD",
           b: "Founders vs Operators · Day [N]\n\nFounders 🏴 avg [F_AVG] ([±Δ])\nOperators 🏳️ avg [O_AVG] ([±Δ])\n\nYour rank: #[RANK] of [FIELD] [SIDE]\nTop today: [HANDLE] · [INDEX] 🔥[STREAK]d\n\nGap to close: [GAP] pts.\n\nFull live board: " + BOARD_LINK + "\nPull a teammate onto your side → " + JOIN_LINK },
-        { id: "wa_nudge", g: "WA", wa: true, post: true, tag: "WA5 · AUTO — 08:25 NUDGE (IF NOT LOGGED)", title: "WhatsApp: morning accountability nudge",
+        { id: "wa_nudge", g: "WA", wa: true, post: true, tag: "WA6 · AUTO — 08:25 NUDGE (IF NOT LOGGED)", title: "WhatsApp: morning accountability nudge",
           obj: "The Day-7 retention lever — fires ~08:25 local only if they haven't logged. Leads with the creed so a rough morning still gets logged instead of skipped, and states the real mechanic (a blank counts 0 for your side). A prompt, not a report — no numbers to invent. Deliberately no \"board closes at 09:00\" claim; that cutoff isn't built.",
           s: "TRIGGER · 08:25 local, no screenshot logged yet today",
           b: "Morning 🌅 Quick one — you haven't logged today yet.\n\nA logged 61 outranks a forgotten 90. The board scores the log, not the flex — your side carries every blank as a 0.\n\nDrop your screenshot now → oriya.app/submit" },
+
+        // --- Transactional email (board@oriya.app). E1 is the email twin of
+        //   WA3, E2 of WA4. E1 is AUTO-sent by the Worker (worker/submit.js) on
+        //   /submit — this card is the canonical copy, edit both together. E2 is
+        //   hand-sent when the Index is normalized (no server "score posted"
+        //   trigger exists yet). Board voice ("— Ori, the Oriya board"), which
+        //   discloses the human behind it; WhatsApp keeps Diana's first-person
+        //   "I" voice — same facts, same mechanic, different channel.
+        { id: "email_confirm", g: "E", post: true, tag: "E1 · AUTO EMAIL — GOT IT (SERVER-SENT)", title: "Email: submission confirmed",
+          obj: "The email twin of WA3. Auto-sent by the Worker to the athlete the moment the /submit form posts. Device + raw score are real (typed into the form), so they're filled server-side, not [TOKEN]s. Sets the within-the-hour expectation and names the board code that arrives next. From board@oriya.app, reply-to team@oriya.app so a reply reaches Diana.",
+          s: "Got it — your Oriya Index is on the way",
+          b: "Got it — your [DEVICE] [RAW] screenshot landed.\n\nEvery score is read and normalized by hand right now, so give it a beat: your Oriya Index and your athlete-board code post to this inbox, usually within the hour during the founding sprint.\n\nThat code opens your 7-day board at oriya.app/board — you'll watch your side move the moment you're on it.\n\nNothing else to do now. Same screenshot tomorrow keeps your streak — a logged red morning still beats a skipped green one.\n\n— Ori, the Oriya board\nReply to this email and it reaches Diana directly." },
+        { id: "email_score", g: "E", post: true, tag: "E2 · EMAIL — SCORE DELIVERED (HAND-SENT)", title: "Email: normalized Index + board code",
+          obj: "The email twin of WA4, hand-sent the moment the Index is normalized (no server trigger for 'score posted' exists yet, so it's paste-ready, not auto). Every [TOKEN] filled live from the real board — omit the Δ / other-side lines when it's too early for them (mirror WA2's 'board just opened' honesty). From board@oriya.app.",
+          s: "Your Oriya Index is up — [INDEX], #[RANK] on the [SIDE] side",
+          b: "[DEVICE] [RAW] → Oriya Index [INDEX] 🎯\n\nYou're #[RANK] of [FIELD] on the [SIDE] side.\n[SIDE] average: [SIDE_AVG] ([±Δ] vs yesterday) — other side leads at [LEAD_AVG].\n🔥 Day [STREAK].\n\nYour board code: [CODE]\nIt opens your 7-day board → oriya.app/board\nYour public Passport is live → oriya.app/p/[HANDLE]\n\nSame screenshot tomorrow keeps the streak. The board scores the log, not the number — a logged red morning outranks a skipped green one.\n\n— Ori, the Oriya board" },
       ];
     }
     /* Archived (2026-07-13) — retired the day Founders vs Operators became the
@@ -289,7 +309,7 @@
           <span className="kicker">Oriya · outreach workbench — internal</span>
           <h1>Founders vs Operators launch set. One inbox at a time.</h1>
           <p className="sm dim" style={{ marginTop: 4 }}>Drafts open in your own mail client (mailto:) — nothing sends automatically, nothing is stored, no contact list lives on this page.</p>
-          <p className="xs dim" style={{ marginTop: 6 }}>The <span className="mono" style={{ color: "var(--accent)" }}>WA1–WA5</span> cards are the WhatsApp auto-reply scripts for the bot (copy-only). Every number is a live-filled <span className="mono">[TOKEN]</span> — computed per athlete from the real board at send time, never hardcoded here.</p>
+          <p className="xs dim" style={{ marginTop: 6 }}>The <span className="mono" style={{ color: "var(--accent)" }}>WA1–WA6</span> cards are the WhatsApp auto-reply scripts (copy-only); the <span className="mono" style={{ color: "var(--accent)" }}>E1–E2</span> cards are the transactional emails from board@oriya.app — E1 fires automatically from the Worker on submit, E2 is hand-sent when the Index is normalized. Every number is a live-filled <span className="mono">[TOKEN]</span> — computed per athlete from the real board at send time, never hardcoded here.</p>
           <p className="xs dim" style={{ marginTop: 6 }}>Live standing baked into every template below: <span className="mono" style={{ color: "var(--accent)" }}>{standingLine(standing)}</span>{standing === "none" && " (sample data or too early — no outbound claim made)"}</p>
           <div className="bar">
             <div><label>Target email</label><input type="email" placeholder="alex@barrys.com" value={c.email} onChange={set("email")} /></div>

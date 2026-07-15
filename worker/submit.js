@@ -60,5 +60,30 @@ export async function manualSubmit(request, env) {
     }),
   });
   if (!res.ok) return json({ ok: false, code: "send" }, 502);
+
+  // E1 — the submission-confirmation receipt to the participant. Best-effort:
+  // the team email above is the real record, so a failed receipt never fails
+  // the submission. Board voice (discloses the human); reply routes to the
+  // founder. Device + raw score are real (typed into the form), not tokens.
+  // Keep this copy in sync with the E1 card on the outreach workbench.
+  try {
+    var lock = challenge ? "\n\nYou're locked in: " + challenge + "." : "";
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + env.RESEND_API_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: env.SUBMIT_FROM || "Oriya Board <board@oriya.app>",
+        to: [email],
+        reply_to: "team@oriya.app",
+        subject: "Got it — your Oriya Index is on the way",
+        text: "Got it — your " + device + " " + score + " screenshot landed." + lock +
+          "\n\nEvery score is read and normalized by hand right now, so give it a beat: your Oriya Index and your athlete-board code post to this inbox, usually within the hour during the founding sprint." +
+          "\n\nThat code opens your 7-day board at oriya.app/board — you'll watch your side move the moment you're on it." +
+          "\n\nNothing else to do now. Same screenshot tomorrow keeps your streak — a logged red morning still beats a skipped green one." +
+          "\n\n— Ori, the Oriya board\nReply to this email and it reaches Diana directly.",
+      }),
+    });
+  } catch (e) { /* receipt is best-effort — never blocks the submission */ }
+
   return json({ ok: true }, 200);
 }
