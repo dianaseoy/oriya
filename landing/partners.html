@@ -9,11 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <meta name="theme-color" content="#070809">
+  <meta name="theme-color" content="#F4F2EB">
   <script>
-    /* Theme boot — same key as the rest of the site. */
+    /* Theme boot — shares oriya:theme with the rest of the site, but this
+       partner-facing page DEFAULTS to light (reads cleaner when the link is
+       shared cold); an explicit saved preference still wins. */
     (function () {
-      var t = "dark";
+      var t = "light";
       try { var s = localStorage.getItem("oriya:theme"); if (s === "light" || s === "dark") t = s; } catch (e) {}
       document.documentElement.dataset.theme = t;
       try { var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = t === "light" ? "#F4F2EB" : "#070809"; } catch (e) {}
