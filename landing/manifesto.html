@@ -21,12 +21,12 @@
       --panel-2:#111015;      /* ink panel (inverted section) */
       --ink:#181410;          /* near-black warm text */
       --ink-soft:#5A5348;     /* muted body */
-      --cobalt:#1F3BE0;       /* electric blue — primary annotation */
-      --coral:#FF4A2B;        /* poppy tangerine-red */
-      --chartreuse:#D8F24E;   /* highlighter */
-      --magenta:#FF3E8A;      /* pink pop */
-      --jade:#12A177;         /* brand nod, brightened */
-      --amber:#F4A72C;        /* brand nod */
+      --cobalt:#2340C6;       /* the single cool primary accent (calmed) */
+      --coral:#2340C6;        /* de-popped: folded into the primary accent */
+      --chartreuse:#E7EC94;   /* highlighter, muted from neon */
+      --magenta:#12805F;      /* de-popped: folded into brand jade */
+      --jade:#12805F;         /* brand nod (deepened for contrast on paper) */
+      --amber:#B4791E;        /* brand nod (deepened) */
       --hairline:rgba(24,20,16,.14);
       --font-display:"Fraunces", ui-serif, Georgia, serif;
       --font-sans:"Inter", system-ui, sans-serif;
@@ -62,12 +62,12 @@
     .btn{ display:inline-flex; align-items:center; gap:8px; font-family:var(--font-alt); font-weight:600;
       font-size:14px; padding:11px 18px; cursor:pointer; border:2px solid var(--ink);
       transition:transform .18s var(--settle), box-shadow .18s var(--settle), background .2s; }
-    .btn-primary{ background:var(--cobalt); color:#fff; box-shadow:4px 4px 0 var(--ink); }
-    .btn-primary:hover{ transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--ink); }
-    .btn-coral{ background:var(--coral); color:#fff; box-shadow:4px 4px 0 var(--ink); }
-    .btn-coral:hover{ transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--ink); }
-    .btn-ghost{ background:transparent; color:var(--ink); box-shadow:4px 4px 0 var(--ink); }
-    .btn-ghost:hover{ transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--ink); background:var(--chartreuse); }
+    .btn-primary{ background:var(--cobalt); color:#fff; box-shadow:2px 2px 0 var(--ink); }
+    .btn-primary:hover{ transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--ink); }
+    .btn-coral{ background:var(--coral); color:#fff; box-shadow:2px 2px 0 var(--ink); }
+    .btn-coral:hover{ transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--ink); }
+    .btn-ghost{ background:transparent; color:var(--ink); box-shadow:2px 2px 0 var(--ink); }
+    .btn-ghost:hover{ transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--ink); background:var(--chartreuse); }
 
     /* ---------------- annotations ---------------- */
     .circled{ position:relative; display:inline-block; white-space:nowrap; }
@@ -110,8 +110,8 @@
     /* ---------------- hero ---------------- */
     .hero{ position:relative; padding:92px 0 72px; overflow:hidden; }
     .eyebrow{ display:inline-flex; align-items:center; gap:9px; font-family:var(--font-mono);
-      font-size:11.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--ink);
-      background:var(--chartreuse); border:2px solid var(--ink); padding:6px 12px; box-shadow:3px 3px 0 var(--ink); }
+      font-size:11.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-soft);
+      border-bottom:2px solid var(--cobalt); padding:0 1px 6px; }
     h1{ font-family:var(--font-display); font-weight:900; font-size:clamp(2.6rem,7.2vw,5.2rem);
       line-height:.98; letter-spacing:-.02em; margin-top:26px; max-width:16ch; }
     h1 .r2{ color:var(--coral); }
@@ -134,18 +134,18 @@
 
     /* four vaults */
     .vaults{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:40px; }
-    .vault{ border:2px solid var(--ink); background:var(--panel); padding:18px 16px 16px;
-      box-shadow:5px 5px 0 var(--ink); display:flex; flex-direction:column; gap:6px; }
+    .vault{ border:1.5px solid var(--ink); background:var(--panel); padding:18px 16px 16px;
+      box-shadow:3px 3px 0 var(--ink); display:flex; flex-direction:column; gap:6px; }
     .vault .dev{ font-family:var(--font-mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); }
     .vault .num{ font-family:var(--font-display); font-weight:900; font-size:clamp(2.4rem,5vw,3.4rem); line-height:1; }
     .vault .lab{ font-family:var(--font-alt); font-weight:600; font-size:12.5px; }
-    .vault.v1 .num{ color:var(--cobalt); } .vault.v2 .num{ color:var(--coral); }
-    .vault.v3 .num{ color:var(--jade); } .vault.v4 .num{ color:var(--magenta); }
+    .vault.v1 .num{ color:var(--cobalt); } .vault.v2 .num{ color:var(--ink); }
+    .vault.v3 .num{ color:var(--jade); } .vault.v4 .num{ color:var(--amber); }
     .vault-note{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-soft); margin-top:16px; }
 
     /* pull quote (ink panel) */
-    .pull{ background:var(--panel-2); color:var(--paper); border:2px solid var(--ink);
-      box-shadow:8px 8px 0 var(--coral); padding:clamp(30px,6vw,64px); }
+    .pull{ background:var(--panel-2); color:var(--paper); border:1.5px solid var(--ink);
+      box-shadow:5px 5px 0 var(--cobalt); padding:clamp(30px,6vw,64px); }
     .pull p{ font-family:var(--font-display); font-weight:400; font-style:italic;
       font-size:clamp(1.5rem,3.6vw,2.5rem); line-height:1.22; letter-spacing:-.01em; max-width:22ch; }
     .pull .hl::before{ mix-blend-mode:normal; opacity:1; }
@@ -154,12 +154,12 @@
 
     /* pillars */
     .pillars{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-top:44px; }
-    .pillar{ border:2px solid var(--ink); background:var(--panel); padding:26px 24px;
-      box-shadow:5px 5px 0 var(--ink); transition:transform .2s var(--settle), box-shadow .2s var(--settle); }
-    .pillar:hover{ transform:translate(-3px,-3px); box-shadow:8px 8px 0 var(--ink); }
+    .pillar{ border:1.5px solid var(--ink); background:var(--panel); padding:26px 24px;
+      box-shadow:3px 3px 0 var(--ink); transition:transform .2s var(--settle), box-shadow .2s var(--settle); }
+    .pillar:hover{ transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--ink); }
     .pillar .pn{ font-family:var(--font-mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
-    .pillar.p1 .pn{ color:var(--cobalt); } .pillar.p2 .pn{ color:var(--coral); }
-    .pillar.p3 .pn{ color:var(--jade); } .pillar.p4 .pn{ color:var(--magenta); }
+    .pillar.p1 .pn{ color:var(--cobalt); } .pillar.p2 .pn{ color:var(--ink-soft); }
+    .pillar.p3 .pn{ color:var(--jade); } .pillar.p4 .pn{ color:var(--amber); }
     .pillar h3{ font-family:var(--font-display); font-weight:900; font-size:1.7rem; line-height:1.05; margin:10px 0 10px; letter-spacing:-.01em; }
     .pillar p{ font-size:14.5px; color:var(--ink-soft); }
     .pillar p b{ color:var(--ink); font-weight:600; }
@@ -192,9 +192,15 @@
       .pillars{ grid-template-columns:1fr; }
     }
     @media (max-width:560px){
-      .hero{ padding:60px 0 52px; }
-      section{ padding:56px 0; }
+      .hero{ padding:52px 0 48px; }
+      section{ padding:52px 0; }
       .nav-link.hide-sm{ display:none; }
+      .deco{ display:none; }                 /* keep mobile clean — no floating clutter */
+      h1{ font-size:clamp(2.1rem,10vw,2.9rem); max-width:100%; }
+      .hero .lede{ font-size:1.12rem; margin-top:22px; }
+      .vaults{ gap:10px; }
+      .vault .num{ font-size:2.5rem; }
+      .hero-cta .btn, .final-cta .btn{ flex:1 1 auto; justify-content:center; }
       .foot{ flex-direction:column; align-items:flex-start; }
     }
 
@@ -224,18 +230,15 @@
 
   <!-- ============ HERO ============ -->
   <header class="hero">
-    <!-- decorative parallax layer -->
-    <div class="deco d1" data-depth="26" style="top:8%; right:6%;" aria-hidden="true">
-      <span class="float"><svg width="118" height="118" viewBox="0 0 118 118"><circle cx="59" cy="59" r="48" fill="none" stroke="#1F3BE0" stroke-width="5"/><circle cx="59" cy="59" r="16" fill="#FF3E8A"/></svg></span>
+    <!-- subtle wearable motifs — muted, low-contrast texture (not pops) -->
+    <div class="deco d1" data-depth="22" style="top:9%; right:5%;" aria-hidden="true">
+      <span class="float"><svg width="140" height="140" viewBox="0 0 140 140" fill="none" stroke="rgba(24,20,16,.12)" stroke-width="2.4">
+        <circle cx="70" cy="70" r="62"/><circle cx="70" cy="70" r="45"/><circle cx="70" cy="70" r="28"/>
+        <circle cx="70" cy="70" r="11" fill="rgba(31,59,224,.14)" stroke="none"/></svg></span>
     </div>
-    <div class="deco d2" data-depth="-18" style="top:52%; right:14%;" aria-hidden="true">
-      <span class="float"><svg width="92" height="92" viewBox="0 0 92 92"><path d="M46 6 L57 35 L88 35 L63 54 L72 84 L46 65 L20 84 L29 54 L4 35 L35 35 Z" fill="#FFCf2E" stroke="#181410" stroke-width="3.5" stroke-linejoin="round"/></svg></span>
-    </div>
-    <div class="deco d3" data-depth="34" style="top:24%; left:2%;" aria-hidden="true">
-      <span class="float"><svg width="120" height="46" viewBox="0 0 120 46"><path d="M4 30 C 22 6, 40 6, 58 24 S 96 42, 116 14" fill="none" stroke="#FF4A2B" stroke-width="6" stroke-linecap="round"/></svg></span>
-    </div>
-    <div class="deco d1" data-depth="-24" style="bottom:6%; left:12%;" aria-hidden="true">
-      <span class="float"><svg width="70" height="70" viewBox="0 0 70 70"><rect x="10" y="10" width="50" height="50" rx="6" fill="#12A177" stroke="#181410" stroke-width="3.5" transform="rotate(12 35 35)"/></svg></span>
+    <div class="deco d3" data-depth="30" style="bottom:11%; left:3%;" aria-hidden="true">
+      <span class="float"><svg width="156" height="42" viewBox="0 0 156 42" fill="none" stroke="rgba(24,20,16,.15)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 21 H42 l6 -15 l7 30 l6 -22 l5 7 H156"/></svg></span>
     </div>
 
     <div class="wrap">
@@ -297,7 +300,8 @@
   <!-- ============ 3. THE BET ============ -->
   <section>
     <div class="deco d3" data-depth="-16" style="top:6%; left:3%;" aria-hidden="true">
-      <span class="float"><svg width="88" height="88" viewBox="0 0 88 88"><path d="M44 8 L52 36 L80 44 L52 52 L44 80 L36 52 L8 44 L36 36 Z" fill="#1F3BE0" stroke="#181410" stroke-width="3.5" stroke-linejoin="round"/></svg></span>
+      <span class="float"><svg width="104" height="104" viewBox="0 0 104 104" fill="none" stroke="rgba(24,20,16,.11)" stroke-width="2.4">
+        <circle cx="52" cy="52" r="46"/><circle cx="52" cy="52" r="30"/><circle cx="52" cy="52" r="14"/></svg></span>
     </div>
     <div class="wrap narrow">
       <p class="kicker reveal">03 · The bet</p>
@@ -350,7 +354,7 @@
   <!-- ============ 5. FINAL CTA ============ -->
   <section class="final">
     <div class="deco d1" data-depth="22" style="top:0%; right:8%;" aria-hidden="true">
-      <span class="float"><svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="30" fill="none" stroke="#FF4A2B" stroke-width="5"/><circle cx="40" cy="40" r="10" fill="#D8F24E" stroke="#181410" stroke-width="3"/></svg></span>
+      <span class="float"><svg width="120" height="34" viewBox="0 0 120 34" fill="none" stroke="rgba(24,20,16,.13)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 17 H32 l5 -12 l6 24 l5 -17 l4 5 H120"/></svg></span>
     </div>
     <div class="wrap narrow">
       <p class="kicker reveal" style="text-align:center;">The move</p>

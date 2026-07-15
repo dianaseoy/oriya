@@ -47,8 +47,9 @@
     .nav { display:flex; align-items:center; justify-content:space-between; padding:22px 0; }
     .logo { display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-size:22px; }
     .logo svg { width:26px; height:26px; }
-    .nav-r { display:flex; align-items:center; gap:14px; }
+    .nav-r { display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:flex-end; }
     .nav-r a { font-size:13px; color:var(--ash); transition:color .25s; }
+    @media (max-width:560px){ .nav-r { gap:10px 12px; } .nav-r a { font-size:12px; } }
     .nav-r a:hover { color:var(--bone); }
     .nav-r a.cta { color:var(--void); background:var(--jade); border-radius:999px; padding:9px 18px; font-weight:600; }
     .theme-toggle { width:32px; height:32px; border-radius:50%; border:1px solid var(--hairline); background:rgba(var(--wash),.04);
@@ -104,27 +105,52 @@
     .play-top { display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
     .play-num { font-family:var(--font-mono); font-size:12px; letter-spacing:.14em; color:var(--accent-glow); flex:none; }
     .play-tag { font-family:var(--font-mono); font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--ash); }
-    .play h3 { font-family:var(--font-display); font-weight:400; font-size:clamp(1.55rem,3.4vw,2rem); line-height:1.12; margin-top:8px; }
-    .play .desc { color:var(--ash); font-size:14px; margin-top:8px; max-width:64ch; }
+    .play h3 { font-family:var(--font-display); font-weight:400; font-size:clamp(1.8rem,4vw,2.35rem); line-height:1.1; margin-top:8px; }
+    .play .desc { color:var(--bone); font-size:16px; margin-top:10px; max-width:64ch; line-height:1.55; }
 
     .mechanic { display:flex; gap:12px; margin-top:16px; padding:14px 16px; border-radius:12px;
       background:rgba(var(--wash),.03); border-left:2px solid var(--accent); }
-    .mechanic .q { font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent-glow); flex:none; padding-top:2px; }
-    .mechanic p { font-family:var(--font-mono); font-size:12.5px; color:var(--bone); line-height:1.6; }
+    .mechanic .q { font-family:var(--font-mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent-glow); flex:none; padding-top:3px; }
+    .mechanic p { font-size:15px; color:var(--bone); line-height:1.55; font-weight:500; }
 
     .gg { display:grid; grid-template-columns:1fr 1fr; gap:0; margin-top:22px; border-top:1px solid var(--hairline); }
     @media (max-width:640px){ .gg { grid-template-columns:1fr; } }
     .gg-col { padding:20px 24px 6px 0; }
     .gg-col + .gg-col { padding-left:26px; border-left:1px solid var(--hairline); }
     @media (max-width:640px){ .gg-col + .gg-col { padding-left:0; border-left:0; border-top:1px solid var(--hairline); padding-top:20px; } }
-    .gg-label { font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+    .gg-label { font-family:var(--font-mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; margin-bottom:13px; display:flex; align-items:center; gap:8px; }
     .gg-give .gg-label { color:var(--ash); }
     .gg-get .gg-label { color:var(--accent-glow); }
-    .gg ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
-    .gg li { font-size:13.5px; color:var(--ash); padding-left:18px; position:relative; line-height:1.5; }
-    .gg li b { color:var(--bone); font-weight:500; }
-    .gg-give li::before { content:"→"; position:absolute; left:0; top:0; font-size:11px; color:var(--ash); }
-    .gg-get li::before { content:"◆"; position:absolute; left:0; top:1px; font-size:8px; color:var(--accent); }
+    .gg ul { list-style:none; display:flex; flex-direction:column; gap:11px; }
+    .gg li { font-size:15px; color:var(--ash); padding-left:20px; position:relative; line-height:1.5; }
+    .gg li b { color:var(--bone); font-weight:600; }
+    .gg-give li::before { content:"→"; position:absolute; left:0; top:0; font-size:12px; color:var(--ash); }
+    .gg-get li::before { content:"◆"; position:absolute; left:0; top:2px; font-size:9px; color:var(--accent); }
+
+    /* Expandable "what a successful pilot looks like" — native <details>, no JS */
+    .pilot { margin-top:22px; border-top:1px solid var(--hairline); }
+    .pilot > summary { list-style:none; cursor:pointer; display:flex; align-items:center; gap:10px;
+      padding:16px 0 4px; font-family:var(--font-mono); font-size:12px; letter-spacing:.08em;
+      text-transform:uppercase; color:var(--accent-glow); transition:color .2s; }
+    .pilot > summary::-webkit-details-marker { display:none; }
+    .pilot > summary::before { content:"▸"; font-size:11px; transition:transform .2s var(--settle); }
+    .pilot[open] > summary::before { transform:rotate(90deg); }
+    .pilot > summary:hover { color:var(--bone); }
+    .pilot-body { padding:10px 0 4px; display:flex; flex-direction:column; gap:18px; animation:pilotIn .4s var(--settle); }
+    @keyframes pilotIn { from{ opacity:0; transform:translateY(-6px); } to{ opacity:1; transform:none; } }
+    .pilot-dream { font-size:15px; color:var(--bone); line-height:1.55; font-style:italic;
+      border-left:2px solid var(--accent); padding-left:15px; }
+    .pilot-arc { display:grid; gap:16px; }
+    @media (min-width:760px){ .pilot-arc { grid-template-columns:repeat(3,1fr); } }
+    .pa-h { font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent-glow); margin-bottom:9px; }
+    .pa p { font-size:13.5px; color:var(--ash); line-height:1.55; }
+    .pa ul { list-style:none; display:flex; flex-direction:column; gap:9px; }
+    .pa li { font-size:13.5px; color:var(--ash); line-height:1.5; }
+    .pa li b { color:var(--bone); font-weight:600; }
+    .pilot-win { font-size:15px; color:var(--bone); line-height:1.55; background:rgba(var(--wash),.03);
+      border:1px solid var(--hairline); border-radius:12px; padding:15px 17px; }
+    .pilot-win b { color:var(--accent-glow); font-weight:600; }
+    .pilot-note { font-family:var(--font-mono); font-size:10.5px; color:var(--ash); opacity:.75; line-height:1.6; }
 
     /* ── Honest "where we are" ───────────────────────────────── */
     .truth { margin:52px 0 0; border:1px solid var(--hairline); border-radius:20px; padding:30px 30px; background:rgba(var(--wash),.015); }
@@ -173,6 +199,8 @@
         Oriya
       </a>
       <div class="nav-r">
+        <a href="manifesto.html">Manifesto</a>
+        <a href="play.html">How to play</a>
         <a href="index.html">For athletes</a>
         <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark theme">☀</button>
         <a href="#start" class="cta">Run a challenge</a>
@@ -220,14 +248,14 @@
         <p class="desc">A small corner and a reason to come back three days running. The recovery check becomes a counter-side ritual.</p>
         <div class="mechanic">
           <span class="q">The pitch</span>
-          <p>“Come to [Café] 3 mornings in a row, show your Oriya recovery score, win a $50 voucher.”</p>
+          <p>“Scan the card 3 mornings in a row, build your streak, and day three's coffee is on the house.”</p>
         </div>
         <div class="gg">
           <div class="gg-col gg-give">
             <div class="gg-label">You bring</div>
             <ul>
               <li>A <b>small corner</b> and a QR sign — no space rebuild.</li>
-              <li>A <b>voucher or perk</b> as the streak prize (you set it).</li>
+              <li>A <b>small day-three perk</b> — a drip, a pastry — something that costs you cents, not margin.</li>
             </ul>
           </div>
           <div class="gg-col gg-get">
@@ -239,6 +267,23 @@
             </ul>
           </div>
         </div>
+        <details class="pilot">
+          <summary>What a successful pilot looks like</summary>
+          <div class="pilot-body">
+            <p class="pilot-dream">Dream partner: a single-location specialty roaster on a runner's route — the barista already knows the 7am regulars by name, and half of them wear an Oura or a Whoop.</p>
+            <div class="pilot-arc">
+              <div class="pa"><div class="pa-h">Before</div><p>Wednesday, 7am. The same fifteen regulars, the same cortados. Nothing built in to make them come back tomorrow.</p></div>
+              <div class="pa"><div class="pa-h">During · 3 mornings</div><ul>
+                <li><b>Day 1</b> — a QR card by the register: scan, show your recovery, start a streak. Self-serve, no line friction.</li>
+                <li><b>Day 2</b> — the board has names on it. Regulars check who came back; a stranger asks what the number means.</li>
+                <li><b>Day 3</b> — streak-holders claim the perk you chose. Someone who'd skip Thursday shows up for the third scan.</li>
+              </ul></div>
+              <div class="pa"><div class="pa-h">After</div><p>You keep an opt-in list of the regulars who joined, a read on when your wearable crowd shows up, and a few people running a habit pointed at your counter.</p></div>
+            </div>
+            <p class="pilot-win"><b>The win:</b> a repeatable morning ritual that gives your best regulars one more reason to come back — and a first opt-in list of exactly who they are.</p>
+            <p class="pilot-note">Illustrative — a founder-run pilot, not a past result. What you'd be set up to see, not numbers we've delivered.</p>
+          </div>
+        </details>
       </section>
 
       <!-- Playbook 02 — Gyms & studios -->
@@ -251,7 +296,7 @@
         <p class="desc">A week-long board your members check every morning. It rewards the smartest recovery, not the priciest device — and it gives people a reason to connect.</p>
         <div class="mechanic">
           <span class="q">The pitch</span>
-          <p>“Five days. Highest recovery score wins. The coach picks the prize.”</p>
+          <p>“Five days. Most improved recovery wins — not the priciest device. The coach picks the prize.”</p>
         </div>
         <div class="gg">
           <div class="gg-col gg-give">
@@ -270,6 +315,23 @@
             </ul>
           </div>
         </div>
+        <details class="pilot">
+          <summary>What a successful pilot looks like</summary>
+          <div class="pilot-body">
+            <p class="pilot-dream">Dream partner: a coach-led strength or hybrid box — 80 to 200 members, community before equipment — where recovery already comes up on the whiteboard and a good share of the room wears a ring or a strap.</p>
+            <div class="pilot-arc">
+              <div class="pa"><div class="pa-h">Before</div><p>Monday. Members train hard, leave, and the only thing linking them between sessions is the class schedule. The coach already knows a few will quietly drift this month.</p></div>
+              <div class="pa"><div class="pa-h">During · 5 days</div><ul>
+                <li><b>Day 1</b> — coach announces it at the top of class. QR on the wall. Every device — ring, strap, watch — lands on one shared board.</li>
+                <li><b>Days 2–4</b> — the board becomes a morning check-in. People who trained side-by-side for a year and never spoke connect via Passport QR.</li>
+                <li><b>Day 5</b> — the prize goes to <b>most improved, not the priciest device</b>. Everyone who logged gets a personal readout tied to their persona.</li>
+              </ul></div>
+              <div class="pa"><div class="pa-h">After</div><p>The room keeps a shared talking point that outlives the challenge, a set of new member-to-member connections, and every participant holding a readout with your gym's name on it.</p></div>
+            </div>
+            <p class="pilot-win"><b>The win:</b> a five-day retention hook that isn't another class on the calendar — plus a personal recovery readout in every member's hands, from your room.</p>
+            <p class="pilot-note">Illustrative — a founder-run pilot, not a past result. What you'd be set up to see, not numbers we've delivered.</p>
+          </div>
+        </details>
       </section>
 
       <!-- Playbook 03 — Events & hosts -->
@@ -282,7 +344,7 @@
         <p class="desc">Turn a one-off gathering into a shared live board. Everyone's recovery score for the day, up in the room — an instant talking point the sponsor gets to own.</p>
         <div class="mechanic">
           <span class="q">The pitch</span>
-          <p>“One night, one board — everyone's recovery score for today, live. The sponsor names the award.”</p>
+          <p>“One night, one opt-in board — everyone who's in shows their recovery score for the day, live. The sponsor names the award.”</p>
         </div>
         <div class="gg">
           <div class="gg-col gg-give">
@@ -301,6 +363,23 @@
             </ul>
           </div>
         </div>
+        <details class="pilot">
+          <summary>What a successful pilot looks like</summary>
+          <div class="pilot-body">
+            <p class="pilot-dream">Dream partner: a recurring founder-and-operator fitness meetup — a monthly run-club-plus-coffee or a sauna social, 30 to 80 RSVPs — run by a community builder who already lines up a sponsor, or wants a reason to.</p>
+            <div class="pilot-arc">
+              <div class="pa"><div class="pa-h">Before</div><p>Great turnout, good energy — then everyone scatters. Next month you rebuild the crowd from scratch, and last night's sponsor got a logo on a Luma page and not much else.</p></div>
+              <div class="pa"><div class="pa-h">During · one night</div><ul>
+                <li><b>Doors</b> — a QR on the check-in table. Guests scan, connect any device, and if they opt in, their score for the day goes up on the board.</li>
+                <li><b>Mid-event</b> — the board does your icebreaking. Strangers compare numbers; the sponsor's name sits on the award all night.</li>
+                <li><b>Close</b> — the sponsor hands out “best recovery of the night.” People screenshot the board on the way out.</li>
+              </ul></div>
+              <div class="pa"><div class="pa-h">After</div><p>The sponsor got their name on a live moment in front of a health-serious room — not a static logo — and you walk away with the seed of a returning-series board.</p></div>
+            </div>
+            <p class="pilot-win"><b>The win:</b> a live centerpiece that does the icebreaking for you and gives your sponsor a real moment to own — plus a board you can carry into the next one.</p>
+            <p class="pilot-note">Illustrative — a founder-run pilot, not a past result. What you'd be set up to see, not numbers we've delivered.</p>
+          </div>
+        </details>
       </section>
     </div>
 
