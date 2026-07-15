@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Oriya for Partners — gyms, communities & sponsors</title>
-  <meta name="description" content="Host a recovery board for your gym, run club, or community — any wearable, one fair index. Or put your brand on a challenge pot. Founding season, SF & NYC.">
+  <title>Oriya for Partners — run a recovery challenge in your room</title>
+  <meta name="description" content="Everyone in your café, gym, or event already wears a tracker. Oriya turns any wearable into one comparable recovery score and a live board. You bring the prize and the room — a founder runs it in person. Free for the founding window, SF & NYC.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 78 22 A 40 40 0 1 0 79 23' stroke='%237FB79E' stroke-width='5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='50' cy='55' r='14' fill='%237FB79E'/%3E%3Ccircle cx='78' cy='22' r='7' fill='%23D7A25C'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,7 +42,7 @@
     html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased; }
     body { font-family:var(--font-sans); background:var(--obsidian); color:var(--bone); line-height:1.6; min-width:320px; overflow-x:clip; }
     a { color:inherit; text-decoration:none; }
-    .wrap { max-width:980px; margin:0 auto; padding:0 24px; }
+    .wrap { max-width:1000px; margin:0 auto; padding:0 24px; }
 
     .nav { display:flex; align-items:center; justify-content:space-between; padding:22px 0; }
     .logo { display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-size:22px; }
@@ -55,73 +55,114 @@
       color:var(--bone); font-size:14px; line-height:1; cursor:pointer; display:grid; place-items:center; flex:none; transition:border-color .25s; }
     .theme-toggle:hover { border-color:var(--jade-deep); }
 
-    .head { padding:64px 0 8px; max-width:680px; }
+    /* ── Hero: the 10-second grasp ───────────────────────────── */
+    .head { padding:60px 0 4px; max-width:760px; }
     .eyebrow { font-family:var(--font-mono); font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--jade); }
-    h1 { font-family:var(--font-display); font-weight:400; font-size:clamp(2.3rem,6vw,3.5rem); line-height:1.05; margin-top:14px; }
+    h1 { font-family:var(--font-display); font-weight:400; font-size:clamp(2.4rem,6.2vw,3.7rem); line-height:1.04; margin-top:14px; letter-spacing:-.01em; }
     h1 em { font-style:italic; color:var(--jade); }
-    .lede { color:var(--ash); font-size:15.5px; margin-top:16px; max-width:58ch; }
+    .lede { color:var(--ash); font-size:16px; margin-top:18px; max-width:60ch; }
     .lede b { color:var(--bone); font-weight:500; }
-    .aud-note { font-family:var(--font-mono); font-size:11px; color:var(--ash); margin-top:14px; }
+    .lede .free { color:var(--amber-glow); font-weight:500; }
+
+    /* Any device → one number → one board. The merge visual, in text. */
+    .flow { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin-top:26px; }
+    .flow .grp { display:flex; flex-wrap:wrap; gap:6px; }
+    .flow .dev { font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em; color:var(--ash); border:1px solid var(--hairline);
+      border-radius:7px; padding:5px 9px; background:rgba(var(--wash),.02); }
+    .flow .arw { color:var(--jade); font-size:15px; flex:none; }
+    .flow .out { font-family:var(--font-mono); font-size:11px; letter-spacing:.05em; color:var(--void); background:var(--jade);
+      border-radius:7px; padding:6px 11px; font-weight:500; }
+    .flow .board { font-family:var(--font-mono); font-size:11px; letter-spacing:.05em; color:var(--amber-glow); border:1px solid rgba(215,162,92,.4);
+      border-radius:7px; padding:5px 10px; background:rgba(215,162,92,.06); }
+
+    .chips { display:flex; flex-wrap:wrap; gap:10px; margin-top:26px; }
+    .chip { display:flex; align-items:center; gap:9px; font-family:var(--font-mono); font-size:12px; color:var(--bone);
+      border:1px solid var(--hairline); border-radius:999px; padding:8px 15px 8px 13px; background:rgba(var(--wash),.02); }
+    .chip .dot { width:6px; height:6px; border-radius:50%; background:var(--jade); flex:none; }
+    .chip.free { border-color:rgba(215,162,92,.45); }
+    .chip.free .dot { background:var(--amber); }
+    .aud-note { font-family:var(--font-mono); font-size:11px; color:var(--ash); margin-top:24px; }
     .aud-note a { color:var(--jade); border-bottom:1px solid rgba(127,183,158,.35); padding-bottom:1px; }
 
-    .tracks { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:44px; }
-    @media (max-width:840px){ .tracks { grid-template-columns:1fr; } }
-    .track { border:1px solid var(--hairline); border-radius:18px; background:rgba(var(--wash),.02); padding:26px 24px;
-      display:flex; flex-direction:column; gap:10px; transition:border-color .3s var(--settle); }
-    .track:hover { border-color:var(--jade-deep); }
-    .track .tk { font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--jade); }
-    .track h3 { font-family:var(--font-display); font-weight:400; font-size:23px; line-height:1.15; }
-    .track ul { list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:4px; }
-    .track li { font-size:13px; color:var(--ash); padding-left:16px; position:relative; }
-    .track li::before { content:"◆"; position:absolute; left:0; top:0; font-size:8px; color:var(--jade); }
-    .track li b { color:var(--bone); font-weight:500; }
-    .track .go { margin-top:auto; padding-top:14px; font-family:var(--font-mono); font-size:12px; color:var(--jade); }
-    .track .go:hover { color:var(--bone); }
-    .track.sponsor { border-color:rgba(215,162,92,.3); }
-    .track.sponsor .tk, .track.sponsor li::before, .track.sponsor .go { color:var(--amber-glow); }
-    .track.sponsor:hover { border-color:var(--amber); }
+    /* ── Section header ──────────────────────────────────────── */
+    .sec-head { margin:64px 0 4px; }
+    .sec-head .eyebrow { color:var(--ash); }
+    .sec-head h2 { font-family:var(--font-display); font-weight:400; font-size:clamp(1.8rem,4vw,2.5rem); line-height:1.1; margin-top:12px; }
+    .sec-head p { color:var(--ash); font-size:14.5px; margin-top:12px; max-width:60ch; }
+    .sec-head p b { color:var(--bone); font-weight:500; }
 
-    .pay { margin:52px 0 0; border:1px solid rgba(215,162,92,.3); border-radius:18px; padding:30px 28px; background:rgba(var(--wash),.02); }
-    .pay h2 { font-family:var(--font-display); font-weight:400; font-size:clamp(1.6rem,3.4vw,2.1rem); margin-top:10px; }
-    .pay-steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:20px; }
-    @media (max-width:720px){ .pay-steps { grid-template-columns:1fr; } }
-    .ps { border:1px solid var(--hairline); border-radius:12px; padding:16px 18px; }
-    .ps-n { font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--amber-glow); }
-    .ps p { font-size:13px; color:var(--ash); margin-top:7px; }
-    .ps p b { color:var(--bone); font-weight:500; }
-    .pay-methods { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:18px; }
-    .pm { font-family:var(--font-mono); font-size:11.5px; color:var(--bone); border:1px solid var(--hairline); border-radius:8px; padding:5px 12px; background:rgba(var(--wash),.03); }
-    .pm-via { font-family:var(--font-mono); font-size:10px; color:var(--ash); margin-left:4px; }
-    .amt-row { display:flex; gap:8px; align-items:stretch; flex-wrap:wrap; }
-    .amt { font-family:var(--font-mono); font-size:12px; color:var(--ash); border:1px solid var(--hairline); border-radius:10px; padding:12px 14px; background:rgba(var(--wash),.03); cursor:pointer; transition:color .2s, border-color .2s; }
-    .amt:hover { color:var(--bone); border-color:var(--jade-deep); }
-    .amt.on { color:var(--void); background:var(--jade); border-color:var(--jade); }
-    .pform #plOrg { width:190px; } .pform #plEmail { width:200px; } .pform #plBoard { width:250px; } .pform #plAmt { width:110px; }
-    @media (max-width:560px){ .amt-row { width:100%; } .pform #plAmt { flex:1; } }
-    .truth { margin:52px 0 0; border:1px solid var(--hairline); border-radius:18px; padding:28px; background:rgba(var(--wash),.015); }
+    /* ── The three playbooks — the centerpiece ───────────────── */
+    .plays { display:flex; flex-direction:column; gap:20px; margin-top:26px; }
+    .play { --accent:var(--jade); --accent-glow:var(--jade);
+      border:1px solid var(--hairline); border-radius:20px; background:rgba(var(--wash),.02); padding:30px 30px 26px;
+      transition:border-color .3s var(--settle), transform .3s var(--settle); }
+    .play:hover { border-color:var(--accent); transform:translateY(-2px); }
+    .play.cafe  { --accent:var(--amber); --accent-glow:var(--amber-glow); }
+    .play.gym   { --accent:var(--jade);  --accent-glow:var(--jade); }
+    .play.event { --accent:var(--amber); --accent-glow:var(--amber-glow); }
+
+    .play-top { display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+    .play-num { font-family:var(--font-mono); font-size:12px; letter-spacing:.14em; color:var(--accent-glow); flex:none; }
+    .play-tag { font-family:var(--font-mono); font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--ash); }
+    .play h3 { font-family:var(--font-display); font-weight:400; font-size:clamp(1.55rem,3.4vw,2rem); line-height:1.12; margin-top:8px; }
+    .play .desc { color:var(--ash); font-size:14px; margin-top:8px; max-width:64ch; }
+
+    .mechanic { display:flex; gap:12px; margin-top:16px; padding:14px 16px; border-radius:12px;
+      background:rgba(var(--wash),.03); border-left:2px solid var(--accent); }
+    .mechanic .q { font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent-glow); flex:none; padding-top:2px; }
+    .mechanic p { font-family:var(--font-mono); font-size:12.5px; color:var(--bone); line-height:1.6; }
+
+    .gg { display:grid; grid-template-columns:1fr 1fr; gap:0; margin-top:22px; border-top:1px solid var(--hairline); }
+    @media (max-width:640px){ .gg { grid-template-columns:1fr; } }
+    .gg-col { padding:20px 24px 6px 0; }
+    .gg-col + .gg-col { padding-left:26px; border-left:1px solid var(--hairline); }
+    @media (max-width:640px){ .gg-col + .gg-col { padding-left:0; border-left:0; border-top:1px solid var(--hairline); padding-top:20px; } }
+    .gg-label { font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+    .gg-give .gg-label { color:var(--ash); }
+    .gg-get .gg-label { color:var(--accent-glow); }
+    .gg ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
+    .gg li { font-size:13.5px; color:var(--ash); padding-left:18px; position:relative; line-height:1.5; }
+    .gg li b { color:var(--bone); font-weight:500; }
+    .gg-give li::before { content:"→"; position:absolute; left:0; top:0; font-size:11px; color:var(--ash); }
+    .gg-get li::before { content:"◆"; position:absolute; left:0; top:1px; font-size:8px; color:var(--accent); }
+
+    /* ── Honest "where we are" ───────────────────────────────── */
+    .truth { margin:52px 0 0; border:1px solid var(--hairline); border-radius:20px; padding:30px 30px; background:rgba(var(--wash),.015); }
     .truth h2 { font-family:var(--font-display); font-weight:400; font-size:clamp(1.5rem,3vw,1.9rem); }
-    .truth p { color:var(--ash); font-size:14px; margin-top:10px; max-width:66ch; }
-    .truth p b { color:var(--bone); font-weight:500; }
+    .truth-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px 26px; margin-top:20px; }
+    @media (max-width:640px){ .truth-grid { grid-template-columns:1fr; } }
+    .tr { padding-left:16px; position:relative; }
+    .tr::before { content:"◆"; position:absolute; left:0; top:5px; font-size:8px; color:var(--jade); }
+    .tr h4 { font-size:13px; font-weight:600; color:var(--bone); }
+    .tr p { color:var(--ash); font-size:13px; margin-top:5px; }
+    .tr p b { color:var(--bone); font-weight:500; }
 
-    .form-block { margin:52px 0 0; border:1px solid rgba(127,183,158,.3); border-radius:18px; padding:30px 28px; background:rgba(var(--wash),.02); }
-    .form-block h2 { font-family:var(--font-display); font-weight:400; font-size:clamp(1.6rem,3.4vw,2.1rem); }
-    .form-block .sub { color:var(--ash); font-size:14px; margin-top:8px; max-width:58ch; }
-    .pform { display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; }
+    /* ── CTA form ────────────────────────────────────────────── */
+    .form-block { margin:52px 0 0; border:1px solid rgba(127,183,158,.3); border-radius:20px; padding:34px 30px; background:rgba(var(--wash),.02); }
+    .form-block h2 { font-family:var(--font-display); font-weight:400; font-size:clamp(1.7rem,3.6vw,2.3rem); }
+    .form-block .sub { color:var(--ash); font-size:14.5px; margin-top:10px; max-width:60ch; }
+    .form-block .sub a { color:var(--jade); }
+    .pform { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
     .pform input, .pform select { background:rgba(var(--wash),.03); border:1px solid var(--hairline); border-radius:10px;
       padding:12px 14px; color:var(--bone); font-family:var(--font-mono); font-size:12px; min-width:0; }
     .pform input:focus, .pform select:focus { outline:none; border-color:var(--jade-deep); }
     .pform select:invalid { color:var(--ash); }
-    .pform #pOrg { width:220px; } .pform #pEmail { width:220px; } .pform #pType { width:200px; }
+    .pform #pOrg { width:220px; } .pform #pEmail { width:220px; } .pform #pType { width:210px; }
     .pform .btn { display:inline-flex; align-items:center; gap:8px; background:var(--jade); color:var(--void); border:0; cursor:pointer;
       border-radius:999px; padding:12px 22px; font-weight:600; font-size:14px; font-family:var(--font-sans); transition:filter .25s; }
     .pform .btn:hover { filter:brightness(1.08); }
     @media (max-width:560px){ .pform input, .pform select, .pform .btn { width:100% !important; } }
-    .form-note { font-family:var(--font-mono); font-size:11px; color:var(--ash); margin-top:12px; line-height:1.7; }
+    .form-note { font-family:var(--font-mono); font-size:11px; color:var(--ash); margin-top:14px; line-height:1.7; }
     .form-note a { color:var(--jade); }
 
     .footer { margin-top:70px; border-top:1px solid var(--hairline); padding:26px 0 40px; display:flex; flex-wrap:wrap; gap:10px 24px;
       font-family:var(--font-mono); font-size:11px; color:var(--ash); }
     .footer a:hover { color:var(--bone); }
+
+    /* ── Tasteful reveal-on-scroll ───────────────────────────── */
+    .reveal { opacity:0; transform:translateY(16px); transition:opacity .6s var(--settle), transform .6s var(--settle); }
+    .reveal.in { opacity:1; transform:none; }
+    @media (prefers-reduced-motion:reduce){ .reveal { opacity:1; transform:none; transition:none; } html { scroll-behavior:auto; } }
   </style>
 </head>
 <body>
@@ -134,114 +175,173 @@
       <div class="nav-r">
         <a href="index.html">For athletes</a>
         <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark theme">☀</button>
-        <a href="#start" class="cta">Start the conversation</a>
+        <a href="#start" class="cta">Run a challenge</a>
       </div>
     </nav>
 
     <header class="head">
-      <span class="eyebrow">Oriya for partners · founding season · SF &amp; NYC</span>
-      <h1>Your people already wear the hardware.<br><em>Host the league.</em></h1>
-      <p class="lede">Oriya normalizes every wearable — Oura, Whoop, Garmin, Apple — onto <b>one comparable recovery index</b>, so a whole gym, run club, or company channel can finally compete on the same board. You bring the people, the venue, or the prize. We run the board.</p>
-      <p class="aud-note">Wearing the device instead of running the org? This page is for partners — <a href="try.html">the athlete side is here →</a></p>
+      <span class="eyebrow">Oriya for partners · free founding window · SF &amp; NYC</span>
+      <h1>Everyone in your room already wears a tracker.<br><em>Give them a reason to compete.</em></h1>
+      <p class="lede">Oriya turns any wearable — Oura, Whoop, Garmin, Apple Watch — into <b>one comparable 0–100 recovery score, on the spot</b>. You bring the prize and the room. We bring the live board and a founder who shows up <b>in person</b> to run it. <span class="free">Free for the founding window — the next ~10 days.</span></p>
+
+      <div class="flow" aria-label="Any device becomes one score and one board">
+        <div class="grp">
+          <span class="dev">OURA</span><span class="dev">WHOOP</span><span class="dev">GARMIN</span><span class="dev">APPLE</span>
+        </div>
+        <span class="arw">→</span>
+        <span class="out">ONE ORIYA INDEX</span>
+        <span class="arw">→</span>
+        <span class="board">YOUR LIVE BOARD</span>
+      </div>
+
+      <div class="chips">
+        <span class="chip"><span class="dot"></span>You bring: a prize + a corner</span>
+        <span class="chip"><span class="dot"></span>We bring: instant scoring + a live board</span>
+        <span class="chip free"><span class="dot"></span>A founder runs it on-site — free</span>
+      </div>
+
+      <p class="aud-note">Wearing the device instead of running the room? This page is for partners — <a href="try.html">the athlete side is here →</a></p>
     </header>
 
-    <div class="tracks">
-      <div class="track">
-        <span class="tk">Gyms &amp; studios</span>
-        <h3>A member board, no new hardware</h3>
-        <ul>
-          <li><b>Whatever members already own</b> — nothing to stock, nothing to sell them.</li>
-          <li><b>Aggregate-only coach view</b> — minimum five members behind every stat, individual sharing off by default.</li>
-          <li>The morning check becomes a front-desk conversation — recovery as your studio's <b>retention layer</b>.</li>
-          <li>Founding season is concierge: members email a screenshot, <b>we normalize and post the board by hand</b>.</li>
-        </ul>
-        <a class="go" href="mailto:team@oriya.app?subject=Member%20board%20—%20%5Byour%20studio%5D&body=Studio%2Fgym%3A%0ACity%3A%0ARoster%20size%20(roughly)%3A%0AWhat%20your%20members%20wear%20(if%20you%20know)%3A" data-track="gym">Start a member board → team@oriya.app</a>
-      </div>
-
-      <div class="track">
-        <span class="tk">Communities &amp; clubs</span>
-        <h3>Your #recovery-squad, scored fairly</h3>
-        <ul>
-          <li>Run clubs, Discord and Slack fitness channels, company wellness crews — <b>one deep-linked board</b> for your people.</li>
-          <li>Members can flex <b>anonymously behind their work email</b> — the domain shows, the name doesn't.</li>
-          <li>Challenge cards built around your culture — crunch weeks, race blocks, <b>your rivalries</b>.</li>
-          <li><b>Free in Season 1.</b> You'd be a founding board, and it's priced like it.</li>
-        </ul>
-        <a class="go" href="mailto:team@oriya.app?subject=Community%20board%20—%20%5Byour%20community%5D&body=Community%2Fclub%3A%0AWhere%20it%20lives%20(Slack%2FDiscord%2FStrava%2FIRL)%3A%0AHeadcount%20(roughly)%3A" data-track="community">Start a community board → team@oriya.app</a>
-      </div>
-
-      <div class="track sponsor">
-        <span class="tk">Sponsors &amp; brands</span>
-        <h3>Your name on the pot</h3>
-        <ul>
-          <li>Sponsor a challenge purse — the card reads <b>“Sponsored by you”</b> while verified athletes race for it.</li>
-          <li>Backing is <b>prize sponsorship, not a wager</b> — how the money moves is spelled out below.</li>
-        </ul>
-        <a class="go" href="#pledge" data-track="sponsor">Back a purse — pledge in 30 seconds ↓</a>
-      </div>
+    <div class="sec-head reveal">
+      <span class="eyebrow">Three ways to run it</span>
+      <h2>Pick a playbook. We handle the rest.</h2>
+      <p>Each one runs on the wearables your people already own. <b>You choose the prize; we score every device fairly and post the board.</b> Nothing to install, no hardware to stock, no money moving through Oriya.</p>
     </div>
 
-    <section class="truth">
-      <h2>Where we actually are</h2>
-      <p><b>Founder-run private beta, Season 1, SF &amp; NYC.</b> Demo boards run with sample athletes until each side fills — every board says so. No partner logos here because <b>there are no signed partners yet</b>; you'd be first, which is why Season 1 is free for gyms and communities and hands-on for everyone. Member data is never sold; team views are aggregate-only.</p>
-    </section>
+    <div class="plays">
+      <!-- Playbook 01 — Cafés -->
+      <section class="play cafe reveal">
+        <div class="play-top">
+          <span class="play-num">01</span>
+          <span class="play-tag">Cafés &amp; coffee shops</span>
+        </div>
+        <h3>The morning streak</h3>
+        <p class="desc">A small corner and a reason to come back three days running. The recovery check becomes a counter-side ritual.</p>
+        <div class="mechanic">
+          <span class="q">The pitch</span>
+          <p>“Come to [Café] 3 mornings in a row, show your Oriya recovery score, win a $50 voucher.”</p>
+        </div>
+        <div class="gg">
+          <div class="gg-col gg-give">
+            <div class="gg-label">You bring</div>
+            <ul>
+              <li>A <b>small corner</b> and a QR sign — no space rebuild.</li>
+              <li>A <b>voucher or perk</b> as the streak prize (you set it).</li>
+            </ul>
+          </div>
+          <div class="gg-col gg-get">
+            <div class="gg-label">You get</div>
+            <ul>
+              <li><b>Repeat foot traffic</b> — a streak is a built-in reason to return.</li>
+              <li><b>Time-of-day analytics</b> — when your wearable crowd actually shows up.</li>
+              <li>An <b>opt-in email list</b> of health-minded regulars.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-    <!-- Sponsor payment flow. DELIBERATELY not a pay-now button: this page never
-         touches money. Pledges are staged here; payment happens on an Airwallex-
-         HOSTED checkout (Apple Pay / cards) issued per verified pledge from
-         team@oriya.app — per the payments policy: backers verified, pots only
-         open on boards with real athletes, no bank details on any page. -->
-    <section class="pay" id="pledge">
-      <span class="eyebrow" style="color:var(--amber-glow);">Sponsors · how the money moves</span>
-      <h2>Pledge here. Pay by Apple&nbsp;Pay there.</h2>
-      <div class="pay-steps">
-        <div class="ps">
-          <span class="ps-n">01 · Pledge</span>
-          <p>Who you are, which board, how much. <b>Nothing is charged on this page</b> — it never touches money.</p>
+      <!-- Playbook 02 — Gyms & studios -->
+      <section class="play gym reveal">
+        <div class="play-top">
+          <span class="play-num">02</span>
+          <span class="play-tag">Gyms &amp; studios</span>
         </div>
-        <div class="ps">
-          <span class="ps-n">02 · Verify</span>
-          <p>We confirm you're real — and that the board is. Purses only open once <b>real, verified athletes</b> are racing; never against sample data.</p>
+        <h3>The 5-day recovery challenge</h3>
+        <p class="desc">A week-long board your members check every morning. It rewards the smartest recovery, not the priciest device — and it gives people a reason to connect.</p>
+        <div class="mechanic">
+          <span class="q">The pitch</span>
+          <p>“Five days. Highest recovery score wins. The coach picks the prize.”</p>
         </div>
-        <div class="ps">
-          <span class="ps-n">03 · Pay</span>
-          <p>A one-off <b>Airwallex-hosted checkout</b> link arrives from team@oriya.app — Apple&nbsp;Pay or any major card, receipt included. Airwallex holds the card rails; we never see card numbers.</p>
+        <div class="gg">
+          <div class="gg-col gg-give">
+            <div class="gg-label">You bring</div>
+            <ul>
+              <li>The <b>room</b> and a coach to announce it.</li>
+              <li>A <b>prize you choose</b> — a free month, gear, a session.</li>
+            </ul>
+          </div>
+          <div class="gg-col gg-get">
+            <div class="gg-label">You get</div>
+            <ul>
+              <li>A <b>live board members check daily</b> — a retention hook that isn't another class.</li>
+              <li>Members <b>connect via a shareable QR Body Passport</b> — the room turns into a network.</li>
+              <li>After 7 days logging, <b>every participant gets a personalized analytics readout</b> tied to their persona — whatever device they wore.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Playbook 03 — Events & hosts -->
+      <section class="play event reveal">
+        <div class="play-top">
+          <span class="play-num">03</span>
+          <span class="play-tag">Events &amp; hosts · Luma</span>
+        </div>
+        <h3>The same-day social</h3>
+        <p class="desc">Turn a one-off gathering into a shared live board. Everyone's recovery score for the day, up in the room — an instant talking point the sponsor gets to own.</p>
+        <div class="mechanic">
+          <span class="q">The pitch</span>
+          <p>“One night, one board — everyone's recovery score for today, live. The sponsor names the award.”</p>
+        </div>
+        <div class="gg">
+          <div class="gg-col gg-give">
+            <div class="gg-label">You bring</div>
+            <ul>
+              <li>The <b>event and the crowd</b> (a Luma list, a meetup, a launch night).</li>
+              <li>A <b>sponsor-chosen award</b> for the day's top score.</li>
+            </ul>
+          </div>
+          <div class="gg-col gg-get">
+            <div class="gg-label">You get</div>
+            <ul>
+              <li>An <b>instant icebreaker</b> — a shared number strangers compare.</li>
+              <li>A <b>live board</b> that turns a one-off into a reason to gather again.</li>
+              <li><b>Sponsor's name on the award</b>, in front of a health-serious room.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="truth reveal">
+      <h2>Where we actually are</h2>
+      <div class="truth-grid">
+        <div class="tr">
+          <h4>Founder-run, Season 1</h4>
+          <p>Private beta, <b>SF &amp; NYC</b>. A founder shows up in person to collect submissions and run the board — no funnel, no app to install.</p>
+        </div>
+        <div class="tr">
+          <h4>You'd be first</h4>
+          <p>No partner logos here because <b>there are no signed partners yet</b>. That's the honest frame — and why the founding window is free.</p>
+        </div>
+        <div class="tr">
+          <h4>Instant &amp; fair</h4>
+          <p>Every device is normalized to one 0–100 index by <b>deterministic math</b>. The only human step is confirming a screenshot is a real capture — it never gates the score.</p>
+        </div>
+        <div class="tr">
+          <h4>Data is never sold</h4>
+          <p>Partner and coach views are <b>aggregate-only — minimum five members behind any stat</b>. A member's Body Passport is theirs to share by QR, or not.</p>
         </div>
       </div>
-      <div class="pay-methods" aria-label="Accepted payment methods">
-        <span class="pm"> Pay</span><span class="pm">Visa</span><span class="pm">Mastercard</span><span class="pm">Amex</span>
-        <span class="pm-via">via Airwallex hosted checkout · PCI handled by Airwallex</span>
-      </div>
-      <form class="pform" id="pledgeForm" style="margin-top:22px;">
-        <input type="text" required placeholder="brand / company" id="plOrg" aria-label="Brand or company">
-        <input type="email" required placeholder="you@brand.com" id="plEmail" aria-label="Email">
-        <input type="text" required placeholder="which board? e.g. Launch-Crunch" id="plBoard" aria-label="Which board">
-        <div class="amt-row">
-          <button type="button" class="amt" data-amt="100">$100</button>
-          <button type="button" class="amt" data-amt="250">$250</button>
-          <button type="button" class="amt" data-amt="500">$500</button>
-          <input type="number" min="25" step="25" required placeholder="$ USD" id="plAmt" aria-label="Pledge amount in USD">
-        </div>
-        <button class="btn" type="submit">Stage my pledge →</button>
-      </form>
-      <p class="form-note">Pledging stages the conversation — it is not a payment and not a wager. Purse backing is prize sponsorship: backers are never paid out, athletes are. The checkout link only ever comes from <a href="mailto:team@oriya.app">team@oriya.app</a>, and only after verification. We never take wires against bank details posted on a webpage — if “Oriya” ever emails you bank numbers, it isn't us.</p>
     </section>
 
     <section class="form-block" id="start">
-      <h2>Start the conversation</h2>
-      <p class="sub">Thirty seconds here, or email <a href="mailto:team@oriya.app" style="color:var(--jade)">team@oriya.app</a> directly — either way a founder replies, not a funnel.</p>
+      <h2>Run a challenge</h2>
+      <p class="sub">Tell us the room and the prize — thirty seconds here, or email <a href="mailto:team@oriya.app">team@oriya.app</a> directly. Either way a founder replies, not a funnel.</p>
       <form class="pform" id="partnerForm">
-        <input type="text" required placeholder="org / studio / brand" id="pOrg" aria-label="Organization">
-        <input type="email" required placeholder="you@yourco.com" id="pEmail" aria-label="Email">
+        <input type="text" required placeholder="café / gym / event / brand" id="pOrg" aria-label="Organization">
+        <input type="email" required placeholder="you@yourplace.com" id="pEmail" aria-label="Email">
         <select required id="pType" aria-label="Partner type">
-          <option value="" disabled selected>which are you?</option>
+          <option value="" disabled selected>which playbook?</option>
+          <option value="cafe">café / coffee shop</option>
           <option value="gym">gym / studio</option>
-          <option value="community">community / club</option>
-          <option value="sponsor">sponsor / brand</option>
+          <option value="event">event / host</option>
+          <option value="other">something else</option>
         </select>
         <button class="btn" type="submit">Start the conversation →</button>
       </form>
-      <p class="form-note">Season 1 is free for gyms and communities. Sponsors: pledge above ↑ — that section explains how the money moves.</p>
+      <p class="form-note">Free for the founding window. A founder replies from <a href="mailto:team@oriya.app">team@oriya.app</a>, usually same-day. You bring the prize and the room — no money ever moves through Oriya. Data is never sold; team views are aggregate-only.</p>
     </section>
 
     <footer class="footer">
@@ -272,8 +372,8 @@
     })();
 
     /* Partner capture — same Tally form as the rest of the site (email + source
-       label); the org and type ride in the label. Mailto links are the direct
-       lane; this is the 30-second lane. Submit-only, never keystrokes. */
+       label); the org and playbook type ride in the label. Mailto links are the
+       direct lane; this is the 30-second lane. Submit-only, never keystrokes. */
     (function () {
       var f = document.getElementById("partnerForm");
       if (!f) return;
@@ -297,46 +397,19 @@
       });
     })();
 
-    /* Sponsor pledge composer — stages the pledge (Tally row + prefilled email).
-       No money moves here by design; the Airwallex-hosted checkout (Apple Pay /
-       cards) is issued per verified pledge from team@oriya.app. */
+    /* Tasteful reveal-on-scroll — staggered block fade-ups, reduced-motion safe. */
     (function () {
-      var f = document.getElementById("pledgeForm");
-      if (!f) return;
-      var amt = document.getElementById("plAmt");
-      f.querySelectorAll(".amt").forEach(function (b) {
-        b.addEventListener("click", function () {
-          amt.value = b.dataset.amt;
-          f.querySelectorAll(".amt").forEach(function (x) { x.classList.toggle("on", x === b); });
-        });
-      });
-      if (amt) amt.addEventListener("input", function () {
-        f.querySelectorAll(".amt").forEach(function (x) { x.classList.toggle("on", x.dataset.amt === amt.value); });
-      });
-      f.addEventListener("submit", function (ev) {
-        ev.preventDefault();
-        var email = String(document.getElementById("plEmail").value || "").trim().toLowerCase();
-        var org = String(document.getElementById("plOrg").value || "").trim();
-        var board = String(document.getElementById("plBoard").value || "").trim();
-        var amount = String(amt.value || "").trim();
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !amount) return;
-        var uid = function () { return window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(16).slice(2); };
-        var responses = {};
-        responses["37cd2a09-f318-438a-91f8-2ef0fa02d065"] = email;
-        responses["84f96066-a5ad-4db1-8e79-75b7eef16231"] = "sponsor_pledge · org:" + org + " · amount:$" + amount + " · board:" + board;
-        try {
-          fetch("https://api.tally.so/forms/xXB0xy/respond", { method: "POST", keepalive: true,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ sessionUuid: uid(), respondentUuid: uid(), responses: responses, captchas: {}, isCompleted: true }) })
-            .catch(function () {});
-        } catch (e) {}
-        var mail = "mailto:team@oriya.app?subject=" + encodeURIComponent("Purse pledge — $" + amount + " — " + board + " (" + org + ")")
-          + "&body=" + encodeURIComponent("Pledge: $" + amount + " USD to the " + board + " purse.\nBrand/company: " + org + "\nReply-to: " + email
-          + "\n\nI understand this is prize sponsorship, not a wager; backers are never paid out. Send the verified Airwallex checkout link (Apple Pay / card) once the board is live with real athletes.");
-        f.innerHTML = '<div><p class="form-note" style="margin:0">Pledge staged ✓ — $' + amount.replace(/[^\d.]/g, "") + ' toward <b style="color:var(--bone)">' + board.replace(/[<>&]/g, "") + '</b>.</p>'
-          + '<a class="btn" style="margin-top:14px" href="' + mail + '">Send the pledge email →</a>'
-          + '<p class="form-note" style="margin-top:12px">After verification, your Airwallex checkout link (Apple Pay / any major card) arrives on that same thread — never from any other address.</p></div>';
-      });
+      var els = document.querySelectorAll(".reveal");
+      if (!els.length) return;
+      var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduce || !("IntersectionObserver" in window)) {
+        els.forEach(function (el) { el.classList.add("in"); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+      }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+      els.forEach(function (el) { io.observe(el); });
     })();
   </script>
 </body>
