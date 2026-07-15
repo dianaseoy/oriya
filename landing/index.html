@@ -1355,17 +1355,17 @@
 
           <!-- Explore · Stakes / Season Ledger -->
           <div class="scr scr-stakes" data-scr="stakes">
-            <div class="chal-head"><span class="chal-live"><span class="ld"></span> Stakes · Season 1</span><span class="chal-days">real odds</span></div>
-            <div class="pd-index" style="margin:4px 0 2px"><span class="pd-num" style="color:var(--jade)">+$140</span><span class="pd-cap">Season ledger · USD</span></div>
+            <div class="chal-head"><span class="chal-live"><span class="ld"></span> Stakes · Season 1</span><span class="chal-days">no buy-in</span></div>
+            <div class="pd-index" style="margin:4px 0 2px"><span class="pd-num" style="color:var(--jade)">+$140</span><span class="pd-cap">Season winnings · USD</span></div>
             <div class="stk-row"><span class="stk-n">Recovery Duel · won</span><span class="stk-v pos">+$50</span></div>
-            <div class="stk-row"><span class="stk-n">Squad Pot · Marina RC</span><span class="stk-v pos">+$120</span></div>
-            <div class="stk-row"><span class="stk-n">Buy-in · Launch-Crunch</span><span class="stk-v neg">−$30</span></div>
-            <div class="stk-open"><span>Open pool · $1,840</span><span>buy-in $20</span></div>
+            <div class="stk-row"><span class="stk-n">Squad prize · Marina RC</span><span class="stk-v pos">+$120</span></div>
+            <div class="stk-row"><span class="stk-n">Entry</span><span class="stk-v">free</span></div>
+            <div class="stk-open"><span>Prizes are partner- or founder-funded</span><span>no pot · no buy-in</span></div>
             <div class="stk-feed">
               <div class="sf">▸ jessica: 94% sleep after a 14-hr crunch. godspeed.</div>
               <div class="sf">▸ riley.m broke a 5-day streak. check on their deploy.</div>
             </div>
-            <div class="chal-foot">One index · any device · real odds · demo</div>
+            <div class="chal-foot">One index · any device · free to enter · demo</div>
           </div>
 
           <!-- Explore · Device sync -->
@@ -1463,10 +1463,10 @@
       <a class="proof-card" href="try.html?challenge=ai">
         <span class="proof-live"><span class="dot"></span> Live</span>
         <h4>Launch-Crunch Bracket</h4>
-        <p>Anthropic's red-team week vs OpenAI's alignment on-call vs Stripe's peak-traffic infra. Highest normalized readiness under load holds the lead.</p>
+        <p>A model-eval crew vs. an alignment on-call team vs. a peak-traffic infra team — Season 1 opens with 3 spots. Highest normalized readiness under load holds the lead.</p>
         <div class="proof-race" aria-hidden="true"><i class="lead" style="width:34.2%"></i><i style="width:33%"></i><i style="width:32.8%"></i></div>
-        <div class="proof-race-key"><span class="lead">Anthropic 86 · leads</span><span>OpenAI 82.7</span><span>Stripe 82.5</span></div>
-        <div class="proof-meta"><span class="ppl">53 logging</span><span class="prize">$1,200 · 1st $700</span></div>
+        <div class="proof-race-key"><span class="lead">Eval crew 86 · leads</span><span>On-call 82.7</span><span>Infra 82.5</span></div>
+        <div class="proof-meta"><span class="ppl">Sample board · 3 spots open</span><span class="prize">Prize: founder-funded</span></div>
       </a>
       <a class="proof-card" href="try.html?challenge=marina">
         <span class="proof-live"><span class="dot"></span> Live</span>
@@ -2396,7 +2396,7 @@
     const setTab = (name) => { if (demoTabs) demoTabs.querySelectorAll(".demo-tab").forEach((b) => b.classList.toggle("active", b.dataset.tab === name)); };
     const EXPLORE_CAP = {
       passport: "Your <b>Body Passport</b> — one identity, any device.",
-      stakes: "Back a squad, settle a duel — <b>real odds.</b>",
+      stakes: "Back a squad, settle a duel — <b>partner-funded prizes, no buy-in.</b>",
       devices: "Read-only sync — <b>we never write to your device.</b>"
     };
     const enterScreen = (t) => {

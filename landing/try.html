@@ -624,7 +624,7 @@
       "Prize distributed within 7 days of challenge end via the sponsor",
     ];
     const CHALLENGES = [
-      { id:"marina", emoji:"🏃", icon:Users, status:"LIVE", sponsor:"Lululemon SF",
+      { id:"marina", emoji:"🏃", icon:Users, status:"LIVE", sponsor:null,
         title:"Marina Run Club vs Stanford Run Club", subtitle:"38 runners. Two clubs. One recovery average that settles it — no more arguing 10K splits.",
         days:4, prize:"$500", split:"$50/winner", projectedPayout:50, payout:"Winner takes all — paid out as $50 gift cards per winning member",
         participants:38, avg:76, joinTeam:"Marina RC", categories:["Run Club","Team Battle","SF"],
@@ -639,28 +639,28 @@
           {init:"LJ",handle:"l.johnson",team:"Stanford",score:74,streak:"4d"},
           {init:"MW",handle:"m.williams",team:"Marina RC",score:72,streak:"2d"},
         ] },
-      { id:"ai", emoji:"🤖", icon:Zap, status:"LIVE", sponsor:"Whoop × Oriya",
+      { id:"ai", emoji:"🤖", icon:Zap, status:"LIVE", sponsor:null,
         title:"Launch-Crunch Bracket", subtitle:"Red-team week vs alignment on-call vs peak-traffic — who holds readiness under load",
         feed:[
           { sys:true, text:"jessica logged a 94% sleep performance after a 14-hour crunch session. Godspeed." },
-          { who:"Riley M.", team:"Anthropic", text:"our 7-day team avg dropped to 79 after the red-team crunch. Whoop says my recovery is 74, Oriya normalized it to 68. explain the 6-point haircut.", reacts:[["Proof of Work",4],["Unaligned",1]] },
-          { who:"Alex K.",  team:"Anthropic", text:"Whoop over-weights respiratory-rate variance in its sleep-stage call. a Whoop 74 is a lower readiness tier than a 74 off an Oura — it's correcting, not sandbagging you.", reacts:[["Citation Provided",3]] },
+          { who:"Riley M.", team:"Eval crew", text:"our 7-day team avg dropped to 79 after the red-team crunch. Whoop says my recovery is 74, Oriya normalized it to 68. explain the 6-point haircut.", reacts:[["Proof of Work",4],["Unaligned",1]] },
+          { who:"Alex K.",  team:"Eval crew", text:"Whoop over-weights respiratory-rate variance in its sleep-stage call. a Whoop 74 is a lower readiness tier than a 74 off an Oura — it's correcting, not sandbagging you.", reacts:[["Citation Provided",3]] },
           { sys:true, text:"riley.m broke a 5-day logging streak. someone check on their deployment." },
-          { who:"Sarah P.", team:"Anthropic", text:"we're 4 normalized points off OpenAI. anyone not logging is a zero today — get your morning reading in before 0900 or you cost the team.", reacts:[["Proof of Work",6],["Deep Sleep or Didn't Happen",2]] },
-          { who:"Jessica",  team:"Anthropic", text:"pulled lights-out to 22:30 for 3 nights, RMSSD up ~12ms, normalized 88 this morning. debt's clearing.", reacts:[["Deep Sleep or Didn't Happen",5]] },
+          { who:"Sarah P.", team:"Eval crew", text:"we're 4 normalized points off the on-call team. anyone not logging is a zero today — get your morning reading in before 0900 or you cost the team.", reacts:[["Proof of Work",6],["Deep Sleep or Didn't Happen",2]] },
+          { who:"Jessica",  team:"Eval crew", text:"pulled lights-out to 22:30 for 3 nights, RMSSD up ~12ms, normalized 88 this morning. debt's clearing.", reacts:[["Deep Sleep or Didn't Happen",5]] },
         ],
         days:9, prize:"$1,200", split:"1st $700", projectedPayout:120, payout:"1st: $700 · 2nd: $350 · 3rd: $150 — split across participating team members",
-        participants:53, avg:79, joinTeam:"Anthropic", categories:["Corporate","Multi-team","Invite-only"],
-        description:"Three teams shipping under acute load, 14 days. Anthropic's model-context crew is mid red-teaming crunch. OpenAI's alignment on-call is eating 4-hour fragmented-REM nights. Stripe's infra team is bracing for peak-traffic. Highest normalized team readiness wins — sleep debt is the silent leader, and a missed morning logs as a zero.",
+        participants:53, avg:79, joinTeam:"Eval crew", categories:["Corporate","Multi-team","Invite-only"],
+        description:"Three teams shipping under acute load, 14 days. A model-eval crew is mid red-teaming crunch. An alignment on-call team is eating 4-hour fragmented-REM nights. A peak-traffic infra team is bracing for launch. Highest normalized team readiness wins — sleep debt is the silent leader, and a missed morning logs as a zero.",
         leaderboard:[
-          {init:"RM",handle:"riley.m",team:"Anthropic",score:91,streak:"7d"},
-          {init:"CP",handle:"casey.p",team:"Anthropic",score:87,streak:"5d"},
-          {init:"◒",handle:"anon-kestrel",team:"OpenAI",score:86,streak:"4d",anon:true},
-          {init:"JK",handle:"jordan.k",team:"Stripe",score:84,streak:"5d"},
-          {init:"SK",handle:"sage.k",team:"OpenAI",score:83,streak:"6d"},
-          {init:"◒",handle:"anon-marmot",team:"Stripe",score:81,streak:"3d",anon:true},
-          {init:"DH",handle:"dana.h",team:"Anthropic",score:80,streak:"7d"},
-          {init:"RA",handle:"river.a",team:"OpenAI",score:79,streak:"4d"},
+          {init:"RM",handle:"riley.m",team:"Eval crew",score:91,streak:"7d"},
+          {init:"CP",handle:"casey.p",team:"Eval crew",score:87,streak:"5d"},
+          {init:"◒",handle:"anon-kestrel",team:"On-call",score:86,streak:"4d",anon:true},
+          {init:"JK",handle:"jordan.k",team:"Infra",score:84,streak:"5d"},
+          {init:"SK",handle:"sage.k",team:"On-call",score:83,streak:"6d"},
+          {init:"◒",handle:"anon-marmot",team:"Infra",score:81,streak:"3d",anon:true},
+          {init:"DH",handle:"dana.h",team:"Eval crew",score:80,streak:"7d"},
+          {init:"RA",handle:"river.a",team:"On-call",score:79,streak:"4d"},
         ] },
       { id:"founders", emoji:"⚡", icon:Zap, status:"SOON", startLabel:"Opens Thu · Jul 16", sponsor:null,
         title:"Founders vs Operators", subtitle:"Founders own the schedule. Operators run the machine. Which one actually recovers better? Season opens Thu, Jul 16 — scores accepted from Wed, Jul 15.",
@@ -670,10 +670,10 @@
         description:"Do founders actually sleep better because they control their schedule? Or are operators more disciplined? The biggest cross-company matchup of the season — building things vs running them, settled on one fair board. Season opens Thursday, Jul 16; drop your first screenshot from Wednesday, Jul 15 and you're on the board the moment it goes live.",
         leaderboard:[
           {init:"BG",handle:"b.gupta",team:"YC Founders",score:76,streak:"7d"},
-          {init:"RM",handle:"riley.m",team:"Anthropic",score:75,streak:"5d"},
-          {init:"JK",handle:"jordan.k",team:"Stripe",score:74,streak:"4d"},
-          {init:"PS",handle:"priya.s",team:"a16z",score:70,streak:"6d"},
-          {init:"DM",handle:"drew.m",team:"Notion",score:71,streak:"3d"},
+          {init:"RM",handle:"riley.m",team:"Eval crew",score:75,streak:"5d"},
+          {init:"JK",handle:"jordan.k",team:"Infra",score:74,streak:"4d"},
+          {init:"PS",handle:"priya.s",team:"Growth ops",score:70,streak:"6d"},
+          {init:"DM",handle:"drew.m",team:"Product ops",score:71,streak:"3d"},
         ] },
       { id:"devicewars", emoji:"⌚", icon:Sparkles, status:"SOON", startLabel:"Starts July 11", sponsor:null,
         title:"Ring vs Band", subtitle:"Oura wearers vs Whoop wearers — same 7 days, same fair scoring. Which community actually holds recovery?",
@@ -681,22 +681,22 @@
         participants:null, avg:null, joinTeam:"Oura", categories:["Devices","Open","Community"],
         description:"The eternal debate, settled on the leaderboard instead of Twitter. Ring wearers vs band wearers — team avg over 7 days, scores normalized so neither device gets a hardware handicap it didn't earn.",
         leaderboard:[] },
-      { id:"vc", emoji:"🏦", icon:Trophy, status:"SOON", startLabel:"Starts July 14", sponsor:"Sequoia Capital × a16z",
-        title:"Sequoia vs a16z 30-Day", subtitle:"30 days. Two funds. Which portfolio recovers better under the same market pressure?",
+      { id:"vc", emoji:"🏦", icon:Trophy, status:"SOON", startLabel:"Starts July 14", sponsor:null,
+        title:"Seed Fund vs Growth Fund · 30-Day", subtitle:"30 days. Two funds. Which portfolio recovers better under the same market pressure?",
         days:null, prize:"$3,000", split:"1st fund $2k", projectedPayout:250, payout:"1st: $2,000 · 2nd: $1,000 — team split proportional to participation rate",
-        participants:null, avg:null, joinTeam:"Sequoia", categories:["VC","Founders","Monthly"],
+        participants:null, avg:null, joinTeam:"Seed fund", categories:["VC","Founders","Monthly"],
         description:"The Valley's biggest VC firms test their portfolio health. 30 days, any device, full normalization. Both firms are actively recruiting participants from their networks.",
         leaderboard:[] },
-      { id:"oakland", emoji:"🌉", icon:Flame, status:"SOON", startLabel:"Starts July 12", sponsor:"Brooks Running",
+      { id:"oakland", emoji:"🌉", icon:Flame, status:"SOON", startLabel:"Starts July 12", sponsor:null,
         title:"Oakland Run Crew vs Caltrain Runners", subtitle:"East Bay grit vs Peninsula discipline — 3 weeks, one recovery average.",
         days:null, prize:"$400", split:"winner takes all", projectedPayout:40, payout:"Winner takes all — gift cards distributed to active members",
         participants:null, avg:null, joinTeam:"Oakland Run Crew", categories:["Run Club","East Bay","Peninsula"],
         description:"Oakland's track crew against the South Bay commuter runners. Who brings the discipline outside of their usual routes? 3 weekends, highest team avg on Saturdays and Sundays wins.",
         leaderboard:[] },
       { id:"computeburn", emoji:"🔥", icon:Zap, status:"SOON", startLabel:"Starts July 21", sponsor:null,
-        title:"The Compute Burn", subtitle:"OpenAI vs Anthropic — output is easy to flex. Holding recovery while you ship is the signal. Readiness-per-load ratio, one week.",
+        title:"The Compute Burn", subtitle:"A model lab vs. an eval lab — output is easy to flex. Holding recovery while you ship is the signal. Readiness-per-load ratio, one week.",
         days:null, prize:null, split:null, payout:"Founding season — bragging rights. The pot opens once both sides seed 5 real athletes.",
-        participants:null, avg:null, joinTeam:"Anthropic", categories:["Tech","Rivalry","Weekly"],
+        participants:null, avg:null, joinTeam:"Eval crew", categories:["Tech","Rivalry","Weekly"],
         description:"The efficiency metric, not the grind metric. One week, highest normalized readiness-to-training-load ratio across the whole side, any device. Company culture settled in a number — and a red morning logged still beats a forgotten green one.",
         leaderboard:[] },
       { id:"alignment", emoji:"🎯", icon:Sparkles, status:"SOON", startLabel:"Opens with Season 1", sponsor:null,
@@ -709,17 +709,17 @@
     // Each battle has sides the athlete must choose between (shows on their passport as their squad)
     const CHALLENGE_TEAMS = {
       marina:["Marina RC","Stanford"],
-      ai:["Anthropic","OpenAI","Stripe"],
+      ai:["Eval crew","On-call","Infra"],
       founders:["Founders","Operators"],
       devicewars:["Oura","Whoop"],
-      vc:["Sequoia","a16z"],
+      vc:["Seed fund","Growth fund"],
       oakland:["Oakland Run Crew","Caltrain Runners"],
-      computeburn:["Anthropic","OpenAI"],
+      computeburn:["Model lab","Eval lab"],
       alignment:["Aligned"],
     };
     CHALLENGES.forEach((c) => { c.teams = CHALLENGE_TEAMS[c.id] || [c.joinTeam]; });
-    // sample-athlete company domains (illustrative — the bracket is a culture reference, not an enrollment)
-    const TEAM_DOMAINS = { Anthropic:"anthropic.com", OpenAI:"openai.com", Stripe:"stripe.com" };
+    // sample-athlete team labels are unnamed role archetypes — no real company is named or implied.
+    const TEAM_DOMAINS = {};
     // the flagship challenge gets a clean, memorable share link (worker SHORTLINKS
     // + _redirects both point /play/foundersvsoperators at this same URL) instead
     // of the raw ?challenge= query string everywhere it's copied or displayed.
@@ -1494,7 +1494,7 @@
     }
 
     /* =============================== Department live feed (raw squad chat) =============================== */
-    const TEAM_COLORS = { Anthropic:"#D7A25C", OpenAI:"#7FB79E", Stripe:"#9FD3BB", "Marina RC":"#9FD3BB", Stanford:"#D7A25C" };
+    const TEAM_COLORS = { "Eval crew":"#D7A25C", "On-call":"#7FB79E", "Infra":"#9FD3BB", "Marina RC":"#9FD3BB", Stanford:"#D7A25C" };
     function LiveFeed({ feed }) {
       const [n, setN] = useState(Math.min(2, feed.length));
       const [typing, setTyping] = useState(false);
