@@ -144,7 +144,8 @@
             <p className="sm" style={{ marginTop: 10 }}><b>{f.device} {f.score}</b> normalized onto the shared 0–100 scale, instantly:</p>
             <div style={{ margin: "16px 0 2px", textAlign: "center" }}>
               <span className="mono" style={{ fontSize: 56, fontWeight: 700, lineHeight: 1, color: "#00FF87" }}>{oriyaIndex(Number(f.score), f.device)}</span>
-              <span className="xs dim" style={{ display: "block", marginTop: 8 }}>your Oriya Index — the same scale as every Oura, Whoop, Garmin &amp; Apple Watch on the board</span>
+              <span className="xs dim" style={{ display: "block", marginTop: 8 }}>your Oriya Index — one comparable 0–100 scale across every Oura, Whoop, Garmin &amp; Apple Watch on the board</span>
+              <span className="xs dim" style={{ display: "block", marginTop: 6, opacity: 0.72 }}>Provisional — a single-screenshot read. It sharpens onto your own baseline as you log ~14 days.</span>
             </div>
             <a className="btn" style={{ display: "block", textAlign: "center", marginTop: 16 }}
               href={back ? "../try.html?challenge=" + encodeURIComponent(back) : "index.html"}>
@@ -206,7 +207,7 @@
           {err && <p className="err">{err}</p>}
           <button className="btn" disabled={state === "sending"} onClick={submit}>{state === "sending" ? "Sending…" : "Submit"}</button>
           {state === "fallback" && <p className="xs dim" style={{ marginTop: 10 }}>We opened an email draft instead — attach your screenshot and hit send. Same result, one extra tap.</p>}
-          <p className="xs dim" style={{ marginTop: 12 }}>Your Oriya Index is calculated the instant you submit — one fair 0–100 scale across every wearable. We only check your screenshot is a real device capture; that keeps the board honest and never changes your number.</p>
+          <p className="xs dim" style={{ marginTop: 12 }}>Your Oriya Index is calculated the instant you submit — a provisional 0–100 read that sharpens onto your own baseline as you log ~14 days. We only check your screenshot is a real device capture; that keeps the board honest and never changes your number.</p>
         </div>
       );
     }
