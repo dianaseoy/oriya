@@ -21,8 +21,8 @@
       --panel-2:#111015;      /* ink panel (inverted section) */
       --ink:#181410;          /* near-black warm text */
       --ink-soft:#5A5348;     /* muted body */
-      --cobalt:#2340C6;       /* the single cool primary accent (calmed) */
-      --coral:#2340C6;        /* de-popped: folded into the primary accent */
+      --cobalt:#12805F;       /* remapped OFF blue → brand jade (structural accent) */
+      --coral:#B4791E;        /* remapped OFF blue → brand amber (warm hand-drawn accent) */
       --chartreuse:#E7EC94;   /* highlighter, muted from neon */
       --magenta:#12805F;      /* de-popped: folded into brand jade */
       --jade:#12805F;         /* brand nod (deepened for contrast on paper) */
@@ -114,7 +114,7 @@
       border-bottom:2px solid var(--cobalt); padding:0 1px 6px; }
     h1{ font-family:var(--font-display); font-weight:900; font-size:clamp(2.6rem,7.2vw,5.2rem);
       line-height:.98; letter-spacing:-.02em; margin-top:26px; max-width:16ch; }
-    h1 .r2{ color:var(--coral); }
+    h1 .r2{ color:var(--jade); }
     .hero .lede{ font-family:var(--font-display); font-weight:400; font-size:clamp(1.15rem,2.4vw,1.55rem);
       color:var(--ink); max-width:44ch; margin-top:30px; line-height:1.42; }
     .hero .lede b{ font-weight:600; }
@@ -134,8 +134,8 @@
 
     /* four vaults */
     .vaults{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:40px; }
-    .vault{ border:1.5px solid var(--ink); background:var(--panel); padding:18px 16px 16px;
-      box-shadow:3px 3px 0 var(--ink); display:flex; flex-direction:column; gap:6px; }
+    .vault{ border:1px solid var(--hairline); background:var(--panel); padding:18px 16px 16px;
+      box-shadow:0 2px 10px rgba(24,20,16,.05); display:flex; flex-direction:column; gap:6px; }
     .vault .dev{ font-family:var(--font-mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); }
     .vault .num{ font-family:var(--font-display); font-weight:900; font-size:clamp(2.4rem,5vw,3.4rem); line-height:1; }
     .vault .lab{ font-family:var(--font-alt); font-weight:600; font-size:12.5px; }
@@ -143,20 +143,19 @@
     .vault.v3 .num{ color:var(--jade); } .vault.v4 .num{ color:var(--amber); }
     .vault-note{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-soft); margin-top:16px; }
 
-    /* pull quote (ink panel) */
-    .pull{ background:var(--panel-2); color:var(--paper); border:1.5px solid var(--ink);
-      box-shadow:5px 5px 0 var(--cobalt); padding:clamp(30px,6vw,64px); }
-    .pull p{ font-family:var(--font-display); font-weight:400; font-style:italic;
-      font-size:clamp(1.5rem,3.6vw,2.5rem); line-height:1.22; letter-spacing:-.01em; max-width:22ch; }
-    .pull .hl::before{ mix-blend-mode:normal; opacity:1; }
+    /* pull quote (editorial, left-ruled — was a heavy ink panel) */
+    .pull{ border-left:4px solid var(--jade); padding:4px 0 6px clamp(20px,4vw,44px); max-width:30ch; }
+    .pull p{ font-family:var(--font-display); font-weight:400; font-style:italic; color:var(--ink);
+      font-size:clamp(1.5rem,3.6vw,2.5rem); line-height:1.22; letter-spacing:-.01em; max-width:24ch; }
+    .pull .hl::before{ mix-blend-mode:multiply; opacity:.5; }
     .pull cite{ display:block; margin-top:22px; font-family:var(--font-mono); font-style:normal;
       font-size:12px; letter-spacing:.08em; color:var(--amber); }
 
     /* pillars */
     .pillars{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-top:44px; }
-    .pillar{ border:1.5px solid var(--ink); background:var(--panel); padding:26px 24px;
-      box-shadow:3px 3px 0 var(--ink); transition:transform .2s var(--settle), box-shadow .2s var(--settle); }
-    .pillar:hover{ transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--ink); }
+    .pillar{ border:1px solid var(--hairline); background:var(--panel); padding:26px 24px;
+      box-shadow:0 2px 12px rgba(24,20,16,.05); transition:transform .2s var(--settle), box-shadow .2s var(--settle); }
+    .pillar:hover{ transform:translateY(-3px); box-shadow:0 10px 24px rgba(24,20,16,.09); }
     .pillar .pn{ font-family:var(--font-mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
     .pillar.p1 .pn{ color:var(--cobalt); } .pillar.p2 .pn{ color:var(--ink-soft); }
     .pillar.p3 .pn{ color:var(--jade); } .pillar.p4 .pn{ color:var(--amber); }
@@ -234,7 +233,7 @@
     <div class="deco d1" data-depth="22" style="top:9%; right:5%;" aria-hidden="true">
       <span class="float"><svg width="140" height="140" viewBox="0 0 140 140" fill="none" stroke="rgba(24,20,16,.12)" stroke-width="2.4">
         <circle cx="70" cy="70" r="62"/><circle cx="70" cy="70" r="45"/><circle cx="70" cy="70" r="28"/>
-        <circle cx="70" cy="70" r="11" fill="rgba(31,59,224,.14)" stroke="none"/></svg></span>
+        <circle cx="70" cy="70" r="11" fill="rgba(18,128,95,.16)" stroke="none"/></svg></span>
     </div>
     <div class="deco d3" data-depth="30" style="bottom:11%; left:3%;" aria-hidden="true">
       <span class="float"><svg width="156" height="42" viewBox="0 0 156 42" fill="none" stroke="rgba(24,20,16,.15)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
@@ -254,7 +253,7 @@
         the bet we're making against it.</p>
       <div class="hero-cta reveal">
         <a href="#thesis" class="btn btn-ghost">Read the argument ↓</a>
-        <a href="try.html" class="btn btn-coral">Build your Passport →</a>
+        <a href="try.html" class="btn btn-primary">Build your Passport →</a>
       </div>
       <p class="byline reveal">A position paper from Oriya — founder-run, early, and writing this down before we've earned the right to be smug about it.</p>
     </div>
@@ -347,6 +346,7 @@
           <li>Your data is <b>aggregate-only and never sold.</b> Team views need a minimum group size; individual sharing is off by default.</li>
           <li><b>No user counts and no partner logos on this page</b> — because we're not going to invent them. There are no signed partners yet. You'd be early.</li>
         </ul>
+        <p class="prose muted" style="margin-top:22px; font-size:15px;">The long version isn't on this page. Oriya's founder set out the full argument in a separate thesis — <a href="https://dianaseo.xyz/essay.html?id=the-body-has-an-api" target="_blank" rel="noopener" style="color:var(--cobalt); border-bottom:1px solid rgba(18,128,95,.4);">The Body Has an API Now. Who Holds the Keys?</a> — that the company that matters won't own the sensor, but the signal every device writes about you. This manifesto is the compressed cut.</p>
       </div>
     </div>
   </section>
