@@ -10,8 +10,9 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://oriya.app/play">
   <meta name="twitter:card" content="summary">
-  <!-- THE outreach conversion link (send when a prospect says "I'm interested").
-       Rules-of-the-game only — teaches the challenge, not the company. Figures
+  <!-- THE in-person conversion link (founder sends it the moment someone says
+       YES face-to-face — handpicked, founder-seeded athletes). Rules-of-the-game
+       only — teaches the challenge, not the company. Figures
        mirror the live Founders vs Operators card on /try (Par 71, 73.0 vs 73.3
        sample board) — if that card changes, change this page in the same
        commit. No sponsor signed yet (2026-07-13): the day-to-day FvO board
@@ -33,6 +34,7 @@
     .steps::before { content:""; position:absolute; left:15px; top:10px; bottom:10px; width:1px; background:linear-gradient(var(--line), rgba(127,183,158,.45)); }
     .step { position:relative; padding:0 0 24px 48px; }
     .stepn { position:absolute; left:0; top:0; width:32px; height:32px; border-radius:50%; background:var(--panel); border:1px solid var(--line); color:var(--accent); font:600 13px/30px ui-monospace,monospace; text-align:center; transition:all .2s ease; }
+    .step.seen .stepn { background:var(--accent); border-color:var(--accent); color:var(--void); }
     .step h2 { font-size:15.5px; font-weight:600; letter-spacing:-0.01em; padding-top:5px; }
     .step p { font-size:13px; color:var(--dim); margin-top:5px; }
     .step p b { color:var(--text); font-weight:600; }
@@ -93,9 +95,10 @@
 <body>
   <div class="wrap">
     <a class="xs mono dim" href="index.html" style="text-decoration:none">← oriya.app</a>
-    <p class="kicker" style="margin-top:20px">Oriya · The 7-Day Sprint Blueprint</p>
-    <h1>Five steps. One board.<br>Nothing to install.</h1>
-    <p class="sm dim" style="margin-top:8px">Read this once — you know everything a player knows.</p>
+    <p class="kicker" style="margin-top:20px">Oriya · Founders vs Operators · founding season</p>
+    <h1>You said yes.<br>Here's the whole game.</h1>
+    <p class="sm dim" style="margin-top:8px">Five steps, nothing to install. Read this once — you know everything a player knows.</p>
+    <p class="sm" style="margin-top:16px; padding:11px 13px; border:1px solid rgba(127,183,158,.35); border-radius:10px; background:rgba(127,183,158,.07);"><b>Season opens Saturday, Jul 18.</b> <span class="dim">Scores are accepted from Friday, Jul 17 — drop your first morning early and you're on the board the moment it goes live.</span></p>
 
     <div class="steps" id="blueprint">
       <div class="step">
@@ -169,6 +172,15 @@
 
   <script>
     (function () {
+      /* step numbers light up as you read down the blueprint — a quiet
+         progress cue, color-only (safe under reduced motion) */
+      if ("IntersectionObserver" in window) {
+        var io = new IntersectionObserver(function (es) {
+          es.forEach(function (e) { if (e.isIntersecting) e.target.classList.add("seen"); });
+        }, { rootMargin: "0px 0px -55% 0px" });
+        document.querySelectorAll(".step").forEach(function (s) { io.observe(s); });
+      }
+
       /* payout straw poll */
       var KEY = "oriya:play:payoutVote";
       var pills = document.querySelectorAll("#payoutPills .pill");

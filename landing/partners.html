@@ -11,12 +11,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <meta name="theme-color" content="#F4F2EB">
   <script>
-    /* Theme boot — shares oriya:theme with the rest of the site, but this
-       partner-facing page DEFAULTS to light (reads cleaner when the link is
-       shared cold); an explicit saved preference still wins. */
+    /* Theme boot — this partner-facing page ALWAYS boots light, even when the
+       rest of the site is in dark mode (deliberate: the partner link should
+       land as its own, cleaner-reading experience). The toggle still works,
+       but persists to a partners-only key so the main site's theme never
+       bleeds in here and vice versa. */
     (function () {
       var t = "light";
-      try { var s = localStorage.getItem("oriya:theme"); if (s === "light" || s === "dark") t = s; } catch (e) {}
+      try { var s = localStorage.getItem("oriya:partners-theme"); if (s === "light" || s === "dark") t = s; } catch (e) {}
       document.documentElement.dataset.theme = t;
       try { var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = t === "light" ? "#F4F2EB" : "#070809"; } catch (e) {}
     })();
@@ -449,7 +451,7 @@
       btn.addEventListener("click", function () {
         var next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
         document.documentElement.dataset.theme = next;
-        try { localStorage.setItem("oriya:theme", next); } catch (e) {}
+        try { localStorage.setItem("oriya:partners-theme", next); } catch (e) {}
         paint();
       });
     })();
