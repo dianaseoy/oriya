@@ -62,7 +62,7 @@
       return (
         <div className="card">
           <p className="sm" style={{ fontWeight: 600 }}>Send today's screenshot</p>
-          <p className="xs dim" style={{ marginTop: 4 }}>Screenshot your {MVP.deviceTag(me.device)} recovery screen and send it — a human reads it and posts your number, usually within the hour.</p>
+          <p className="xs dim" style={{ marginTop: 4 }}>Screenshot your {MVP.deviceTag(me.device)} recovery screen and send it — your Oriya Index computes instantly against your own baseline; a human only verifies it's a real capture before it posts, usually within the hour.</p>
           <a className="btn" style={{ marginTop: 12 }} href={href}>Submit today's score →</a>
         </div>
       );
@@ -115,7 +115,8 @@
           {me && <ReminderBanner me={me} />}
           {me && <UploadCard me={me} />}
           <Board rows={rows} myCode={code} />
-          <p className="xs dim" style={{ marginTop: 14 }}>Scores are adjusted so every device competes fairly. Run by a human, on purpose — reply to any email with questions.</p>
+          <p className="xs dim" style={{ marginTop: 14 }}>This board never ranks raw numbers: every score converts to an Oriya Index read against that athlete's own baseline, so rank is the gap you hold to Par 71 — not genetics, not whichever device scores generous. Run by a human, on purpose — reply to any email with questions.</p>
+          <p className="xs dim" style={{ marginTop: 8 }}>New here? <a style={{ color: "var(--accent)" }} href="../play.html">How to play</a> · <a style={{ color: "var(--accent)" }} href="../science.html">the math behind the Index</a> · <a style={{ color: "var(--accent)" }} href="../manifesto.html">why we built it this way</a> · <a style={{ color: "var(--accent)" }} href="../index.html">oriya.app</a></p>
         </React.Fragment>
       );
     }

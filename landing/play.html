@@ -18,8 +18,13 @@
        commit. No sponsor signed yet (2026-07-13): the day-to-day FvO board
        claims no cash pot — see step 5. The Oriya Olympics bracket is a
        separate, founder-committed prize pool of at least $2,000; keep that
-       distinction intact if either figure changes. Mini Ask Ori: 3 chips,
-       honest answers, every card lands on /submit or /try. -->
+       distinction intact if either figure changes. Mini Ask Ori: 5 chips,
+       honest answers, every card lands on /submit, /try, /science or the
+       manifesto. Scoring canon (matches science.html + submit.html): Index is
+       baseline-relative (~90-day window, ~14 days before it's honest, labelled
+       provisional until then), Par 71 = a typical morning on the shared scale,
+       normalization is instant math — the only human step is the real-capture
+       check. Ori the companion is sold as IN BUILD, never as shipped. -->
   <style>
     :root { --bg:#0B0C0E; --panel:#101114; --line:#23252B; --text:#E6E7EA; --dim:#8A8F98; --accent:#7FB79E; --amber:#D7A25C; --void:#0B0C0E; }
     * { box-sizing:border-box; margin:0; }
@@ -104,7 +109,7 @@
       <div class="step">
         <span class="stepn">1</span>
         <h2>Pick your side</h2>
-        <p><b>Founders or Operators.</b> Everyone starts against the same baseline — <b>Par 71</b>. No fitness test, no minimum score.</p>
+        <p><b>Founders or Operators.</b> No fitness test, no minimum score — because this board never ranks raw numbers. Your score is read against <b>your own baseline</b>, and <b>Par 71</b> is simply where a typical morning lands on the shared scale. Beat your usual and you're over par — whoever you are, whatever you wear.</p>
         <div class="acc race">
           <div class="row"><span class="name">Founders</span><div class="track"><div class="fill" style="width:73%"></div></div><span class="val mono">73.0</span></div>
           <div class="row"><span class="name">Operators<span class="lead-tag">LEADS</span></span><div class="track"><div class="fill hot" style="width:73.3%"></div></div><span class="val mono">73.3</span></div>
@@ -122,7 +127,8 @@
       <div class="step">
         <span class="stepn">3</span>
         <h2>Get your Oriya Index</h2>
-        <p>A person adjusts your raw score for your device — <b>Whoop 80 → Index 73</b> — so every wearable competes fairly. Posted, usually within the hour.</p>
+        <p>Your raw score converts the instant it's read — <b>Whoop 80 → Index 73</b> — same math for every device. The Index isn't your raw number: it's where this morning sits in <b>your own ~90-day range</b> (floor → par → ceiling), so your device's quirks cancel out and every body competes fairly. A person only checks that the screenshot is a real capture — it posts within the hour and never changes your number.</p>
+        <p class="xs dim" style="margin-top:6px">First ~14 days, a clearly-labelled per-device estimate stands in while your baseline builds. Full math + published factors: <a href="science.html">the science</a> · why we refuse raw-number boards: <a href="manifesto.html">the manifesto</a>.</p>
       </div>
 
       <div class="step">
@@ -144,10 +150,19 @@
       </div>
     </div>
 
+    <div class="acc" id="founding" style="margin-top:8px">
+      <p class="kicker" style="font-size:10px">Season 1 never reruns — what founding athletes hold</p>
+      <p style="font-size:13px; margin-top:9px">🏛 <b>The FOUNDING 50 stamp</b> <span class="dim">— permanent on your Body Passport. Later cohorts can outscore you; nobody can out-early you.</span></p>
+      <p style="font-size:13px; margin-top:7px">🏅 <b>An Oriya Olympics seed</b> <span class="dim">— top your board and you're in the running for the bracket carrying a prize pool of at least $2,000.</span></p>
+      <p style="font-size:13px; margin-top:7px">📐 <b>A hand in the calibration</b> <span class="dim">— wear two devices and your mornings feed the published cross-device mapping, credited if you want it.</span></p>
+      <p style="font-size:13px; margin-top:7px">🧭 <b>First run of Ori</b> <span class="dim">— the recovery companion we're building around this board (the chat bubble in the corner is its seed). Founding athletes get it first — and a say in what it becomes.</span></p>
+    </div>
+
     <div class="foot">
       <a class="cta" href="mvp/submit.html?challenge=Founders%20vs%20Operators&amp;back=founders">Submit this morning's proof →</a>
       <a class="cta ghost" href="/play/foundersvsoperators">Pick your side on the board →</a>
       <p class="xs dim" style="text-align:center">Every athlete gets a live, shareable Body Passport — <a href="mvp/passport.html?u=mayaruns">see a sample →</a></p>
+      <p class="xs dim" style="text-align:center"><a href="science.html">The science</a> · <a href="manifesto.html">the manifesto</a> · <a href="index.html">oriya.app</a></p>
     </div>
 
     <div class="qa">
@@ -155,6 +170,7 @@
       <div><b>Connect my device?</b> <span>No — a screenshot is enough. Oura owners get optional live read-only sync.</span></div>
       <div><b>Miss a morning?</b> <span>Counts 0 that day. You're never removed from the board.</span></div>
       <div><b>Bad score?</b> <span>A logged red morning outranks a forgotten green one. The board scores the log, not the flex.</span></div>
+      <div><b>Why not just rank raw scores?</b> <span>Raw boards crown genetics and the most generous algorithm. Here your rank is the gap you hold to Par 71, read against your own baseline — <a href="science.html">the math</a> · <a href="manifesto.html">the why</a>.</span></div>
       <div><b>Who sees my data?</b> <span>Name/handle, device, adjusted score. Anon mode shows only your company domain.</span></div>
       <div><b>Cost?</b> <span>Free either way. If a sponsor backs a pot, backers fund it, athletes win it, backers are never paid out. Payment only via verified Airwallex links from team@oriya.app. It's <b style="display:inline;color:var(--text)">not a wager</b>.</span></div>
       <div><b>Getting paid?</b> <span>No sponsor on the day-to-day board yet, so nothing to pay out there. The Oriya Olympics bracket carries a guaranteed prize pool of at least $2,000 for the season's highest sustained Index.</span></div>
@@ -220,6 +236,18 @@
           cards: [
             { t: "Send a screenshot →", href: "mvp/submit.html?challenge=Founders%20vs%20Operators&back=founders" },
             { t: "Try Oura live sync →", href: "try.html" }
+          ] },
+        score: { q: "📐 How is my number scored?",
+          a: "Never as a raw number. Your score becomes your Oriya Index — where this morning sits against your own ~90-day baseline — and the board ranks your gap to Par 71, where a typical morning lands. Genetics and generous algorithms buy you nothing here. (First ~14 days run on a labelled per-device estimate while your baseline builds.)",
+          cards: [
+            { t: "The full math →", href: "science.html" },
+            { t: "Why we refuse raw boards →", href: "manifesto.html" }
+          ] },
+        why: { q: "🎁 Why bother? No pot.",
+          a: "Season 1 never reruns. Founding athletes keep the permanent FOUNDING 50 stamp, a shot at the $2,000+ Oriya Olympics seed, a credited hand in the published cross-device calibration — and first run of Ori, the recovery companion being built around this board. I'm its seed.",
+          cards: [
+            { t: "What founding athletes hold ↓", scroll: "#founding" },
+            { t: "Pick your side →", href: "/play/foundersvsoperators" }
           ] }
       };
       var fab = document.getElementById("oriFab");
@@ -233,7 +261,7 @@
         fab.classList.toggle("hide", open);
         if (open && !started) {
           started = true;
-          bubble("bot", "Hey — I'm Ori. Three taps cover everything on this page:");
+          bubble("bot", "Hey — I'm Ori. A few taps cover everything on this page:");
         }
       }
       function bubble(role, text) {

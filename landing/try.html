@@ -664,7 +664,7 @@
         ] },
       { id:"founders", emoji:"⚡", icon:Zap, status:"SOON", startLabel:"Opens Sat · Jul 18", sponsor:null,
         title:"Founders vs Operators", subtitle:"Founders own the schedule. Operators run the machine. Which one actually recovers better? Season opens Sat, Jul 18 — scores accepted from Fri, Jul 17.",
-        days:14, prize:null, split:null, payout:"No sponsor signed yet — no cash pot. Founding season is bragging rights, settled on the board.",
+        days:7, prize:null, split:null, payout:"No sponsor signed yet — no cash pot. Founding season is bragging rights, settled on the board.",
         participants:null, avg:null, joinTeam:"YC Founders", categories:["Founders","Corporate","Epic"],
         race:[{ t:"Founders", v:73.0 }, { t:"Operators", v:73.3 }],
         description:"Do founders actually sleep better because they control their schedule? Or are operators more disciplined? The biggest cross-company matchup of the season — building things vs running them, settled on one fair board. Season opens Saturday, Jul 18; drop your first screenshot from Friday, Jul 17 and you're on the board the moment it goes live.",
@@ -2060,6 +2060,86 @@
       );
     }
 
+    /* =============================== the Caddy — Ori v0.1 =============================== */
+    /* Deterministic morning call, written the instant the passport lands — no LLM, no
+       latency. Canon (matches play.html step 1 + science.html): the Index is already
+       baseline-relative, Par 71 is where a typical morning lands, and OVER par means
+       beating your own usual. Course-talk only — descriptive, never health advice.
+       Voice is generated on demand (button press) via /api/caddy-voice so free-tier
+       TTS credits are never burned on a render. */
+    const CADDY_PAR = 71;
+    function caddyLine(oriya, team) {
+      const gap = oriya - CADDY_PAR;
+      const founders = team !== "operators";
+      if (gap > 0) return founders
+        ? "Sitting " + gap + " over your par today. You control the calendar and it shows. Capitalize on the clear air."
+        : gap + " over par. Machine-like discipline through a launch window. The system is clean. Keep executing.";
+      if (gap < 0) return founders
+        ? "You're " + Math.abs(gap) + " under your par. The schedule is yours, but the crunch is catching up. Soft morning. Protect the baseline."
+        : Math.abs(gap) + " under par today. Heavy headwind on the operational baseline. The margin is thin. Steady round.";
+      return founders
+        ? "Level with your par. Holding your usual on a full calendar — steady air, keep it."
+        : "Dead level with par. The machine is running exactly at spec. Hold the line.";
+    }
+
+    function CaddyCall({ oriya, team }) {
+      const [voice, setVoice] = useState({ state: "idle", url: null, blob: null }); // idle | loading | ready | error
+      const line = caddyLine(oriya, team);
+      useEffect(() => { track("caddy_call_shown", { oriya, team }); }, []);
+      const hear = async () => {
+        if (voice.state === "loading" || voice.state === "ready") return;
+        setVoice({ state: "loading", url: null, blob: null });
+        try {
+          const res = await fetch("/api/caddy-voice", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: line, team }),
+          });
+          if (!res.ok) throw new Error("voice " + res.status);
+          const blob = await res.blob();
+          setVoice({ state: "ready", url: URL.createObjectURL(blob), blob });
+          track("caddy_voice_ready", { team });
+        } catch (e) {
+          setVoice({ state: "error", url: null, blob: null });
+          track("caddy_voice_failed", { team });
+        }
+      };
+      const share = async () => {
+        if (!voice.blob) return;
+        const file = new File([voice.blob], "caddy-morning-call.mp3", { type: "audio/mpeg" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file], title: "My Oriya Caddy Call", text: "Morning check-in for the Founders vs Operators board." });
+            track("caddy_call_shared", { team, method: "share" });
+          } catch (e) {}
+          return;
+        }
+        const a = document.createElement("a"); a.href = voice.url; a.download = "caddy-morning-call.mp3"; a.click();
+        track("caddy_call_shared", { team, method: "download" });
+      };
+      return (
+        <div className="mt-4 rounded-2xl border border-jade/30 bg-gradient-to-br from-jade/[0.08] to-transparent p-4 animate-fade-up">
+          <div className="text-[10px] uppercase tracking-wider font-mono text-jade/80">Ori v0.1 · the Caddy&rsquo;s morning call</div>
+          <p className="mt-1.5 text-sm text-bone leading-snug">&ldquo;{line}&rdquo;</p>
+          <div className="mt-3 flex items-center gap-2">
+            {voice.state !== "ready" && (
+              <button onClick={hear} disabled={voice.state === "loading"}
+                className={"rounded-full px-4 py-2 text-xs font-semibold transition inline-flex items-center gap-1.5 " + (voice.state === "loading" ? "bg-white/10 text-ash cursor-wait" : "bg-jade text-void hover:brightness-110")}>
+                ▶ {voice.state === "loading" ? "Warming up…" : "Hear the call"}
+              </button>
+            )}
+            {voice.state === "ready" && (
+              <React.Fragment>
+                <audio controls autoPlay src={voice.url} className="h-9 max-w-[220px]" />
+                <button onClick={share} className="rounded-full border border-jade/40 bg-jade/[0.08] px-4 py-2 text-xs font-semibold text-jade hover:bg-jade/[0.15] transition">Share the call</button>
+              </React.Fragment>
+            )}
+            {voice.state === "error" && <span className="text-[11px] font-mono text-ash">Voice is warming up for Season 1 — the read above is your call.</span>}
+          </div>
+        </div>
+      );
+    }
+
     /* =============================== Dashboard =============================== */
     function Dashboard({ passport, setPassport, deepId }) {
       const [selected, setSelected] = useState(null);
@@ -2235,6 +2315,7 @@
             <div className="max-w-md mx-auto">
               <PassportCard passport={passport} cardRef={cardRef} onSwap={swapDevice} onSetName={setName} social={igHandle}
                 personality={personality} badges={badges} countryStamps={countryStamps} earnings={earnings} onCycleNation={cycleNation} tier={tier} />
+              <CaddyCall oriya={passport.oriya} team={joined["founders"] === "Operators" ? "operators" : "founders"} />
               {tierHint && (
                 <div className="mt-3 flex items-center justify-center gap-2 text-[11px] font-mono animate-fade-up">
                   <span className="inline-flex items-center gap-1.5" style={{ color: tier.accent }}><span className="w-2 h-2 rounded-full" style={{ background: tier.accent, boxShadow: "0 0 7px " + tier.accent }} /> {tier.name}</span>

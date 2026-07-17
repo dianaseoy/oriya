@@ -10,7 +10,8 @@
  * logs must stay score-free.
  *
  * Secrets (wrangler secret put / .dev.vars): OURA_CLIENT_ID,
- * OURA_CLIENT_SECRET, OURA_STATE_SECRET (random 32+ chars, HMAC key only).
+ * OURA_CLIENT_SECRET, OURA_STATE_SECRET (random 32+ chars, HMAC key only),
+ * FISH_API_KEY (Fish Audio TTS for /api/caddy-voice).
  */
 
 import { manualSubmit } from "./submit.js";
@@ -139,6 +140,39 @@ async function callback(request, env) {
   return backToTry(origin, "#oura=" + b64url(enc.encode(JSON.stringify(payload))), clearCookie);
 }
 
+/* Caddy voice — TTS pass-through for the deterministic morning call the
+   browser already rendered (Fish Audio s2.1-pro-free while in dry-run).
+   Same contract as the Oura routes: nothing stored, and the text is never
+   logged — it encodes a score. Voice IDs are placeholders until the two
+   persona clones exist. */
+const FISH_TTS = "https://api.fish.audio/v1/tts";
+const CADDY_VOICES = { founders: "FOUNDER_VOICE_ID", operators: "OPERATOR_VOICE_ID" };
+
+async function caddyVoice(request, env) {
+  if (request.method !== "POST") return new Response("POST only", { status: 405 });
+  if (!env.FISH_API_KEY) return new Response("Voice not configured", { status: 503 });
+  let body;
+  try { body = await request.json(); } catch (e) { return new Response("Bad JSON", { status: 400 }); }
+  const text = typeof body.text === "string" ? body.text.trim() : "";
+  // caddy lines run ~140 chars; the cap keeps the free TTS tier un-drainable
+  if (!text) return new Response("Missing text", { status: 400 });
+  if (text.length > 280) return new Response("Text too long", { status: 400 });
+  const res = await fetch(FISH_TTS, {
+    method: "POST",
+    headers: { "Authorization": "Bearer " + env.FISH_API_KEY, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      text: text,
+      model: "s2.1-pro-free",
+      reference_id: CADDY_VOICES[body.team] || CADDY_VOICES.founders,
+      format: "mp3",
+    }),
+  });
+  if (!res.ok) return new Response("Voice generation failed", { status: 502 });
+  return new Response(res.body, {
+    headers: { "Content-Type": "audio/mpeg", "Cache-Control": "no-store" },
+  });
+}
+
 /* Outreach-friendly short routes (assets match first, so these only fire when
    no static file exists at the path). 302 so they stay repointable. */
 const SHORTLINKS = {
@@ -158,6 +192,7 @@ export default {
     if (pathname === "/auth/oura/start") return start(request, env);
     if (pathname === "/auth/oura/callback") return callback(request, env);
     if (pathname === "/api/manual-submit") return manualSubmit(request, env);
+    if (pathname === "/api/caddy-voice") return caddyVoice(request, env);
     if (SHORTLINKS[pathname]) return Response.redirect(url.origin + SHORTLINKS[pathname] + url.search, 302);
     // /p/<handle-or-code> — public Body Passport (renders live from board.json)
     if (pathname.startsWith("/p/") && pathname.length > 3) {
