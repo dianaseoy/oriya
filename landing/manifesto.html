@@ -110,6 +110,27 @@
     .vault .lab{ font-size:12.5px; color:var(--stone); }
     .vault-note{ font-family:var(--font-mono); font-size:11.5px; color:var(--stone); margin-top:18px; line-height:1.7; max-width:70ch; }
 
+    /* founder's note — audio card (pre-generated MP3; Ori's AI voice reading
+       the founder's words, labeled as such — never presented as Diana's own
+       voice). Hidden by JS if the file is missing. */
+    .fnote{ display:flex; align-items:center; gap:16px; margin-top:32px; padding:16px 18px;
+      border:1px solid var(--line-2); border-left:3px solid var(--jade); border-radius:8px;
+      background:var(--paper-2); max-width:540px; }
+    .fnote-play{ width:44px; height:44px; flex:0 0 44px; border-radius:50%; border:1px solid var(--jade);
+      background:var(--jade-soft); color:var(--jade); font-size:15px; cursor:pointer;
+      transition:background .2s, color .2s; }
+    .fnote-play:hover{ background:var(--jade); color:#FCFAF4; }
+    .fnote-k{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--jade); }
+    .fnote-t{ font-size:13.5px; color:var(--ink-2); margin-top:4px; line-height:1.5; }
+    .fnote-ai{ font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; padding:1px 7px;
+      border:1px solid var(--line-2); border-radius:999px; color:var(--stone); white-space:nowrap; }
+    .fnote-bar{ height:2px; background:var(--line); border-radius:2px; margin-top:10px; overflow:hidden; }
+    .fnote-bar i{ display:block; height:100%; width:0; background:var(--jade); }
+    .fnote-meta{ flex:1; min-width:0; }
+    .fnote-tr{ margin-top:12px; max-width:540px; }
+    .fnote-tr summary{ font-family:var(--font-mono); font-size:11px; letter-spacing:.08em; color:var(--stone); cursor:pointer; }
+    .fnote-tr p{ font-size:14px; color:var(--ink-2); line-height:1.7; margin-top:12px; max-width:62ch; }
+
     /* pull quote */
     .pull{ border-left:2px solid var(--jade); padding:6px 0 6px clamp(22px,4vw,40px); max-width:34ch; }
     .pull p{ font-family:var(--font-display); font-weight:400; font-style:italic; color:var(--ink);
@@ -201,6 +222,24 @@
         <a href="try.html" class="btn btn-primary">Build your Passport →</a>
       </div>
       <p class="byline reveal">A position paper from Oriya — founder-run, early, and writing this down before we've earned the right to be smug about it.</p>
+
+      <!-- Spoken version of the "why" in plainer, warmer words than the essay.
+           Transcript below must stay identical to the MP3 (regen_v2.py FOUNDER). -->
+      <div class="fnote reveal" id="fnote">
+        <button class="fnote-play" id="fnotePlay" aria-label="Play the founder's note">▶</button>
+        <div class="fnote-meta">
+          <span class="fnote-k">Listen · 70 sec</span>
+          <p class="fnote-t">Why Oriya exists — the founder's note in plain words, read by Ori. <span class="fnote-ai">AI voice</span></p>
+          <div class="fnote-bar"><i id="fnoteFill"></i></div>
+        </div>
+      </div>
+      <details class="fnote-tr reveal" id="fnoteTr">
+        <summary>Read the transcript instead</summary>
+        <p>Hey — Ori here. This is the founder's note, read out loud, so you don't have to squint at a wall of text.</p>
+        <p>Diana built Oriya after noticing two things. First: people who track their sleep wake up to one number and feel quietly judged by it — every single morning, alone. Second: the moment you change devices, your own history stops counting. Your body didn't reset — the record did.</p>
+        <p>So Oriya asks a stubborn question: what if your baseline belonged to you, and not to the hardware on your wrist? Put every wearable on one scale. Measure each morning against your own usual — not a stranger's. Then let people actually play together: some mornings over your par, some under, every one of them counted.</p>
+        <p>There's no big company behind this — one founder, building in the open, and entering is free. The goal is simple: make checking your recovery feel less like a verdict and more like a game among friends. If that lands, put one morning on the board and see.</p>
+      </details>
     </div>
   </header>
 
@@ -334,6 +373,26 @@
       /* subtle stagger for pillar cards */
       document.querySelectorAll(".pillars .pillar").forEach(function (el, i) {
         el.style.transitionDelay = (i * 70) + "ms";
+      });
+
+      /* founder's-note player — static MP3, tap-to-play; if the file is
+         missing the card hides and the transcript opens itself. */
+      var fBtn = document.getElementById("fnotePlay"),
+          fFill = document.getElementById("fnoteFill"),
+          fCard = document.getElementById("fnote"),
+          fTr = document.getElementById("fnoteTr"),
+          fA = null;
+      if (fBtn) fBtn.addEventListener("click", function () {
+        if (!fA) {
+          fA = new Audio("audio/manifesto/founder.mp3");
+          fA.addEventListener("timeupdate", function () {
+            if (fA.duration) fFill.style.width = (fA.currentTime / fA.duration * 100) + "%";
+          });
+          fA.addEventListener("ended", function () { fBtn.textContent = "▶"; fFill.style.width = "0"; });
+          fA.addEventListener("error", function () { fCard.style.display = "none"; if (fTr) fTr.open = true; });
+        }
+        if (fA.paused) { fA.play(); fBtn.textContent = "❚❚"; }
+        else { fA.pause(); fBtn.textContent = "▶"; }
       });
     })();
   </script>

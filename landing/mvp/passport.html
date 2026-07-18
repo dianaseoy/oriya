@@ -42,7 +42,7 @@
             {playing ? "❚❚" : "▶"}
           </button>
           <span className="xs" style={{ color: "var(--accent)", letterSpacing: ".06em", textTransform: "uppercase" }}>Hear Ori's read on this week</span>
-          <audio ref={ref} src="/audio/passport/maya.mp3" preload="none"
+          <audio ref={ref} src="../audio/passport/maya.mp3" preload="none"
             onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
             onEnded={() => setPlaying(false)} onError={() => setDead(true)} />
         </span>
@@ -126,7 +126,16 @@
       const copy = () => {
         try { navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1600); } catch (e) {}
       };
-      const wa = "https://wa.me/?text=" + encodeURIComponent((own ? "My" : me.name.split(" ")[0] + "'s") + " Oriya passport — Index " + row.avg + ", " + row.streak + "d streak, #" + row.rank + " on the founding board. " + url);
+      // Share copy leads with the challenge, not the stats — "beat your own
+      // usual" is the hook that makes a recipient tap, whatever device they own.
+      const shareTxt = (own ? "My week on one card" : me.name.split(" ")[0] + "'s week on one card")
+        + " — Index " + row.avg + ", " + row.streak + "d streak. Any wearable, one scale."
+        + " Think you can beat your own usual? " + url;
+      const wa = "https://wa.me/?text=" + encodeURIComponent(shareTxt);
+      const canNative = typeof navigator !== "undefined" && !!navigator.share;
+      const nativeShare = () => {
+        navigator.share({ title: "Oriya Body Passport", text: shareTxt, url: url }).catch(() => {});
+      };
       return (
         <div className="pass-wrap">
           <div className="pass">
@@ -168,6 +177,7 @@
               <p className="xs dim">Scan for the live card. A screenshot goes stale — this link renders straight from the board, so what it shows is what the board says.</p>
             </div>
             <div className="share-row">
+              {canNative && <button type="button" className="share-btn" onClick={nativeShare}>Share this card…</button>}
               <button type="button" className="share-btn" onClick={copy}>{copied ? "Copied ✓" : "Copy shareable link"}</button>
               <a className="share-btn" href={wa} target="_blank" rel="noopener">Share to WhatsApp squad</a>
             </div>
@@ -206,6 +216,7 @@
               <p className="sm">No passport on this device yet — <b>this is what yours will look like.</b></p>
               <p className="xs dim" style={{ marginTop: 6 }}>Below is <b style={{ color: "var(--text)" }}>Maya's sample card</b>. Submit your morning screenshots and your own Body Passport builds itself the same way — index, rank, streak and stamps, one morning at a time.</p>
               <MayaVoice />
+              <a className="btn" style={{ marginTop: 12 }} href="submit.html?challenge=Founders%20vs%20Operators">Think you can beat your own usual? Start your card →</a>
             </div>
           )}
           {!demo && me.handle === "@mayaruns" && <div style={{ marginTop: 2 }}><MayaVoice /></div>}

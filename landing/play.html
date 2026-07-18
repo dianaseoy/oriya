@@ -32,7 +32,7 @@
        "not a wager" and the header can't contradict it. Step 5 = two contrast
        cards: board/Olympics seed (jade) vs unsigned sponsor pot (amber).
        Olympics seeding is earned (top your board), never "automatic".
-       2026-07-18: two-caddy audio scene above the steps — per-line MP3s from
+       2026-07-18: founder/operator audio scene above the steps — per-line MP3s from
        /audio/dialogue/ chained in JS, transcript readable with audio off, SCENE
        text must stay byte-identical to the generated files. Athletes named are
        sample-board rows (Chris B. Garmin/Founders, Sam W. Whoop/Operators);
@@ -68,7 +68,7 @@
     .pill { flex:1; background:#0D0E11; border:1px solid var(--line); color:var(--text); border-radius:10px; padding:10px 8px; font:inherit; font-size:13px; cursor:pointer; transition:all .2s ease; }
     .pill:hover { border-color:#3A3D45; }
     .pill.on { border-color:var(--accent); background:rgba(127,183,158,.08); }
-    /* two-caddy scene: per-line MP3s chained client-side; the live line lights
+    /* sample scene: per-line MP3s chained client-side; the live line lights
        up chat-style. Transcript is fully readable with audio off. */
     .dlg { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px; margin-top:18px; }
     .dlg-top { display:flex; align-items:center; gap:12px; }
@@ -149,24 +149,25 @@
     <p class="sm dim" style="margin-top:8px">Five steps. Nothing to install.</p>
     <p class="sm" style="margin-top:16px; padding:11px 13px; border:1px solid rgba(127,183,158,.35); border-radius:10px; background:rgba(127,183,158,.07);"><b>Season opens Saturday, Jul 18.</b> <span class="dim">Scores accepted from Fri Jul 17 — drop one early, you're on the board at the horn.</span></p>
 
-    <!-- Two-caddy sample scene. Chris B. (Garmin · Founders) and Sam W.
-         (Whoop · Operators) are real rows on the sample board; Garmin 82 →
-         Index 78 matches the live normalization factors. One MP3 per line
-         under /audio/dialogue/ (pre-generated stock voices), chained in JS. -->
+    <!-- Sample scene: two humans on opposite sides of the board. Chris B.
+         (Garmin · Founders) and Sam W. (Whoop · Operators) are real rows on
+         the sample board; Garmin 82 → Index 78 matches the live normalization
+         factors. One MP3 per line under audio/dialogue/ (pre-generated stock
+         voices, relative path so local preview works too), chained in JS. -->
     <div class="dlg" id="dlg">
       <div class="dlg-top">
-        <button class="dlg-play" id="dlgPlay" aria-label="Play the caddy scene">▶</button>
+        <button class="dlg-play" id="dlgPlay" aria-label="Play the scene">▶</button>
         <div>
           <p class="xs mono" style="letter-spacing:.12em; color:var(--accent)">HEAR THE WHOLE GAME · 45 SEC</p>
-          <p class="xs dim" style="margin-top:3px">Sample scene, day 3 — the two sides' caddies compare their athletes' morning cards.</p>
+          <p class="xs dim" style="margin-top:3px">Sample scene, day 3 — a founder and an operator catch up after posting their morning cards.</p>
         </div>
       </div>
       <div class="dlg-cast xs dim">
-        <span><i class="cav a">A</i>Adrian — Founders' caddy</span>
-        <span><i class="cav s">S</i>Selene — Operators' caddy</span>
+        <span><i class="cav a">C</i>Chris — founder · Garmin</span>
+        <span><i class="cav s">S</i>Sam — operator · Whoop</span>
       </div>
       <div class="dlg-feed" id="dlgFeed"></div>
-      <p class="xs dim" style="margin-top:8px">Sample athletes from the demo board — your caddy sounds like this about <b style="color:var(--text)">your</b> mornings.</p>
+      <p class="xs dim" style="margin-top:8px">Sample athletes from the demo board — your mornings write <b style="color:var(--text)">your</b> version.</p>
     </div>
 
     <div class="steps" id="blueprint">
@@ -179,6 +180,7 @@
           <div class="row"><span class="name">Operators<span class="lead-tag">LEADS</span></span><div class="track"><div class="fill hot" style="width:73.3%"></div></div><span class="val mono">73.3</span></div>
           <p class="xs dim" style="margin-top:2px">Sample board — fills with real athletes as they enter.</p>
         </div>
+        <p class="xs" style="margin-top:9px"><a href="#" id="parExp" style="text-decoration:none; color:var(--accent)">▶ New to &ldquo;par&rdquo;? 30-second explainer</a> <span class="dim">— no golf required.</span></p>
       </div>
 
       <div class="step">
@@ -301,20 +303,21 @@
       poll("payoutPills", "pillNote", "oriya:play:payoutVote",
         "Noted on this device ✓ — the binding vote belongs to the winning side.");
 
-      /* two-caddy scene — text here MUST match the pre-generated MP3s
-         (scratchpad gen_audio.py manifest); a missing file is skipped so the
+      /* the scene — Chris (founder · Garmin) and Sam (operator · Whoop),
+         real humans catching up. Text here MUST match the pre-generated MP3s
+         (scratchpad regen_v2.py manifest); a missing file is skipped so the
          scene never stalls. */
       var SCENE = [
-        ["a", "Morning, Selene. Day three of the sprint. Chris just dropped a card — Garmin read 82."],
-        ["s", "And on the shared scale?"],
-        ["a", "Index 78, instant. Their Garmin, your Sam's Whoop — same math, one scale. No favors."],
-        ["s", "Sam posted a 74 — two under their own par. A heavier morning than usual, still logged. The streak holds."],
-        ["a", "That's the whole game. Par is your own typical morning — nobody else's number."],
-        ["s", "The board still moved, though. Founders take the morning."],
-        ["a", "Seven mornings decide the week, Selene."],
-        ["s", "And everyone watching can tap a call on who takes it — no buy-in, pure bragging rights."],
-        ["a", "See you at the top of the board."],
-        ["s", "You'll see me above it."]
+        ["a", "Morning — day three. Did you post your card yet?"],
+        ["s", "Just did. My Whoop gave me a 74, and my first thought was: great, another app telling me I'm failing."],
+        ["a", "That's why the board reads it differently. My Garmin said 82 — the Index called it 78 against my own usual."],
+        ["s", "Mine came out two under my par. Launch week, short night — and it still counted. Streak's alive."],
+        ["a", "Two under just means a heavier morning than your usual. It's not a grade."],
+        ["s", "That's what finally clicked for me. Par is my own typical morning — I'm not chasing your numbers, I'm defending mine."],
+        ["a", "Your Whoop, my Garmin — the raw numbers never compared anyway. One scale fixed that."],
+        ["s", "And Operators still hold the week, whatever Founders did this morning."],
+        ["a", "We took today. Check the board tonight."],
+        ["s", "Look up when you do — I'll be the line above you."]
       ];
       var feed = document.getElementById("dlgFeed");
       SCENE.forEach(function (l) {
@@ -322,7 +325,7 @@
         d.className = "dlg-line " + l[0];
         var av = document.createElement("i");
         av.className = "cav " + l[0];
-        av.textContent = l[0] === "a" ? "A" : "S";
+        av.textContent = l[0] === "a" ? "C" : "S";
         var sp = document.createElement("span");
         sp.textContent = l[1];
         d.appendChild(av); d.appendChild(sp);
@@ -343,7 +346,7 @@
       function dlgPlayLine(i) {
         if (i >= SCENE.length) { dlgStop(); return; }
         dlgIdx = i; dlgLive(i);
-        dlgAudio.src = "/audio/dialogue/d-" + String(i + 1).padStart(2, "0") + ".mp3";
+        dlgAudio.src = "audio/dialogue/d-" + String(i + 1).padStart(2, "0") + ".mp3";
         dlgAudio.play().catch(function () { if (dlgPlaying) dlgPlayLine(i + 1); });
       }
       dlgAudio.addEventListener("ended", function () {
@@ -354,6 +357,19 @@
         if (dlgPlaying) { dlgPlaying = false; dlgAudio.pause(); dlgBtn.textContent = "▶"; return; }
         dlgPlaying = true; dlgBtn.textContent = "❚❚";
         if (dlgIdx >= 0) dlgAudio.play(); else dlgPlayLine(0);
+      });
+
+      /* 30-second "what par means" read — same words as the submit-page
+         explainer (audio/explain/par-a.mp3 from the regen_v2 manifest). */
+      var parA = null, parLink = document.getElementById("parExp");
+      if (parLink) parLink.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (!parA) { parA = new Audio("audio/explain/par-a.mp3");
+          parA.addEventListener("ended", function () { parLink.firstChild.textContent = "▶ New to “par”? 30-second explainer"; });
+          parA.addEventListener("error", function () { parLink.textContent = "Par = your own typical morning. Beat it and you're over par."; });
+        }
+        if (parA.paused) { parA.play(); parLink.firstChild.textContent = "❚❚ Par, in plain words"; }
+        else { parA.pause(); parLink.firstChild.textContent = "▶ New to “par”? 30-second explainer"; }
       });
 
       /* mini Ask Ori — canned honest answers, zero typing. Copy mirrors the

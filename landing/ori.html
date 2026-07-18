@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ori · your recovery caddy</title>
+  <title>Ori · your recovery companion</title>
   <meta name="description" content="Talk to Ori — Oriya's early recovery companion. A breathing space from wearable anxiety, not another optimizer.">
   <!-- Ori v0.1 — the REAL chat (Workers AI via /api/ori-chat), first shipped
        2026-07-18 for the founding 50. Honesty rails, keep intact:
@@ -59,6 +59,8 @@
     .bar { display:flex; gap:8px; margin-top:14px; }
     .bar textarea { flex:1; resize:none; font:inherit; font-size:13.5px; background:var(--panel); border:1px solid var(--line); border-radius:12px; color:var(--text); padding:11px 13px; outline:none; height:44px; max-height:120px; }
     .bar textarea:focus { border-color:var(--accent); }
+    /* 16px floor stops iOS Safari's zoom-on-focus jump */
+    @media (max-width:640px) { .bar textarea { font-size:16px; } }
     .send { flex:none; background:var(--accent); color:var(--void); border:0; border-radius:12px; padding:0 18px; font:inherit; font-weight:600; cursor:pointer; transition:all .2s ease; }
     .send:hover { filter:brightness(1.08); }
     .send:disabled { opacity:.5; cursor:default; }
@@ -70,7 +72,7 @@
     <a class="xs mono dim" href="index.html" style="text-decoration:none">← oriya.app</a>
     <div class="head">
       <span class="avatar">o</span>
-      <b>Ori · your recovery caddy</b>
+      <b>Ori · your recovery companion</b>
       <span class="vtag">v0.1 · early AI</span>
       <span class="sp"></span>
       <button class="hbtn" id="personaBtn" title="Change what Ori focuses on">focus</button>

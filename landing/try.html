@@ -271,6 +271,8 @@
     .qt-pulse{ animation:qtPulse 2.4s ease-in-out infinite; }
     @keyframes qtPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(127,183,158,0); } 50%{ box-shadow:0 0 22px -5px rgba(127,183,158,.5); } }
     @media (prefers-reduced-motion: reduce){ .qt-pulse{ animation:none } }
+    /* 16px floor stops iOS Safari's zoom-on-focus jump */
+    @media (max-width:640px){ input, textarea, select{ font-size:16px !important; } }
   
     /* ---- LIGHT MODE: white-alpha utility remaps (generated). Dark washes on
        cream; .dark-pin/.passport-card re-pin the originals inside islands ---- */
@@ -877,6 +879,7 @@
     /* =============================== Hook view =============================== */
     function Hook({ onPreset, onScreenshot, onConnect, resume, onResume, deep, oauthError, onRetryDemo, onBrowse }) {
       const [dragging, setDragging] = useState(false);
+      const [simOpen, setSimOpen] = useState(false); // simulated device sync, collapsed by default
       const fileRef = useRef(null);
       const readFile = (file) => {
         if (!file) return;
@@ -930,37 +933,12 @@
               </div>
             )}
 
-            {/* Primary path (mobile-first): tap to connect a device read-only */}
+            {/* Real path first (2026-07-18 cut): the screenshot IS the entry.
+                The simulated device sync — honest but fake — no longer outranks
+                it; it lives collapsed below, for explorers only. */}
             <div className="flex items-center gap-3 mb-3">
               <div className="h-px flex-1 bg-white/10" />
-              <span className="text-xs text-ash font-mono">connect read-only — pick your device</span>
-              <div className="h-px flex-1 bg-white/10" />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              {CONNECT.map((item) => {
-                const m = DEVICE_MODEL[item.key];
-                const brand = BRAND[item.key];
-                const hot = !!item.live; // no live integrations today (worker undeployed) — pill renders only when one ships
-                return (
-                  <button key={item.key}
-                    onClick={() => onConnect(item.key)}
-                    className={"group relative flex items-center gap-3 rounded-xl border bg-white/[0.03] px-4 py-3 text-left transition-all min-h-[58px] " + (hot ? "border-jade/50 qt-pulse hover:border-jade" : "border-white/10 hover:border-jade/60 hover:bg-white/[0.06]")}>
-                    {hot && <span className="absolute -top-2 left-3 font-mono text-[8px] uppercase tracking-wider text-void bg-jade rounded-full px-1.5 py-0.5">● live</span>}
-                    <span className="w-8 h-8 rounded-lg flex items-center justify-center text-void font-bold text-sm shrink-0" style={{ background: brand }}>{m.tag[0]}</span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-medium text-bone truncate">{m.tag}</span>
-                      <span className="block text-[10.5px] text-ash font-mono truncate">{item.scope + (item.live ? "" : " · demo")}</span>
-                    </span>
-                    <ChevronRight className={"w-4 h-4 shrink-0 transition-colors " + (hot ? "text-jade" : "text-ash/60 group-hover:text-jade")} />
-                  </button>
-                );
-              })}
-            </div>
-            <p className="text-center text-[11px] text-ash/70 mt-3 font-mono leading-relaxed">Every sync here is a simulated demo — no real account is touched, and it saves to this browser only. The real path today is a screenshot below.</p>
-
-            <div className="flex items-center gap-3 my-6">
-              <div className="h-px flex-1 bg-white/10" />
-              <span className="text-xs text-ash font-mono">or drop a screenshot</span>
+              <span className="text-xs text-ash font-mono">drop this morning's screenshot — that's the entry</span>
               <div className="h-px flex-1 bg-white/10" />
             </div>
 
@@ -999,6 +977,36 @@
             <p className="text-center text-[11px] text-ash/70 mt-3 font-mono leading-relaxed">
               No screenshot handy? Email your recovery screen to <a href="mailto:team@oriya.app?subject=My%20recovery%20screenshot%20%E2%80%94%20normalize%20me" className="text-jade hover:underline" onClick={() => track("email_proof_clicked", { from: "hook" })}>team@oriya.app</a> — we reply with your Index and your board spot.
             </p>
+
+            <button type="button" onClick={() => { const next = !simOpen; setSimOpen(next); track("sim_sync_toggle", { open: next }); }}
+              className="mt-6 w-full rounded-xl border border-dashed border-white/12 py-2.5 text-[11px] font-mono text-ash hover:text-bone hover:border-white/25 transition">
+              {simOpen ? "hide the simulated sync ▴" : "just exploring? watch a simulated device sync ▾"}
+            </button>
+            {simOpen && (
+              <div className="mt-3 animate-fade-up">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {CONNECT.map((item) => {
+                    const m = DEVICE_MODEL[item.key];
+                    const brand = BRAND[item.key];
+                    const hot = !!item.live; // no live integrations today (worker undeployed) — pill renders only when one ships
+                    return (
+                      <button key={item.key}
+                        onClick={() => onConnect(item.key)}
+                        className={"group relative flex items-center gap-3 rounded-xl border bg-white/[0.03] px-4 py-3 text-left transition-all min-h-[58px] " + (hot ? "border-jade/50 qt-pulse hover:border-jade" : "border-white/10 hover:border-jade/60 hover:bg-white/[0.06]")}>
+                        {hot && <span className="absolute -top-2 left-3 font-mono text-[8px] uppercase tracking-wider text-void bg-jade rounded-full px-1.5 py-0.5">● live</span>}
+                        <span className="w-8 h-8 rounded-lg flex items-center justify-center text-void font-bold text-sm shrink-0" style={{ background: brand }}>{m.tag[0]}</span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-medium text-bone truncate">{m.tag}</span>
+                          <span className="block text-[10.5px] text-ash font-mono truncate">{item.scope + (item.live ? "" : " · demo")}</span>
+                        </span>
+                        <ChevronRight className={"w-4 h-4 shrink-0 transition-colors " + (hot ? "text-jade" : "text-ash/60 group-hover:text-jade")} />
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-center text-[11px] text-ash/70 mt-3 font-mono leading-relaxed">Every sync here is a simulated demo — no real account is touched, and it saves to this browser only. The real entry is a screenshot above.</p>
+              </div>
+            )}
 
             {/* Cold-visitor path to the boards (panel 2026-07-13): read a
                 challenge and pick a side BEFORE building any passport — each
@@ -2041,20 +2049,20 @@
       };
       const share = async () => {
         if (!voice.blob) return;
-        const file = new File([voice.blob], "caddy-morning-call.mp3", { type: "audio/mpeg" });
+        const file = new File([voice.blob], "oriya-morning-call.mp3", { type: "audio/mpeg" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           try {
-            await navigator.share({ files: [file], title: "My Oriya Caddy Call", text: "Morning check-in for the Founders vs Operators board." });
+            await navigator.share({ files: [file], title: "My Oriya Morning Call", text: "Morning check-in for the Founders vs Operators board." });
             track("caddy_call_shared", { team, method: "share" });
           } catch (e) {}
           return;
         }
-        const a = document.createElement("a"); a.href = voice.url; a.download = "caddy-morning-call.mp3"; a.click();
+        const a = document.createElement("a"); a.href = voice.url; a.download = "oriya-morning-call.mp3"; a.click();
         track("caddy_call_shared", { team, method: "download" });
       };
       return (
         <div className="mt-4 rounded-2xl border border-jade/30 bg-gradient-to-br from-jade/[0.08] to-transparent p-4 animate-fade-up">
-          <div className="text-[10px] uppercase tracking-wider font-mono text-jade/80">Ori v0.1 · the Caddy&rsquo;s morning call</div>
+          <div className="text-[10px] uppercase tracking-wider font-mono text-jade/80">Ori v0.1 · your morning call</div>
           <p className="mt-1.5 text-sm text-bone leading-snug">&ldquo;{line}&rdquo;</p>
           <div className="mt-3 flex items-center gap-2">
             {voice.state !== "ready" && (
@@ -2319,11 +2327,9 @@
             )}
             <p className="mt-3 text-[11px] font-mono text-ash">Boards are one thing to do with the number. <a href="builds.html" onClick={() => track("builds_page_click", { from: "challenges" })} className="text-jade hover:text-jade-glow border-b border-jade/30">See what people build with the exported data →</a></p>
 
-            {showSim && (
-              <button onClick={simulateFriend} className="mt-6 w-full rounded-xl border border-dashed border-jade/40 bg-jade/5 py-3 text-sm font-medium text-jade hover:bg-jade/10 transition inline-flex items-center justify-center gap-2 animate-fade-up">
-                <UserPlus className="w-4 h-4" /> Pull in a teammate — watch the average move <span className="text-jade/60 font-mono text-xs">(demo)</span>
-              </button>
-            )}
+            {/* (cut 2026-07-18) the "pull in a teammate (demo)" simulator is gone —
+                a fake average-mover moved no real participation; sharing the
+                passport is the honest version of the same ask. */}
 
             {/* share + how-the-number-works — demoted below the boards */}
             <div className="max-w-md mx-auto">
