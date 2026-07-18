@@ -231,7 +231,9 @@ async function oriChat(request, env) {
     if (!reply) throw new Error("empty");
     return new Response(JSON.stringify({ reply: reply }), { headers });
   } catch (e) {
-    return new Response(JSON.stringify({ error: "upstream" }), { status: 502, headers });
+    // sanitized infra error only (model/binding failures) — never chat content
+    const detail = String((e && e.message) || e).slice(0, 140);
+    return new Response(JSON.stringify({ error: "upstream", detail: detail }), { status: 502, headers });
   }
 }
 
