@@ -162,10 +162,15 @@ async function caddyVoice(request, env) {
   if (text.length > 280) return new Response("Text too long", { status: 400 });
   const res = await fetch(FISH_TTS, {
     method: "POST",
-    headers: { "Authorization": "Bearer " + env.FISH_API_KEY, "Content-Type": "application/json" },
+    headers: {
+      "Authorization": "Bearer " + env.FISH_API_KEY,
+      "Content-Type": "application/json",
+      // free tier is selected via this HEADER, not the body — in the body
+      // Fish ignores it and bills the default paid model (402 at $0 credit)
+      "model": "s2.1-pro-free",
+    },
     body: JSON.stringify({
       text: text,
-      model: "s2.1-pro-free",
       reference_id: CADDY_VOICES[body.team] || CADDY_VOICES.founders,
       format: "mp3",
     }),
