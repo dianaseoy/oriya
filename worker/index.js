@@ -187,7 +187,14 @@ async function caddyVoice(request, env) {
    and message content is never logged (observability is on). Copy rails live
    in the system prompt: descriptive never prescriptive, no medical advice,
    no invented stats/partners/features, honest v0.1 framing. */
-const ORI_MODEL = "@cf/meta/llama-3.1-8b-instruct";
+/* llama-3.1-8b-instruct (non-fast) was deprecated 2026-05-30; the -fast
+   variant stays active per Cloudflare's deprecation notice. Fallbacks cover
+   the next deprecation wave so chat degrades to a different model, not a 502. */
+const ORI_MODELS = [
+  "@cf/meta/llama-3.1-8b-instruct-fast",
+  "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "@cf/zai-org/glm-4.7-flash",
+];
 
 const ORI_SYSTEM = `You are Ori, the recovery companion from oriya.app — warm and grounded, for people who track sleep and recovery with wearables (Oura, Whoop, Garmin, Apple Watch). You are v0.1: an early, text-first AI built in the open by a solo founder (Diana). Be honest about that if asked.
 
@@ -222,19 +229,22 @@ async function oriChat(request, env) {
     return new Response(JSON.stringify({ error: "bad_messages" }), { status: 400, headers });
   }
   const persona = ORI_PERSONAS[body.persona] ? body.persona : "breathe";
-  try {
-    const out = await env.AI.run(ORI_MODEL, {
-      messages: [{ role: "system", content: ORI_SYSTEM + ORI_PERSONAS[persona] }].concat(clean),
-      max_tokens: 320,
-    });
-    const reply = String((out && out.response) || "").trim();
-    if (!reply) throw new Error("empty");
-    return new Response(JSON.stringify({ reply: reply }), { headers });
-  } catch (e) {
-    // sanitized infra error only (model/binding failures) — never chat content
-    const detail = String((e && e.message) || e).slice(0, 140);
-    return new Response(JSON.stringify({ error: "upstream", detail: detail }), { status: 502, headers });
+  let detail = "";
+  for (const model of ORI_MODELS) {
+    try {
+      const out = await env.AI.run(model, {
+        messages: [{ role: "system", content: ORI_SYSTEM + ORI_PERSONAS[persona] }].concat(clean),
+        max_tokens: 320,
+      });
+      const reply = String((out && out.response) || "").trim();
+      if (!reply) throw new Error("empty");
+      return new Response(JSON.stringify({ reply: reply }), { headers });
+    } catch (e) {
+      // sanitized infra error only (model/binding failures) — never chat content
+      detail = String((e && e.message) || e).slice(0, 140);
+    }
   }
+  return new Response(JSON.stringify({ error: "upstream", detail: detail }), { status: 502, headers });
 }
 
 /* Outreach-friendly short routes (assets match first, so these only fire when
