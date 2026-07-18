@@ -1495,6 +1495,78 @@
   </div>
 </section>
 
+<!-- ACT 1.5 — OVERHEARD (rally scripts: the product revealing itself in
+     conversations people recognize; 50 invented convos in rally.js, always
+     labeled invented — honesty gate) -->
+<style>
+  .rally-card{ max-width:520px; margin:34px auto 0; background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.09); border-radius:18px; padding:22px 20px 18px; }
+  .rally-tag{ font-family:var(--font-mono); font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--jade); }
+  .rally-feed{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+  .rally-line{ max-width:86%; border-radius:14px; padding:9px 13px; font-size:14px;
+    line-height:1.5; opacity:0; transform:translateY(6px);
+    animation:rallyIn .4s ease forwards; }
+  .rally-line.l{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
+    border-top-left-radius:4px; align-self:flex-start; }
+  .rally-line.r{ background:rgba(127,183,158,.13); border:1px solid transparent;
+    border-top-right-radius:4px; align-self:flex-end; }
+  @keyframes rallyIn{ to{ opacity:1; transform:none; } }
+  .rally-foot{ display:flex; justify-content:space-between; align-items:center; gap:10px;
+    margin-top:16px; flex-wrap:wrap; }
+  .rally-next{ background:none; border:1px solid rgba(255,255,255,.16); color:var(--bone);
+    border-radius:99px; padding:7px 15px; font:600 12.5px var(--font-sans,inherit); cursor:pointer;
+    transition:border-color .2s, color .2s; }
+  .rally-next:hover{ border-color:var(--jade); color:var(--jade); }
+  @media (prefers-reduced-motion: reduce){ .rally-line{ animation:none; opacity:1; transform:none; } }
+</style>
+<section class="act" id="overheard">
+  <div class="wrap reveal">
+    <div class="act-head" style="margin:0 auto; text-align:center;">
+      <span class="eyebrow">Overheard, once the board's in the chat</span>
+      <h2 class="display display-l">You've literally had<br>this exact morning.</h2>
+    </div>
+    <div class="rally-card">
+      <span class="rally-tag" id="rallyTag"></span>
+      <div class="rally-feed" id="rallyFeed" aria-live="polite"></div>
+      <div class="rally-foot">
+        <button type="button" class="rally-next" id="rallyNext">Another morning ↺</button>
+        <span style="font-family:var(--font-mono); font-size:10.5px; color:var(--ash); opacity:.8;">1 of 50 · all invented — your crew writes the real ones</span>
+      </div>
+    </div>
+  </div>
+</section>
+<script src="rally.js"></script>
+<script>
+(function () {
+  var feed = document.getElementById("rallyFeed"), tag = document.getElementById("rallyTag"),
+      next = document.getElementById("rallyNext"),
+      count = next ? next.nextElementSibling : null;
+  if (!feed || typeof RALLY === "undefined") return;
+  var order = RALLY.map(function (_, i) { return i; });
+  for (var i = order.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1)), t = order[i]; order[i] = order[j]; order[j] = t;
+  }
+  var at = -1;
+  function show() {
+    at = (at + 1) % order.length;
+    var c = RALLY[order[at]];
+    tag.textContent = c.tag;
+    feed.textContent = "";
+    c.lines.forEach(function (ln, k) {
+      var d = document.createElement("div");
+      d.className = "rally-line " + (k % 2 ? "r" : "l");
+      d.style.animationDelay = (k * 120) + "ms";
+      d.textContent = ln;
+      feed.appendChild(d);
+    });
+    if (count) count.textContent = (at + 1) + " of " + RALLY.length + " · all invented — your crew writes the real ones";
+  }
+  next.addEventListener("click", show);
+  show();
+})();
+</script>
+
 <!-- ACT 2 — THE BIOMETRIC HANDICAP -->
 <section class="act" id="handicap">
   <div class="wrap reveal">

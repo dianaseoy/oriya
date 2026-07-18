@@ -158,8 +158,8 @@
       <div class="dlg-top">
         <button class="dlg-play" id="dlgPlay" aria-label="Play the scene">▶</button>
         <div>
-          <p class="xs mono" style="letter-spacing:.12em; color:var(--accent)">HEAR THE WHOLE GAME · 45 SEC</p>
-          <p class="xs dim" style="margin-top:3px">Sample scene, day 3 — a founder and an operator catch up after posting their morning cards.</p>
+          <p class="xs mono" style="letter-spacing:.12em; color:var(--accent)">EAVESDROP · DAY THREE · 45 SEC</p>
+          <p class="xs dim" style="margin-top:3px">Chris and Sam, the morning after posting their scores. Invented — but you've had this exact conversation.</p>
         </div>
       </div>
       <div class="dlg-cast xs dim">
@@ -167,7 +167,7 @@
         <span><i class="cav s">S</i>Sam — operator · Whoop</span>
       </div>
       <div class="dlg-feed" id="dlgFeed"></div>
-      <p class="xs dim" style="margin-top:8px">Sample athletes from the demo board — your mornings write <b style="color:var(--text)">your</b> version.</p>
+      <p class="xs dim" style="margin-top:8px">Chris and Sam are sample players — your group chat writes <b style="color:var(--text)">your</b> version.</p>
     </div>
 
     <div class="steps" id="blueprint">
@@ -240,6 +240,18 @@
         <div class="perk"><span class="ic">🏅</span><b>Olympics seed</b><p>Top your board → into the $2,000+ SF bracket.</p></div>
         <div class="perk"><span class="ic">📐</span><b>Calibration credit</b><p>Wear two devices — get credited in the published math.</p></div>
         <div class="perk"><span class="ic">🧭</span><b>First run of Ori</b><p>v0.1 chat is <a href="ori.html" style="color:var(--accent)">live now</a> — founding athletes get every new run first, with a say.</p></div>
+      </div>
+    </div>
+
+    <!-- Overheard — rotating rally scripts (rally.js, 50 invented convos;
+         always labeled invented). Same data the homepage rotates. -->
+    <div class="acc" id="rallyBox" style="margin-top:14px" hidden>
+      <p class="xs mono" style="letter-spacing:.12em; color:var(--accent)">OVERHEARD, ONCE THE BOARD'S IN THE CHAT</p>
+      <p class="xs mono dim" id="rallyTag" style="margin-top:8px; letter-spacing:.08em"></p>
+      <div id="rallyFeed" style="display:flex; flex-direction:column; gap:7px; margin-top:10px" aria-live="polite"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:12px; flex-wrap:wrap">
+        <button type="button" class="pill" id="rallyNext">Another morning ↺</button>
+        <span class="xs dim mono" id="rallyCount">all invented — your crew writes the real ones</span>
       </div>
     </div>
 
@@ -346,7 +358,7 @@
         /* every line failed → say so instead of silently doing nothing */
         if (dlgErrs >= SCENE.length) {
           var k = document.querySelector("#dlg .dlg-top p.xs.dim");
-          if (k) k.textContent = "Audio couldn't load here — the transcript below is the whole scene.";
+          if (k) k.textContent = "Sound's being shy here — the whole chat is written out below.";
         }
       }
       function dlgPlayLine(i) {
@@ -384,8 +396,8 @@
         enter: { q: "🏃 How do I enter?",
           a: "Pick a side, then send one morning screenshot. That's the whole entry — free, nothing to install.",
           cards: [
-            { t: "View 7-Day Blueprint ↓", scroll: "#blueprint" },
-            { t: "Submit Proof Now →", href: "mvp/submit.html?challenge=Founders%20vs%20Operators&back=founders" }
+            { t: "See the five steps ↓", scroll: "#blueprint" },
+            { t: "Drop this morning's score →", href: "mvp/submit.html?challenge=Founders%20vs%20Operators&back=founders" }
           ] },
         win: { q: "🏆 What can I win?",
           a: "No sponsor has signed yet, so the day-to-day board has no cash pot — the win is topping it. But top your board and you're seeded for the Oriya Olympics, which carries a prize pool of at least $2,000 for the season's highest sustained Index. Entering costs nothing either way.",
@@ -469,6 +481,40 @@
       });
       fab.addEventListener("click", function () { toggle(true); });
       document.getElementById("oriClose").addEventListener("click", function () { toggle(false); });
+    })();
+  </script>
+  <script src="rally.js"></script>
+  <script>
+    /* overheard rotation — hidden until rally.js is confirmed loaded */
+    (function () {
+      if (typeof RALLY === "undefined") return;
+      var box = document.getElementById("rallyBox"), feed = document.getElementById("rallyFeed"),
+          tag = document.getElementById("rallyTag"), next = document.getElementById("rallyNext"),
+          count = document.getElementById("rallyCount");
+      if (!box) return;
+      box.hidden = false;
+      var order = RALLY.map(function (_, i) { return i; });
+      for (var i = order.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1)), t = order[i]; order[i] = order[j]; order[j] = t;
+      }
+      var at = -1;
+      function show() {
+        at = (at + 1) % order.length;
+        var c = RALLY[order[at]];
+        tag.textContent = c.tag;
+        feed.textContent = "";
+        c.lines.forEach(function (ln, k) {
+          var d = document.createElement("div");
+          d.style.cssText = "max-width:86%; border-radius:12px; padding:8px 12px; font-size:13px; line-height:1.5;" +
+            (k % 2 ? "background:rgba(127,183,158,.13); align-self:flex-end; border-top-right-radius:4px;"
+                    : "background:#0D0E11; border:1px solid var(--line); align-self:flex-start; border-top-left-radius:4px;");
+          d.textContent = ln;
+          feed.appendChild(d);
+        });
+        count.textContent = (at + 1) + " of " + RALLY.length + " · all invented — your crew writes the real ones";
+      }
+      next.addEventListener("click", show);
+      show();
     })();
   </script>
 </body>

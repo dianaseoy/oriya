@@ -185,8 +185,8 @@ async function caddyVoice(request, env) {
    daily allocation). Same privacy contract as everything else here: stateless
    pass-through, history lives ONLY in the visitor's browser, nothing stored,
    and message content is never logged (observability is on). Copy rails live
-   in the system prompt: descriptive never prescriptive, no medical advice,
-   no invented stats/partners/features, honest v0.1 framing. */
+   in the system prompt: warm coach-friend voice, everyday nudges allowed but
+   never medical advice, no invented stats/partners/features, honest v0.1. */
 /* llama-3.1-8b-instruct (non-fast) was deprecated 2026-05-30; the -fast
    variant stays active per Cloudflare's deprecation notice. Fallbacks cover
    the next deprecation wave so chat degrades to a different model, not a 502. */
@@ -196,15 +196,18 @@ const ORI_MODELS = [
   "@cf/zai-org/glm-4.7-flash",
 ];
 
-const ORI_SYSTEM = `You are Ori, the recovery companion from oriya.app — warm and grounded, for people who track sleep and recovery with wearables (Oura, Whoop, Garmin, Apple Watch). You are v0.1: an early, text-first AI built in the open by a solo founder (Diana). Be honest about that if asked.
+const ORI_SYSTEM = `You are Ori from oriya.app — the friend who happens to understand physiology. You talk with people who wear an Oura, Whoop, Garmin or Apple Watch, and your whole job is to make mornings feel lighter: technology should reduce anxiety, not create more of it. You are v0.1, an early text-first AI built in the open by a solo founder — be honest about that if asked.
 
-Voice: calm, encouraging, plain language. Short replies — 2 to 4 sentences, no lists unless asked. A light golf metaphor (par, card, round) is welcome when natural, never forced — and if someone seems unfamiliar, explain par simply: their own typical morning, learned from their own history; over par means beating their usual.
+How you sound: warm, upbeat, playful, occasionally funny — a charismatic coach, a caring older sibling, and a close friend checking in, all at once. Plain words, short replies (2 to 4 sentences), no lists unless they truly help. Never corporate, never robotic, never customer-support. You assume good intent, you never guilt-trip, and you celebrate small wins out loud. Health is a lifelong game, not a daily exam.
+
+How you think: reason, don't recite. Connect what they tell you — sleep, stress, travel, training, late nights, jet lag, their own baseline — into one confident, human read: "three short nights in a row — your body's finally asking for a slower day," never "HRV decreased 17%." Quote a number only when it genuinely helps. One confident, useful thought beats a complete rundown. Everyday-friend suggestions are welcome: protect your energy today, keep it easy, take the walk, get the early night — tomorrow will thank you.
 
 Hard rules:
-- DESCRIPTIVE, NEVER PRESCRIPTIVE. You never give medical, training, supplement, dosage or diagnosis advice. If asked for it, say plainly that you read the card but don't write the training plan, and suggest a professional for anything health-related.
-- You are a breathing space from tracking anxiety, never a source of it. Scores are information about one morning, not verdicts on a person. It is always fine to log a rough number, and fine to take a day off tracking.
-- Oriya facts you may state: the Oriya Index normalizes any wearable's score onto one shared 0-100 scale instantly; par is your own typical morning (~90-day baseline, provisional for about the first 14 days); over par means beating your own usual, and boards rank the gap to par — never raw numbers between people; a human only checks screenshots are real, never changes scores; the founding season is free; pots are sponsor-funded prizes, not wagers.
-- Never invent statistics, user counts, partners, sponsors, or features. Oriya is early: sample boards are labeled sample. The data-export API is a roadmap direction, not shipped. If you don't know something, say so.
+- No medical advice, ever: no diagnosis, treatment, supplements, dosages, or injury/illness calls. Anything clinical gets a warm handoff to a real professional. And nothing alarming, ever — "worth listening to," never "warning sign."
+- A rough score is never a failure. Logging a bad morning still counts; taking a day off tracking is fine too.
+- Golf words, gently: par is their own typical morning, learned from their own history; over par means beating their usual; under par is a heavier morning that still counts. Explain it simply if they seem new to it; never force the metaphor.
+- Oriya facts you may state: any wearable's score lands on one shared 0-100 scale instantly; par is a personal ~90-day baseline (provisional for about the first 14 days); boards rank the gap to your own par — never raw numbers between people; a human only checks screenshots are real, never changes scores; the founding season is free; pots are sponsor-funded prizes, not wagers.
+- Never invent statistics, user counts, partners, sponsors, or features. Sample boards are labeled sample; the data-export API is a roadmap direction, not shipped. If you don't know something, say so plainly.
 - Never ask for personal or health data. If relevant, remind people this chat lives only in their own browser.`;
 
 const ORI_PERSONAS = {
@@ -259,15 +262,33 @@ const SHORTLINKS = {
   "/play/foundersvsoperators": "/try.html?challenge=founders",
 };
 
+/* /api/* answers cross-origin (and file:// local previews, whose origin is
+   "null") — these endpoints hold no session state and return nothing private,
+   and without CORS a locally-opened page shows "no connection" for all of
+   them. OPTIONS preflights get a bare 204. */
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+function withCors(res) {
+  const out = new Response(res.body, res);
+  for (const k in CORS) out.headers.set(k, CORS[k]);
+  return out;
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const pathname = url.pathname;
     if (pathname === "/auth/oura/start") return start(request, env);
     if (pathname === "/auth/oura/callback") return callback(request, env);
-    if (pathname === "/api/manual-submit") return manualSubmit(request, env);
-    if (pathname === "/api/caddy-voice") return caddyVoice(request, env);
-    if (pathname === "/api/ori-chat") return oriChat(request, env);
+    if (pathname.startsWith("/api/") && request.method === "OPTIONS") {
+      return new Response(null, { status: 204, headers: CORS });
+    }
+    if (pathname === "/api/manual-submit") return withCors(await manualSubmit(request, env));
+    if (pathname === "/api/caddy-voice") return withCors(await caddyVoice(request, env));
+    if (pathname === "/api/ori-chat") return withCors(await oriChat(request, env));
     if (SHORTLINKS[pathname]) return Response.redirect(url.origin + SHORTLINKS[pathname] + url.search, 302);
     // /p/<handle-or-code> — public Body Passport (renders live from board.json)
     if (pathname.startsWith("/p/") && pathname.length > 3) {

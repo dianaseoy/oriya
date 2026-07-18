@@ -188,9 +188,15 @@
     }
 
     function App() {
-      const [board, setBoard] = useState(null);
-      useEffect(() => { STORE.fetchBoard().then(setBoard); }, []);
-      if (!board) return <p className="dim sm">Loading…</p>;
+      const [board, setBoard] = useState(undefined); // undefined = loading, null = failed
+      useEffect(() => { STORE.fetchBoard().then((b) => setBoard(b || null)); }, []);
+      if (board === undefined) return <p className="dim sm">Loading…</p>;
+      if (board === null) return (
+        <div className="card">
+          <p className="sm">The board didn't load this time — nothing's lost.</p>
+          <p className="xs dim" style={{ marginTop: 6 }}>Check your connection and refresh, or open the live card at <a href="https://oriya.app/passport" style={{ color: "var(--accent)" }}>oriya.app/passport</a>.</p>
+        </div>
+      );
       const myCode = STORE.loadMe();
       const params = new URLSearchParams(location.search);
       const raw = params.get("u") || params.get("code") || myCode;

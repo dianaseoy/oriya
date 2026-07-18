@@ -1,0 +1,4 @@
+# Public sample/board data — readable from anywhere, including file:// previews
+# (store.js falls back to the live URL when a relative fetch fails).
+/mvp/data/board.json
+  Access-Control-Allow-Origin: *

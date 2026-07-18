@@ -41,9 +41,18 @@ var STORE = (function () {
   async function fetchBoard() {
     try {
       var r = await fetch(BOARD_URL + "?t=" + Date.now());
-      if (!r.ok) return null;
+      if (!r.ok) throw 0;
       return reanchor(await r.json());
-    } catch (e) { return null; }
+    } catch (e) {
+      // file:// previews (and broken local setups) can't fetch a relative
+      // path — fall back to the live board, which sends CORS via _headers.
+      if (location.hostname === "oriya.app") return null;
+      try {
+        var r2 = await fetch("https://oriya.app/mvp/data/board.json?t=" + Date.now());
+        if (!r2.ok) return null;
+        return reanchor(await r2.json());
+      } catch (e2) { return null; }
+    }
   }
 
   function loadLocal(key, fallback) {

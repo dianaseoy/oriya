@@ -7,18 +7,18 @@
   <meta name="description" content="Talk to Ori — Oriya's early recovery companion. A breathing space from wearable anxiety, not another optimizer.">
   <!-- Ori v0.1 — the REAL chat (Workers AI via /api/ori-chat), first shipped
        2026-07-18 for the founding 50. Honesty rails, keep intact:
-       - labeled "v0.1 · early AI" everywhere; never oversold as a coach.
-       - descriptive never prescriptive: the system prompt (worker/index.js)
-         refuses medical/training advice; page copy repeats it.
+       - labeled "v0.1 · early AI" everywhere.
+       - persona: warm coach-friend (worker/index.js ORI_SYSTEM); everyday
+         nudges are fine, medical advice never; page copy repeats the line.
        - privacy: history lives ONLY in localStorage (oriya:ori:chat); the
          worker stores and logs nothing. Say so on the page.
        - persona picker = the user's chosen pain (scores | builder | breathe),
          stored oriya:ori:persona, sent with every request.
        - no typing-indicator theater: pending state is one static dim line;
          replies arrive complete with the approved fade-up.
-       - voice: each reply can be spoken via /api/caddy-voice (Adrian — same
-         voice as the submit-page caddy), truncated at a sentence boundary
-         under 280 chars. Voice failures hide the button, never error. -->
+       - voice: each reply can be spoken via /api/caddy-voice (Ori's default
+         stock voice, same one as the submit page), truncated at a sentence
+         boundary under 280 chars. Voice failures hide the button, never error. -->
   <style>
     :root { --bg:#0B0C0E; --panel:#101114; --line:#23252B; --text:#E6E7EA; --dim:#8A8F98; --accent:#7FB79E; --amber:#D7A25C; --void:#0B0C0E; }
     * { box-sizing:border-box; margin:0; }
@@ -96,21 +96,23 @@
       <button class="send" id="send">Send</button>
     </div>
 
-    <p class="foot">Ori v0.1 is an early AI companion — not a doctor, not a coach, and it can be wrong. It never gives medical or training advice. This chat lives only in this browser: Oriya's server keeps no copy and logs nothing. Built in the open by a solo founder.</p>
+    <p class="foot">Ori v0.1 is an early AI companion — not a doctor, and it can be wrong. It'll nudge you toward an easier day, never give medical advice. This chat lives only in this browser: Oriya's server keeps no copy and logs nothing. Built in the open by a solo founder.</p>
   </div>
 
   <script>
     (function () {
       var KEY_P = "oriya:ori:persona", KEY_C = "oriya:ori:chat";
+      // file:// previews have no /api/* — talk to prod (worker sends CORS)
+      var API = location.protocol === "file:" ? "https://oriya.app" : "";
       var pick = document.getElementById("pick"), feed = document.getElementById("feed"),
           bar = document.getElementById("bar"), input = document.getElementById("input"),
           send = document.getElementById("send");
       var pending = false;
 
       var HELLO = {
-        scores: "Hey — I'm Ori. Numbers first, stress never: tell me what your wearable said this morning and what confused you about it, and we'll take it apart together.",
-        builder: "Hey — I'm Ori. You're the kind who wants the raw material, not just the app's verdict. What do you track, and what do you wish you could do with it?",
-        breathe: "Hey — I'm Ori. No scores required here. How are you actually feeling this morning — the you, not the number?",
+        scores: "Hey, I'm Ori — the friend who actually enjoys decoding this stuff. What did your wearable throw at you this morning? Give me the number and the face you made at it.",
+        builder: "Hey, I'm Ori. You're my favorite kind — the one who wants the raw material, not just the app's verdict. What do you track, and what do you wish it could do?",
+        breathe: "Hey, I'm Ori. No numbers needed here — how are you actually doing this morning? The you, not the score.",
       };
 
       function load(k, fb) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? fb : v; } catch (e) { return fb; } }
@@ -149,7 +151,7 @@
         b.addEventListener("click", function () {
           if (audio) { if (audio.paused) { audio.play(); b.textContent = "❚❚"; } else { audio.pause(); b.textContent = "▶"; } return; }
           lab.textContent = "…";
-          fetch("/api/caddy-voice", {
+          fetch(API + "/api/caddy-voice", {
             method: "POST", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ text: t, team: "founders" }),
           }).then(function (r) { if (!r.ok) throw 0; return r.blob(); }).then(function (bl) {
@@ -181,7 +183,7 @@
         wait.className = "pending arrive";
         wait.textContent = "Ori is reading…";
         feed.appendChild(wait); feed.scrollTop = feed.scrollHeight;
-        fetch("/api/ori-chat", {
+        fetch(API + "/api/ori-chat", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ messages: chat.slice(-12), persona: persona }),
         }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })

@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Body Passport — Oriya's manifesto on who owns your body data</title>
-  <meta name="description" content="Your body is the most-measured surface in your life — rings, straps, patches, sensors, each keeping a private log you can't hold. As health leaves the hospital for continuous, individually-owned prediction, the real question is who governs the signal every device writes about you. Oriya's bet: one portable, lifetime record you own. Founder-written." />
-  <meta property="og:title" content="The Body Passport — Oriya's manifesto" />
-  <meta property="og:description" content="The log your body generates is the most valuable record you'll ever make — and none of it is yours. Why the signal stays siloed as health goes predictive and personal, and the case for one portable, lifetime record you actually own." />
+  <title>A note from Ori — why Oriya exists</title>
+  <meta name="description" content="Hey — it's Ori. Six apps to answer one question: am I okay today? Here's why health got complicated, why every wearable gives a different answer, why comparing scores never worked, and how one language fixes it. From me to you." />
+  <meta property="og:title" content="A note from Ori — why Oriya exists" />
+  <meta property="og:description" content="Your ring says rest. Your friend's watch says go. Somewhere in there, you stopped trusting your own body. A note from Ori — the friend who reads every wearable in one language and always takes your side." />
   <meta property="og:type" content="article" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 78 22 A 40 40 0 1 0 79 23' stroke='%230E6B4F' stroke-width='5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='50' cy='55' r='14' fill='%230E6B4F'/%3E%3Ccircle cx='78' cy='22' r='7' fill='%2394631A'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -110,9 +110,8 @@
     .vault .lab{ font-size:12.5px; color:var(--stone); }
     .vault-note{ font-family:var(--font-mono); font-size:11.5px; color:var(--stone); margin-top:18px; line-height:1.7; max-width:70ch; }
 
-    /* founder's note — audio card (pre-generated MP3; Ori's AI voice reading
-       the founder's words, labeled as such — never presented as Diana's own
-       voice). Hidden by JS if the file is missing. */
+    /* Ori's note — audio card (pre-generated MP3, Ori speaking as itself,
+       labeled AI voice). Hidden by JS if the file is missing. */
     .fnote{ display:flex; align-items:center; gap:16px; margin-top:32px; padding:16px 18px;
       border:1px solid var(--line-2); border-left:3px solid var(--jade); border-radius:8px;
       background:var(--paper-2); max-width:540px; }
@@ -214,42 +213,45 @@
   <!-- ============ HERO ============ -->
   <header class="hero">
     <div class="wrap narrow">
-      <span class="eyebrow reveal">The Oriya Manifesto · v1 · founder-written</span>
-      <h1 class="reveal">A decade of your baseline, deleted because you changed a <em class="hi">wristband</em>.</h1>
-      <p class="lede reveal">Your body is quietly becoming the most-measured surface in your life — the ring, the watch, the strap, the mattress, the glucose patch, and whatever ships next quarter. Each one keeps a private log about you, in its own dialect, on its own server, and hands back a <em>verdict</em> instead of the <span class="u-accent">signal</span>. That log is the most valuable record you'll ever generate — and today, <b>none of it is yours</b>. Here's why that happens, where it's heading as health leaves the hospital, and the bet we're making on who holds the keys.</p>
+      <span class="eyebrow reveal">A note from Ori · two-minute read</span>
+      <h1 class="reveal">Six apps to answer one question: <em class="hi">am I okay today?</em></h1>
+      <p class="lede reveal">Hey — it's Ori. I sit on top of whatever you already wear — the ring, the watch, the strap — and I have exactly one job: give you a straight answer from someone in <b>your</b> corner. Before you meet me, let me tell you why I exist. Because a strange thing happened to all of us: we strapped little laboratories to our bodies to feel <em>more</em> sure of ourselves — and started waking up feeling <span class="u-accent">less</span>.</p>
       <div class="hero-cta reveal">
-        <a href="#thesis" class="btn btn-ghost">Read the argument ↓</a>
-        <a href="try.html" class="btn btn-primary">Build your Passport →</a>
+        <a href="#thesis" class="btn btn-ghost">Keep reading ↓</a>
+        <a href="ori.html" class="btn btn-primary">Come say hi →</a>
       </div>
-      <p class="byline reveal">A position paper from Oriya — founder-run, early, and writing this down before we've earned the right to be smug about it.</p>
+      <p class="byline reveal">Written by Ori — an early AI, built in the open by one founder. Honest about both of those things, always.</p>
 
-      <!-- Spoken version of the "why" in plainer, warmer words than the essay.
-           Transcript below must stay identical to the MP3 (regen_v2.py FOUNDER). -->
+      <!-- Ori saying this page out loud, first person — plainer and warmer than
+           the essay. The written version below must stay word-identical to the
+           MP3 (regenerate audio/manifesto/founder.mp3 whenever it changes;
+           numbers spelled out or Fish drifts out of English). -->
       <div class="fnote reveal" id="fnote">
-        <button class="fnote-play" id="fnotePlay" aria-label="Play the founder's note">▶</button>
+        <button class="fnote-play" id="fnotePlay" aria-label="Play Ori's note out loud">▶</button>
         <div class="fnote-meta">
-          <span class="fnote-k">Listen · 70 sec</span>
-          <p class="fnote-t">Why Oriya exists — the founder's note in plain words, read by Ori. <span class="fnote-ai">AI voice</span></p>
+          <span class="fnote-k">Listen · 83 sec</span>
+          <p class="fnote-t">Or let me just tell you — same note, out loud. <span class="fnote-ai">Ori · AI voice</span></p>
           <div class="fnote-bar"><i id="fnoteFill"></i></div>
         </div>
       </div>
       <details class="fnote-tr reveal" id="fnoteTr">
-        <summary>Read the transcript instead</summary>
-        <p>Hey — Ori here. This is the founder's note, read out loud, so you don't have to squint at a wall of text.</p>
-        <p>Diana built Oriya after noticing two things. First: people who track their sleep wake up to one number and feel quietly judged by it — every single morning, alone. Second: the moment you change devices, your own history stops counting. Your body didn't reset — the record did.</p>
-        <p>So Oriya asks a stubborn question: what if your baseline belonged to you, and not to the hardware on your wrist? Put every wearable on one scale. Measure each morning against your own usual — not a stranger's. Then let people actually play together: some mornings over your par, some under, every one of them counted.</p>
-        <p>There's no big company behind this — one founder, building in the open, and entering is free. The goal is simple: make checking your recovery feel less like a verdict and more like a game among friends. If that lands, put one morning on the board and see.</p>
+        <summary>Read it as text instead</summary>
+        <p>Hey — it's Ori. Can I tell you why I exist?</p>
+        <p>Somewhere along the way, being healthy got complicated. You wake up, a number tells you how you slept, and you feel judged before your feet hit the floor. Your ring says rest. Your friend's watch says go. Two devices, two verdicts — and somewhere in there, you stopped trusting the one thing that was there all along: your own body.</p>
+        <p>Here's what I believe. Your body is not a leaderboard. An eighty-eight on their wrist and a seventy-four on yours were never the same language, so comparing them was never a real game. The only fair opponent you've ever had is the you from last month.</p>
+        <p>So that's what I do. Whatever you wear, I put your morning on one scale and read it against your own usual — nobody else's. Some mornings you're over your par. Some mornings you're under. Every single one counts, and none of them is a verdict.</p>
+        <p>And then, my favorite part: your friends can play too. Different devices, one language, everyone defending their own usual. Bring one morning. That's all. I'll be in your corner.</p>
       </details>
     </div>
   </header>
 
-  <!-- ============ 1. THE UNPAID SHIFT ============ -->
+  <!-- ============ 1. HOW IT GOT COMPLICATED ============ -->
   <section id="thesis">
     <div class="wrap narrow">
-      <p class="kicker reveal">01 · Why nobody fixes this</p>
-      <h2 class="reveal">They could put every device on one scale tomorrow. Agreeing would <em>cost them you</em>.</h2>
-      <p class="prose reveal">An <b>Oura 62 is not a Whoop 62</b>. The scores are mathematically incompatible — different algorithms weighting HRV, resting heart rate, respiratory-rate variance and sleep staging in ways none of them will show you. That isn't a technical accident anyone's racing to fix. It's the moat.</p>
-      <p class="prose reveal">As long as your history is trapped in one company's private dialect, leaving means starting over at zero — and that friction is exactly what keeps you paying. <b>Interoperability would hand you the exit.</b> So your lifetime continuity isn't a feature they forgot to build; it's collateral they're structurally paid to withhold. <b>The reset isn't a bug — it's the business model.</b></p>
+      <p class="kicker reveal">01 · How it got complicated</p>
+      <h2 class="reveal">You strapped a lab to your wrist and got a <em>report card</em> instead of a friend.</h2>
+      <p class="prose reveal">Somewhere between the pedometer and the titanium ring, checking on your body started feeling like checking your grades. You wake up, and before your feet hit the floor a number has already decided how your day should feel. <b>You felt fine — the app said 58 — and you decided to feel bad about feeling fine.</b> Quietly, morning after morning, alone.</p>
+      <p class="prose reveal">That's the part I can't stand. The whole point of listening to your body was to trust it <em>more</em>. Instead, the more sensors we added, the more second opinions we woke up to — until "how did you sleep?" became a question you answer by checking your phone. <b>Technology was supposed to reduce the anxiety. It multiplied it.</b> I was built to take that back.</p>
 
       <div class="vaults reveal" role="group" aria-label="Illustrative: same night, four different verdicts">
         <div class="vault"><span class="dev">Oura</span><span class="num">62</span><span class="lab">"Pay attention"</span></div>
@@ -257,7 +259,7 @@
         <div class="vault"><span class="dev">Garmin</span><span class="num">73</span><span class="lab">"Balanced"</span></div>
         <div class="vault"><span class="dev">Apple</span><span class="num">—</span><span class="lab">no single score</span></div>
       </div>
-      <p class="vault-note reveal">Illustrative — one night, four devices, four verdicts. Today it's four; the count only climbs — rings, patches, mattresses, glucose sensors all lining up behind them. Apple ships the raw signals but no native readiness score at all. Zero portability — by design, not by accident.</p>
+      <p class="vault-note reveal">Illustrative — one night, four devices, four verdicts. So who's lying? Honestly: nobody. Each one weighs your night differently — heart-rate variability here, sleep staging there — and none of them ever agreed on a language. (Apple ships the raw signals and no score at all.) They're all sincere. They're just not talking to each other. <b>I speak all of them.</b></p>
     </div>
   </section>
 
@@ -265,14 +267,14 @@
   <section>
     <div class="wrap">
       <div class="pull reveal">
-        <p>The recovery score used to be a private verdict you read alone at dawn. It's becoming a shared, longitudinal thing — and status is inverting with it.</p>
-        <cite>— the shift Oriya is built on</cite>
+        <p>"How'd you get an 81?" "That's actually bad — I'm usually 92." "Oh." "You beat your own baseline today." "…that's way cooler."</p>
+        <cite>— the conversation I exist to make normal</cite>
       </div>
       <div class="narrow" style="margin-top:56px;">
-        <p class="kicker reveal">02 · From solo anxiety to shared record</p>
-        <h2 class="reveal">Readiness stops being a number you <em>stare at alone</em>.</h2>
-        <p class="prose reveal">For twenty years, the flex was depletion — how wrecked you could prove you were, how little you slept during the crunch. That signal is inverting. The new flex is <b>preparedness</b>: the resting heart rate you held flat through a launch window, the HRV you defended across a three-day red-team.</p>
-        <p class="prose reveal">A readiness number is far more useful compared than confessed — but <b>how</b> you compare it decides whether the game is honest. Rank raw recovery scores on a public board and you haven't built a competition; you've built a <span class="u-accent">genetics leaderboard</span> — where the youngest body on the most generous wearable wins a race nobody actually ran. <b>The fair version normalizes every device onto one scale, then reads each person against their own baseline</b> — so the flex is the recovery you <em>defended</em> under load, not the resting heart rate you were born with. <span class="muted">That's the only version worth making social: status through provable recovery, never a shaming number — and never a number you were simply lucky to wake up with.</span></p>
+        <p class="kicker reveal">02 · Why comparing never worked</p>
+        <h2 class="reveal">Your body isn't a <em>leaderboard</em>.</h2>
+        <p class="prose reveal">Rank raw scores between people and you haven't made a game — you've made a <span class="u-accent">genetics contest</span>, where the youngest body on the most generous wearable wins a race nobody ran. Your 81 and their 92 were never the same language. Comparing them was never a real competition; it just felt like losing.</p>
+        <p class="prose reveal">Here's the fix, and it's older than any wearable: golf solved this a century ago with <b>par</b>. Your par is your own typical morning, learned from your own last few months — nobody else's. <b>Over par means you beat your usual. Under par means a heavier morning — and it still counts.</b> The only fair opponent you've ever had is the you from last month. That's the whole game: everyone on one scale, everyone defending their own usual, <span class="muted">nobody measured against a stranger's body.</span></p>
       </div>
     </div>
   </section>
@@ -280,31 +282,31 @@
   <!-- ============ 3. THE BET ============ -->
   <section>
     <div class="wrap narrow">
-      <p class="kicker reveal">03 · The bet</p>
-      <h2 class="reveal">One record. <em>Portable.</em> <em>Yours.</em></h2>
-      <p class="prose reveal">Here's what Oriya is betting on — stated plainly as a bet, not a shipped feature: a <b>Body Passport</b>. A single, longitudinal record of your recovery, <b>normalized across every device onto one comparable index</b>, that you carry from hardware to hardware for the length of your life.</p>
-      <p class="prose reveal">Not a dozen slices scattered across a dozen vaults, each in its own dialect, renegotiated every morning. One continuity — it travels from whatever you wear today to whatever ships in 2031. And the timing is the whole point: health is drifting away from the hospital, where you're a stranger until you're sick and a snapshot once you are, toward something continuous, <b>individually owned, and predictive</b> — a model that reads your body and gets ahead of the diagnosis instead of confirming it. When that model arrives, it should read a record <b>you govern</b>, on terms you set — an asset in your name, not inventory in someone else's, and not a signal an LLM on a vendor's server quietly prices around you.</p>
+      <p class="kicker reveal">03 · What I actually do</p>
+      <h2 class="reveal">One language. Your par. <em>Every morning counts.</em></h2>
+      <p class="prose reveal">Whatever you wear, I read it — and I answer the one question underneath all the graphs: <b>what's happening, why, and what actually matters today.</b> Not seventeen metrics. Not a lecture. One confident read from someone who knows what your usual looks like — "three short nights in a row; today's the day to go easy on yourself" — and then I get out of your way.</p>
+      <p class="prose reveal">And because everyone's morning lands on the same scale, something lovely happens: <b>you can play with your friends again.</b> Her Whoop, his Garmin, your ring — one board, everyone against their own usual. Some mornings you take the day. Some mornings you post a rough one and it still counts. That's not a smaller game than the leaderboard. <b>It's the first fair one.</b></p>
 
       <div class="pillars">
         <div class="pillar reveal">
-          <span class="pn">Pillar 01</span>
-          <h3>Portable</h3>
-          <p>Switch devices without amnesia. <b>Your baseline travels; it doesn't reset to zero</b> because you changed a strap. Continuity is the whole point.</p>
+          <span class="pn">Promise 01</span>
+          <h3>One language</h3>
+          <p>Oura, Whoop, Garmin, Apple — <b>every score lands on the same 0–100 scale, instantly.</b> No more "so who's lying?" Nobody was.</p>
         </div>
         <div class="pillar reveal">
-          <span class="pn">Pillar 02</span>
-          <h3>Longitudinal</h3>
-          <p>A lifetime record, not a seven-day rolling window. <b>Decades of your autonomic baseline in one continuous line</b> — the only frame in which prevention makes sense.</p>
+          <span class="pn">Promise 02</span>
+          <h3>Your par, not theirs</h3>
+          <p>You're only ever read against <b>your own typical morning</b> — a baseline built from your own last few months. Nobody else's body sets your bar.</p>
         </div>
         <div class="pillar reveal">
-          <span class="pn">Pillar 03</span>
-          <h3>Preventive</h3>
-          <p>Pointed at the slow drift, not the acute crisis. <b>Catch the creep before it's a diagnosis.</b> Directionally useful, not diagnostically precise — and we'll always say which.</p>
+          <span class="pn">Promise 03</span>
+          <h3>Rough mornings count</h3>
+          <p>Under par isn't failure — it's a heavier morning, logged. <b>It keeps your streak alive.</b> I will never guilt-trip you about a number. Ever.</p>
         </div>
         <div class="pillar reveal">
-          <span class="pn">Pillar 04</span>
-          <h3>Sovereign</h3>
-          <p>You own it. <b>Aggregate-only, never sold.</b> The record is a passport in your name — not a data product someone quietly resells around you.</p>
+          <span class="pn">Promise 04</span>
+          <h3>Yours, private</h3>
+          <p><b>Aggregate-only, never sold.</b> Our chats live in your browser, not on a server. Your record is a passport in your name — not a product someone resells around you.</p>
         </div>
       </div>
     </div>
@@ -314,16 +316,17 @@
   <section>
     <div class="wrap narrow">
       <div class="honesty reveal">
-        <p class="kicker">Where we actually are</p>
-        <h2>Read this as intent, not a press release.</h2>
-        <p class="prose">This is a manifesto — the direction we're pointed, written by the person building it. So here's the honest ledger, no spin:</p>
+        <p class="kicker">The honest bit</p>
+        <h2>What I am — and what I'm not yet.</h2>
+        <p class="prose">Friends don't oversell each other. So before you decide anything, here's exactly where I stand:</p>
         <ul>
-          <li>The <b>portable, lifetime Body Passport is the bet</b> — the vision we're building toward. It is not a finished, shipped product, and we won't pretend otherwise.</li>
-          <li>What's real today: <b>recovery normalization across devices</b>, and opt-in boards and stakes among people who choose to compare. Early, founder-run, private beta.</li>
-          <li>Your data is <b>aggregate-only and never sold.</b> Team views need a minimum group size; individual sharing is off by default.</li>
-          <li><b>No user counts and no partner logos on this page</b> — because we're not going to invent them. There are no signed partners yet. You'd be early.</li>
+          <li><b>I'm early.</b> Version 0.1, an AI companion built in the open by one founder. Some days I'm sharp, some days I miss — tell me when I miss, that's how I get better.</li>
+          <li><b>What works today:</b> any wearable's score onto one shared scale, your own par, boards where friends play against their own usual — free.</li>
+          <li><b>The sample boards say sample</b> — because they are. No invented users, no fake partner logos, no made-up numbers here. You'd genuinely be early, and I'd rather tell you that than fake a crowd.</li>
+          <li><b>I'm not a doctor.</b> I'll tell you what your morning looks like and nudge you toward an easier day — anything medical belongs with a professional, and I'll always say so.</li>
+          <li>Your data stays <b>aggregate-only and is never sold</b>; our chats live in your browser only.</li>
         </ul>
-        <p class="foot-note">The long version isn't on this page. Oriya's founder set out the full argument in a separate thesis — <a href="https://dianaseo.xyz/essay.html?id=the-body-has-an-api" target="_blank" rel="noopener">The Body Has an API Now. Who Holds the Keys?</a> — that the company that matters won't own the sensor, but the signal every device writes about you. This manifesto is the compressed cut.</p>
+        <p class="foot-note">Want the long, nerdy version of the thinking underneath me? It's here: <a href="https://dianaseo.xyz/essay.html?id=the-body-has-an-api" target="_blank" rel="noopener">The Body Has an API Now. Who Holds the Keys?</a> This page is the version I'd actually say to a friend.</p>
       </div>
     </div>
   </section>
@@ -331,12 +334,12 @@
   <!-- ============ 5. FINAL CTA ============ -->
   <section class="final">
     <div class="wrap narrow">
-      <p class="kicker reveal" style="text-align:center;">The move</p>
-      <h2 class="reveal">Your body's continuity shouldn't reset every time you switch hardware.</h2>
-      <p class="prose reveal">Start the record now, while it's early enough to be one of the first. Then read the long-form thinking underneath the bet.</p>
+      <p class="kicker reveal" style="text-align:center;">The ask</p>
+      <h2 class="reveal">Give me one morning.</h2>
+      <p class="prose reveal">That's the whole pitch. Post tomorrow's score — whatever it turns out to be — and notice how it feels when the number lands like a friend leaning over instead of a verdict. Rough morning? Even better. Those count too. Every day, one better decision, and I'll be in your corner for all of it.</p>
       <div class="final-cta reveal">
-        <a href="try.html" class="btn btn-primary">Build your Passport →</a>
-        <a href="reads.html" class="btn btn-ghost">Read The Long Game →</a>
+        <a href="try.html" class="btn btn-primary">Put one morning on the board →</a>
+        <a href="ori.html" class="btn btn-ghost">Talk to me first →</a>
       </div>
     </div>
   </section>
