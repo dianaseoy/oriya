@@ -143,10 +143,13 @@ async function callback(request, env) {
 /* Caddy voice — TTS pass-through for the deterministic morning call the
    browser already rendered (Fish Audio s2.1-pro-free while in dry-run).
    Same contract as the Oura routes: nothing stored, and the text is never
-   logged — it encodes a score. Voice IDs are placeholders until the two
-   persona clones exist. */
+   logged — it encodes a score. Voice IDs are stock Fish voices for now —
+   swap for the persona clones' reference IDs when they exist. */
 const FISH_TTS = "https://api.fish.audio/v1/tts";
-const CADDY_VOICES = { founders: "FOUNDER_VOICE_ID", operators: "OPERATOR_VOICE_ID" };
+const CADDY_VOICES = {
+  founders: "bf322df2096a46f18c579d0baa36f41d",  // "Adrian" — en stock voice
+  operators: "b347db033a6549378b48d00acb0d06cd", // "Selene" — en stock voice
+};
 
 async function caddyVoice(request, env) {
   if (request.method !== "POST") return new Response("POST only", { status: 405 });

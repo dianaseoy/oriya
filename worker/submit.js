@@ -44,6 +44,9 @@ export async function manualSubmit(request, env) {
   var score = Number(body.score);
   var challenge = String(body.challenge || "").slice(0, 80);
   var code = String(body.code || "").slice(0, 12);
+  // Ori's read — computed client-side (par lives in the browser); quoted in the
+  // E1 receipt only. Flattened + capped so it can't bloat or break the email.
+  var read = String(body.read || "").replace(/\s+/g, " ").trim().slice(0, 300);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ ok: false, code: "email" }, 400);
   if (DEVICES.indexOf(device) < 0) return json({ ok: false, code: "device" }, 400);
   if (!(score >= 0 && score <= 100)) return json({ ok: false, code: "score" }, 400);
@@ -95,11 +98,12 @@ export async function manualSubmit(request, env) {
         reply_to: "team@oriya.app",
         subject: "Your Oriya Index is " + index + " — you're on the board",
         text: "Your Oriya Index is " + index + "." + lock +
-          "\n\n" + device + " " + score + " → Oriya Index " + index + ". Every wearable normalizes to the same 0–100 index instantly, so your number sits on the exact same scale as every Oura, Whoop, Garmin and Apple Watch on the board." +
-          "\n\nThe only human in the loop is a quick check that your screenshot is a real device capture — that keeps the board honest, and it never changes your number." +
+          (read ? "\n\n“" + read + "”\n— Ori, your caddy" : "") +
+          "\n\n" + device + " " + score + " → Index " + index + " — every wearable normalizes to the same 0–100 scale, instantly." +
+          "\n\nThe only human step is a quick check that your screenshot is a real device capture — it never changes your number." +
           "\n\nWatch your side move → oriya.app/board" +
           "\nSame screenshot tomorrow keeps your streak — a rough morning logged still beats a great one skipped." +
-          "\n\n— Ori, the Oriya board\nReply to this email and it reaches Diana directly.",
+          "\n\n— the Oriya board\nReply to this email and it reaches Diana directly.",
       }),
     });
   } catch (e) { /* receipt is best-effort — never blocks the submission */ }

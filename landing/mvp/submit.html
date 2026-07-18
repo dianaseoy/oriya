@@ -9,7 +9,10 @@
        POST /api/manual-submit forwards one email (screenshot attached) to
        team@oriya.app; the founder normalizes by hand. If the endpoint isn't
        configured yet it falls back to a prefilled mail draft. No OCR, no AI,
-       no accounts — premium chrome over a deliberately manual workflow. -->
+       no accounts — premium chrome over a deliberately manual workflow.
+       Success moment = a message from Ori (deterministic caddy read + optional
+       tap-to-play voice note via /api/caddy-voice; the note only mounts if TTS
+       succeeds, so a 503 leaves a clean text-only message). -->
   <style>
     :root { --bg:#0B0C0E; --panel:#101114; --line:#23252B; --text:#E6E7EA; --dim:#8A8F98; --accent:#7FB79E; --amber:#D7A25C; }
     * { box-sizing:border-box; margin:0; }
@@ -44,6 +47,25 @@
     .rm { transition:all .2s ease; }
     .err { color:var(--amber); font-size:12px; margin-top:10px; }
     .success h2 { font-size:24px; font-weight:600; letter-spacing:-0.02em; }
+    /* Ori's message — voice-note pattern. Arrives complete (no typing theater);
+       motion is the approved fade-up only. */
+    .msg-kicker { font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin-top:20px; }
+    .msg { border:1px solid rgba(127,183,158,.3); background:rgba(127,183,158,.06); border-radius:14px; border-top-left-radius:4px; padding:14px 16px; margin-top:8px; text-align:left; }
+    .avatar { width:26px; height:26px; flex:none; border-radius:99px; border:1px solid rgba(127,183,158,.5); background:rgba(127,183,158,.1); color:var(--accent); font-weight:600; font-size:14px; display:inline-flex; align-items:center; justify-content:center; }
+    .msg-head { display:flex; align-items:center; gap:8px; }
+    .sender { font-size:12px; font-weight:600; }
+    .vtag { font-size:10px; color:var(--dim); }
+    .msg-body { font-size:13.5px; line-height:1.55; margin-top:9px; }
+    .vnote { display:flex; align-items:center; gap:10px; max-width:250px; margin-top:12px; border:1px solid rgba(127,183,158,.3); background:rgba(127,183,158,.07); border-radius:10px; padding:8px 10px; }
+    .vplay { width:32px; height:32px; flex:none; border:0; border-radius:99px; background:var(--accent); color:#0B0C0E; font-size:11px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
+    .vplay:hover { filter:brightness(1.08); }
+    .wave { display:flex; align-items:center; gap:2px; height:16px; flex:1; }
+    .wave span { width:3px; border-radius:2px; background:var(--dim); opacity:.55; }
+    .wave span.on { background:var(--accent); opacity:1; }
+    .vdur { font-size:11px; min-width:30px; text-align:right; }
+    .arrive { opacity:0; animation:arrive .45s ease forwards; }
+    @keyframes arrive { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+    @media (prefers-reduced-motion: reduce) { .arrive { animation:none; opacity:1; transform:none; } }
   </style>
 </head>
 <body>
@@ -52,7 +74,7 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script type="text/babel">
-    const { useState, useRef } = React;
+    const { useState, useRef, useEffect } = React;
     const DEVICES = ["Oura", "Whoop", "Garmin", "Apple Health"];
     // Instant normalization — same factors as landing/mvp/logic.js + worker/submit.js.
     // Raw device score → one comparable 0-100 Oriya Index, computed on the spot.
@@ -61,6 +83,119 @@
       const [factor, offset] = MODEL[device] || [1.0, 0.0];
       return Math.max(0, Math.min(100, Math.round(raw * factor + offset)));
     };
+
+    // Same event-key shape as try.html's track() so the two dataLayers merge.
+    window.dataLayer = window.dataLayer || [];
+    function track(event, props) {
+      const payload = Object.assign({ event: event, ts: Date.now() }, props || {});
+      window.dataLayer.push(payload);
+      try { if (window.ORIYA_INGEST_URL && navigator.sendBeacon) navigator.sendBeacon(window.ORIYA_INGEST_URL, JSON.stringify(payload)); } catch (e) {}
+    }
+
+    /* Ori's read. Unlike /try (where the index is already baseline-relative and
+       par is the fixed 71), this page has no server baseline — so "your par" is
+       the average of YOUR prior submissions kept in this browser, and the first
+       card gets a welcome line instead of a fabricated gap. Canon holds: over
+       par = beating your own usual; copy is descriptive, never advice. */
+    const HISTORY_KEY = "oriya:mvp-history";
+    const dayKey = () => new Date().toISOString().slice(0, 10);
+    const readHistory = () => {
+      try { const v = JSON.parse(localStorage.getItem(HISTORY_KEY)); return Array.isArray(v) ? v : []; } catch (e) { return []; }
+    };
+    function personalPar() {
+      const past = readHistory().filter((h) => h.day !== dayKey() && typeof h.oriya === "number");
+      if (!past.length) return null;
+      return Math.round(past.reduce((s, h) => s + h.oriya, 0) / past.length);
+    }
+    function logHistory(oriya) {
+      const rest = readHistory().filter((h) => h.day !== dayKey());
+      rest.push({ day: dayKey(), oriya: oriya });
+      // 7-day window — the par lives on the same clock as the board
+      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(rest.slice(-7))); } catch (e) {}
+    }
+
+    function caddyLine(oriya, par, side) {
+      if (par == null) return "First card's on the board — " + oriya + " on the shared scale. One screenshot is a guess at your par; give me three mornings and I'll know your real number better than your ring does. See you tomorrow.";
+      const gap = oriya - par;
+      const founders = side === "Founders", operators = side === "Operators";
+      const device = side === "Oura" || side === "Whoop" ? side : "";
+      if (gap > 0) {
+        if (founders) return "Sitting " + gap + " over your par today. You control the calendar and it shows. Capitalize on the clear air.";
+        if (operators) return gap + " over par. Machine-like discipline through a launch window. The system is clean. Keep executing.";
+        if (device) return gap + " over your par — and your " + device + " knows it. Post it before the board fills up.";
+        return "You're " + gap + " over your par. That's you beating your own usual morning — the number earned it, not the algo. Clear air up there. Bank it and let the board see the gap.";
+      }
+      if (gap < 0) {
+        const n = Math.abs(gap);
+        if (founders) return "You're " + n + " under your par. The schedule is yours, but the crunch is catching up. Soft morning. Protect the baseline.";
+        if (operators) return n + " under par today. Heavy headwind on the operational baseline. The margin is thin. Steady round.";
+        return n + " under your par this morning. Not a bad number — a heavier one than your usual. Headwind on the card today. Soft round, still a round. It's logged; that's the streak.";
+      }
+      if (founders) return "Level with your par. Holding your usual on a full calendar — steady air, keep it.";
+      if (operators) return "Dead level with par. The machine is running exactly at spec. Hold the line.";
+      return "Dead level with your par. No drama, no gift — you posted exactly your usual morning. That's a signal too. Hold the line and log it.";
+    }
+
+    // Static waveform — fixed heights, no audio analysis; the playhead sweep
+    // just tints bars by elapsed fraction.
+    const WAVE = [3, 6, 9, 5, 11, 13, 7, 4, 9, 6, 11, 8, 5, 10, 13, 6, 3, 7, 9, 5, 8, 11, 4, 6];
+
+    function OriMessage({ oriya, par, side }) {
+      const line = caddyLine(oriya, par, side);
+      const team = side === "Operators" ? "operators" : "founders";
+      const [voiceUrl, setVoiceUrl] = useState(null);
+      const [playing, setPlaying] = useState(false);
+      const [dur, setDur] = useState(0);
+      const [at, setAt] = useState(0);
+      const audioRef = useRef(null);
+      const fetched = useRef(false);
+      useEffect(() => {
+        if (fetched.current) return;
+        fetched.current = true;
+        track("caddy_message_shown", { oriya: oriya, team: team, gap: par == null ? null : oriya - par });
+        // One background TTS call per submission; the voice note only mounts on
+        // success — a 503 (key not wired yet) leaves a clean text-only message.
+        fetch("/api/caddy-voice", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: line, team: team }),
+        })
+          .then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
+          .then((b) => { setVoiceUrl(URL.createObjectURL(b)); track("caddy_voice_ready", { team: team }); })
+          .catch((e) => track("caddy_voice_failed", { team: team, status: String(e && e.message || e) }));
+      }, []);
+      const toggle = () => {
+        const a = audioRef.current;
+        if (!a) return;
+        if (a.paused) { a.play(); track("caddy_voice_played", { team: team }); } else { a.pause(); }
+      };
+      const lit = dur > 0 ? Math.floor((at / dur) * WAVE.length) : 0;
+      const fmt = (s) => Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0");
+      return (
+        <div className="arrive" style={{ animationDelay: ".35s" }}>
+          <p className="msg-kicker">Ori left you a read</p>
+          <div className="msg">
+            <div className="msg-head">
+              <span className="avatar">o</span>
+              <span className="sender">Ori · your caddy</span>
+              <span className="vtag">v0.1</span>
+            </div>
+            <p className="msg-body">{line}</p>
+            {voiceUrl && (
+              <div className="vnote arrive">
+                <button type="button" className="vplay" onClick={toggle} aria-label={playing ? "Pause Ori's voice note" : "Play Ori's voice note"}>{playing ? "❚❚" : "▶"}</button>
+                <span className="wave" aria-hidden="true">{WAVE.map((h, i) => <span key={i} className={i < lit ? "on" : ""} style={{ height: h }} />)}</span>
+                <span className="vdur mono dim">{dur ? fmt(playing || at > 0 ? at : dur) : "· · ·"}</span>
+                <audio ref={audioRef} src={voiceUrl} preload="metadata"
+                  onLoadedMetadata={(e) => setDur(isFinite(e.target.duration) ? e.target.duration : 0)}
+                  onTimeUpdate={(e) => setAt(e.target.currentTime)}
+                  onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
+                  onEnded={() => { setPlaying(false); setAt(0); }} />
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
     const CHALLENGES = ["Founders vs Operators", "Marina Run Club", "Ring vs Band", "Open board"];
     // Exact-title map to the /try board details (no entry for Open board on purpose)
     const TRY_ID = { "Founders vs Operators": "founders", "Marina Run Club": "marina", "Ring vs Band": "devicewars" };
@@ -121,13 +256,23 @@
         if (!valid) { setErr(needsSide && !f.side ? "Pick a side before you submit." : "Fill everything in — email, device, score, screenshot."); return; }
         setState("sending"); setErr("");
         const challengeLabel = f.side ? f.challenge + " — " + f.side : f.challenge;
+        // Ori's read rides along so the E1 receipt opens with the exact same
+        // sentence the success card shows — the server can't compute it (par
+        // lives in this browser).
+        const idxNow = oriyaIndex(Number(f.score), f.device);
+        const read = caddyLine(idxNow, personalPar(), f.side);
         try {
           const res = await fetch("/api/manual-submit", {
             method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: f.email, device: f.device, score: Number(f.score), challenge: challengeLabel, code: f.code, image: img }),
+            body: JSON.stringify({ email: f.email, device: f.device, score: Number(f.score), challenge: challengeLabel, code: f.code, image: img, read: read }),
           });
           const out = await res.json();
-          if (out.ok) { setState("done"); return; }
+          if (out.ok) {
+            track("submit_success", { device: f.device, score: Number(f.score), oriya: idxNow, challenge: f.challenge, side: f.side });
+            logHistory(idxNow);
+            setState("done");
+            return;
+          }
           if (out.code === "config") { setState("fallback"); location.href = mailDraft(f); return; }
           setErr("That didn't go through (" + (out.code || res.status) + "). Try again, or email it instead below.");
           setState("form");
@@ -137,21 +282,26 @@
       if (state === "done") {
         // Loop closure (panel, 2026-07-11): peak-intent moment gets a live tap
         // back to the exact board they entered — never "go wait in your inbox".
+        // Sequence (panel, 2026-07-17): number instant → Ori's message → CTA.
         const back = params.get("back");
+        const idx = oriyaIndex(Number(f.score), f.device);
+        const par = personalPar();   // excludes today's entry — null on first card
+        const gap = par == null ? 0 : idx - par;
         return (
           <div className="card success">
             <h2>You're in.</h2>
             <p className="sm" style={{ marginTop: 10 }}><b>{f.device} {f.score}</b> normalized onto the shared 0–100 scale, instantly:</p>
             <div style={{ margin: "16px 0 2px", textAlign: "center" }}>
-              <span className="mono" style={{ fontSize: 56, fontWeight: 700, lineHeight: 1, color: "var(--accent)" }}>{oriyaIndex(Number(f.score), f.device)}</span>
-              <span className="xs dim" style={{ display: "block", marginTop: 8 }}>your Oriya Index — one comparable 0–100 scale across every Oura, Whoop, Garmin &amp; Apple Watch on the board</span>
-              <span className="xs dim" style={{ display: "block", marginTop: 6, opacity: 0.72 }}>Provisional — a single-screenshot read. It sharpens onto your own baseline as you log ~14 days.</span>
+              <span className="mono" style={{ fontSize: 56, fontWeight: 700, lineHeight: 1, color: "var(--accent)" }}>{idx}</span>
+              <span className="xs dim" style={{ display: "block", marginTop: 8 }}>Provisional 0–100 read — one scale across every Oura, Whoop, Garmin &amp; Apple Watch. Three mornings in, it reads against your own par.</span>
             </div>
-            <a className="btn" style={{ display: "block", textAlign: "center", marginTop: 16 }}
+            <OriMessage oriya={idx} par={par} side={f.side} />
+            <a className="btn arrive" style={{ display: "block", textAlign: "center", marginTop: 16, animationDelay: ".7s" }}
+              onClick={() => track("board_return_clicked", { challenge: f.challenge, back: !!back })}
               href={back ? "../try.html?challenge=" + encodeURIComponent(back) : "index.html"}>
-              <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: 99, background: "var(--accent)", marginRight: 8, verticalAlign: "middle" }}></span>Watch your board move →
+              <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: 99, background: "var(--accent)", marginRight: 8, verticalAlign: "middle" }}></span>{gap > 0 ? "See where " + gap + " over lands you →" : "Watch your board move →"}
             </a>
-            <p className="xs dim" style={{ marginTop: 12 }}>The only human step is a quick check that your screenshot is a real device capture — it keeps the board honest and never changes your number. Log the same screenshot tomorrow to keep your streak.</p>
+            <p className="xs dim arrive" style={{ marginTop: 12, animationDelay: ".7s" }}>The only human step is a quick check that your screenshot is a real device capture — it never changes your number. Same time tomorrow keeps the streak.</p>
           </div>
         );
       }
@@ -205,9 +355,9 @@
             <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => pick(e.target.files[0])} />
           </div>
           {err && <p className="err">{err}</p>}
-          <button className="btn" disabled={state === "sending"} onClick={submit}>{state === "sending" ? "Sending…" : "Get my Oriya Index →"}</button>
+          <button className="btn" disabled={state === "sending"} onClick={submit}>{state === "sending" ? "Ori's reading your morning…" : "Get my Oriya Index →"}</button>
           {state === "fallback" && <p className="xs dim" style={{ marginTop: 10 }}>We opened an email draft instead — attach your screenshot and hit send. Same result, one extra tap.</p>}
-          <p className="xs dim" style={{ marginTop: 12 }}>Your Oriya Index is calculated the instant you submit — a provisional 0–100 read that sharpens onto your own baseline as you log ~14 days. We only check your screenshot is a real device capture; that keeps the board honest and never changes your number.</p>
+          <p className="xs dim" style={{ marginTop: 12 }}>Your Oriya Index is calculated the instant you submit — a provisional 0–100 read that locks onto your own par within a few mornings. We only check your screenshot is a real device capture; that keeps the board honest and never changes your number.</p>
         </div>
       );
     }
