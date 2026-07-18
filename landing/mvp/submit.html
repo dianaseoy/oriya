@@ -115,10 +115,17 @@
     }
 
     function caddyLine(oriya, par, side) {
-      if (par == null) return "First card's on the board — " + oriya + " on the shared scale. One screenshot is a guess at your par; give me three mornings and I'll know your real number better than your ring does. See you tomorrow.";
-      const gap = oriya - par;
       const founders = side === "Founders", operators = side === "Operators";
       const device = side === "Oura" || side === "Whoop" ? side : "";
+      // First card: warm welcome, side-flavored, never a verdict — the old
+      // "guess at your par / better than your ring" line read cold and cocky.
+      if (par == null) {
+        if (founders) return "Welcome in — first card reads " + oriya + ", Founders' side. Day one has no par: nothing to beat yet, just a starting point that's all yours. Each morning from here teaches me what a good day looks like for you. Your first real read is waiting tomorrow.";
+        if (operators) return "Welcome in — first card reads " + oriya + ", Operators' side. No par on day one — this number is a starting point, not a verdict. Give me a few mornings and I'll learn your rhythm. Your first real read is waiting tomorrow.";
+        if (device) return "First card down — " + oriya + ", straight off your " + device + ". No par yet: yours comes from your own mornings, nobody else's. Log tomorrow and the picture starts to sharpen. Good to have you on the board.";
+        return "Welcome to the board — your first card reads " + oriya + ". Day one has no par: this number is a starting point, not a verdict. Every morning from here teaches me what a good day looks like for you. Your first real read lands tomorrow.";
+      }
+      const gap = oriya - par;
       if (gap > 0) {
         if (founders) return "Sitting " + gap + " over your par today. You control the calendar and it shows. Capitalize on the clear air.";
         if (operators) return gap + " over par. Machine-like discipline through a launch window. The system is clean. Keep executing.";
