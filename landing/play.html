@@ -24,7 +24,14 @@
        baseline-relative (~90-day window, ~14 days before it's honest, labelled
        provisional until then), Par 71 = a typical morning on the shared scale,
        normalization is instant math — the only human step is the real-capture
-       check. Ori the companion is sold as IN BUILD, never as shipped. -->
+       check. Ori the companion is sold as IN BUILD, never as shipped.
+       2026-07-17 scan-first cut: body copy halved — deep logic lives on
+       /science + /manifesto and in the Ask Ori chips, not on this page. Step 4
+       gained a tap-to-call mockup (localStorage straw call, like the payout
+       poll). "Wager" is deliberately NOT used anywhere — the cost answer says
+       "not a wager" and the header can't contradict it. Step 5 = two contrast
+       cards: board/Olympics seed (jade) vs unsigned sponsor pot (amber).
+       Olympics seeding is earned (top your board), never "automatic". -->
   <style>
     :root { --bg:#0B0C0E; --panel:#101114; --line:#23252B; --text:#E6E7EA; --dim:#8A8F98; --accent:#7FB79E; --amber:#D7A25C; --void:#0B0C0E; }
     * { box-sizing:border-box; margin:0; }
@@ -56,6 +63,21 @@
     .pill { flex:1; background:#0D0E11; border:1px solid var(--line); color:var(--text); border-radius:10px; padding:10px 8px; font:inherit; font-size:13px; cursor:pointer; transition:all .2s ease; }
     .pill:hover { border-color:#3A3D45; }
     .pill.on { border-color:var(--accent); background:rgba(127,183,158,.08); }
+    /* step-5 contrast cards: the real prize (jade) vs the unsigned pot (amber) */
+    .prize { display:flex; flex-direction:column; gap:10px; margin-top:10px; }
+    .pcard { border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+    .pcard.jade { border-color:rgba(127,183,158,.4); background:rgba(127,183,158,.06); }
+    .pcard.amber { border-color:rgba(215,162,92,.4); background:rgba(215,162,92,.05); }
+    .pcard .pk { font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:600; margin:0; }
+    .pcard.jade .pk { color:var(--accent); }
+    .pcard.amber .pk { color:var(--amber); }
+    .pcard p { margin-top:6px; }
+    /* founding perks grid */
+    .perks { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+    .perk { background:#0D0E11; border:1px solid var(--line); border-radius:10px; padding:11px 12px; }
+    .perk .ic { font-size:16px; }
+    .perk b { display:block; font-size:12.5px; margin-top:6px; letter-spacing:-0.01em; }
+    .perk p { font-size:11.5px; color:var(--dim); margin-top:3px; line-height:1.45; }
     .cta { display:inline-block; position:relative; overflow:hidden; background:var(--accent); color:var(--void); border-radius:10px; padding:12px 18px; font-weight:600; text-decoration:none; text-align:center; transition:all .2s ease; }
     .cta:hover { filter:brightness(1.08); }
     .cta::after { content:""; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(110deg, transparent 35%, rgba(255,255,255,.22) 50%, transparent 65%); background-size:220% 100%; background-position:200% 0; opacity:0; transition:opacity .2s ease; pointer-events:none; }
@@ -102,81 +124,97 @@
     <a class="xs mono dim" href="index.html" style="text-decoration:none">← oriya.app</a>
     <p class="kicker" style="margin-top:20px">Oriya · Founders vs Operators · founding season</p>
     <h1>You said yes.<br>Here's the whole game.</h1>
-    <p class="sm dim" style="margin-top:8px">Five steps, nothing to install. Read this once — you know everything a player knows.</p>
-    <p class="sm" style="margin-top:16px; padding:11px 13px; border:1px solid rgba(127,183,158,.35); border-radius:10px; background:rgba(127,183,158,.07);"><b>Season opens Saturday, Jul 18.</b> <span class="dim">Scores are accepted from Friday, Jul 17 — drop your first morning early and you're on the board the moment it goes live.</span></p>
+    <p class="sm dim" style="margin-top:8px">Five steps. Nothing to install.</p>
+    <p class="sm" style="margin-top:16px; padding:11px 13px; border:1px solid rgba(127,183,158,.35); border-radius:10px; background:rgba(127,183,158,.07);"><b>Season opens Saturday, Jul 18.</b> <span class="dim">Scores accepted from Fri Jul 17 — drop one early, you're on the board at the horn.</span></p>
 
     <div class="steps" id="blueprint">
       <div class="step">
         <span class="stepn">1</span>
         <h2>Pick your side</h2>
-        <p><b>Founders or Operators.</b> No fitness test, no minimum score — because this board never ranks raw numbers. Your score is read against <b>your own baseline</b>, and <b>Par 71</b> is simply where a typical morning lands on the shared scale. Beat your usual and you're over par — whoever you are, whatever you wear.</p>
+        <p><b>Founders or Operators.</b> No fitness test — this board never ranks raw numbers. Beat <b>your own usual morning</b> and you're over <b>Par 71</b>, whoever you are, whatever you wear.</p>
         <div class="acc race">
           <div class="row"><span class="name">Founders</span><div class="track"><div class="fill" style="width:73%"></div></div><span class="val mono">73.0</span></div>
           <div class="row"><span class="name">Operators<span class="lead-tag">LEADS</span></span><div class="track"><div class="fill hot" style="width:73.3%"></div></div><span class="val mono">73.3</span></div>
-          <p class="xs dim" style="margin-top:2px">Founding-season sample board — fills with real athletes as they enter.</p>
+          <p class="xs dim" style="margin-top:2px">Sample board — fills with real athletes as they enter.</p>
         </div>
       </div>
 
       <div class="step">
         <span class="stepn">2</span>
         <h2>The morning drop</h2>
-        <p>Wake up → screenshot your recovery screen (<b>Oura, Whoop, Garmin, Apple Watch</b>) → send. <b>~60 seconds.</b></p>
-        <p class="xs dim" style="margin-top:6px">Anon mode: send from your work email — the board shows only ◒ anon + @company.com.</p>
+        <p>Wake → screenshot your recovery screen (<b>Oura, Whoop, Garmin, Apple Watch</b>) → send. <b>~60 seconds.</b></p>
+        <p class="xs dim" style="margin-top:6px">Anon mode: send from your work email — the board shows ◒ anon + @company.com.</p>
       </div>
 
       <div class="step">
         <span class="stepn">3</span>
         <h2>Get your Oriya Index</h2>
-        <p>Your raw score converts the instant it's read — <b>Whoop 80 → Index 73</b> — same math for every device. The Index isn't your raw number: it's where this morning sits in <b>your own ~90-day range</b> (floor → par → ceiling), so your device's quirks cancel out and every body competes fairly. A person only checks that the screenshot is a real capture — it posts within the hour and never changes your number.</p>
-        <p class="xs dim" style="margin-top:6px">First ~14 days, a clearly-labelled per-device estimate stands in while your baseline builds. Full math + published factors: <a href="science.html">the science</a> · why we refuse raw-number boards: <a href="manifesto.html">the manifesto</a>.</p>
+        <p><b>Whoop 80 → Index 73</b> — instant, same math for every device. The Index reads this morning against <b>your own ~90-day range</b>, so device quirks and genetics cancel out.</p>
+        <p class="xs dim" style="margin-top:6px">First ~14 days: a labelled estimate while your baseline builds. A human only checks the shot is real — never your number. <a href="science.html">Full math</a> · <a href="manifesto.html">the why</a>.</p>
       </div>
 
       <div class="step">
         <span class="stepn">4</span>
-        <h2>Watch the board — or call it</h2>
-        <p>Your side's average moves every morning. Not competing yet? <b>Call the winner</b> — a free prediction, no buy-in.</p>
+        <h2>Watch it — or call it (free)</h2>
+        <p>Your side's average moves every morning. Not competing yet? <b>Tap to call the winner</b> — zero buy-in, pure bragging rights.</p>
+        <div class="acc">
+          <p class="xs mono" style="letter-spacing:.12em; color:var(--dim)">WHO TAKES THE WEEK?</p>
+          <div class="pill-row" id="callPills" style="margin-top:8px">
+            <button class="pill" data-v="founders">Founders</button>
+            <button class="pill" data-v="operators">Operators</button>
+          </div>
+          <p class="xs dim" id="callNote" style="margin-top:6px">One tap locks your call on this device.</p>
+        </div>
       </div>
 
       <div class="step" style="padding-bottom:6px" id="step5">
         <span class="stepn">5</span>
-        <h2>Win — the board is the prize (for now)</h2>
-        <p>No sponsor has signed yet, so there's no cash pot to claim — <b>the win is topping the board.</b> If a sponsor backs this challenge, the winning side votes how the pot splits:</p>
-        <div class="pill-row" id="payoutPills">
-          <button class="pill" data-v="dinner">🍽 Team dinner</button>
-          <button class="pill" data-v="charity">🎗 Charity donation</button>
+        <h2>Win — the board is the prize</h2>
+        <div class="prize">
+          <div class="pcard jade">
+            <p class="pk">🏁 The board — live now</p>
+            <p><b>Top your 7-day board</b> → your seed in the <b>Oriya Olympics</b>, the SF bracket with a <b>$2,000+</b> prize pool.</p>
+            <p class="xs dim" style="margin-top:5px">First bracket forms the week the founding boards fill.</p>
+          </div>
+          <div class="pcard amber">
+            <p class="pk">🤝 The sponsor pot — unsigned</p>
+            <p>No sponsor yet — no cash pot today. If one signs, <b>the winning side votes the split:</b></p>
+            <div class="pill-row" id="payoutPills">
+              <button class="pill" data-v="dinner">🍽 Team dinner</button>
+              <button class="pill" data-v="charity">🎗 Charity donation</button>
+            </div>
+            <p class="xs dim" id="pillNote" style="margin-top:6px">Straw poll on this device — the binding vote belongs to the winning side.</p>
+          </div>
         </div>
-        <p class="xs dim" id="pillNote" style="margin-top:6px">Straw poll on this device, for if a pot opens — the binding vote would belong to the winning side.</p>
-        <p style="margin-top:12px">🏅 Top your 7-day board and you're seeded for the <b>Oriya Olympics</b> — the SF bracket carrying a prize pool of at least $2,000 for the season's highest sustained Index. No bracket has run yet: the first one forms the week the founding boards fill.</p>
       </div>
     </div>
 
     <div class="acc" id="founding" style="margin-top:8px">
-      <p class="kicker" style="font-size:10px">Season 1 never reruns — what founding athletes hold</p>
-      <p style="font-size:13px; margin-top:9px">🏛 <b>The FOUNDING 50 stamp</b> <span class="dim">— permanent on your Body Passport. Later cohorts can outscore you; nobody can out-early you.</span></p>
-      <p style="font-size:13px; margin-top:7px">🏅 <b>An Oriya Olympics seed</b> <span class="dim">— top your board and you're in the running for the bracket carrying a prize pool of at least $2,000.</span></p>
-      <p style="font-size:13px; margin-top:7px">📐 <b>A hand in the calibration</b> <span class="dim">— wear two devices and your mornings feed the published cross-device mapping, credited if you want it.</span></p>
-      <p style="font-size:13px; margin-top:7px">🧭 <b>First run of Ori</b> <span class="dim">— the recovery companion we're building around this board (the chat bubble in the corner is its seed). Founding athletes get it first — and a say in what it becomes.</span></p>
+      <p class="kicker" style="font-size:10px">Founding perks — Season 1 never reruns</p>
+      <div class="perks">
+        <div class="perk"><span class="ic">🏛</span><b>Founding 50 stamp</b><p>Permanent on your Body Passport. Nobody can out-early you.</p></div>
+        <div class="perk"><span class="ic">🏅</span><b>Olympics seed</b><p>Top your board → into the $2,000+ SF bracket.</p></div>
+        <div class="perk"><span class="ic">📐</span><b>Calibration credit</b><p>Wear two devices — get credited in the published math.</p></div>
+        <div class="perk"><span class="ic">🧭</span><b>First run of Ori</b><p>The recovery companion in build — you get it first, with a say.</p></div>
+      </div>
     </div>
 
     <div class="foot">
       <a class="cta" href="mvp/submit.html?challenge=Founders%20vs%20Operators&amp;back=founders">Submit this morning's proof →</a>
       <a class="cta ghost" href="/play/foundersvsoperators">Pick your side on the board →</a>
-      <p class="xs dim" style="text-align:center">Every athlete gets a live, shareable Body Passport — <a href="mvp/passport.html?u=mayaruns">see a sample →</a></p>
+      <p class="xs dim" style="text-align:center">Your live, shareable Body Passport — <a href="mvp/passport.html?u=mayaruns">see a sample →</a></p>
       <p class="xs dim" style="text-align:center"><a href="science.html">The science</a> · <a href="manifesto.html">the manifesto</a> · <a href="index.html">oriya.app</a></p>
     </div>
 
     <div class="qa">
       <h3>Quick answers</h3>
-      <div><b>Connect my device?</b> <span>No — a screenshot is enough. Oura owners get optional live read-only sync.</span></div>
-      <div><b>Miss a morning?</b> <span>Counts 0 that day. You're never removed from the board.</span></div>
-      <div><b>Bad score?</b> <span>A logged red morning outranks a forgotten green one. The board scores the log, not the flex.</span></div>
-      <div><b>Why not just rank raw scores?</b> <span>Raw boards crown genetics and the most generous algorithm. Here your rank is the gap you hold to Par 71, read against your own baseline — <a href="science.html">the math</a> · <a href="manifesto.html">the why</a>.</span></div>
-      <div><b>Who sees my data?</b> <span>Name/handle, device, adjusted score. Anon mode shows only your company domain.</span></div>
-      <div><b>Cost?</b> <span>Free either way. If a sponsor backs a pot, backers fund it, athletes win it, backers are never paid out. Payment only via verified Airwallex links from team@oriya.app. It's <b style="display:inline;color:var(--text)">not a wager</b>.</span></div>
-      <div><b>Getting paid?</b> <span>No sponsor on the day-to-day board yet, so nothing to pay out there. The Oriya Olympics bracket carries a guaranteed prize pool of at least $2,000 for the season's highest sustained Index.</span></div>
+      <div><b>Miss a morning?</b> <span>Counts 0 — you're never removed.</span></div>
+      <div><b>Bad score?</b> <span>A logged red morning outranks a forgotten green one.</span></div>
+      <div><b>Who sees my data?</b> <span>Name/handle, device, adjusted score — or anon mode (company domain only).</span></div>
+      <div><b>Cost?</b> <span>Free. If a pot opens, backers fund it, athletes win it — it's <b style="display:inline;color:var(--text)">not a wager</b>. Payment only via verified Airwallex links from team@oriya.app.</span></div>
     </div>
 
-    <p class="fine">Founding season — boards show clearly-labeled sample athletes until each side fills with real entries. Pots open once a board holds real, verified athletes. Built in the open by a solo founder.</p>
+    <p class="fine">Sample athletes are clearly labeled until boards fill. Pots open only on boards holding real, verified athletes. Built in the open by a solo founder.</p>
   </div>
 
   <button class="ori-fab" id="oriFab" aria-label="Ask Ori">O</button>
@@ -197,24 +235,29 @@
         document.querySelectorAll(".step").forEach(function (s) { io.observe(s); });
       }
 
-      /* payout straw poll */
-      var KEY = "oriya:play:payoutVote";
-      var pills = document.querySelectorAll("#payoutPills .pill");
-      function paint(v) {
-        pills.forEach(function (p) { p.classList.toggle("on", p.getAttribute("data-v") === v); });
-        if (v) document.getElementById("pillNote").textContent =
-          "Noted on this device ✓ — the binding vote belongs to the winning side.";
-      }
-      var saved = null;
-      try { saved = localStorage.getItem(KEY); } catch (e) {}
-      if (saved) paint(saved);
-      pills.forEach(function (p) {
-        p.addEventListener("click", function () {
-          var v = p.getAttribute("data-v");
-          try { localStorage.setItem(KEY, v); } catch (e) {}
-          paint(v);
+      /* straw polls — call-the-winner (step 4) + payout split (step 5).
+         Device-local only; the binding versions live with the board. */
+      function poll(rowId, noteId, key, lockedText) {
+        var pills = document.querySelectorAll("#" + rowId + " .pill");
+        function paint(v) {
+          pills.forEach(function (p) { p.classList.toggle("on", p.getAttribute("data-v") === v); });
+          if (v) document.getElementById(noteId).textContent = lockedText;
+        }
+        var saved = null;
+        try { saved = localStorage.getItem(key); } catch (e) {}
+        if (saved) paint(saved);
+        pills.forEach(function (p) {
+          p.addEventListener("click", function () {
+            var v = p.getAttribute("data-v");
+            try { localStorage.setItem(key, v); } catch (e) {}
+            paint(v);
+          });
         });
-      });
+      }
+      poll("callPills", "callNote", "oriya:play:callVote",
+        "Call locked ✓ — pure bragging rights. Change it anytime.");
+      poll("payoutPills", "pillNote", "oriya:play:payoutVote",
+        "Noted on this device ✓ — the binding vote belongs to the winning side.");
 
       /* mini Ask Ori — canned honest answers, zero typing. Copy mirrors the
          page; the "no sponsor yet / not a wager / Oura-only live sync" rails hold. */

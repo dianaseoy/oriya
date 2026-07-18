@@ -10,7 +10,9 @@
        ?code= / ?u=<handle> make any athlete's card shareable (the worker maps
        /p/<username> here), and a shared link exposes nothing the public board
        doesn't already show. The QR points at the /p/ URL: a screenshot can go
-       stale or be doctored — this link renders live from the board. -->
+       stale or be doctored — this link renders live from the board.
+       Empty state (no code on device, no ?u=) falls back to @mayaruns's card,
+       labelled as a sample — never a blank page. -->
   <link rel="stylesheet" href="ui.css">
 </head>
 <body>
@@ -160,31 +162,35 @@
       const myCode = STORE.loadMe();
       const params = new URLSearchParams(location.search);
       const raw = params.get("u") || params.get("code") || myCode;
-      const me = raw ? board.participants.find((p) => {
+      const found = raw ? board.participants.find((p) => {
         const h = String(raw).replace(/^@/, "").toLowerCase();
         return p.code === MVP.cleanCode(raw) || (p.handle || "").replace("@", "").toLowerCase() === h;
       }) : null;
-      const own = !!me && me.code === myCode;
-      const row = me ? MVP.rankBoard(board.participants, DAY).find((r) => r.p.code === me.code) : null;
-      const dev = me ? (me.device === "apple" ? "Apple Health" : MVP.deviceTag(me.device)) : "";
+      // No passport here yet → show Maya's sample card instead of a dead end,
+      // labelled as a sample so nobody mistakes it for their own.
+      const demo = !found;
+      const me = found || board.participants.find((p) => p.handle === "@mayaruns") || board.participants[0];
+      const own = !demo && me.code === myCode;
+      const row = MVP.rankBoard(board.participants, DAY).find((r) => r.p.code === me.code);
+      const dev = me.device === "apple" ? "Apple Health" : MVP.deviceTag(me.device);
       return (
         <React.Fragment>
           <span className="kicker">Oriya · passport</span>
-          <h1>{own || !me ? "Your seven mornings." : me.name.split(" ")[0] + "'s seven mornings."}</h1>
+          <h1>{own ? "Your seven mornings." : me.name.split(" ")[0] + "'s seven mornings."}</h1>
           <p className="xs dim" style={{ marginTop: 6 }}>{board.season}{board.sample ? " · sample data" : ""}</p>
           <SubNavigation active="passport" />
-          {!me && (
+          {demo && (
             <div className="card">
-              <p className="sm">No passport on this device yet.</p>
-              <p className="xs dim" style={{ marginTop: 6 }}>Enter your invite code on the <a href="index.html" style={{ color: "var(--accent)" }}>board</a> — your passport builds itself from the scores you send.</p>
+              <p className="sm">No passport on this device yet — <b>this is what yours will look like.</b></p>
+              <p className="xs dim" style={{ marginTop: 6 }}>Below is <b style={{ color: "var(--text)" }}>Maya's sample card</b>. Submit your morning screenshots and your own Body Passport builds itself the same way — index, rank, streak and stamps, one morning at a time.</p>
             </div>
           )}
-          {me && <ViralPassportCard board={board} me={me} row={row} own={own} />}
-          {me && <Ledger board={board} me={me} row={row} />}
-          {me && own && !row.loggedToday && (
+          <ViralPassportCard board={board} me={me} row={row} own={own} />
+          <Ledger board={board} me={me} row={row} />
+          {own && !row.loggedToday && (
             <a className="btn" style={{ marginTop: 14 }} href={"submit.html?code=" + encodeURIComponent(me.code) + "&device=" + encodeURIComponent(dev)}>Send today's score →</a>
           )}
-          {me && !own && (
+          {!own && (
             <div className="card">
               <p className="sm">Want one of these?</p>
               <p className="xs dim" style={{ marginTop: 6 }}>Every athlete is invited by hand during the founding sprint. Got a code? <a href="index.html" style={{ color: "var(--accent)" }}>Claim your slot</a>. No code? Email <a href="mailto:team@oriya.app" style={{ color: "var(--accent)" }}>team@oriya.app</a>.</p>
