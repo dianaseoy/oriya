@@ -10,9 +10,11 @@
        team@oriya.app; the founder normalizes by hand. If the endpoint isn't
        configured yet it falls back to a prefilled mail draft. No OCR, no AI,
        no accounts — premium chrome over a deliberately manual workflow.
-       Success moment = a message from Ori (deterministic caddy read + optional
-       tap-to-play voice note via /api/caddy-voice; the note only mounts if TTS
-       succeeds, so a 503 leaves a clean text-only message). -->
+       Success moment = a message from Ori (deterministic caddy read + tap-to-
+       play voice note). Voice is PRE-GENERATED static MP3s under /audio/caddy/
+       (number phrase + body chained via Web Audio; the Index digit pulses while
+       the number is spoken); live /api/caddy-voice is only the fallback. If
+       neither path works the message stays clean text-only. -->
   <style>
     :root { --bg:#0B0C0E; --panel:#101114; --line:#23252B; --text:#E6E7EA; --dim:#8A8F98; --accent:#7FB79E; --amber:#D7A25C; }
     * { box-sizing:border-box; margin:0; }
@@ -63,6 +65,13 @@
     .wave span { width:3px; border-radius:2px; background:var(--dim); opacity:.55; }
     .wave span.on { background:var(--accent); opacity:1; }
     .vdur { font-size:11px; min-width:30px; text-align:right; }
+    .vhint { color:var(--accent); letter-spacing:.06em; text-transform:uppercase; font-size:10px; flex:none; }
+    /* the Index digit lights up while the voice is saying the number */
+    #bigIdx { display:inline-block; transition:text-shadow .3s ease, transform .3s ease; }
+    #bigIdx.speaking { text-shadow:0 0 26px rgba(127,183,158,.85); transform:scale(1.05); }
+    .vnote.fresh { animation:noteglow 1.8s ease-in-out infinite; }
+    @keyframes noteglow { 0%,100% { box-shadow:0 0 0 0 rgba(127,183,158,0); } 50% { box-shadow:0 0 0 5px rgba(127,183,158,.13); } }
+    @media (prefers-reduced-motion: reduce) { .vnote.fresh { animation:none; } #bigIdx.speaking { transform:none; } }
     .arrive { opacity:0; animation:arrive .45s ease forwards; }
     @keyframes arrive { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
     @media (prefers-reduced-motion: reduce) { .arrive { animation:none; opacity:1; transform:none; } }
@@ -114,66 +123,169 @@
       try { localStorage.setItem(HISTORY_KEY, JSON.stringify(rest.slice(-7))); } catch (e) {}
     }
 
-    function caddyLine(oriya, par, side) {
+    /* Caddy read = two spoken parts: the number phrase ("Index 84." / "4 over
+       your par today."), a beat, then the read. Every part exists as a
+       pre-generated MP3 under /audio/caddy/<voice>/ (Adrian voices Founders +
+       default, Selene voices Operators) — generated while Fish's free window
+       was open; static files cost nothing forever. The display text, the voice,
+       and the E1 email all use the exact same words, so CADDY_BODY must stay
+       byte-identical to the generation manifest (scratchpad gen_audio.py →
+       committed audio). Gaps beyond ±30 fall back to live TTS. First card:
+       warm welcome, side-flavored, never a verdict. Copy stays descriptive,
+       never advice. */
+    const CADDY_BODY = {
+      "fc-founders": "Welcome in — first card on the board, Founders' side. Day one has no par: nothing to beat yet, just a starting point that's all yours. Each morning from here teaches me what a good day looks like for you. Your first real read is waiting tomorrow.",
+      "fc-operators": "Welcome in — first card on the board, Operators' side. No par on day one — this number is a starting point, not a verdict. Give me a few mornings and I'll learn your rhythm. Your first real read is waiting tomorrow.",
+      "fc-oura": "First card down, straight off your Oura. No par yet: yours comes from your own mornings, nobody else's. Log tomorrow and the picture starts to sharpen. Good to have you on the board.",
+      "fc-whoop": "First card down, straight off your Whoop. No par yet: yours comes from your own mornings, nobody else's. Log tomorrow and the picture starts to sharpen. Good to have you on the board.",
+      "fc-generic": "Welcome to the board — that's your first card. Day one has no par: this number is a starting point, not a verdict. Every morning from here teaches me what a good day looks like for you. Your first real read lands tomorrow.",
+      "ovb-founders": "You control the calendar and it shows. Clear air up there — capitalize on it.",
+      "ovb-operators": "Discipline through a launch window — the system is running clean. Keep executing.",
+      "ovb-oura": "Your Oura knows it. Post it before the board fills up.",
+      "ovb-whoop": "Your Whoop knows it. Post it before the board fills up.",
+      "ovb-generic": "That's you beating your own usual morning — the number earned it. Clear air up there; let the board see the gap.",
+      "unb-founders": "The schedule is yours, but the crunch is catching up. Soft morning — protect the baseline.",
+      "unb-operators": "Headwind on the operational baseline this morning. The margin is thin — steady round.",
+      "unb-generic": "Not a bad number — a heavier one than your usual. Soft round, still a round. It's logged, and that's the streak.",
+      "lvb-founders": "Holding your usual on a full calendar — steady air. Keep it.",
+      "lvb-operators": "Running exactly at spec. Hold the line.",
+      "lvb-generic": "No drama, no gift — you posted exactly your usual morning. That's a signal too. Hold the line and log it.",
+    };
+
+    function caddyParts(oriya, par, side) {
       const founders = side === "Founders", operators = side === "Operators";
       const device = side === "Oura" || side === "Whoop" ? side : "";
-      // First card: warm welcome, side-flavored, never a verdict — the old
-      // "guess at your par / better than your ring" line read cold and cocky.
+      const v = operators ? "s" : "a";
+      const mk = (numText, numKey, bodyKey) => ({
+        text: numText + " " + CADDY_BODY[bodyKey],
+        segs: numKey ? ["/audio/caddy/" + v + "/" + numKey + ".mp3", "/audio/caddy/" + v + "/" + bodyKey + ".mp3"] : null,
+      });
       if (par == null) {
-        if (founders) return "Welcome in — first card reads " + oriya + ", Founders' side. Day one has no par: nothing to beat yet, just a starting point that's all yours. Each morning from here teaches me what a good day looks like for you. Your first real read is waiting tomorrow.";
-        if (operators) return "Welcome in — first card reads " + oriya + ", Operators' side. No par on day one — this number is a starting point, not a verdict. Give me a few mornings and I'll learn your rhythm. Your first real read is waiting tomorrow.";
-        if (device) return "First card down — " + oriya + ", straight off your " + device + ". No par yet: yours comes from your own mornings, nobody else's. Log tomorrow and the picture starts to sharpen. Good to have you on the board.";
-        return "Welcome to the board — your first card reads " + oriya + ". Day one has no par: this number is a starting point, not a verdict. Every morning from here teaches me what a good day looks like for you. Your first real read lands tomorrow.";
+        const numText = "Index " + oriya + ".", numKey = "ix-" + oriya;
+        if (founders) return mk(numText, numKey, "fc-founders");
+        if (operators) return mk(numText, numKey, "fc-operators");
+        if (device) return mk(numText, numKey, device === "Oura" ? "fc-oura" : "fc-whoop");
+        return mk(numText, numKey, "fc-generic");
       }
       const gap = oriya - par;
       if (gap > 0) {
-        if (founders) return "Sitting " + gap + " over your par today. You control the calendar and it shows. Capitalize on the clear air.";
-        if (operators) return gap + " over par. Machine-like discipline through a launch window. The system is clean. Keep executing.";
-        if (device) return gap + " over your par — and your " + device + " knows it. Post it before the board fills up.";
-        return "You're " + gap + " over your par. That's you beating your own usual morning — the number earned it, not the algo. Clear air up there. Bank it and let the board see the gap.";
+        const numText = gap + " over your par today.", numKey = gap <= 30 ? "ov-" + gap : null;
+        if (founders) return mk(numText, numKey, "ovb-founders");
+        if (operators) return mk(numText, numKey, "ovb-operators");
+        if (device) return mk(numText, numKey, device === "Oura" ? "ovb-oura" : "ovb-whoop");
+        return mk(numText, numKey, "ovb-generic");
       }
       if (gap < 0) {
         const n = Math.abs(gap);
-        if (founders) return "You're " + n + " under your par. The schedule is yours, but the crunch is catching up. Soft morning. Protect the baseline.";
-        if (operators) return n + " under par today. Heavy headwind on the operational baseline. The margin is thin. Steady round.";
-        return n + " under your par this morning. Not a bad number — a heavier one than your usual. Headwind on the card today. Soft round, still a round. It's logged; that's the streak.";
+        const numText = n + " under your par today.", numKey = n <= 30 ? "un-" + n : null;
+        if (founders) return mk(numText, numKey, "unb-founders");
+        if (operators) return mk(numText, numKey, "unb-operators");
+        return mk(numText, numKey, "unb-generic");
       }
-      if (founders) return "Level with your par. Holding your usual on a full calendar — steady air, keep it.";
-      if (operators) return "Dead level with par. The machine is running exactly at spec. Hold the line.";
-      return "Dead level with your par. No drama, no gift — you posted exactly your usual morning. That's a signal too. Hold the line and log it.";
+      const numText = "Dead level with your par today.";
+      if (founders) return mk(numText, "lv", "lvb-founders");
+      if (operators) return mk(numText, "lv", "lvb-operators");
+      return mk(numText, "lv", "lvb-generic");
     }
+    const caddyLine = (oriya, par, side) => caddyParts(oriya, par, side).text;
 
     // Static waveform — fixed heights, no audio analysis; the playhead sweep
     // just tints bars by elapsed fraction.
     const WAVE = [3, 6, 9, 5, 11, 13, 7, 4, 9, 6, 11, 8, 5, 10, 13, 6, 3, 7, 9, 5, 8, 11, 4, 6];
 
+    /* Playback: the pre-generated pair plays through Web Audio — number phrase,
+       a 0.4s beat, then the read — and the big Index digit pulses exactly while
+       the number is being spoken (the UI reacting to the voice is the moment).
+       If the static files aren't there (or the gap is out of range) it falls
+       back to one live /api/caddy-voice call, same as before. */
+    const SEG_GAP = 0.4;
+
     function OriMessage({ oriya, par, side }) {
-      const line = caddyLine(oriya, par, side);
+      const parts = caddyParts(oriya, par, side);
+      const line = parts.text;
       const team = side === "Operators" ? "operators" : "founders";
-      const [voiceUrl, setVoiceUrl] = useState(null);
+      const [ready, setReady] = useState(false);      // pre-gen path decoded
+      const [voiceUrl, setVoiceUrl] = useState(null); // live-TTS fallback
       const [playing, setPlaying] = useState(false);
+      const [hasPlayed, setHasPlayed] = useState(false);
       const [dur, setDur] = useState(0);
       const [at, setAt] = useState(0);
       const audioRef = useRef(null);
+      const eng = useRef(null);   // { ctx, bufs, t0, running }
+      const raf = useRef(0);
       const fetched = useRef(false);
+
+      const speakGlow = (on) => {
+        const el = document.getElementById("bigIdx");
+        if (el) el.classList.toggle("speaking", on);
+      };
+
       useEffect(() => {
         if (fetched.current) return;
         fetched.current = true;
         track("caddy_message_shown", { oriya: oriya, team: team, gap: par == null ? null : oriya - par });
-        // One background TTS call per submission; the voice note only mounts on
-        // success — a 503 (key not wired yet) leaves a clean text-only message.
-        fetch("/api/caddy-voice", {
+        const liveFallback = () => fetch("/api/caddy-voice", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text: line, team: team }),
         })
           .then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
-          .then((b) => { setVoiceUrl(URL.createObjectURL(b)); track("caddy_voice_ready", { team: team }); })
+          .then((b) => { setVoiceUrl(URL.createObjectURL(b)); track("caddy_voice_ready", { team: team, via: "live" }); })
           .catch((e) => track("caddy_voice_failed", { team: team, status: String(e && e.message || e) }));
+        (async () => {
+          if (!parts.segs || !(window.AudioContext || window.webkitAudioContext)) throw new Error("uncovered");
+          const raw = await Promise.all(parts.segs.map(async (u) => {
+            const r = await fetch(u);
+            if (!r.ok) throw new Error("missing " + u);
+            return r.arrayBuffer();
+          }));
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const bufs = [];
+          for (const b of raw) bufs.push(await ctx.decodeAudioData(b));
+          eng.current = { ctx: ctx, bufs: bufs, t0: 0, running: false };
+          setDur(bufs[0].duration + SEG_GAP + bufs[1].duration);
+          setReady(true);
+          track("caddy_voice_ready", { team: team, via: "pregen" });
+        })().catch(() => liveFallback());
+        return () => { cancelAnimationFrame(raf.current); speakGlow(false); };
       }, []);
+
+      const tick = () => {
+        raf.current = requestAnimationFrame(() => {
+          const e = eng.current;
+          if (!e || !e.running) return;
+          const t = e.ctx.currentTime - e.t0;
+          setAt(Math.max(0, t));
+          speakGlow(t >= 0 && t < e.bufs[0].duration + 0.15);
+          tick();
+        });
+      };
+
+      const startWeb = () => {
+        const e = eng.current;
+        const t0 = e.ctx.currentTime + 0.05;
+        const s1 = e.ctx.createBufferSource(); s1.buffer = e.bufs[0]; s1.connect(e.ctx.destination); s1.start(t0);
+        const s2 = e.ctx.createBufferSource(); s2.buffer = e.bufs[1]; s2.connect(e.ctx.destination); s2.start(t0 + e.bufs[0].duration + SEG_GAP);
+        s2.onended = () => {
+          e.running = false; cancelAnimationFrame(raf.current); speakGlow(false);
+          setPlaying(false); setAt(0);
+          e.ctx.suspend();
+        };
+        e.t0 = t0; e.running = true;
+        e.ctx.resume();
+        setPlaying(true); setHasPlayed(true); tick();
+      };
+
       const toggle = () => {
+        const e = eng.current;
+        if (ready && e) {
+          if (playing) { e.ctx.suspend(); cancelAnimationFrame(raf.current); setPlaying(false); return; }
+          if (e.running) { e.ctx.resume(); setPlaying(true); tick(); return; }
+          startWeb(); track("caddy_voice_played", { team: team, via: "pregen" });
+          return;
+        }
         const a = audioRef.current;
         if (!a) return;
-        if (a.paused) { a.play(); track("caddy_voice_played", { team: team }); } else { a.pause(); }
+        if (a.paused) { a.play(); setHasPlayed(true); track("caddy_voice_played", { team: team, via: "live" }); } else { a.pause(); }
       };
       const lit = dur > 0 ? Math.floor((at / dur) * WAVE.length) : 0;
       const fmt = (s) => Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0");
@@ -187,16 +299,20 @@
               <span className="vtag">v0.1</span>
             </div>
             <p className="msg-body">{line}</p>
-            {voiceUrl && (
-              <div className="vnote arrive">
+            <p className="xs" style={{ marginTop: 8 }}><a href="../ori.html" style={{ color: "var(--accent)", textDecoration: "none" }}>Keep talking to Ori →</a> <span className="dim">v0.1 chat — early, honest, yours.</span></p>
+            {(ready || voiceUrl) && (
+              <div className={"vnote arrive" + (hasPlayed ? "" : " fresh")}>
                 <button type="button" className="vplay" onClick={toggle} aria-label={playing ? "Pause Ori's voice note" : "Play Ori's voice note"}>{playing ? "❚❚" : "▶"}</button>
                 <span className="wave" aria-hidden="true">{WAVE.map((h, i) => <span key={i} className={i < lit ? "on" : ""} style={{ height: h }} />)}</span>
                 <span className="vdur mono dim">{dur ? fmt(playing || at > 0 ? at : dur) : "· · ·"}</span>
-                <audio ref={audioRef} src={voiceUrl} preload="metadata"
-                  onLoadedMetadata={(e) => setDur(isFinite(e.target.duration) ? e.target.duration : 0)}
-                  onTimeUpdate={(e) => setAt(e.target.currentTime)}
-                  onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
-                  onEnded={() => { setPlaying(false); setAt(0); }} />
+                {!hasPlayed && <span className="vhint xs">Hear it</span>}
+                {voiceUrl && !ready && (
+                  <audio ref={audioRef} src={voiceUrl} preload="metadata"
+                    onLoadedMetadata={(e) => setDur(isFinite(e.target.duration) ? e.target.duration : 0)}
+                    onTimeUpdate={(e) => setAt(e.target.currentTime)}
+                    onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
+                    onEnded={() => { setPlaying(false); setAt(0); }} />
+                )}
               </div>
             )}
           </div>
@@ -299,7 +415,7 @@
             <h2>You're in.</h2>
             <p className="sm" style={{ marginTop: 10 }}><b>{f.device} {f.score}</b> normalized onto the shared 0–100 scale, instantly:</p>
             <div style={{ margin: "16px 0 2px", textAlign: "center" }}>
-              <span className="mono" style={{ fontSize: 56, fontWeight: 700, lineHeight: 1, color: "var(--accent)" }}>{idx}</span>
+              <span id="bigIdx" className="mono" style={{ fontSize: 56, fontWeight: 700, lineHeight: 1, color: "var(--accent)" }}>{idx}</span>
               <span className="xs dim" style={{ display: "block", marginTop: 8 }}>Provisional 0–100 read — one scale across every Oura, Whoop, Garmin &amp; Apple Watch. Three mornings in, it reads against your own par.</span>
             </div>
             <OriMessage oriya={idx} par={par} side={f.side} />

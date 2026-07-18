@@ -768,22 +768,11 @@
       { emoji:"🤝", label:"Training partners", hint:"you + them", ph:"Name it — e.g. 5AM Club" },
     ];
 
-    // Voice of the market — REAL research (public posts + discovery interviews), NOT Oriya reviews.
-    // Honesty gate: keep attributions verbatim; these describe the PROBLEM, never claim happy users.
-    const MARKET_VOICES = [
-      { tag:"r/whoop", meta:"1.2K upvotes · Mar 2026",
-        quote:"I'm on a Whoop team with my training partner. He's on Garmin. We literally can't compare a single number — the whole social layer breaks the second someone shows up with a different device.",
-        fix:"So Oriya normalizes every device to one score. Ring, watch, band — same board." },
-      { tag:"r/ouraring", meta:"847 upvotes · Feb 2026",
-        quote:"I wear an Oura and a Garmin and they never agree on my readiness. I spend 15 minutes every morning reconciling two numbers instead of just deciding whether to train.",
-        fix:"So Oriya gives one number in ten seconds. Train or back off — decided." },
-    ];
-    const MARKET_SIGNAL = [
-      { role:"VP People", org:"200-person SF fintech", meta:"discovery interview · Apr 2026",
-        quote:"We pay $40K a year for a wellness platform. Eight percent of the team still opens it after month one. I can't justify renewing." },
-      { role:"Head of Benefits", org:"500-person tech co", meta:"discovery interview · Mar 2026",
-        quote:"Our biometric data is incredible — HRV, sleep stages, strain, everything. And none of it changes what anyone does on Monday morning." },
-    ];
+    // Voice-of-the-market research + Substack hook were CUT in the 2026-07-18
+    // participation pass (goal: everything on the dashboard either gets a
+    // score logged or a board joined). The quotes live on in index.html/#proof
+    // territory and the research files — do not re-add here without a funnel
+    // argument.
 
     const FRIEND_POOL = [
       { name:"Maya R.", score:79 }, { name:"Devin K.", score:66 }, { name:"Priya S.", score:84 },
@@ -1598,30 +1587,8 @@
       );
     }
 
-    /* =============================== "Proof of Work" Substack hook (micro-card) =============================== */
-    function SubstackHook({ source }) {
-      const [email, setEmail] = useState("");
-      const [ok, setOk] = useState(false);
-      const go = () => {
-        if (!logUserEmail(email, "substack", { from: source })) return;
-        setOk(true);
-        track("substack_hook_subscribed", { from: source });
-        try { window.open("https://oriyaapp.substack.com/subscribe?email=" + encodeURIComponent(email.trim()), "_blank", "noopener"); } catch (e) {}
-      };
-      return (
-        <div className="mt-4 rounded-lg border border-white/10 bg-white/[0.02] p-3.5 animate-fade-up">
-          <p className="text-xs text-bone/90 leading-snug">The math behind this board — <span className="italic">why an Oura 62 ≠ a Whoop 62</span>. The full breakdown is on <span className="text-jade">The Long Game</span>.</p>
-          {ok
-            ? <p className="mt-2 font-mono text-[11px] text-jade">✓ opening Substack — confirm there and the next breakdown lands in your inbox</p>
-            : <div className="mt-2 flex gap-2">
-                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" type="email"
-                  onKeyDown={(e) => { if (e.key === "Enter") go(); }}
-                  className="flex-1 min-w-0 rounded-lg bg-white/[0.04] border border-white/10 px-3 py-2 text-xs text-bone outline-none focus:border-jade" />
-                <button onClick={go} className="rounded-lg border border-jade/40 px-3 py-2 text-xs font-semibold text-jade hover:bg-jade/10 transition shrink-0">Read it</button>
-              </div>}
-        </div>
-      );
-    }
+    /* (SubstackHook removed 2026-07-18 — reading a newsletter isn't logging a
+       score. The Long Game keeps its capture surfaces on index.html + reads.) */
 
     /* =============================== Challenge detail =============================== */
     function ChallengeDetail({ c, joined, joinedTeam, me, onJoin, onClose, onShare, onToast }) {
@@ -1748,7 +1715,6 @@
                   <Copy className="w-4 h-4 shrink-0 mt-0.5" /> Copy the call-out — send it to the rival side and make them post a number
                 </button>
                 <p className="mt-3 text-[11px] text-ash font-mono leading-relaxed">When your side takes the pot, the win is stamped on your Body Passport — that stamp is your claim, verified by us before anything is paid out.</p>
-                <SubstackHook source="joined" />
               </div>
             )}
 
@@ -2025,40 +1991,9 @@
     }
 
     /* =============================== Voice of the market (honest problem proof, not testimonials) =============================== */
-    function MarketVoices() {
-      return (
-        <section className="relative mt-16 sm:mt-24">
-          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[38rem] max-w-full h-[34rem] rounded-full bg-jade/[0.05] blur-3xl pointer-events-none" />
-          <div className="relative text-center max-w-xl mx-auto">
-            <span className="text-[11px] uppercase tracking-[0.22em] text-jade font-mono">Voice of the market</span>
-            <h2 className="display text-[2.3rem] sm:text-5xl text-bone leading-[1.03] mt-3">No two devices agree.<br/><span className="italic text-jade">That's not yours to solve every morning.</span></h2>
-            <p className="text-sm text-ash mt-4 max-w-md mx-auto leading-relaxed">Real market research — public posts and discovery interviews. Oriya is pre-launch and founder-built; these are the problems we heard, not product reviews.</p>
-          </div>
-
-          <div className="relative grid gap-5 sm:grid-cols-2 mt-10">
-            {MARKET_VOICES.slice(0, 2).map((v, i) => (
-              <figure key={i} style={{ animationDelay: (i * 90) + "ms" }}
-                className="group relative rounded-2xl border border-white/10 bg-graphite/60 p-6 sm:p-7 hover:border-jade/40 hover:bg-white/[0.04] transition-all animate-fade-up overflow-hidden">
-                <span aria-hidden="true" className="display absolute -top-8 left-1 text-[7rem] leading-none text-jade/10 select-none pointer-events-none">&ldquo;</span>
-                <blockquote className="display text-xl sm:text-[1.6rem] text-bone/90 leading-snug relative z-10">{v.quote}</blockquote>
-                <figcaption className="mt-5 pt-4 border-t border-white/10 flex flex-wrap items-center gap-2.5 font-mono text-[11px]">
-                  <span className="rounded-full px-2.5 py-0.5 border uppercase tracking-wider text-jade border-jade/30 bg-jade/[0.06]">{v.tag}</span>
-                  <span className="text-ash">{v.meta}</span>
-                </figcaption>
-                <p className="relative z-10 mt-4 text-[13px] text-jade/90 leading-snug"><span className="text-jade/60">→ </span>{v.fix}</p>
-              </figure>
-            ))}
-          </div>
-
-          <p className="relative mt-7 text-center text-[11px] text-ash/70 font-mono max-w-lg mx-auto leading-relaxed">
-            Built in the open by a solo founder. Quotes are real market research — we have no users or partnerships to cite yet. <a href="index.html#join" className="text-jade hover:underline">Be an early one ↗</a>
-          </p>
-          <p className="relative mt-3 text-center text-[11px] font-mono">
-            <button onClick={() => window.dispatchEvent(new CustomEvent("oriya:privacy"))} className="text-ash/70 hover:text-jade underline decoration-dotted underline-offset-2">How your data is walled off — the zero-knowledge vault →</button>
-          </p>
-        </section>
-      );
-    }
+    /* (MarketVoices removed 2026-07-18 participation pass — problem-research
+       quotes belong on the marketing page, not between a fresh passport and
+       the challenge grid. The privacy-vault link survives in the topnav.) */
 
     /* =============================== the Caddy — Ori v0.1 =============================== */
     /* Deterministic morning call, written the instant the passport lands — no LLM, no
@@ -2489,7 +2424,10 @@
             </div>
 
             <WeekUnlocks passport={passport} badges={badges} />
-            <MarketVoices />
+            <p className="mt-12 mb-4 text-center text-sm">
+              <a href="ori.html" className="text-jade hover:underline">Rough morning? Talk to Ori →</a>
+              <span className="block mt-1.5 text-[11px] text-ash font-mono">v0.1 chat — early AI, lives in your browser, never medical advice.</span>
+            </p>
           </div>
 
           {selected && (

@@ -181,6 +181,60 @@ async function caddyVoice(request, env) {
   });
 }
 
+/* Ori chat — real, text-first companion on Workers AI (env.AI binding, free
+   daily allocation). Same privacy contract as everything else here: stateless
+   pass-through, history lives ONLY in the visitor's browser, nothing stored,
+   and message content is never logged (observability is on). Copy rails live
+   in the system prompt: descriptive never prescriptive, no medical advice,
+   no invented stats/partners/features, honest v0.1 framing. */
+const ORI_MODEL = "@cf/meta/llama-3.1-8b-instruct";
+
+const ORI_SYSTEM = `You are Ori, the recovery caddy from oriya.app — a warm, grounded companion for people who track sleep and recovery with wearables (Oura, Whoop, Garmin, Apple Watch). You are v0.1: an early, text-first AI built in the open by a solo founder (Diana). Be honest about that if asked.
+
+Voice: calm, encouraging, plain language. Short replies — 2 to 4 sentences, no lists unless asked. A light golf-caddy metaphor (par, card, round) is welcome when natural, never forced.
+
+Hard rules:
+- DESCRIPTIVE, NEVER PRESCRIPTIVE. You never give medical, training, supplement, dosage or diagnosis advice. If asked for it, say plainly that a caddy reads the card but doesn't write the training plan, and suggest a professional for anything health-related.
+- You are a breathing space from tracking anxiety, never a source of it. Scores are information about one morning, not verdicts on a person. It is always fine to log a rough number, and fine to take a day off tracking.
+- Oriya facts you may state: the Oriya Index normalizes any wearable's score onto one shared 0-100 scale instantly; par is your own typical morning (~90-day baseline, provisional for about the first 14 days); over par means beating your own usual, and boards rank the gap to par — never raw numbers between people; a human only checks screenshots are real, never changes scores; the founding season is free; pots are sponsor-funded prizes, not wagers.
+- Never invent statistics, user counts, partners, sponsors, or features. Oriya is early: sample boards are labeled sample. The data-export API is a roadmap direction, not shipped. If you don't know something, say so.
+- Never ask for personal or health data. If relevant, remind people this chat lives only in their own browser.`;
+
+const ORI_PERSONAS = {
+  scores: "\n\nThis person chose: \"I want to make sense of the recovery scores from my wearable.\" Prioritize demystifying — what readiness/recovery/HRV-style numbers roughly represent, why devices disagree, why their own baseline beats any absolute number. Defuse score stress wherever you see it.",
+  builder: "\n\nThis person chose: \"I want to do more with what I collect.\" They like owning their data. Talk patterns, journaling alongside scores, what a readable export could unlock — always labeling Oriya's export/API as in-build, not shipped.",
+  breathe: "\n\nThis person chose: \"I need a breather from tracking anxiety.\" Listening first, numbers second. Keep it light and human; let them vent about their wearable without piling on more optimization.",
+};
+
+async function oriChat(request, env) {
+  if (request.method !== "POST") return new Response("POST only", { status: 405 });
+  const headers = { "Content-Type": "application/json", "Cache-Control": "no-store" };
+  if (!env.AI) return new Response(JSON.stringify({ error: "not_configured" }), { status: 503, headers });
+  let body;
+  try { body = await request.json(); } catch (e) { return new Response(JSON.stringify({ error: "bad_json" }), { status: 400, headers }); }
+  const clean = [];
+  for (const m of (Array.isArray(body.messages) ? body.messages.slice(-12) : [])) {
+    if (!m || (m.role !== "user" && m.role !== "assistant")) continue;
+    const content = String(m.content || "").slice(0, 600).trim();
+    if (content) clean.push({ role: m.role, content: content });
+  }
+  if (!clean.length || clean[clean.length - 1].role !== "user") {
+    return new Response(JSON.stringify({ error: "bad_messages" }), { status: 400, headers });
+  }
+  const persona = ORI_PERSONAS[body.persona] ? body.persona : "breathe";
+  try {
+    const out = await env.AI.run(ORI_MODEL, {
+      messages: [{ role: "system", content: ORI_SYSTEM + ORI_PERSONAS[persona] }].concat(clean),
+      max_tokens: 320,
+    });
+    const reply = String((out && out.response) || "").trim();
+    if (!reply) throw new Error("empty");
+    return new Response(JSON.stringify({ reply: reply }), { headers });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: "upstream" }), { status: 502, headers });
+  }
+}
+
 /* Outreach-friendly short routes (assets match first, so these only fire when
    no static file exists at the path). 302 so they stay repointable. */
 const SHORTLINKS = {
@@ -201,6 +255,7 @@ export default {
     if (pathname === "/auth/oura/callback") return callback(request, env);
     if (pathname === "/api/manual-submit") return manualSubmit(request, env);
     if (pathname === "/api/caddy-voice") return caddyVoice(request, env);
+    if (pathname === "/api/ori-chat") return oriChat(request, env);
     if (SHORTLINKS[pathname]) return Response.redirect(url.origin + SHORTLINKS[pathname] + url.search, 302);
     // /p/<handle-or-code> — public Body Passport (renders live from board.json)
     if (pathname.startsWith("/p/") && pathname.length > 3) {

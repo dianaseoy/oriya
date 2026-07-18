@@ -6,6 +6,10 @@
   // site keeps serving even if the worker breaks. Secrets via `wrangler secret
   // put OURA_CLIENT_ID / OURA_CLIENT_SECRET / OURA_STATE_SECRET` (never files).
   "main": "worker/index.js",
+  // Workers AI powers /api/ori-chat (free daily allocation; no external vendor)
+  "ai": {
+    "binding": "AI"
+  },
   "observability": {
     "enabled": true
   },
