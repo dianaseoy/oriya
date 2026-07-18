@@ -339,9 +339,15 @@
         for (var k = 0; k < dlgLines.length; k++) dlgLines[k].classList.toggle("live", k === i);
         if (i >= 0) feed.scrollTop = Math.max(0, dlgLines[i].offsetTop - feed.offsetTop - 56);
       }
+      var dlgErrs = 0;
       function dlgStop() {
         dlgPlaying = false; dlgIdx = -1; dlgLive(-1);
         dlgBtn.textContent = "▶"; dlgAudio.pause();
+        /* every line failed → say so instead of silently doing nothing */
+        if (dlgErrs >= SCENE.length) {
+          var k = document.querySelector("#dlg .dlg-top p.xs.dim");
+          if (k) k.textContent = "Audio couldn't load here — the transcript below is the whole scene.";
+        }
       }
       function dlgPlayLine(i) {
         if (i >= SCENE.length) { dlgStop(); return; }
@@ -352,7 +358,7 @@
       dlgAudio.addEventListener("ended", function () {
         setTimeout(function () { if (dlgPlaying) dlgPlayLine(dlgIdx + 1); }, 350);
       });
-      dlgAudio.addEventListener("error", function () { if (dlgPlaying) dlgPlayLine(dlgIdx + 1); });
+      dlgAudio.addEventListener("error", function () { dlgErrs++; if (dlgPlaying) dlgPlayLine(dlgIdx + 1); });
       dlgBtn.addEventListener("click", function () {
         if (dlgPlaying) { dlgPlaying = false; dlgAudio.pause(); dlgBtn.textContent = "▶"; return; }
         dlgPlaying = true; dlgBtn.textContent = "❚❚";
