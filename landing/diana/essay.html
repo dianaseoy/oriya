@@ -45,17 +45,36 @@
        Her words, an AI voice, disclaimed in the open. Only on long-form essays. */
     .listen{margin:0 0 30px;padding:15px 17px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
     .listen-row{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
-    .listen-btn{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--text);border:1px solid var(--accent-line);background:var(--accent-dim);border-radius:9px;padding:9px 14px;cursor:pointer;transition:border-color .2s var(--ease),color .2s var(--ease)}
+    .listen-btn{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--text);border:1px solid var(--accent-line);background:var(--accent-dim);border-radius:9px;padding:9px 14px;cursor:pointer;transition:border-color .2s var(--ease),color .2s var(--ease),box-shadow .3s var(--ease)}
     .listen-btn:hover{border-color:var(--accent);color:var(--accent)}
+    /* soft accent pulse while playing — the "it's live" cue, restrained (motion only during playback) */
+    .listen.playing .listen-btn{border-color:var(--accent);color:var(--accent);animation:lpulse 2.4s ease-in-out infinite}
+    @keyframes lpulse{0%,100%{box-shadow:0 0 0 0 rgba(185,84,45,0)}50%{box-shadow:0 0 0 4px var(--accent-dim)}}
     .lp-ico{width:0;height:0;border-style:solid;border-width:5px 0 5px 9px;border-color:transparent transparent transparent currentColor}
     .listen.playing .lp-ico{border:0;width:9px;height:11px;background:linear-gradient(currentColor 0 0) 0/3px 100% no-repeat,linear-gradient(currentColor 0 0) 100%/3px 100% no-repeat}
     .listen-tag{font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-3);border:1px solid var(--line);border-radius:6px;padding:3px 8px}
-    .listen-prog{display:flex;align-items:center;gap:10px;margin-top:12px}
-    .listen-bar{flex:1;height:3px;background:var(--line);border-radius:2px;cursor:pointer;position:relative}
-    .listen-bar>i{display:block;height:100%;width:0;background:var(--accent);border-radius:2px}
-    .listen-time{font-family:var(--mono);font-size:10.5px;color:var(--text-3);white-space:nowrap}
+    /* now-playing equalizer — Spotify's live bars, but thin + accent + on-brand. Bounces only
+       while .playing; freezes (paused mid-bounce) on pause; flattens under reduced-motion. */
+    .eq{display:none;align-items:flex-end;gap:2px;height:15px;margin-left:1px}
+    .listen.playing .eq{display:inline-flex}
+    .eq i{width:3px;height:100%;background:var(--accent);border-radius:2px;transform-origin:bottom;transform:scaleY(.3);animation:eqb .9s ease-in-out infinite}
+    .eq i:nth-child(2){animation-duration:.72s;animation-delay:-.18s}
+    .eq i:nth-child(3){animation-duration:1.08s;animation-delay:-.4s}
+    .eq i:nth-child(4){animation-duration:.82s;animation-delay:-.1s}
+    .eq i:nth-child(5){animation-duration:.96s;animation-delay:-.3s}
+    @keyframes eqb{0%,100%{transform:scaleY(.28)}50%{transform:scaleY(1)}}
+    .listen-prog{display:none;align-items:center;gap:10px;margin-top:13px}
+    .listen.ready .listen-prog{display:flex}
+    .listen-bar{flex:1;height:4px;background:var(--line);border-radius:3px;cursor:pointer;position:relative}
+    .listen-bar>i{display:block;height:100%;width:0;background:var(--accent);border-radius:3px;transition:width .12s linear}
+    .listen-time{font-family:var(--mono);font-size:10.5px;color:var(--text-3);white-space:nowrap;font-variant-numeric:tabular-nums}
     .listen-note{font-family:var(--mono);font-size:10.5px;color:var(--text-3);margin:11px 0 0;line-height:1.55}
     .listen-audio{display:none}
+    @media(prefers-reduced-motion:reduce){
+      .listen.playing .listen-btn{animation:none}
+      .eq i{animation:none;transform:scaleY(.55)}
+      .listen-bar>i{transition:none}
+    }
 
     .e-body p{margin:0 0 20px;color:var(--text);font-size:16.5px}
     /* inline citations — understated underline, never a button; the prose stays the object */
@@ -248,11 +267,12 @@
             '<button class="listen-btn" type="button" aria-label="Play AI narration of this essay">'+
               '<span class="lp-ico" aria-hidden="true"></span><span class="lp-txt">Listen · '+au.min+' min</span>'+
             '</button>'+
+            '<span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>'+
             '<span class="listen-tag">AI voice</span>'+
           '</div>'+
-          '<div class="listen-prog" hidden><div class="listen-bar"><i></i></div><span class="listen-time">0:00 / 0:00</span></div>'+
+          '<div class="listen-prog"><div class="listen-bar"><i></i></div><span class="listen-time">0:00 / 0:00</span></div>'+
           '<p class="listen-note">Synthetic narration — Diana’s words, read by an AI voice, not her own.</p>'+
-          '<audio class="listen-audio" preload="none" src="audio/essays/'+encodeURIComponent(e.slug)+'.mp3"></audio>'+
+          '<audio class="listen-audio" preload="metadata" src="audio/essays/'+encodeURIComponent(e.slug)+'.mp3"></audio>'+
         '</div>' : '';
       var relRows = related(idx).map(function(r){
         return '<a class="rel-row" href="essay.html?id='+encodeURIComponent(r.slug)+'"><span class="rmk">›</span>'+
@@ -287,11 +307,13 @@
     function wireListen(){
       var box=wrap.querySelector(".listen"); if(!box) return;
       var au=box.querySelector(".listen-audio"), btn=box.querySelector(".listen-btn"),
-          prog=box.querySelector(".listen-prog"), bar=box.querySelector(".listen-bar"),
-          fill=box.querySelector(".listen-bar > i"), tspan=box.querySelector(".listen-time"),
-          txt=box.querySelector(".lp-txt");
+          bar=box.querySelector(".listen-bar"), fill=box.querySelector(".listen-bar > i"),
+          tspan=box.querySelector(".listen-time"), txt=box.querySelector(".lp-txt");
+      function showMeta(){ box.classList.add("ready"); tspan.textContent="0:00 / "+fmtT(au.duration); }
+      if(au.readyState>=1) showMeta();                    // metadata already cached
+      au.addEventListener("loadedmetadata", showMeta);
       btn.addEventListener("click", function(){ if(au.paused){ au.play().catch(function(){}); } else { au.pause(); } });
-      au.addEventListener("play", function(){ box.classList.add("playing"); prog.hidden=false; txt.textContent="Pause"; });
+      au.addEventListener("play", function(){ box.classList.add("playing"); txt.textContent="Pause"; });
       au.addEventListener("pause", function(){ box.classList.remove("playing"); txt.textContent="Resume"; });
       au.addEventListener("ended", function(){ box.classList.remove("playing"); txt.textContent="Replay"; fill.style.width="0%"; });
       au.addEventListener("timeupdate", function(){
