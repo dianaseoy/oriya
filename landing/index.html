@@ -669,13 +669,19 @@
     /* ============================================================
        ORI CHATBOT  (preserved)
        ============================================================ */
-    .ori-fab { position:fixed; bottom:24px; right:24px; z-index:1200; display:flex; align-items:center; gap:10px; padding:11px 18px 11px 12px; border-radius:999px; background:var(--graphite); border:1px solid var(--hairline); box-shadow:0 14px 40px -12px rgba(0,0,0,0.7); transition:transform 0.3s var(--settle); }
-    .ori-fab:hover { transform:translateY(-2px); }
+    .ori-fab { position:fixed; bottom:24px; right:24px; z-index:1200; display:flex; align-items:center; gap:10px; padding:11px 18px 11px 12px; border-radius:999px; background:var(--jade); border:1px solid var(--jade); color:var(--void); box-shadow:0 14px 40px -12px rgba(0,0,0,0.7); transition:transform 0.3s var(--settle), filter 0.2s; animation:fabBob 3.4s ease-in-out infinite; }
+    .ori-fab:hover { transform:translateY(-2px); filter:brightness(1.07); }
     .ori-fab.hidden { display:none; }
     .ori-ava, .ori-head .ava { width:30px; height:30px; border-radius:50%; background:var(--jade); color:var(--void); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:17px; }
-    .ori-fab .lbl { font-size:14px; font-weight:500; }
+    .ori-fab .ori-ava { background:var(--void); color:var(--jade); font-size:16px; }
+    .ori-fab .lbl { font-size:14px; font-weight:600; }
+    .ori-fab .wave { display:inline-block; }
+    .ori-fab:hover .wave { animation:fabWave .7s ease; }
     .ori-pulse { position:absolute; left:12px; top:11px; width:30px; height:30px; border-radius:50%; box-shadow:0 0 0 0 rgba(127,183,158,0.4); animation:opulse 2.4s ease infinite; }
     @keyframes opulse { 0%{box-shadow:0 0 0 0 rgba(127,183,158,0.4)} 70%,100%{box-shadow:0 0 0 12px rgba(127,183,158,0)} }
+    @keyframes fabBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+    @keyframes fabWave { 0%,100%{transform:rotate(0)} 40%{transform:rotate(20deg)} 70%{transform:rotate(-10deg)} }
+    @media (prefers-reduced-motion: reduce) { .ori-fab, .ori-fab:hover .wave, .ori-pulse { animation:none; } }
     .ori-panel { position:fixed; bottom:24px; right:24px; z-index:1200; width:min(380px,calc(100vw - 32px)); height:min(560px,72vh); background:var(--graphite); border:1px solid var(--hairline); border-radius:20px; box-shadow:0 30px 80px -20px rgba(0,0,0,0.8); display:none; flex-direction:column; overflow:hidden; }
     .ori-panel.open { display:flex; }
     .ori-head { display:flex; align-items:center; gap:11px; padding:16px 18px; border-bottom:1px solid var(--hairline); }
@@ -1024,7 +1030,8 @@
       .science-details > summary, .science-body { padding-left:22px; padding-right:22px; }
     }
     @media (max-width: 560px) {
-      .ori-fab .lbl { display:none; }
+      /* keep the "Talk to Ori" label on mobile — the FAB was too easy to miss */
+      .ori-fab .lbl { font-size:13px; }
       .footer-grid { grid-template-columns:1fr 1fr; }
       .display-xl { font-size:clamp(2.3rem,10.5vw,3.1rem); }
       /* the radial cross can't fit 4 readable chips + a center orb under ~300px —
@@ -1495,15 +1502,17 @@
   </div>
 </section>
 
-<!-- ACT 1.5 — OVERHEARD (rally scripts: the product revealing itself in
-     conversations people recognize; 50 invented convos in rally.js, always
-     labeled invented — honesty gate) -->
+<!-- ACT 1.5 — OVERHEARD (identity picker: tap who you are, see the sample
+     conversations for that life, then talk to Ori tuned to it via ?who=.
+     Scripts live in rally.js grouped by identity; the mock/sample label is a
+     hard honesty-gate requirement on every render.) -->
 <style>
-  .rally-card{ max-width:520px; margin:34px auto 0; background:rgba(255,255,255,.03);
+  .rally-card{ max-width:520px; margin:22px auto 0; background:rgba(255,255,255,.03);
     border:1px solid rgba(255,255,255,.09); border-radius:18px; padding:22px 20px 18px; }
   .rally-tag{ font-family:var(--font-mono); font-size:11px; letter-spacing:.14em;
-    text-transform:uppercase; color:var(--jade); }
-  .rally-feed{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+    text-transform:uppercase; color:var(--jade); display:block; }
+  .rally-feed{ display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+  .rally-feed + .rally-tag{ margin-top:20px; }
   .rally-line{ max-width:86%; border-radius:14px; padding:9px 13px; font-size:14px;
     line-height:1.5; opacity:0; transform:translateY(6px);
     animation:rallyIn .4s ease forwards; }
@@ -1512,26 +1521,33 @@
   .rally-line.r{ background:rgba(127,183,158,.13); border:1px solid transparent;
     border-top-right-radius:4px; align-self:flex-end; }
   @keyframes rallyIn{ to{ opacity:1; transform:none; } }
+  .rally-chips{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:26px; }
+  .rally-chip{ background:none; border:1px solid rgba(255,255,255,.16); color:var(--bone);
+    border-radius:999px; padding:8px 15px; font:600 12.5px var(--font-sans,inherit); cursor:pointer;
+    transition:border-color .2s, color .2s, background .2s; }
+  .rally-chip:hover{ border-color:var(--jade); color:var(--jade); }
+  .rally-chip.on{ background:rgba(127,183,158,.12); border-color:var(--jade); color:var(--jade); }
   .rally-foot{ display:flex; justify-content:space-between; align-items:center; gap:10px;
-    margin-top:16px; flex-wrap:wrap; }
-  .rally-next{ background:none; border:1px solid rgba(255,255,255,.16); color:var(--bone);
-    border-radius:99px; padding:7px 15px; font:600 12.5px var(--font-sans,inherit); cursor:pointer;
-    transition:border-color .2s, color .2s; }
-  .rally-next:hover{ border-color:var(--jade); color:var(--jade); }
+    margin-top:18px; flex-wrap:wrap; }
+  .rally-cta{ color:var(--jade); font-size:13.5px; font-weight:600; text-decoration:none;
+    border-bottom:1px solid rgba(127,183,158,.35); padding-bottom:1px; transition:border-color .2s; }
+  .rally-cta:hover{ border-color:var(--jade); }
+  .rally-label{ font-family:var(--font-mono); font-size:10.5px; color:var(--ash); opacity:.8; }
   @media (prefers-reduced-motion: reduce){ .rally-line{ animation:none; opacity:1; transform:none; } }
 </style>
 <section class="act" id="overheard">
   <div class="wrap reveal">
     <div class="act-head" style="margin:0 auto; text-align:center;">
-      <span class="eyebrow">Overheard, once the board's in the chat</span>
-      <h2 class="display display-l">You've literally had<br>this exact morning.</h2>
+      <span class="eyebrow">Same board, different mornings</span>
+      <h2 class="display display-l">Pick the life that's<br>wrecking your sleep.</h2>
+      <p class="lede" style="margin:14px auto 0;">See how the board reads it — then let Ori talk your language.</p>
     </div>
+    <div class="rally-chips" id="rallyChips" aria-label="Pick who you are"></div>
     <div class="rally-card">
-      <span class="rally-tag" id="rallyTag"></span>
-      <div class="rally-feed" id="rallyFeed" aria-live="polite"></div>
+      <div id="rallyFeeds" aria-live="polite"></div>
       <div class="rally-foot">
-        <button type="button" class="rally-next" id="rallyNext">Another morning ↺</button>
-        <span style="font-family:var(--font-mono); font-size:10.5px; color:var(--ash); opacity:.8;">1 of 50 · all invented — your crew writes the real ones</span>
+        <a class="rally-cta" id="rallyOri" href="ori.html">Talk to Ori about your actual mornings →</a>
+        <span class="rally-label">Mock chatter — yours goes here</span>
       </div>
     </div>
   </div>
@@ -1539,31 +1555,49 @@
 <script src="rally.js"></script>
 <script>
 (function () {
-  var feed = document.getElementById("rallyFeed"), tag = document.getElementById("rallyTag"),
-      next = document.getElementById("rallyNext"),
-      count = next ? next.nextElementSibling : null;
-  if (!feed || typeof RALLY === "undefined") return;
-  var order = RALLY.map(function (_, i) { return i; });
-  for (var i = order.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1)), t = order[i]; order[i] = order[j]; order[j] = t;
-  }
-  var at = -1;
-  function show() {
-    at = (at + 1) % order.length;
-    var c = RALLY[order[at]];
-    tag.textContent = c.tag;
-    feed.textContent = "";
-    c.lines.forEach(function (ln, k) {
-      var d = document.createElement("div");
-      d.className = "rally-line " + (k % 2 ? "r" : "l");
-      d.style.animationDelay = (k * 120) + "ms";
-      d.textContent = ln;
-      feed.appendChild(d);
+  var chips = document.getElementById("rallyChips"), feeds = document.getElementById("rallyFeeds"),
+      cta = document.getElementById("rallyOri");
+  if (!chips || typeof RALLY === "undefined") return;
+  var keys = Object.keys(RALLY);
+  function select(key) {
+    chips.querySelectorAll(".rally-chip").forEach(function (b) {
+      var on = b.getAttribute("data-k") === key;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
     });
-    if (count) count.textContent = (at + 1) + " of " + RALLY.length + " · all invented — your crew writes the real ones";
+    var g = RALLY[key];
+    feeds.textContent = "";
+    var delay = 0;
+    g.convos.forEach(function (c) {
+      var t = document.createElement("span");
+      t.className = "rally-tag";
+      t.textContent = c.tag;
+      feeds.appendChild(t);
+      var f = document.createElement("div");
+      f.className = "rally-feed";
+      c.lines.forEach(function (ln, k) {
+        var d = document.createElement("div");
+        d.className = "rally-line " + (k % 2 ? "r" : "l");
+        d.style.animationDelay = (delay += 90) + "ms";
+        d.textContent = ln;
+        f.appendChild(d);
+      });
+      feeds.appendChild(f);
+    });
+    cta.textContent = "Talk to Ori — tuned to " + g.ori + " →";
+    cta.href = "ori.html?who=" + key;
   }
-  next.addEventListener("click", show);
-  show();
+  keys.forEach(function (k) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "rally-chip";
+    b.setAttribute("data-k", k);
+    b.setAttribute("aria-pressed", "false");
+    b.textContent = RALLY[k].label;
+    b.addEventListener("click", function () { select(k); });
+    chips.appendChild(b);
+  });
+  select(keys[Math.floor(Math.random() * keys.length)]);
 })();
 </script>
 
@@ -1953,10 +1987,10 @@
 </div>
 
 <!-- ORI CHATBOT (preserved) -->
-<button class="ori-fab" id="oriFab" onclick="oriToggle(true)" aria-label="Chat with Ori">
+<button class="ori-fab" id="oriFab" onclick="oriToggle(true)" aria-label="Talk to Ori">
   <span class="ori-pulse"></span>
-  <span class="ori-ava">O</span>
-  <span class="lbl">Ask Ori</span>
+  <span class="ori-ava"><span class="wave">👋</span></span>
+  <span class="lbl">Talk to Ori</span>
 </button>
 <div class="ori-panel" id="oriPanel" role="dialog" aria-label="Chat with Ori">
   <div class="ori-head">

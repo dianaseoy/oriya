@@ -121,6 +121,18 @@
       var persona = load(KEY_P, null);
       var chat = load(KEY_C, []);   // [{role, content}]
 
+      /* ?who= identity hint from the homepage picker — whitelisted again
+         server-side (ORI_WHO); anything unknown is dropped. Stored so the
+         tuning survives the visit, shown honestly in the hello. */
+      var KEY_W = "oriya:ori:who";
+      var WHO_LABEL = { founder: "founder", nurse: "night-shift nurse", runner: "marathon runner",
+                        parent: "new parent", oncall: "on-call engineer", travel: "road warrior" };
+      var whoParam = null;
+      try { whoParam = new URLSearchParams(location.search).get("who"); } catch (e) {}
+      if (whoParam && WHO_LABEL[whoParam]) save(KEY_W, whoParam);
+      var who = load(KEY_W, null);
+      if (who && !WHO_LABEL[who]) who = null;
+
       function bubble(role, text, cls) {
         var d = document.createElement("div");
         d.className = "msg " + role + " arrive" + (cls ? " " + cls : "");
@@ -167,7 +179,9 @@
         pick.hidden = has; feed.hidden = !has; bar.hidden = !has;
         if (!has) return;
         feed.textContent = "";
-        bubble("bot", HELLO[persona] || HELLO.breathe, "hello");
+        var hi = HELLO[persona] || HELLO.breathe;
+        if (who) hi += " (Heard you're a " + WHO_LABEL[who] + " — I'll read your mornings that way.)";
+        bubble("bot", hi, "hello");
         chat.forEach(function (m) { bubble(m.role === "user" ? "user" : "bot", m.content); });
       }
 
@@ -185,7 +199,7 @@
         feed.appendChild(wait); feed.scrollTop = feed.scrollHeight;
         fetch(API + "/api/ori-chat", {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: chat.slice(-12), persona: persona }),
+          body: JSON.stringify({ messages: chat.slice(-12), persona: persona, who: who }),
         }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
           .then(function (res) {
             wait.remove();

@@ -32,11 +32,21 @@
        "not a wager" and the header can't contradict it. Step 5 = two contrast
        cards: board/Olympics seed (jade) vs unsigned sponsor pot (amber).
        Olympics seeding is earned (top your board), never "automatic".
-       2026-07-18: founder/operator audio scene above the steps — per-line MP3s from
-       /audio/dialogue/ chained in JS, transcript readable with audio off, SCENE
-       text must stay byte-identical to the generated files. Athletes named are
-       sample-board rows (Chris B. Garmin/Founders, Sam W. Whoop/Operators);
-       82→78 matches the real Garmin factors. Missing files are skipped. -->
+       2026-07-18: founder/operator audio scene — per-line MP3s from
+       /audio/dialogue/ chained in JS. SCENE display text mirrors the generated
+       files (scratchpad gen_scene_v3.py; spoken numbers spelled out, display
+       keeps digits). Voices: "Energetic Male" (Chris) + "Upbeat Woman" (Sam) —
+       recast 2026-07-18, the old pair read corporate/sleepy. Scene text is
+       readable with audio off: primed 2-line peek by default, expands on play
+       or "Read it instead", fully expanded under reduced-motion (Sable+Vera
+       verdict — progressive reveal keeps the game feel, full text stays one
+       tap away, never audio-gated). Athletes named are sample-board rows
+       (Chris B. Garmin/Founders, Sam W. Whoop/Operators); 82→78 matches the
+       real Garmin factors. Missing files are skipped.
+       Guided Ori walkthrough (#guide) above the scene: scripted local bubbles,
+       clearly labeled scripted — never impersonates the live /ori chat, no fake
+       typing theater. Every branch ends at /submit; a typed score is a warm-up,
+       never a board entry (Index needs the server-side baseline). -->
   <style>
     :root { --bg:#0B0C0E; --panel:#101114; --line:#23252B; --text:#E6E7EA; --dim:#8A8F98; --accent:#7FB79E; --amber:#D7A25C; --void:#0B0C0E; }
     * { box-sizing:border-box; margin:0; }
@@ -79,6 +89,32 @@
     .cav.a { background:rgba(127,183,158,.15); color:var(--accent); border:1px solid rgba(127,183,158,.5); }
     .cav.s { background:rgba(215,162,92,.15); color:var(--amber); border:1px solid rgba(215,162,92,.5); }
     .dlg-feed { max-height:230px; overflow-y:auto; margin-top:10px; display:flex; flex-direction:column; gap:7px; }
+    /* primed = pre-play peek: line one lit, line two ghosting out under a fade
+       mask. Expands on play / "Read it instead"; reduced-motion skips the game
+       and gets the full text immediately. */
+    .dlg-feed.primed { max-height:92px; overflow:hidden;
+      -webkit-mask-image:linear-gradient(#000 45%, transparent 96%); mask-image:linear-gradient(#000 45%, transparent 96%); }
+    .dlg-feed.primed .dlg-line:first-child { opacity:1; }
+    .dlg-feed.read .dlg-line { opacity:1; }
+    .dlg-read { background:none; border:0; padding:0; color:var(--accent); font:inherit; font-size:11px; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+    /* voice bubble: the live line grows a tiny equalizer that moves with the
+       actual audio (Web Audio analyser; CSS loop fallback). Motion only while
+       sound is really playing — never idle theater. */
+    .dlg-line .vox { display:none; margin-left:auto; padding-left:8px; flex:none; align-items:flex-end; gap:2px; height:13px; align-self:center; }
+    .dlg-line.live .vox { display:inline-flex; }
+    .vox i { width:3px; background:var(--accent); border-radius:2px; height:20%; transition:height .09s linear; }
+    .dlg-line.live.s .vox i { background:var(--amber); }
+    .vox.css i { animation:voxb .85s ease-in-out infinite; }
+    .vox.css i:nth-child(2) { animation-delay:.22s; }
+    .vox.css i:nth-child(3) { animation-delay:.44s; }
+    @keyframes voxb { 0%,100%{height:25%} 50%{height:100%} }
+    .dlg-line.live { box-shadow:0 0 16px -8px rgba(127,183,158,.55); }
+    .dlg-line.live.s { box-shadow:0 0 16px -8px rgba(215,162,92,.55); }
+    @media (prefers-reduced-motion: reduce) {
+      .dlg-feed.primed { max-height:230px; overflow-y:auto; -webkit-mask-image:none; mask-image:none; }
+      .dlg-feed .dlg-line { opacity:1; }
+      .vox { display:none !important; }
+    }
     .dlg-line { display:flex; gap:8px; align-items:flex-start; font-size:12.5px; line-height:1.5; border:1px solid var(--line); border-radius:12px; padding:8px 10px; opacity:.7; transition:all .25s ease; background:#0D0E11; }
     .dlg-line .cav { flex:none; margin-top:1px; }
     .dlg-line.a { border-top-left-radius:4px; }
@@ -116,8 +152,12 @@
     .foot { margin-top:28px; display:flex; flex-direction:column; gap:10px; }
     .fine { font-size:10.5px; font-family:ui-monospace,monospace; color:#5A5F68; margin-top:22px; line-height:1.6; }
     /* ---- mini Ask Ori ---- */
-    .ori-fab { position:fixed; right:16px; bottom:16px; width:48px; height:48px; border-radius:50%; background:var(--accent); color:var(--void); border:0; font:700 18px/1 "Inter",system-ui,sans-serif; cursor:pointer; box-shadow:0 6px 24px rgba(0,0,0,.5); transition:all .2s ease; z-index:40; }
-    .ori-fab:hover { transform:translateY(-2px); }
+    .ori-fab { position:fixed; right:16px; bottom:16px; display:flex; align-items:center; gap:8px; height:48px; padding:0 16px 0 12px; border-radius:99px; background:var(--accent); color:var(--void); border:0; font:600 13px/1 "Inter",system-ui,sans-serif; cursor:pointer; box-shadow:0 6px 24px rgba(0,0,0,.5); transition:all .2s ease; z-index:40; animation:fabBob 3.4s ease-in-out infinite; }
+    .ori-fab .wave { display:inline-block; font-size:19px; }
+    .ori-fab:hover { filter:brightness(1.08); }
+    .ori-fab:hover .wave { animation:fabWave .7s ease; }
+    @keyframes fabBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+    @keyframes fabWave { 0%,100%{transform:rotate(0)} 40%{transform:rotate(20deg)} 70%{transform:rotate(-10deg)} }
     .ori-fab.hide { opacity:0; pointer-events:none; }
     .ori-panel { position:fixed; right:16px; bottom:16px; width:min(340px, calc(100vw - 32px)); background:var(--panel); border:1px solid var(--line); border-radius:16px; box-shadow:0 12px 40px rgba(0,0,0,.6); z-index:41; opacity:0; transform:translateY(8px); pointer-events:none; transition:all .2s ease; }
     .ori-panel.open { opacity:1; transform:none; pointer-events:auto; }
@@ -137,6 +177,7 @@
     .ori-chip:hover { border-color:var(--accent); }
     @media (prefers-reduced-motion: reduce) {
       .cta:hover::after { animation:none; opacity:0; }
+      .ori-fab, .ori-fab:hover .wave { animation:none; }
       .ori-fab:hover { transform:none; }
     }
   </style>
@@ -149,6 +190,19 @@
     <p class="sm dim" style="margin-top:8px">Five steps. Nothing to install.</p>
     <p class="sm" style="margin-top:16px; padding:11px 13px; border:1px solid rgba(127,183,158,.35); border-radius:10px; background:rgba(127,183,158,.07);"><b>Season opens Saturday, Jul 18.</b> <span class="dim">Scores accepted from Fri Jul 17 — drop one early, you're on the board at the horn.</span></p>
 
+    <!-- Guided walkthrough — scripted Ori bubbles with tap replies, clearly
+         labeled scripted (the live AI chat stays at /ori; no typing theater).
+         Every branch terminates at /submit: a typed score is a warm-up, never
+         a board entry — the Index needs the server-side personal baseline. -->
+    <div class="dlg" id="guide" style="margin-top:18px">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap">
+        <p class="xs mono" style="letter-spacing:.12em; color:var(--accent)">ORI WALKS YOU IN · TAP TO REPLY</p>
+        <span class="xs dim">scripted taps · <a href="ori.html">the live Ori →</a></span>
+      </div>
+      <div id="gFeed" style="display:flex; flex-direction:column; gap:8px; margin-top:12px"></div>
+      <div id="gRow" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px"></div>
+    </div>
+
     <!-- Sample scene: two humans on opposite sides of the board. Chris B.
          (Garmin · Founders) and Sam W. (Whoop · Operators) are real rows on
          the sample board; Garmin 82 → Index 78 matches the live normalization
@@ -158,15 +212,15 @@
       <div class="dlg-top">
         <button class="dlg-play" id="dlgPlay" aria-label="Play the scene">▶</button>
         <div>
-          <p class="xs mono" style="letter-spacing:.12em; color:var(--accent)">EAVESDROP · DAY THREE · 45 SEC</p>
-          <p class="xs dim" style="margin-top:3px">Chris and Sam, the morning after posting their scores. Invented — but you've had this exact conversation.</p>
+          <p class="xs mono" style="letter-spacing:.12em; color:var(--accent)">EAVESDROP · DAY THREE · 40 SEC</p>
+          <p class="xs dim" style="margin-top:3px">Chris and Sam, the morning after posting their scores. Scripted — but you've had this exact conversation. <button type="button" class="dlg-read" id="dlgRead">Read it instead</button></p>
         </div>
       </div>
       <div class="dlg-cast xs dim">
         <span><i class="cav a">C</i>Chris — founder · Garmin</span>
         <span><i class="cav s">S</i>Sam — operator · Whoop</span>
       </div>
-      <div class="dlg-feed" id="dlgFeed"></div>
+      <div class="dlg-feed primed" id="dlgFeed"></div>
       <p class="xs dim" style="margin-top:8px">Chris and Sam are sample players — your group chat writes <b style="color:var(--text)">your</b> version.</p>
     </div>
 
@@ -243,18 +297,6 @@
       </div>
     </div>
 
-    <!-- Overheard — rotating rally scripts (rally.js, 50 invented convos;
-         always labeled invented). Same data the homepage rotates. -->
-    <div class="acc" id="rallyBox" style="margin-top:14px" hidden>
-      <p class="xs mono" style="letter-spacing:.12em; color:var(--accent)">OVERHEARD, ONCE THE BOARD'S IN THE CHAT</p>
-      <p class="xs mono dim" id="rallyTag" style="margin-top:8px; letter-spacing:.08em"></p>
-      <div id="rallyFeed" style="display:flex; flex-direction:column; gap:7px; margin-top:10px" aria-live="polite"></div>
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:12px; flex-wrap:wrap">
-        <button type="button" class="pill" id="rallyNext">Another morning ↺</button>
-        <span class="xs dim mono" id="rallyCount">all invented — your crew writes the real ones</span>
-      </div>
-    </div>
-
     <div class="foot">
       <a class="cta" href="mvp/submit.html?challenge=Founders%20vs%20Operators&amp;back=founders">Submit this morning's proof →</a>
       <a class="cta ghost" href="/play/foundersvsoperators">Pick your side on the board →</a>
@@ -273,7 +315,7 @@
     <p class="fine">Sample athletes are clearly labeled until boards fill. Pots open only on boards holding real, verified athletes. Built in the open by a solo founder.</p>
   </div>
 
-  <button class="ori-fab" id="oriFab" aria-label="Ask Ori">O</button>
+  <button class="ori-fab" id="oriFab" aria-label="Talk to Ori"><span class="wave">👋</span>Talk to Ori</button>
   <div class="ori-panel" id="oriPanel" role="dialog" aria-label="Ask Ori">
     <div class="ori-head"><b>Ori · quick answers</b><button id="oriClose" aria-label="Close">✕</button></div>
     <div class="ori-body" id="oriBody"></div>
@@ -320,16 +362,16 @@
          (scratchpad regen_v2.py manifest); a missing file is skipped so the
          scene never stalls. */
       var SCENE = [
-        ["a", "Morning — day three. Did you post your card yet?"],
-        ["s", "Just did. My Whoop gave me a 74, and my first thought was: great, another app telling me I'm failing."],
-        ["a", "That's why the board reads it differently. My Garmin said 82 — the Index called it 78 against my own usual."],
-        ["s", "Mine came out two under my par. Launch week, short night — and it still counted. Streak's alive."],
-        ["a", "Two under just means a heavier morning than your usual. It's not a grade."],
-        ["s", "That's what finally clicked for me. Par is my own typical morning — I'm not chasing your numbers, I'm defending mine."],
-        ["a", "Your Whoop, my Garmin — the raw numbers never compared anyway. One scale fixed that."],
-        ["s", "And Operators still hold the week, whatever Founders did this morning."],
-        ["a", "We took today. Check the board tonight."],
-        ["s", "Look up when you do — I'll be the line above you."]
+        ["a", "Day three. Tell me you posted."],
+        ["s", "Posted. My Whoop gave me a 74 and I almost threw it in a drawer."],
+        ["a", "A 74? I'd frame a 74."],
+        ["s", "It's two under MY par — the only par I care about. Launch week is eating me alive."],
+        ["a", "Still counted, though."],
+        ["s", "Still counted. Streak lives. And before you ask — yes, I saw your little 82."],
+        ["a", "Garmin said 82. The board called it a 78. Apparently my watch flatters me."],
+        ["s", "Every watch flatters somebody. That's why there's one scale."],
+        ["a", "Operators still hold the week."],
+        ["s", "Because we sleep. Look up tonight — I'm the line above you."]
       ];
       var feed = document.getElementById("dlgFeed");
       SCENE.forEach(function (l) {
@@ -340,9 +382,56 @@
         av.textContent = l[0] === "a" ? "C" : "S";
         var sp = document.createElement("span");
         sp.textContent = l[1];
-        d.appendChild(av); d.appendChild(sp);
+        var vx = document.createElement("span");
+        vx.className = "vox";
+        vx.setAttribute("aria-hidden", "true");
+        vx.innerHTML = "<i></i><i></i><i></i>";
+        d.appendChild(av); d.appendChild(sp); d.appendChild(vx);
         feed.appendChild(d);
       });
+      /* pre-play the feed is primed (2-line peek); playing or "Read it
+         instead" expands it — the full text is never audio-gated */
+      var readBtn = document.getElementById("dlgRead");
+      function dlgExpand() { feed.classList.remove("primed"); }
+      readBtn.addEventListener("click", function () {
+        dlgExpand(); feed.classList.add("read"); readBtn.hidden = true;
+      });
+      /* voice bubble engine — the live line's equalizer follows the real
+         audio via an analyser. file:// (or any Web Audio failure) falls back
+         to the CSS loop: an analyser on a cross-origin-tainted element would
+         silence playback entirely. */
+      var voxCtx = null, voxAn = null, voxRaf = 0;
+      function voxStart() {
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        if (voxAn === null) {
+          if (location.protocol === "file:") voxAn = "css";
+          else try {
+            var AC = window.AudioContext || window.webkitAudioContext;
+            voxCtx = new AC();
+            var src = voxCtx.createMediaElementSource(dlgAudio);
+            voxAn = voxCtx.createAnalyser(); voxAn.fftSize = 64;
+            src.connect(voxAn); voxAn.connect(voxCtx.destination);
+          } catch (e) { voxAn = "css"; }
+        }
+        if (voxCtx && voxCtx.state === "suspended") voxCtx.resume();
+        if (voxAn === "css") {
+          for (var k = 0; k < dlgLines.length; k++) dlgLines[k].querySelector(".vox").classList.add("css");
+          return;
+        }
+        var buf = new Uint8Array(voxAn.frequencyBinCount);
+        cancelAnimationFrame(voxRaf);
+        (function loop() {
+          voxRaf = requestAnimationFrame(loop);
+          if (dlgIdx < 0 || !dlgPlaying) return;
+          voxAn.getByteFrequencyData(buf);
+          var live = dlgLines[dlgIdx];
+          if (!live) return;
+          var bars = live.querySelectorAll(".vox i");
+          for (var b = 0; b < bars.length; b++) {
+            bars[b].style.height = Math.max(16, Math.round((buf[2 + b * 5] / 255) * 100)) + "%";
+          }
+        })();
+      }
       var dlgLines = feed.children;
       var dlgAudio = new Audio();
       var dlgIdx = -1, dlgPlaying = false;
@@ -355,10 +444,12 @@
       function dlgStop() {
         dlgPlaying = false; dlgIdx = -1; dlgLive(-1);
         dlgBtn.textContent = "▶"; dlgAudio.pause();
-        /* every line failed → say so instead of silently doing nothing */
+        cancelAnimationFrame(voxRaf);
+        /* every line failed → say so, and open the full text right up */
         if (dlgErrs >= SCENE.length) {
           var k = document.querySelector("#dlg .dlg-top p.xs.dim");
           if (k) k.textContent = "Sound's being shy here — the whole chat is written out below.";
+          dlgExpand(); feed.classList.add("read");
         }
       }
       function dlgPlayLine(i) {
@@ -374,8 +465,118 @@
       dlgBtn.addEventListener("click", function () {
         if (dlgPlaying) { dlgPlaying = false; dlgAudio.pause(); dlgBtn.textContent = "▶"; return; }
         dlgPlaying = true; dlgBtn.textContent = "❚❚";
+        dlgExpand(); voxStart();
         if (dlgIdx >= 0) dlgAudio.play(); else dlgPlayLine(0);
       });
+
+      /* guided walkthrough — scripted Ori, tap replies only. Bubbles land
+         instantly (no fake typing), every branch ends at /submit. The typed
+         score is a warm-up: only the verified screenshot reaches the board. */
+      var SUBMIT_URL = "mvp/submit.html?challenge=Founders%20vs%20Operators&back=founders";
+      var gFeed = document.getElementById("gFeed"), gRow = document.getElementById("gRow");
+      function gBubble(role, text) {
+        var m = document.createElement("div");
+        m.className = "ori-msg " + role;
+        m.textContent = text;
+        gFeed.appendChild(m);
+      }
+      function gCards(list) {
+        var box = document.createElement("div");
+        box.className = "ori-cards";
+        list.forEach(function (c) {
+          var a = document.createElement("a");
+          a.textContent = c.t; a.href = c.href;
+          box.appendChild(a);
+        });
+        gFeed.appendChild(box);
+      }
+      function gChips(list) {
+        gRow.textContent = "";
+        list.forEach(function (c) {
+          if (c.href) {
+            var a = document.createElement("a");
+            a.className = "ori-chip"; a.style.textDecoration = "none";
+            a.textContent = c.t; a.href = c.href;
+            gRow.appendChild(a); return;
+          }
+          var b = document.createElement("button");
+          b.type = "button"; b.className = "ori-chip"; b.textContent = c.t;
+          b.addEventListener("click", function () {
+            if (!c.silent) gBubble("user", c.t.replace(/^[^\s]+\s/, ""));
+            c.go();
+          });
+          gRow.appendChild(b);
+        });
+      }
+      function gScroll(sel) {
+        var el = document.querySelector(sel);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      function gScoreInput(device) {
+        gRow.textContent = "";
+        var inp = document.createElement("input");
+        inp.type = "number"; inp.min = "0"; inp.max = "100"; inp.placeholder = "e.g. 74";
+        inp.setAttribute("aria-label", "This morning's score");
+        inp.style.cssText = "flex:1; min-width:90px; background:#0D0E11; border:1px solid var(--line); color:var(--text); border-radius:10px; padding:9px 11px; font:inherit; font-size:13px;";
+        var go = document.createElement("button");
+        go.type = "button"; go.className = "ori-chip"; go.textContent = "Tell Ori →";
+        function send() {
+          var n = parseInt(inp.value, 10);
+          if (isNaN(n) || n < 0 || n > 100) {
+            gBubble("bot", "Just the number on the screen — 0 to 100. I've seen them all, no judgment.");
+            inp.focus(); return;
+          }
+          gBubble("user", String(n));
+          gBubble("bot", device + " " + n + " — got it. I won't score it in this box, though: your Index reads that number against your own ~90-day usual, and the first ~14 days run as a labelled estimate while your baseline builds. Drop the screenshot and you're on the board — a human only checks the shot is real, never your number.");
+          gCards([{ t: "Put it on the board →", href: SUBMIT_URL }]);
+          gBubble("bot", "Low-key option: send it from your work email and the board just shows ◒ anon + @company.com.");
+          gChips([
+            { t: "💬 Keep talking — live Ori", href: "ori.html" },
+            { t: "🧾 Read the five steps", go: function () { gScroll("#blueprint"); }, silent: true }
+          ]);
+        }
+        go.addEventListener("click", send);
+        inp.addEventListener("keydown", function (e) { if (e.key === "Enter") send(); });
+        gRow.appendChild(inp); gRow.appendChild(go);
+        inp.focus();
+      }
+      function gScore() {
+        gBubble("bot", "Yes. Whose number are we talking about?");
+        gChips(["Oura", "Whoop", "Garmin", "Apple Watch"].map(function (d) {
+          return { t: d, go: function () { gBubble("bot", "And what did it say this morning?"); gScoreInput(d); } };
+        }));
+      }
+      function gTour() {
+        gBubble("bot", "Easy. Pick a side — Founders or Operators. Which one's you?");
+        gChips([
+          { t: "Founders", go: gSide }, { t: "Operators", go: gSide }
+        ]);
+      }
+      function gSide() {
+        gBubble("bot", "Good company. From here the whole job is one habit: wake up, screenshot your recovery screen — Oura, Whoop, Garmin, Apple — send it. Sixty seconds.");
+        gBubble("bot", "I read every card against your own usual. Par 71 is your typical morning — over par means you beat you, nobody else. Rough mornings still count.");
+        gMenu();
+      }
+      function gMenu() {
+        gChips([
+          { t: "📸 I've got this morning's score", go: gScore },
+          { t: "🏆 What do I win?", go: gWin },
+          { t: "🧾 The five steps, written down", go: function () { gScroll("#blueprint"); }, silent: true }
+        ]);
+      }
+      function gWin() {
+        gBubble("bot", "Top your board and you're seeded for the Oriya Olympics — a $2,000+ bracket in SF. Day to day there's no cash pot until a sponsor signs; the board itself is the prize. Free either way.");
+        gChips([
+          { t: "📸 I've got this morning's score", go: gScore },
+          { t: "🧾 The five steps, written down", go: function () { gScroll("#blueprint"); }, silent: true }
+        ]);
+      }
+      gBubble("bot", "Hey — I'm Ori. Somebody clearly likes you enough to hand you this link. Want the quick tour, or are you holding this morning's score?");
+      gChips([
+        { t: "🏁 Show me the game", go: gTour },
+        { t: "📸 I've got this morning's score", go: gScore },
+        { t: "💬 Just talk to me", href: "ori.html" }
+      ]);
 
       /* 30-second "what par means" read — same words as the submit-page
          explainer (audio/explain/par-a.mp3 from the regen_v2 manifest). */
@@ -481,40 +682,6 @@
       });
       fab.addEventListener("click", function () { toggle(true); });
       document.getElementById("oriClose").addEventListener("click", function () { toggle(false); });
-    })();
-  </script>
-  <script src="rally.js"></script>
-  <script>
-    /* overheard rotation — hidden until rally.js is confirmed loaded */
-    (function () {
-      if (typeof RALLY === "undefined") return;
-      var box = document.getElementById("rallyBox"), feed = document.getElementById("rallyFeed"),
-          tag = document.getElementById("rallyTag"), next = document.getElementById("rallyNext"),
-          count = document.getElementById("rallyCount");
-      if (!box) return;
-      box.hidden = false;
-      var order = RALLY.map(function (_, i) { return i; });
-      for (var i = order.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1)), t = order[i]; order[i] = order[j]; order[j] = t;
-      }
-      var at = -1;
-      function show() {
-        at = (at + 1) % order.length;
-        var c = RALLY[order[at]];
-        tag.textContent = c.tag;
-        feed.textContent = "";
-        c.lines.forEach(function (ln, k) {
-          var d = document.createElement("div");
-          d.style.cssText = "max-width:86%; border-radius:12px; padding:8px 12px; font-size:13px; line-height:1.5;" +
-            (k % 2 ? "background:rgba(127,183,158,.13); align-self:flex-end; border-top-right-radius:4px;"
-                    : "background:#0D0E11; border:1px solid var(--line); align-self:flex-start; border-top-left-radius:4px;");
-          d.textContent = ln;
-          feed.appendChild(d);
-        });
-        count.textContent = (at + 1) + " of " + RALLY.length + " · all invented — your crew writes the real ones";
-      }
-      next.addEventListener("click", show);
-      show();
     })();
   </script>
 </body>
