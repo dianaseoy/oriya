@@ -18,7 +18,14 @@
          replies arrive complete with the approved fade-up.
        - voice: each reply can be spoken via /api/caddy-voice (Ori's default
          stock voice, same one as the submit page), truncated at a sentence
-         boundary under 280 chars. Voice failures hide the button, never error. -->
+         boundary under 280 chars. Voice failures hide the button, never error.
+       - voice IN: 🎤 = browser SpeechRecognition (on-device/browser service,
+         nothing sent to Oriya until Send); button hidden when unsupported.
+       - screenshots: 📷 → canvas-downscaled JPEG data URL → /api/ori-chat
+         `image` field → llama-3.2 vision read server-side. The image is never
+         stored: localStorage keeps a text placeholder, the worker keeps
+         nothing. Ori's read is warm encouragement, never a diagnosis, and a
+         screenshot here is still a warm-up — board entry stays /submit. -->
   <style>
     :root { --bg:#0B0C0E; --panel:#101114; --line:#23252B; --text:#E6E7EA; --dim:#8A8F98; --accent:#7FB79E; --amber:#D7A25C; --void:#0B0C0E; }
     * { box-sizing:border-box; margin:0; }
@@ -64,6 +71,12 @@
     .send { flex:none; background:var(--accent); color:var(--void); border:0; border-radius:12px; padding:0 18px; font:inherit; font-weight:600; cursor:pointer; transition:all .2s ease; }
     .send:hover { filter:brightness(1.08); }
     .send:disabled { opacity:.5; cursor:default; }
+    .abtn { flex:none; width:44px; height:44px; background:var(--panel); border:1px solid var(--line); border-radius:12px; color:var(--dim); font-size:17px; cursor:pointer; transition:all .2s ease; }
+    .abtn:hover { color:var(--text); border-color:#3A3D45; }
+    .abtn.rec { color:#E66A6A; border-color:rgba(230,106,106,.6); animation:recPulse 1.2s ease infinite; }
+    @keyframes recPulse { 50% { background:rgba(230,106,106,.12); } }
+    @media (prefers-reduced-motion: reduce) { .abtn.rec { animation:none; } }
+    .msg .shot { display:block; max-width:100%; border-radius:9px; margin-bottom:7px; }
     .foot { font-size:10.5px; font-family:ui-monospace,monospace; color:#5A5F68; line-height:1.6; margin-top:12px; }
   </style>
 </head>
@@ -92,11 +105,14 @@
     <div class="feed" id="feed" hidden></div>
 
     <div class="bar" id="bar" hidden>
+      <button class="abtn" id="micBtn" title="Speak instead of typing" aria-label="Voice input" hidden>🎤</button>
+      <button class="abtn" id="shotBtn" title="Share a screenshot of your score" aria-label="Share a screenshot">📷</button>
+      <input type="file" id="shotFile" accept="image/*" hidden>
       <textarea id="input" rows="1" maxlength="600" placeholder="Say anything — your scores, your ring, your morning…" aria-label="Message Ori"></textarea>
       <button class="send" id="send">Send</button>
     </div>
 
-    <p class="foot">Ori v0.1 is an early AI companion — not a doctor, and it can be wrong. It'll nudge you toward an easier day, never give medical advice. This chat lives only in this browser: Oriya's server keeps no copy and logs nothing. Built in the open by a solo founder.</p>
+    <p class="foot">Ori v0.1 is an early AI companion — not a doctor, and it can be wrong. It'll nudge you toward an easier day, never give medical advice. This chat lives only in this browser: Oriya's server keeps no copy and logs nothing. A screenshot you share is read once to write the reply, then gone — posting to the board still happens at <a href="mvp/submit.html">oriya.app/submit</a>. Voice typing uses your browser's built-in speech service. Built in the open by a solo founder.</p>
   </div>
 
   <script>
@@ -185,27 +201,38 @@
         chat.forEach(function (m) { bubble(m.role === "user" ? "user" : "bot", m.content); });
       }
 
-      function ask() {
-        var text = input.value.trim();
-        if (!text || pending) return;
+      /* shot = optional data-URL screenshot. It rides this one request only:
+         history stores a text placeholder, so nothing image-shaped ever
+         touches localStorage or the server's (empty) logs. */
+      function sendMsg(text, shot) {
+        if (pending || (!text && !shot)) return;
         input.value = "";
-        chat.push({ role: "user", content: text });
+        chat.push({ role: "user", content: text || "(shared a screenshot of this morning's score)" });
         chat = chat.slice(-40); save(KEY_C, chat);
-        bubble("user", text);
+        var ub = bubble("user", text || "");
+        if (shot) {
+          var im = document.createElement("img");
+          im.className = "shot"; im.src = shot; im.alt = "your screenshot";
+          ub.insertBefore(im, ub.firstChild);
+        }
         pending = true; send.disabled = true;
         var wait = document.createElement("div");
         wait.className = "pending arrive";
-        wait.textContent = "Ori is reading…";
+        wait.textContent = shot ? "Ori is looking at your screenshot…" : "Ori is reading…";
         feed.appendChild(wait); feed.scrollTop = feed.scrollHeight;
+        var payload = { messages: chat.slice(-12), persona: persona, who: who };
+        if (shot) payload.image = shot;
         fetch(API + "/api/ori-chat", {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: chat.slice(-12), persona: persona, who: who }),
+          body: JSON.stringify(payload),
         }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
           .then(function (res) {
             wait.remove();
             if (!res.ok || !res.j.reply) {
               var why = res.j && res.j.error === "not_configured"
                 ? "Ori's chat brain isn't switched on in this deployment yet — the rest of the board still works."
+                : res.j && (res.j.error === "vision" || res.j.error === "bad_image")
+                ? "I couldn't open that screenshot just now — type the number instead and I'll give you the same read."
                 : "That one didn't get through. Give it another try in a moment.";
               bubble("bot", why, "err");
             } else {
@@ -216,6 +243,55 @@
           })
           .catch(function () { wait.remove(); bubble("bot", "No connection just now — your message is still here, try again in a moment.", "err"); })
           .finally(function () { pending = false; send.disabled = false; input.focus(); });
+      }
+
+      function ask() { sendMsg(input.value.trim(), null); }
+
+      /* 📷 — downscale in-browser so a 12MP phone shot becomes a ~100KB JPEG
+         before it ever leaves the device */
+      var shotBtn = document.getElementById("shotBtn"), shotFile = document.getElementById("shotFile");
+      shotBtn.addEventListener("click", function () { if (!pending) shotFile.click(); });
+      shotFile.addEventListener("change", function () {
+        var f = shotFile.files && shotFile.files[0];
+        shotFile.value = "";
+        if (!f || !/^image\//.test(f.type)) return;
+        var url = URL.createObjectURL(f), img = new Image();
+        img.onload = function () {
+          var max = 1280, s = Math.min(1, max / Math.max(img.width, img.height));
+          var c = document.createElement("canvas");
+          c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          URL.revokeObjectURL(url);
+          sendMsg(input.value.trim(), c.toDataURL("image/jpeg", 0.85));
+        };
+        img.onerror = function () {
+          URL.revokeObjectURL(url);
+          bubble("bot", "That file didn't open as an image — try a plain screenshot (PNG or JPG).", "err");
+        };
+        img.src = url;
+      });
+
+      /* 🎤 — browser speech recognition fills the box; you still hit Send,
+         so a botched transcription never fires on its own */
+      var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      var micBtn = document.getElementById("micBtn");
+      if (SR) {
+        micBtn.hidden = false;
+        var rec = null, recOn = false;
+        micBtn.addEventListener("click", function () {
+          if (recOn) { try { rec.stop(); } catch (e) {} return; }
+          rec = new SR();
+          rec.lang = "en-US"; rec.interimResults = true;
+          var base = input.value.trim();
+          rec.onresult = function (e) {
+            var t = "";
+            for (var i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
+            input.value = ((base ? base + " " : "") + t).slice(0, 600);
+          };
+          rec.onend = function () { recOn = false; micBtn.classList.remove("rec"); input.focus(); };
+          rec.onerror = function () { recOn = false; micBtn.classList.remove("rec"); };
+          try { rec.start(); recOn = true; micBtn.classList.add("rec"); } catch (e) {}
+        });
       }
 
       document.querySelectorAll(".pcard").forEach(function (c) {

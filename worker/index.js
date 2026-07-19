@@ -222,6 +222,28 @@ const ORI_WHO = {
   travel: "They said they travel constantly for work. Time zones, hotels, red-eyes — their baseline travels with them, which is the one thing that stays fair.",
 };
 
+/* Screenshot reads — vision model on the same stateless contract: the image
+   lives only inside this one invocation, never stored, never logged. First
+   call per account must accept Meta's license (prompt "agree"); the retry
+   below self-heals that. */
+const ORI_VISION_MODEL = "@cf/meta/llama-3.2-11b-vision-instruct";
+
+const ORI_VISION = `
+
+They just shared a screenshot — almost certainly their wearable app (Whoop, Oura, Garmin, Apple Watch or similar). Read what's actually on it: which app, the main recovery/readiness/sleep score, anything else notable. Then give your warm human read of their morning — encouragement first, never a clinical verdict, and never guess a number you can't clearly see (say so honestly instead). If a score is visible, remind them the same screenshot at oriya.app/submit puts it on the board — this chat can't post it. If it isn't a wearable screenshot, say kindly what you do see and roll with the conversation.`;
+
+/* data:image/…;base64 → byte array for the AI binding. Caps at ~2MB decoded
+   so an oversized upload can't balloon the invocation. */
+function imageBytes(dataUrl) {
+  const m = /^data:image\/(?:jpeg|png|webp);base64,([A-Za-z0-9+/]+=*)$/.exec(dataUrl);
+  if (!m || m[1].length > 2800000) return null;
+  let bin;
+  try { bin = atob(m[1]); } catch (e) { return null; }
+  const bytes = new Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
 const ORI_PERSONAS = {
   scores: "\n\nThis person chose: \"I want to make sense of the recovery scores from my wearable.\" Prioritize demystifying — what readiness/recovery/HRV-style numbers roughly represent, why devices disagree, why their own baseline beats any absolute number. Defuse score stress wherever you see it.",
   builder: "\n\nThis person chose: \"I want to do more with what I collect.\" They like owning their data. Talk patterns, journaling alongside scores, what a readable export could unlock — always labeling Oriya's export/API as in-build, not shipped.",
@@ -245,6 +267,33 @@ async function oriChat(request, env) {
   }
   const persona = ORI_PERSONAS[body.persona] ? body.persona : "breathe";
   const who = ORI_WHO[body.who] ? "\n\n" + ORI_WHO[body.who] : "";
+
+  /* Screenshot turn — vision model takes a single prompt, so the recent
+     exchange is folded in as text. Image is request-scoped only. */
+  if (typeof body.image === "string" && body.image) {
+    const bytes = imageBytes(body.image);
+    if (!bytes) return new Response(JSON.stringify({ error: "bad_image" }), { status: 400, headers });
+    let convo = "";
+    for (const m of clean.slice(-6)) convo += (m.role === "user" ? "\nThem: " : "\nOri: ") + m.content;
+    const vprompt = ORI_SYSTEM + ORI_PERSONAS[persona] + who + ORI_VISION +
+      "\n\nRecent conversation:" + convo + "\n\nOri replies (2 to 4 sentences, warm, no lists):";
+    let vdetail = "";
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const out = await env.AI.run(ORI_VISION_MODEL, { prompt: vprompt, image: bytes, max_tokens: 320 });
+        const reply = String((out && out.response) || "").trim();
+        if (!reply) throw new Error("empty");
+        return new Response(JSON.stringify({ reply: reply }), { headers });
+      } catch (e) {
+        vdetail = String((e && e.message) || e).slice(0, 140);
+        if (attempt === 0 && /agree|license|accept/i.test(vdetail)) {
+          try { await env.AI.run(ORI_VISION_MODEL, { prompt: "agree" }); } catch (e2) {}
+        } else break;
+      }
+    }
+    return new Response(JSON.stringify({ error: "vision", detail: vdetail }), { status: 502, headers });
+  }
+
   let detail = "";
   for (const model of ORI_MODELS) {
     try {
