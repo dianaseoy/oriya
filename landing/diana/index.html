@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Diana Seo — Founder of Oriya</title>
-  <meta name="description" content="Diana Seo — founder of Oriya. Field notes and essays on crypto, fintech, AI, and building across four continents. A ledger of non-consensus bets, from 2017 crypto to today.">
-  <meta property="og:title" content="Diana Seo — Founder of Oriya">
-  <meta property="og:description" content="A working ledger: crypto and cross-border fintech from the 2010s, AI today, and what building across SF, Nairobi, Colombo, and Accra teaches you about timing, talent, and conviction.">
+  <title>Diana Seo — Mapping the AI Control Layer</title>
+  <meta name="description" content="Diana Seo maps where control lives in the AI stack — who owns the agents, and at which layer enforcement actually fires. Neutral on vendors; she builds the naïve version herself to find where it breaks. Founder of Oriya, reading infrastructure from crypto to fintech since 2017.">
+  <meta property="og:title" content="Diana Seo — Mapping the AI Control Layer">
+  <meta property="og:description" content="Where control lives in the AI stack, and who owns it. A vendor-neutral map of the control-plane fight from an analyst who builds the naïve version to find where it breaks — reading infrastructure from crypto to fintech since 2017.">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#fbfbf9">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23fbfbf9'/%3E%3Ctext x='50' y='68' font-family='Georgia,serif' font-size='54' fill='%23b9542d' text-anchor='middle'%3EDS%3C/text%3E%3C/svg%3E">
@@ -138,6 +138,22 @@
     .feat-row:hover .feat-rt{color:var(--accent)}
     .feat-rd{display:block;font-size:12.5px;color:var(--text-3);margin-top:3px;line-height:1.48}
     @media(max-width:560px){.feat-list{grid-template-columns:1fr}}
+
+    /* control-plane series */
+    .series{margin:0 0 22px;padding:16px 18px 8px;border:1px solid var(--accent-line,rgba(185,84,45,.28));border-radius:14px;background:linear-gradient(180deg,rgba(185,84,45,.05),var(--bg-2))}
+    .series-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;padding:0 2px}
+    .series-title{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent)}
+    .series-tag{font-family:var(--mono);font-size:11px;color:var(--text-3);letter-spacing:0.04em}
+    .series-ep{display:grid;grid-template-columns:auto 1fr auto;align-items:start;gap:14px;padding:11px 6px;border-top:1px solid var(--line);text-decoration:none}
+    .series-ep-n{font-family:var(--mono);font-size:11px;color:var(--text-3);letter-spacing:0.04em;padding-top:2px}
+    .series-ep-t{display:block;font-size:16px;font-weight:600;letter-spacing:-0.012em;color:var(--text);line-height:1.32;transition:color .2s var(--ease)}
+    .series-ep-s{display:block;font-size:12.5px;color:var(--text-3);margin-top:3px;line-height:1.48}
+    a.series-ep:hover .series-ep-t{color:var(--accent)}
+    .series-ep-st{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 7px;border-radius:999px;white-space:nowrap;margin-top:1px}
+    .series-ep-st.live{color:var(--accent);background:rgba(185,84,45,.1);border:1px solid rgba(185,84,45,.28)}
+    .series-ep-st.coming{color:var(--text-3);background:var(--panel-2);border:1px solid var(--line)}
+    .series-ep.coming{opacity:.82}
+    @media(max-width:560px){.series-ep{grid-template-columns:auto 1fr;gap:4px 12px}.series-ep-st{grid-column:2;justify-self:start;margin-top:6px}}
 
     /* ledger */
     .era{margin-bottom:34px}
@@ -271,11 +287,11 @@
         <img class="brand-face" src="assets/diana-milan-tight.jpg" alt="Diana Seo" width="48" height="48" loading="eager" decoding="async">
         <div>
           <div class="brand-name">Diana Seo</div>
-          <div class="brand-role">Founder, <b>Oriya</b></div>
+          <div class="brand-role"><b>Analyst</b> · operator · investor</div>
         </div>
       </div>
 
-      <p class="bio">Building <b>Oriya</b> — the recovery network. It normalizes every wearable (Oura, Whoop, Garmin, Apple) onto one fair <b>0–100</b> index, so a squad competes on how well they recover — and the longer arc is user-owned health infrastructure. Before AI, I spent years in <b>crypto, web3 &amp; fintech</b> — Bitcoin in 2017, building by 2018, across digital assets and cross-border payments. I grew up between continents and have built across four of them; I write about what that vantage shows that a single market can't.</p>
+      <p class="bio">I map where control lives in the AI stack: who governs the agents, and at which layer enforcement actually fires. I build the naïve version myself, because a diagram never shows you where it breaks. <b>Neutral on vendors, specific on architecture.</b> Before AI: <b>crypto, web3 &amp; fintech</b>. I bought Bitcoin in 2017, was building by 2018, and watched the access layer beat the rails. I'm building <b>Oriya</b>, a recovery network, and I've operated across four continents. I write about the control layer from outside any single vendor, or any single market.</p>
 
       <nav class="site-nav">
         <a href="index.html" class="active">Writing <span class="n" id="navN">41</span></a>
@@ -320,6 +336,30 @@
         <div class="main-count" id="count"></div>
       </div>
       <p class="lede">A ledger of <em>non-consensus bets</em> — from early crypto and cross-border fintech to building in AI today.</p>
+
+      <section class="series" aria-label="The Control Plane — a series">
+        <div class="series-head"><span class="series-title">The Control Plane</span><span class="series-tag">a four-part series</span></div>
+        <a class="series-ep live" href="essay.html?id=ai-control-plane">
+          <span class="series-ep-n">Part 1</span>
+          <span class="series-ep-b"><span class="series-ep-t">The Gateway Is Plumbing. The Control Plane Is the Prize.</span><span class="series-ep-s">Why this layer exists: every layer of the AI stack, and why the durable money sits with the one that can say no.</span></span>
+          <span class="series-ep-st live">live</span>
+        </a>
+        <a class="series-ep live" href="essay.html?id=ai-maturity-ladder">
+          <span class="series-ep-n">Part 2</span>
+          <span class="series-ep-b"><span class="series-ep-t">The AI Maturity Ladder</span><span class="series-ep-s">Companies grow into needing a control plane — they don't start there. The ladder, and a ten-agent simulation of where a policy actually holds.</span></span>
+          <span class="series-ep-st live">live</span>
+        </a>
+        <div class="series-ep coming">
+          <span class="series-ep-n">Part 3</span>
+          <span class="series-ep-b"><span class="series-ep-t">Everyone Agrees on Control. Nobody Agrees on Where It Lives.</span><span class="series-ep-s">Mapping the four competing architectural bets for AI control — gateway, lifecycle, neutral layer, enterprise platform. A fair map each camp would recognize.</span></span>
+          <span class="series-ep-st coming">in progress</span>
+        </div>
+        <div class="series-ep coming">
+          <span class="series-ep-n">Part 4</span>
+          <span class="series-ep-b"><span class="series-ep-t">Why Enterprise AI Governance May Become Global AI Governance.</span><span class="series-ep-s">Where the enterprise control layer and the coming public one converge.</span></span>
+          <span class="series-ep-st coming">in progress</span>
+        </div>
+      </section>
 
       <section class="featured" id="featured"></section>
 

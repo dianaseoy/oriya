@@ -70,6 +70,11 @@
     .listen-time{font-family:var(--mono);font-size:10.5px;color:var(--text-3);white-space:nowrap;font-variant-numeric:tabular-nums}
     .listen-note{font-family:var(--mono);font-size:10.5px;color:var(--text-3);margin:11px 0 0;line-height:1.55}
     .listen-audio{display:none}
+    /* podcast-style skip — appears once audio is ready; jumps the read +/-10s */
+    .listen-skip{display:none;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;color:var(--text-2);border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 10px;cursor:pointer;transition:border-color .2s var(--ease),color .2s var(--ease)}
+    .listen.ready .listen-skip{display:inline-flex}
+    .listen-skip:hover{border-color:var(--accent-line);color:var(--accent)}
+    .listen-skip svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     @media(prefers-reduced-motion:reduce){
       .listen.playing .listen-btn{animation:none}
       .eq i{animation:none;transform:scaleY(.55)}
@@ -114,6 +119,23 @@
     .e-body>*{opacity:0;transform:translateY(8px);transition:opacity .4s var(--ease),transform .4s var(--ease)}
     .e-body>*.in{opacity:1;transform:none}
     @media(prefers-reduced-motion:reduce){.e-body>*{opacity:1;transform:none;transition:none}}
+
+    /* ── transcript sync: click a line to jump; the line being read is marked ──
+       An accent bar sits in the left gutter (no layout shift). Marked lines get a
+       pointer + a faint bar on hover; the active line's bar fills + text darkens. */
+    .e-body.seekable > [data-seek]{cursor:pointer}
+    .e-body > [data-seek]{position:relative}
+    .e-body > [data-seek]::before{content:"";position:absolute;left:-16px;top:2px;bottom:2px;width:2px;
+      background:var(--accent);border-radius:2px;opacity:0;transform:scaleY(.35);transform-origin:top center;
+      transition:opacity .3s var(--ease),transform .35s var(--ease)}
+    .e-body.seekable > [data-seek]:hover::before{opacity:.4;transform:scaleY(1)}
+    .e-body > [data-seek].reading::before{opacity:1;transform:scaleY(1)}
+    /* focus dim only while a listen is engaged — reading the page keeps full contrast */
+    .e-body{transition:color .35s var(--ease)}
+    .e-body.listening > [data-seek]{color:var(--text-2);transition:color .35s var(--ease)}
+    .e-body.listening > [data-seek].reading{color:var(--text)}
+    @media(max-width:560px){.e-body > [data-seek]::before{left:-12px}}
+    @media(prefers-reduced-motion:reduce){.e-body > [data-seek]::before{transition:none}.e-body > [data-seek]{transition:none}}
 
     /* ── typed figure system (evidence, not decoration): pull-quote · mono table · hand-built SVG ── */
     .e-body .e-quote{margin:30px 0;padding:2px 0 2px 22px;border-left:2px solid var(--accent-line);
@@ -261,17 +283,27 @@
       var next = idx<ESSAYS.length-1 ? ESSAYS[idx+1] : null;
       var bodyHtml = (e.body||[]).map(blockHtml).join("");
       var au = (window.ESSAY_AUDIO||{})[e.slug];
+      var hasMarks = au && au.marks && au.marks.length;
+      var skipHtml =
+        '<button class="listen-skip listen-back" type="button" aria-label="Back 10 seconds">'+
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 8 7 12l4 4"/><path d="M7 12h7a4 4 0 1 1 0 8h-3"/></svg>10</button>'+
+        '<button class="listen-skip listen-fwd" type="button" aria-label="Forward 10 seconds">'+
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 8l4 4-4 4"/><path d="M17 12h-7a4 4 0 1 0 0 8h3"/></svg>10</button>';
+      var noteTxt = hasMarks
+        ? 'Synthetic narration — Diana’s words, read by an AI voice, not her own. Tap any line to jump there.'
+        : 'Synthetic narration — Diana’s words, read by an AI voice, not her own.';
       var listenHtml = au ?
         '<div class="listen">'+
           '<div class="listen-row">'+
             '<button class="listen-btn" type="button" aria-label="Play AI narration of this essay">'+
               '<span class="lp-ico" aria-hidden="true"></span><span class="lp-txt">Listen · '+au.min+' min</span>'+
             '</button>'+
+            skipHtml+
             '<span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>'+
             '<span class="listen-tag">AI voice</span>'+
           '</div>'+
           '<div class="listen-prog"><div class="listen-bar"><i></i></div><span class="listen-time">0:00 / 0:00</span></div>'+
-          '<p class="listen-note">Synthetic narration — Diana’s words, read by an AI voice, not her own.</p>'+
+          '<p class="listen-note">'+noteTxt+'</p>'+
           '<audio class="listen-audio" preload="metadata" src="audio/essays/'+encodeURIComponent(e.slug)+'.mp3"></audio>'+
         '</div>' : '';
       var relRows = related(idx).map(function(r){
@@ -308,17 +340,58 @@
       var box=wrap.querySelector(".listen"); if(!box) return;
       var au=box.querySelector(".listen-audio"), btn=box.querySelector(".listen-btn"),
           bar=box.querySelector(".listen-bar"), fill=box.querySelector(".listen-bar > i"),
-          tspan=box.querySelector(".listen-time"), txt=box.querySelector(".lp-txt");
+          tspan=box.querySelector(".listen-time"), txt=box.querySelector(".lp-txt"),
+          bk=box.querySelector(".listen-back"), fw=box.querySelector(".listen-fwd");
       function showMeta(){ box.classList.add("ready"); tspan.textContent="0:00 / "+fmtT(au.duration); }
       if(au.readyState>=1) showMeta();                    // metadata already cached
       au.addEventListener("loadedmetadata", showMeta);
       btn.addEventListener("click", function(){ if(au.paused){ au.play().catch(function(){}); } else { au.pause(); } });
-      au.addEventListener("play", function(){ box.classList.add("playing"); txt.textContent="Pause"; });
+      if(bk) bk.addEventListener("click", function(){ au.currentTime=Math.max(0,au.currentTime-10); });
+      if(fw) fw.addEventListener("click", function(){ au.currentTime=Math.min(au.duration||1e9,au.currentTime+10); });
+      au.addEventListener("play", function(){ box.classList.add("playing"); if(eBody) eBody.classList.add("listening"); txt.textContent="Pause"; });
       au.addEventListener("pause", function(){ box.classList.remove("playing"); txt.textContent="Resume"; });
-      au.addEventListener("ended", function(){ box.classList.remove("playing"); txt.textContent="Replay"; fill.style.width="0%"; });
+      au.addEventListener("ended", function(){ box.classList.remove("playing"); if(eBody) eBody.classList.remove("listening"); txt.textContent="Replay"; fill.style.width="0%"; setReading(-1); });
+
+      /* ── transcript sync: map each timing mark to its body block ──
+         au.marks = [{b:<bodyBlockIndex==.e-body child index>, t:<startSec>}] */
+      var eBody=wrap.querySelector(".e-body");
+      var meta=(window.ESSAY_AUDIO||{})[ESSAYS[curIdx].slug]||{};
+      var MK=meta.marks;
+      var segs=[];                        // [{el, t}] in play order
+      if(eBody && MK && MK.length){
+        eBody.classList.add("seekable");
+        for(var mi=0;mi<MK.length;mi++){
+          var el=eBody.children[MK[mi].b];
+          if(el){ el.setAttribute("data-seek",""); segs.push({el:el, t:MK[mi].t}); }
+        }
+      }
+      var lastSeg=-1;
+      function setReading(k){
+        if(k===lastSeg) return;
+        if(lastSeg>=0 && segs[lastSeg]) segs[lastSeg].el.classList.remove("reading");
+        if(k>=0 && segs[k]) segs[k].el.classList.add("reading");
+        lastSeg=k;
+      }
+      function activeSeg(tCur){
+        var k=-1; for(var j=0;j<segs.length;j++){ if(segs[j].t<=tCur+0.04) k=j; else break; } return k;
+      }
+      /* click a line -> seek to its start + play (podcast transcript behaviour).
+         Ignore clicks on inline links/figures so citations still navigate. */
+      if(segs.length){
+        eBody.addEventListener("click", function(ev){
+          if(ev.target.closest("a")) return;
+          var line=ev.target.closest("[data-seek]"); if(!line) return;
+          for(var j=0;j<segs.length;j++){ if(segs[j].el===line){
+            au.currentTime=segs[j].t+0.001; eBody.classList.add("listening"); setReading(j);
+            au.play().catch(function(){}); break;
+          } }
+        });
+      }
+
       au.addEventListener("timeupdate", function(){
         if(au.duration){ fill.style.width=(au.currentTime/au.duration*100)+"%"; }
         tspan.textContent=fmtT(au.currentTime)+" / "+fmtT(au.duration);
+        if(segs.length) setReading(activeSeg(au.currentTime));
       });
       bar.addEventListener("click", function(ev){
         if(!au.duration) return; var r=bar.getBoundingClientRect();
