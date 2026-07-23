@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Diana Seo — Mapping the AI Control Layer</title>
-  <meta name="description" content="Diana Seo maps where control lives in the AI stack — who owns the agents, and at which layer enforcement actually fires. Neutral on vendors; she builds the naïve version herself to find where it breaks. Founder of Oriya, reading infrastructure from crypto to fintech since 2017.">
+  <meta name="description" content="Diana Seo is building an AI health companion that reasons over wearable data and long-term health context, plus the MCP servers underneath it. She writes about where control lives in the AI stack, from outside any single vendor. Reading infrastructure from crypto to fintech since 2017.">
   <meta property="og:title" content="Diana Seo — Mapping the AI Control Layer">
-  <meta property="og:description" content="Where control lives in the AI stack, and who owns it. A vendor-neutral map of the control-plane fight from an analyst who builds the naïve version to find where it breaks — reading infrastructure from crypto to fintech since 2017.">
+  <meta property="og:description" content="Building an AI health companion that reasons over wearable data and long-term health context, and the MCP servers underneath it. Diana Seo writes about where control lives in the AI stack, from outside any single vendor.">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#fbfbf9">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23fbfbf9'/%3E%3Ctext x='50' y='68' font-family='Georgia,serif' font-size='54' fill='%23b9542d' text-anchor='middle'%3EDS%3C/text%3E%3C/svg%3E">
@@ -68,6 +68,8 @@
 
     /* ---- sidebar ---------------------------------------------- */
     .side{position:sticky;top:0;align-self:start;height:100vh;padding:38px 30px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:26px;overflow-y:auto}
+    .side-head{display:flex;flex-direction:column;gap:24px}
+    .side-meta{display:flex;flex-direction:column;gap:14px;margin-top:auto}
     .brand{display:flex;align-items:center;gap:12px}
     .brand-mark{width:38px;height:38px;border-radius:10px;border:1px solid var(--accent-line);background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:21px;color:var(--accent);flex-shrink:0}
     .brand-face{width:48px;height:48px;border-radius:13px;object-fit:cover;object-position:50% 32%;border:1px solid var(--accent-line);background:var(--accent-dim);flex-shrink:0;filter:grayscale(1) contrast(1.07) brightness(1.03)}
@@ -77,6 +79,7 @@
 
     .bio{font-size:13.5px;color:var(--text-2);line-height:1.62}
     .bio b{color:var(--text);font-weight:500}
+    .bio-lead{color:var(--text)}
 
     .meta{display:flex;flex-direction:column;gap:9px;font-family:var(--mono);font-size:11px;color:var(--text-3)}
     .meta-row{display:flex;align-items:center;gap:8px}
@@ -99,7 +102,7 @@
 
     .kbd-chip{margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:11px;color:var(--text-3);border:1px solid var(--line);border-radius:9px;padding:10px 12px;cursor:pointer;transition:all .2s var(--ease)}
     /* newsletter capture — count-free (honesty gate); sells signal, not a crowd */
-    .sub{margin-top:auto;display:flex;flex-direction:column;gap:8px;padding:14px;border:1px solid var(--line);border-radius:11px;background:linear-gradient(180deg,var(--panel),var(--bg-2))}
+    .sub{display:flex;flex-direction:column;gap:8px;padding:14px;border:1px solid var(--line);border-radius:11px;background:linear-gradient(180deg,var(--panel),var(--bg-2))}
     .sub-h{font-family:var(--mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent)}
     .sub-p{font-size:12px;line-height:1.5;color:var(--text-2)}
     .sub-row{display:flex;gap:6px;margin-top:2px}
@@ -139,20 +142,31 @@
     .feat-rd{display:block;font-size:12.5px;color:var(--text-3);margin-top:3px;line-height:1.48}
     @media(max-width:560px){.feat-list{grid-template-columns:1fr}}
 
-    /* control-plane series */
-    .series{margin:0 0 22px;padding:16px 18px 8px;border:1px solid var(--accent-line,rgba(185,84,45,.28));border-radius:14px;background:linear-gradient(180deg,rgba(185,84,45,.05),var(--bg-2))}
-    .series-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;padding:0 2px}
+    /* control-plane series — a compact carousel (one part at a time; auto-advances 1→4) */
+    .series{margin:0 0 22px;padding:14px 18px 12px;border:1px solid var(--accent-line,rgba(185,84,45,.28));border-radius:14px;background:linear-gradient(180deg,rgba(185,84,45,.05),var(--bg-2))}
+    .series-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:0 2px}
     .series-title{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent)}
-    .series-tag{font-family:var(--mono);font-size:11px;color:var(--text-3);letter-spacing:0.04em}
-    .series-ep{display:grid;grid-template-columns:auto 1fr auto;align-items:start;gap:14px;padding:11px 6px;border-top:1px solid var(--line);text-decoration:none}
+    .series-tag{font-family:var(--mono);font-size:11px;color:var(--text-3);letter-spacing:0.04em;margin-right:auto}
+    .series-nav{display:flex;gap:6px;flex-shrink:0}
+    .series-arrow{width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:16px;line-height:1;color:var(--text-2);background:var(--panel);border:1px solid var(--line);border-radius:7px;cursor:pointer;transition:all .18s var(--ease)}
+    .series-arrow:hover{color:var(--accent);border-color:var(--accent-line);background:var(--accent-dim)}
+    .series-viewport{overflow:hidden;touch-action:pan-y}
+    .series-track{display:flex;transition:transform .55s var(--ease);will-change:transform}
+    @media(prefers-reduced-motion:reduce){.series-track{transition:none}}
+    .series-ep{flex:0 0 100%;min-width:0;display:grid;grid-template-columns:auto 1fr auto;align-items:start;gap:14px;padding:8px 4px;text-decoration:none}
     .series-ep-n{font-family:var(--mono);font-size:11px;color:var(--text-3);letter-spacing:0.04em;padding-top:2px}
+    .series-ep-b{min-width:0}
     .series-ep-t{display:block;font-size:16px;font-weight:600;letter-spacing:-0.012em;color:var(--text);line-height:1.32;transition:color .2s var(--ease)}
     .series-ep-s{display:block;font-size:12.5px;color:var(--text-3);margin-top:3px;line-height:1.48}
     a.series-ep:hover .series-ep-t{color:var(--accent)}
-    .series-ep-st{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 7px;border-radius:999px;white-space:nowrap;margin-top:1px}
+    .series-ep-st{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 7px;border-radius:999px;white-space:nowrap;margin-top:1px;height:fit-content}
     .series-ep-st.live{color:var(--accent);background:rgba(185,84,45,.1);border:1px solid rgba(185,84,45,.28)}
     .series-ep-st.coming{color:var(--text-3);background:var(--panel-2);border:1px solid var(--line)}
     .series-ep.coming{opacity:.82}
+    .series-dots{display:flex;gap:7px;justify-content:center;align-items:center;margin-top:10px}
+    .series-dot{width:7px;height:7px;padding:0;border:0;border-radius:50%;background:var(--line);cursor:pointer;transition:all .22s var(--ease)}
+    .series-dot:hover{background:var(--accent-line)}
+    .series-dot.on{background:var(--accent);transform:scale(1.2)}
     @media(max-width:560px){.series-ep{grid-template-columns:auto 1fr;gap:4px 12px}.series-ep-st{grid-column:2;justify-self:start;margin-top:6px}}
 
     /* ledger */
@@ -245,9 +259,17 @@
 
     /* ---- responsive ------------------------------------------- */
     @media(max-width:820px){
-      .shell{grid-template-columns:1fr}
-      /* compact header, not a stacked sidebar — the ledger stays one thumb-flick away */
-      .side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);flex-direction:column;gap:16px;padding:26px 22px 22px}
+      /* Mobile lands on the writing itself: a minimal identity header, then the
+         theme filters + the ledger, with meta/links/subscribe dropped below.
+         display:contents promotes the sidebar's two blocks into the shell flex
+         so .main can be ordered between them. */
+      .shell{display:flex;flex-direction:column}
+      .side{display:contents}
+      .side-head{order:0;padding:26px 22px 18px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:16px;background:var(--bg)}
+      .main{order:1}
+      .side-meta{order:2;margin-top:0;padding:24px 22px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:16px}
+      .bio-rest{display:none} /* mobile header keeps only the lead line; full bio on desktop */
+      .featured{display:none} /* the compact series is the only up-top shortcut on mobile */
       .site-nav{flex-direction:row;gap:6px}
       .site-nav a{flex:1 1 0;justify-content:center;padding:10px 6px;border-color:var(--line)}
       .site-nav a .n{display:none}
@@ -255,14 +277,13 @@
       .meta-row .k{width:auto}
       .side-links{flex-direction:row;flex-wrap:wrap;gap:6px;margin-top:0}
       .side-link{gap:7px;border-color:var(--line);border-radius:999px;padding:7px 12px}
-      .sub{margin-top:0}
       .sub-in{font-size:16px;padding:9px 10px} /* ≥16px so iOS Safari doesn't zoom on focus */
       .kbd-chip,.kbd-hint{display:none} /* keyboard affordances read as clutter on touch */
-      .main{padding:28px 22px 64px}
+      .main{padding:24px 22px 64px}
       .work-grid{grid-template-columns:1fr}
       .quotes{grid-template-columns:1fr}
       .card.span{flex-direction:column;align-items:flex-start}
-      .lede{font-size:22px}
+      .lede{font-size:21px;margin:12px 0 18px}
     }
     @media(max-width:560px){
       .row{grid-template-columns:14px 1fr;gap:10px}
@@ -283,6 +304,7 @@
 
     <!-- ============ SIDEBAR ============ -->
     <aside class="side">
+      <div class="side-head">
       <div class="brand">
         <img class="brand-face" src="assets/diana-milan-tight.jpg" alt="Diana Seo" width="48" height="48" loading="eager" decoding="async">
         <div>
@@ -291,14 +313,16 @@
         </div>
       </div>
 
-      <p class="bio">I map where control lives in the AI stack: who governs the agents, and at which layer enforcement actually fires. I build the naïve version myself, because a diagram never shows you where it breaks. <b>Neutral on vendors, specific on architecture.</b> Before AI: <b>crypto, web3 &amp; fintech</b>. I bought Bitcoin in 2017, was building by 2018, and watched the access layer beat the rails. I'm building <b>Oriya</b>, a recovery network, and I've operated across four continents. I write about the control layer from outside any single vendor, or any single market.</p>
+      <p class="bio"><span class="bio-lead">I'm building an <b>AI health companion</b> that reasons over your wearable data and your long-term health context, not just yesterday's numbers.</span> <span class="bio-rest">Underneath it sit the <b>MCP servers</b> that let a model actually work with your health and personal knowledge. I got here the long way, through years in <b>crypto, web3 &amp; fintech</b>, where the lesson that stuck was simple: the layer that controls access usually beats the one everyone is watching. That's what I write about in AI now, from outside any single vendor.</span></p>
 
       <nav class="site-nav">
         <a href="index.html" class="active">Writing <span class="n" id="navN">41</span></a>
         <a href="stack.html">Stack <span class="n">how I build</span></a>
         <a href="reading.html">Reading <span class="n">the canon</span></a>
       </nav>
+      </div>
 
+      <div class="side-meta">
       <div class="meta">
         <div class="meta-row"><span class="dot"></span><span class="v" id="status">Currently building Oriya</span></div>
         <div class="meta-row"><span class="k">local</span><span class="v" id="clock">—</span></div>
@@ -327,6 +351,7 @@
         <span>Jump to anything</span>
         <span class="kbd"><b>⌘</b><b>K</b></span>
       </div>
+      </div>
     </aside>
 
     <!-- ============ MAIN ============ -->
@@ -337,28 +362,40 @@
       </div>
       <p class="lede">A ledger of <em>non-consensus bets</em> — from early crypto and cross-border fintech to building in AI today.</p>
 
-      <section class="series" aria-label="The Control Plane — a series">
-        <div class="series-head"><span class="series-title">The Control Plane</span><span class="series-tag">a four-part series</span></div>
-        <a class="series-ep live" href="essay.html?id=ai-control-plane">
-          <span class="series-ep-n">Part 1</span>
-          <span class="series-ep-b"><span class="series-ep-t">The Gateway Is Plumbing. The Control Plane Is the Prize.</span><span class="series-ep-s">Why this layer exists: every layer of the AI stack, and why the durable money sits with the one that can say no.</span></span>
-          <span class="series-ep-st live">live</span>
-        </a>
-        <a class="series-ep live" href="essay.html?id=ai-maturity-ladder">
-          <span class="series-ep-n">Part 2</span>
-          <span class="series-ep-b"><span class="series-ep-t">The AI Maturity Ladder</span><span class="series-ep-s">Companies grow into needing a control plane — they don't start there. The ladder, and a ten-agent simulation of where a policy actually holds.</span></span>
-          <span class="series-ep-st live">live</span>
-        </a>
-        <div class="series-ep coming">
-          <span class="series-ep-n">Part 3</span>
-          <span class="series-ep-b"><span class="series-ep-t">Everyone Agrees on Control. Nobody Agrees on Where It Lives.</span><span class="series-ep-s">Mapping the four competing architectural bets for AI control — gateway, lifecycle, neutral layer, enterprise platform. A fair map each camp would recognize.</span></span>
-          <span class="series-ep-st coming">in progress</span>
+      <section class="series" id="series" aria-label="The Control Plane — a four-part series" aria-roledescription="carousel">
+        <div class="series-head">
+          <span class="series-title">The Control Plane</span>
+          <span class="series-tag">a four-part series</span>
+          <div class="series-nav">
+            <button class="series-arrow" id="seriesPrev" type="button" aria-label="Previous part">‹</button>
+            <button class="series-arrow" id="seriesNext" type="button" aria-label="Next part">›</button>
+          </div>
         </div>
-        <div class="series-ep coming">
-          <span class="series-ep-n">Part 4</span>
-          <span class="series-ep-b"><span class="series-ep-t">Why Enterprise AI Governance May Become Global AI Governance.</span><span class="series-ep-s">Where the enterprise control layer and the coming public one converge.</span></span>
-          <span class="series-ep-st coming">in progress</span>
+        <div class="series-viewport" id="seriesVp">
+          <div class="series-track" id="seriesTrack">
+            <a class="series-ep live" href="essay.html?id=ai-control-plane" role="group" aria-roledescription="slide" aria-label="Part 1 of 4">
+              <span class="series-ep-n">Part 1</span>
+              <span class="series-ep-b"><span class="series-ep-t">The Gateway Is Plumbing. The Control Plane Is the Prize.</span><span class="series-ep-s">Why this layer exists: every layer of the AI stack, and why the durable money sits with the one that can say no.</span></span>
+              <span class="series-ep-st live">live</span>
+            </a>
+            <a class="series-ep live" href="essay.html?id=ai-maturity-ladder" role="group" aria-roledescription="slide" aria-label="Part 2 of 4">
+              <span class="series-ep-n">Part 2</span>
+              <span class="series-ep-b"><span class="series-ep-t">The AI Maturity Ladder</span><span class="series-ep-s">Companies grow into needing a control plane, they don't start there. The ladder, and a ten-agent simulation of where a policy actually holds.</span></span>
+              <span class="series-ep-st live">live</span>
+            </a>
+            <div class="series-ep coming" role="group" aria-roledescription="slide" aria-label="Part 3 of 4">
+              <span class="series-ep-n">Part 3</span>
+              <span class="series-ep-b"><span class="series-ep-t">Everyone Agrees on Control. Nobody Agrees on Where It Lives.</span><span class="series-ep-s">Mapping the four competing architectural bets for AI control: gateway, lifecycle, neutral layer, enterprise platform. A fair map each camp would recognize.</span></span>
+              <span class="series-ep-st coming">in progress</span>
+            </div>
+            <div class="series-ep coming" role="group" aria-roledescription="slide" aria-label="Part 4 of 4">
+              <span class="series-ep-n">Part 4</span>
+              <span class="series-ep-b"><span class="series-ep-t">Why Enterprise AI Governance May Become Global AI Governance.</span><span class="series-ep-s">Where the enterprise control layer and the coming public one converge.</span></span>
+              <span class="series-ep-st coming">in progress</span>
+            </div>
+          </div>
         </div>
+        <div class="series-dots" id="seriesDots" role="tablist" aria-label="Choose a part"></div>
       </section>
 
       <section class="featured" id="featured"></section>
@@ -647,6 +684,52 @@
       },{passive:true});
       document.addEventListener("mouseleave",function(){ spot.classList.remove("on"); });
     }
+
+    /* ---- The Control Plane — series carousel ----
+       One part visible at a time; auto-advances 1→2→3→4→loop. Arrows, dots and
+       swipe drive it; auto pauses on hover/focus, when the tab is hidden, and
+       under reduced motion (manual controls still work). */
+    (function seriesCarousel(){
+      var track=document.getElementById("seriesTrack");
+      if(!track) return;
+      var slides=[].slice.call(track.children);
+      var n=slides.length; if(!n) return;
+      var vp=document.getElementById("seriesVp");
+      var dotsWrap=document.getElementById("seriesDots");
+      var prev=document.getElementById("seriesPrev"), next=document.getElementById("seriesNext");
+      var i=0, timer=null, AUTO=5200;
+      var dots=slides.map(function(s,k){
+        var d=document.createElement("button");
+        d.className="series-dot"+(k===0?" on":""); d.type="button";
+        d.setAttribute("role","tab"); d.setAttribute("aria-label","Part "+(k+1));
+        d.addEventListener("click",function(){ go(k,true); });
+        dotsWrap.appendChild(d); return d;
+      });
+      function render(){
+        track.style.transform="translateX("+(-i*100)+"%)";
+        dots.forEach(function(d,k){ d.classList.toggle("on",k===i); d.setAttribute("aria-selected",k===i?"true":"false"); });
+        slides.forEach(function(s,k){ s.setAttribute("aria-hidden",k===i?"false":"true"); if(s.tagName==="A"){ s.tabIndex=(k===i?0:-1); } });
+      }
+      function go(k,user){ i=(k%n+n)%n; render(); if(user) restart(); }
+      function start(){ if(reduce||n<2||timer) return; timer=setInterval(function(){ i=(i+1)%n; render(); },AUTO); }
+      function stop(){ if(timer){ clearInterval(timer); timer=null; } }
+      function restart(){ stop(); start(); }
+      prev.addEventListener("click",function(){ go(i-1,true); });
+      next.addEventListener("click",function(){ go(i+1,true); });
+      vp.addEventListener("pointerenter",stop);
+      vp.addEventListener("pointerleave",start);
+      vp.addEventListener("focusin",stop);
+      vp.addEventListener("focusout",start);
+      document.addEventListener("visibilitychange",function(){ document.hidden?stop():start(); });
+      /* swipe — and suppress the click-through navigation when the pointer actually dragged */
+      var x0=null, dx=0, dragging=false;
+      vp.addEventListener("pointerdown",function(e){ x0=e.clientX; dx=0; dragging=true; stop(); },{passive:true});
+      vp.addEventListener("pointermove",function(e){ if(dragging&&x0!=null) dx=e.clientX-x0; },{passive:true});
+      vp.addEventListener("pointerup",function(){ if(dragging){ if(dx<-40) go(i+1,true); else if(dx>40) go(i-1,true); else start(); } dragging=false; x0=null; });
+      vp.addEventListener("pointercancel",function(){ dragging=false; x0=null; start(); });
+      track.addEventListener("click",function(e){ if(Math.abs(dx)>8) e.preventDefault(); },true);
+      render(); start();
+    })();
 
     /* ---- page in ---- */
     requestAnimationFrame(function(){ document.getElementById("page").classList.add("in"); });
