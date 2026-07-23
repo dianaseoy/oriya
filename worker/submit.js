@@ -99,7 +99,7 @@ export async function manualSubmit(request, env) {
         subject: "Your Oriya Index is " + index + " — you're on the board",
         text: "Your Oriya Index is " + index + "." + lock +
           (read ? "\n\n“" + read + "”\n— Ori, your recovery companion" : "") +
-          "\n\n" + device + " " + score + " → Index " + index + " — every wearable normalizes to the same 0–100 scale, instantly." +
+          "\n\n" + device + " " + score + " → Index " + index + " — read against your own baseline, same instant math for every device." +
           "\n\nThe only human step is a quick check that your screenshot is a real device capture — it never changes your number." +
           "\n\nWatch your side move → oriya.app/board" +
           "\nSame screenshot tomorrow keeps your streak — a rough morning logged still beats a great one skipped." +

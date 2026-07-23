@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Oriya — Your ring. Their watch. One score.</title>
-  <meta name="description" content="Oriya gives every wearable a handicap, so your whole squad competes fairly on how well you recover. Oura, Garmin, Apple, Whoop — one normalized 0–100 index. The recovery network. Private beta in SF & NYC.">
+  <meta name="description" content="Oriya gives every wearable a handicap, so your whole squad competes fairly on how well you recover. Oura, Garmin, Apple, Whoop — each of you ranked against your own baseline on one 0–100 board. The recovery network. Private beta in SF & NYC.">
   <meta property="og:title" content="Oriya — Your ring. Their watch. One score.">
   <meta property="og:description" content="The recovery network. Every wearable handicapped onto one fair 0–100 index, so the whole squad competes on how well you recover.">
   <meta property="og:type" content="website">
@@ -1219,7 +1219,7 @@
     <div class="act-head" style="margin:0 auto; text-align:center;">
       <span class="eyebrow">How it works · about a minute</span>
       <h2 class="display display-l">From screenshot<br>to leaderboard.</h2>
-      <p class="lede" style="margin:18px auto 0;">No new hardware. No manual entry. Drop the recovery screen you already get every morning — or sync the device directly. Oriya reads it, normalizes it, and puts you on a board with people on every other device.</p>
+      <p class="lede" style="margin:18px auto 0;">No new hardware. No manual entry. Drop the recovery screen you already get every morning — or sync the device directly. Oriya reads it, scores it against your own baseline, and puts you on a board with people on every other device.</p>
     </div>
 
     <div class="scrolly" id="howScrolly">
@@ -1284,12 +1284,12 @@
 
           <!-- State 03 — Normalize flip payoff -->
           <div class="scr scr-score" data-scr="result">
-            <span class="scr-eyebrow" style="position:absolute; top:46px; left:18px;">The recovery network · normalized</span>
+            <span class="scr-eyebrow" style="position:absolute; top:46px; left:18px;">The recovery network · your index</span>
             <div class="flip-row"><span class="flip-raw" id="flipRaw">83</span><span class="flip-arrow">→</span><span class="big-index" id="flipOriya">75</span></div>
-            <div class="idx-cap">Oriya Index</div>
+            <div class="idx-cap">Oriya Index · provisional</div>
             <div class="idx-formula" id="flipFormula">WHOOP Recovery 83 × 0.92 − 1.0</div>
             <div class="idx-state2" id="flipState">Balanced</div>
-            <div class="crop-share">↗ screenshot-ready — the crop that ends the Oura-vs-Whoop argument</div>
+            <div class="crop-share">↗ screenshot-ready — no more arguing whose raw score is real</div>
           </div>
 
           <!-- State 04 — Live Board (belonging payoff) -->
@@ -1298,12 +1298,12 @@
               <span class="board-title">Live board</span>
               <span class="board-stamp">Sample · demo</span>
             </div>
-            <div class="board-sub">Every device, normalized to one index</div>
-            <div class="rank-row"><span class="rk">1</span><span class="who"><b>Maya R.</b><small>Oura</small></span><span><span class="rsc">88</span><span class="rst">🔥7</span></span></div>
-            <div class="rank-row"><span class="rk">2</span><span class="who"><b>Devon P.</b><small>Garmin</small></span><span><span class="rsc">84</span><span class="rst">🔥5</span></span></div>
-            <div class="rank-row"><span class="rk">3</span><span class="who"><b>Priya N.</b><small>Apple</small></span><span><span class="rsc">80</span><span class="rst">🔥4</span></span></div>
-            <div class="rank-row you"><span class="rk">4</span><span class="who"><b>You</b><small id="youDev">Whoop</small></span><span><span class="rsc" id="youScore">75</span><span class="rst">🔥1</span></span></div>
-            <div class="rank-row"><span class="rk">5</span><span class="who"><b>Lena V.</b><small>Whoop</small></span><span><span class="rsc">71</span><span class="rst">🔥6</span></span></div>
+            <div class="board-sub">Ranked by how far over your own par you are, not by your raw number</div>
+            <div class="rank-row"><span class="rk">1</span><span class="who"><b>Devon P.</b><small>Garmin</small></span><span><span class="rsc">+9</span><span class="rst">idx 79</span></span></div>
+            <div class="rank-row"><span class="rk">2</span><span class="who"><b>Maya R.</b><small>Oura</small></span><span><span class="rsc">+7</span><span class="rst">idx 84</span></span></div>
+            <div class="rank-row you"><span class="rk">3</span><span class="who"><b>You</b><small id="youDev">Whoop</small></span><span><span class="rsc">+6</span><span class="rst">idx <span id="youScore">75</span></span></span></div>
+            <div class="rank-row"><span class="rk">4</span><span class="who"><b>Priya N.</b><small>Apple</small></span><span><span class="rsc">+4</span><span class="rst">idx 88</span></span></div>
+            <div class="rank-row"><span class="rk">5</span><span class="who"><b>Lena V.</b><small>Whoop</small></span><span><span class="rsc">+1</span><span class="rst">idx 71</span></span></div>
             <div class="board-strip">
               <span class="arch">High-HRV Sustainer</span>
               <span class="arch-note">illustrative · after ~7 days</span>
@@ -1449,7 +1449,7 @@
 
     <div class="how-cta">
       <a href="try.html" id="ctaHow" class="btn btn-primary" data-magnetic data-door="create">Try it with your screenshot →</a>
-      <a href="science.html" class="btn-ghost" style="opacity:0.8;">or read how we normalize ↓</a>
+      <a href="science.html" class="btn-ghost" style="opacity:0.8;">or read how the score works ↓</a>
     </div>
   </div>
 </section>
@@ -1608,7 +1608,7 @@
       <span class="eyebrow">The Biometric Handicap</span>
       <h2 class="display display-l">Four devices. Four scales.<br>One fair number.</h2>
       <p class="lede" style="margin:16px auto 0; max-width:56ch;"><em style="color:var(--bone); font-style:italic;">In 1911, golf gave every player one handicap — so a beginner and a scratch player could compete on the same round, fairly.</em> Recovery never had one. Oriya is the handicap.</p>
-      <p class="lede" style="margin:14px auto 0;">Oura scores Readiness, Whoop a Recovery %, Garmin a Body Battery — three different composites. Apple ships no recovery score at all, so Oriya computes one from your Apple Health signals. Tap any device to watch it normalize, then collapse all four into one — the same model behind <a href="#science" style="color:var(--jade);">the science</a>.</p>
+      <p class="lede" style="margin:14px auto 0;">Oura scores Readiness, Whoop a Recovery %, Garmin a Body Battery — three different composites. Apple ships no recovery score at all, so Oriya computes one from your Apple Health signals. Tap any device to see it land on the board, then collapse all four into one — everyone ranked against their own par. Here's <a href="#science" style="color:var(--jade);">the science</a>.</p>
     </div>
 
     <div class="normalizer" id="normalizer">
@@ -1653,8 +1653,8 @@
   <div class="wrap reveal">
     <div class="act-head" style="margin:0 auto; text-align:center;">
       <span class="eyebrow">The science · grounded in research</span>
-      <h2 class="display display-l">A normalized number<br>you can actually trust.</h2>
-      <p class="lede" style="margin:18px auto 0;">Comparing a Whoop score to an Oura score directly is like mixing Celsius and Fahrenheit. Oriya applies a device-specific correction so every wearable lands on one honest 0–100 scale.</p>
+      <h2 class="display display-l">A number you can<br>actually trust.</h2>
+      <p class="lede" style="margin:18px auto 0;">Comparing a Whoop score to an Oura score directly is like mixing Celsius and Fahrenheit — and no one can honestly convert one into the other. So Oriya doesn't. Every device lands on one scale, then you're ranked against your own 90-day baseline — your par.</p>
     </div>
 
     <div class="science-card">
@@ -1662,11 +1662,11 @@
         <div class="science-left">
           <span class="eyebrow">The worked example</span>
           <h3>A Whoop 83 isn't<br>an Oura 83.</h3>
-          <p>Each device measures recovery differently and validates differently. We translate the raw score with a calibrated factor and offset — tuned per sensor — into the comparable Oriya Standard.</p>
-          <div class="science-eq"><span class="raw">Whoop 83 × 0.92 − 1.0</span> = <span class="out">75</span> Oriya</div>
+          <p>Each device measures recovery differently, and the brands don't publish their formulas — so no one can honestly convert between them. On your first screenshot, before Oriya knows your baseline, a rough per-device placeholder gets you on the board. After ~14 days, your number is a percentile inside your own 90 days.</p>
+          <div class="science-eq"><span class="raw">Whoop 83 × 0.92 − 1.0</span> = <span class="out">75</span> provisional</div>
         </div>
         <div class="science-right">
-          <span class="lbl">Native score → Oriya Standard</span>
+          <span class="lbl">Native score → provisional Index</span>
           <table class="sci-table">
             <thead><tr><th>Device · native</th><th>Raw</th><th>Oriya</th></tr></thead>
             <tbody>
@@ -1682,10 +1682,10 @@
       </div>
 
       <details class="science-details">
-        <summary>How we normalize — the four steps</summary>
+        <summary>How your number is built — the four steps</summary>
         <div class="science-body">
           <div class="sci-step"><b>01 · Read the score</b>From your screenshot (OCR-verified) or a read-only connection. Devices with no native score — like Apple Watch — are computed from raw Apple Health signals instead.</div>
-          <div class="sci-step"><b>02 · Apply the <span>device correction</span></b>A factor + offset calibrated per sensor. Independent testing shows the same heartbeats yield very different HRV by device (ICC 0.99 on Whoop vs 0.24 on Garmin) — so each needs its own correction.</div>
+          <div class="sci-step"><b>02 · Rank against <span>your own baseline</span></b>The same heartbeats yield very different HRV by device (ICC 0.99 on Whoop vs 0.24 on Garmin) — which is exactly why we don't convert between brands. With ~14 days of history your score becomes a percentile inside your own range; a rough per-device placeholder stands in until then.</div>
           <div class="sci-step"><b>03 · Weight the full signal</b>The full method blends the contributors the literature finds across these scores — HRV &amp; resting HR, sleep, and activity. The single-screenshot demo uses the linear factor only.</div>
           <div class="sci-step"><b>04 · Post to the board</b>Now every device is on one scale — ranked against your own baseline, never a raw public number.</div>
           <div class="sci-source"><b>The evidence.</b> Doherty &amp; Altini et al., <em>Translational Exercise Biomedicine</em> (2025) — composite scores use undisclosed, inconsistent formulas and are rarely validated; Miller et al., <em>Sensors</em> (2022) — device HRV &amp; sleep accuracy varies widely; Shaffer &amp; Ginsberg, <em>Frontiers in Public Health</em> (2017) — RMSSD and SDNN are different HRV metrics, not interchangeable. Full references on the <a href="science.html" style="color:var(--jade);">science page</a>. Directionally useful, not diagnostic — a social layer, not a medical report.</div>
@@ -1715,7 +1715,7 @@
               <span class="pp-label">Oriya Index</span>
               <div class="pp-score">74</div>
             </div>
-            <span class="pp-std">Standardized · 0–100</span>
+            <span class="pp-std">Your own par · 0–100</span>
           </div>
           <div class="pp-name">Alex Mercer</div>
           <div class="pp-meta">
@@ -1751,7 +1751,7 @@
       <div class="act-head">
         <span class="eyebrow">The Body Passport</span>
         <h2 class="display display-l">One recovery ID.<br>Any device.</h2>
-        <p class="lede" style="margin:18px 0 0;">A portable, standardized recovery identity — like a card in your wallet. Keep your history, your rank, your people when you switch or abandon hardware. Every wearable resolves to the same 0–100 index, so the number means the same thing to everyone.</p>
+        <p class="lede" style="margin:18px 0 0;">A portable recovery identity — like a card in your wallet. Keep your history, your rank, your people when you switch or abandon hardware. Whatever you wear lands on one scale, and you're only ever ranked against your own baseline — so changing devices never resets who you are.</p>
         <div style="margin-top:30px;">
           <a href="try.html" id="ctaPassport" class="btn btn-primary" data-magnetic data-door="create">Claim your Body Passport →</a>
         </div>
@@ -1916,7 +1916,7 @@
           <svg viewBox="0 0 100 100" fill="none"><path d="M 78 22 A 40 40 0 1 0 79 23" stroke="#7FB79E" stroke-width="5" stroke-linecap="round"/><circle cx="50" cy="55" r="14" fill="#7FB79E"/><circle cx="78" cy="22" r="7" fill="#D7A25C"/></svg>
           Oriya
         </div>
-        <p class="footer-desc">The recovery network. We give every wearable a handicap, normalize it onto one fair index, and make rest something you do together — on any device.</p>
+        <p class="footer-desc">The recovery network. We give every wearable a handicap — ranking each of you against your own baseline — and make rest something you do together, on any device.</p>
       </div>
       <div class="footer-col">
         <h5>Product</h5>
@@ -1931,7 +1931,7 @@
         <h5>Read</h5>
         <a href="reads.html">The Long Game</a>
         <a href="https://oriyaapp.substack.com/subscribe" target="_blank" rel="noopener">Subscribe free</a>
-        <a href="science.html">The normalization method</a>
+        <a href="science.html">How the score works</a>
         <a href="try.html" data-door="create">Build your Body Passport</a>
       </div>
       <div class="footer-col">
@@ -2421,7 +2421,7 @@
       flipFormula.textContent = formula(d); flipState.textContent = label(n);
       scrResult.classList.add("struck"); showBoard(d);
       if (scrBoard) scrBoard.classList.add("sorted");
-      cap.innerHTML = "Your <b>75</b> lands mid-pack — you're on the board.";
+      cap.innerHTML = "You're <b>+6</b> over your own par — that's your rank.";
       if (scrChallenge) scrChallenge.classList.add("run");
       if (demoTabs) demoTabs.addEventListener("click", (e) => {
         const b = e.target.closest(".demo-tab"); if (!b) return;
@@ -2456,9 +2456,9 @@
       at(2550, () => { show("scan"); scrScan.classList.remove("mode-device"); scanStatus.textContent = "Reading screenshot…"; scanSub.textContent = "OCR · detecting device"; scanBar.style.width = "22%"; cap.textContent = "Scanning your recovery score…"; });
       at(3350, () => { scanStatus.textContent = "Detected WHOOP · Recovery 83%"; scanSub.textContent = "match confidence 98%"; scanBar.style.width = "48%"; cap.innerHTML = "Found: <b>Whoop Recovery 83%</b>"; });
       at(4150, () => { scanStatus.textContent = "Applying device handicap ×0.92"; scanSub.textContent = "Whoop validation · medium"; scanBar.style.width = "74%"; });
-      at(4950, () => { scanStatus.textContent = "Computing Oriya Standard…"; scanSub.textContent = "cross-checking your baseline"; scanBar.style.width = "100%"; });
-      at(5750, () => { showResult(d); cap.innerHTML = "Every device → <b>one comparable number.</b>"; });
-      at(7650, () => { showBoard(d); cap.innerHTML = "Your <b>75</b> slides mid-pack — you're on the board."; });
+      at(4950, () => { scanStatus.textContent = "Ranking against your baseline…"; scanSub.textContent = "cross-checking your baseline"; scanBar.style.width = "100%"; });
+      at(5750, () => { showResult(d); cap.innerHTML = "Every device lands on <b>one scale.</b>"; });
+      at(7650, () => { showBoard(d); cap.innerHTML = "You beat your own par by <b>+6</b> — that's your rank, not the raw number."; });
       at(9700, () => { showChallenge(); cap.innerHTML = "Now you're an <b>active contender</b> — racing a live challenge."; });
       at(12900, () => { running = false; play(); });
     }
@@ -2473,9 +2473,9 @@
       at(2250, () => { cursor.style.opacity = "0"; show("scan"); scrScan.classList.add("mode-device"); scanStatus.textContent = "Pulling " + (d.computed ? "Apple Health signals" : d.metric) + "…"; scanSub.textContent = d.computed ? "computed from HRV · RHR · sleep" : "live from device"; scanBar.style.width = "24%"; cap.textContent = "Reading your live recovery…"; });
       at(3150, () => { scanStatus.textContent = "Detected " + (d.computed ? "recovery" : d.metric) + " " + d.native; scanSub.textContent = d.tag + (d.computed ? " · computed" : " native score"); scanBar.style.width = "52%"; cap.innerHTML = "Read: <b>" + d.name + " " + d.native + "</b>"; });
       at(3950, () => { scanStatus.textContent = "Applying device handicap ×" + d.factor.toFixed(2); scanSub.textContent = d.tag + " validation"; scanBar.style.width = "78%"; });
-      at(4750, () => { scanStatus.textContent = "Computing Oriya Standard…"; scanSub.textContent = "cross-checking your baseline"; scanBar.style.width = "100%"; });
-      at(5550, () => { showResult(d); cap.innerHTML = "Every device → <b>one comparable number.</b>"; });
-      at(7450, () => { showBoard(d); cap.innerHTML = "You slide onto the board — <b>ranked, not alone.</b>"; });
+      at(4750, () => { scanStatus.textContent = "Ranking against your baseline…"; scanSub.textContent = "cross-checking your baseline"; scanBar.style.width = "100%"; });
+      at(5550, () => { showResult(d); cap.innerHTML = "Every device lands on <b>one scale.</b>"; });
+      at(7450, () => { showBoard(d); cap.innerHTML = "Ranked by your gap over par — <b>not your raw score.</b>"; });
       at(9500, () => { showChallenge(); cap.innerHTML = "Now you're an <b>active contender</b> — racing a live challenge."; });
       at(12700, () => { running = false; play(); });
     }
@@ -2918,7 +2918,7 @@
         { t: "⌚ 3. Pick a side in Ring vs Band", d: "Oura wearers vs Whoop wearers, 7 days, team average decides. He logs every morning — a missed day counts as 0.", cta: "See the board →", href: "try.html?challenge=devicewars" },
         { t: "🏆 4. Higher average takes it", d: "Alex's side holds the better week and takes the board. On sponsor-backed boards there's a pot: sponsors fund it, athletes win it.", cta: "How the money moves →", href: "partners.html" }
       ] },
-    play: { q: "How do I enter? (the 5-step game)", a: "Five steps, nothing to install: pick a side, screenshot your wearable each morning, we normalize it into your Oriya Index, the board moves, higher team average takes the pot. The whole rulebook fits on one page 👇",
+    play: { q: "How do I enter? (the 5-step game)", a: "Five steps, nothing to install: pick a side, screenshot your wearable each morning, we score it against your own baseline into your Oriya Index, the board moves, higher team average takes the pot. The whole rulebook fits on one page 👇",
       next: ["challenges", "scoring"],
       steps: [
         { t: "🎮 The 7-Day Sprint Blueprint", d: "Par 71 baseline, the morning drop, calling the winner, how the pot splits — every question answered before you join.", cta: "How to play →", href: "play.html" },
@@ -2930,7 +2930,7 @@
         { t: "⚔️ Live challenges", d: "Three live now, more starting soon.", cta: "Pick a side →", href: "try.html" },
         { t: "🎮 New here?", d: "The whole game in five steps — read it once, know everything a player knows.", cta: "How to play →", href: "play.html" }
       ] },
-    scoring: { q: "How is the Index scored?", a: "Sleep 40% + Recovery 35% + Activity 25%, then a per-device correction — the Biometric Handicap — so an Oura 85 and a Whoop 85 finally mean the same thing. You're ranked against your own 90-day baseline, never a raw public number.",
+    scoring: { q: "How is the Index scored?", a: "Sleep 40% + Recovery 35% + Activity 25% blend into one Index — but the ranking that matters is against your own 90-day baseline, your par, never a raw public number. That's the Biometric Handicap: you're only ever measured against your own usual, not someone else's raw score.",
       next: ["devices", "privacy"],
       steps: [{ t: "🔬 The Science", d: "Every factor, every source, the whole method — nothing behind a curtain.", cta: "Read the full method →", href: "science.html" }] },
     devices: { q: "Which devices work?", a: "Oura, Whoop, Garmin and Apple Watch connect read-only. Apple has no single native score, so we compute yours from Health signals — HRV, sleep, resting HR. Anything else (Samsung, Pixel, an app we don't sync yet): drop a screenshot, we read it.",

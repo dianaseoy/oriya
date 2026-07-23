@@ -5,7 +5,8 @@
  * current label copy: "Mock chatter — yours goes here". Lines alternate
  * speakers strictly: even index = first voice, odd = second. Keys match the
  * worker's ORI_WHO whitelist so the "Talk to Ori" CTA can carry ?who=<key>.
- * Zero dependencies. */
+ * One scenario per identity — each one carries the same idea: you're only ever
+ * ranked against your own par, never anyone else's raw number. Zero deps. */
 
 var RALLY = {
   founder: {
@@ -13,45 +14,23 @@ var RALLY = {
     ori: "a founder's week",
     convos: [
       { tag: "founders · 8:12 AM", lines: [
-        "I'm running on four hours.",
-        "Still going to the gym?",
-        "I was. Ori said today isn't the day to prove anything.",
-        "…so?",
-        "Coffee. Walk. Survive launch.",
-        "Honestly? Smarter." ] },
-      { tag: "founders · after the pitch", lines: [
-        "How'd it go?",
-        "Bombed.",
-        "You okay?",
-        "Actually, yeah. Ori's been saying my stress was climbing all week.",
-        "So?",
-        "Turns out today wasn't about the pitch." ] },
-      { tag: "cofounders · 11 PM", lines: [
-        "We ship Thursday.",
-        "Sleep tonight then.",
-        "Can't. Wired.",
-        "Your par can tell, you know. It always tells." ] }
+        "Running on four hours. Still hitting the gym?",
+        "Ori says today isn't the day to prove anything.",
+        "So what's the move?",
+        "Coffee, a walk, and I still logged it. Under my own par, but logged.",
+        "That counts?",
+        "It's the only number that's actually mine." ] }
     ] },
 
   nurse: {
     label: "Night-shift nurse",
     ori: "a night-shift week",
     convos: [
-      { tag: "nurses · shift change", lines: [
-        "How do you even track sleep on nights?",
-        "Against my own usual. Nobody else's.",
-        "Which is chaos.",
-        "And I'm beating it." ] },
       { tag: "night shift · 7:40 AM", lines: [
         "Everyone posted their scores an hour ago.",
         "Your morning starts at 7 PM. It counts at 7 PM.",
-        "That's allowed?",
-        "Your usual, your par. Chaos included." ] },
-      { tag: "break room · day three", lines: [
-        "Three twelves in a row.",
-        "And you still posted?",
-        "Under par all week — but logged every one.",
-        "That's the flex, honestly." ] }
+        "Even off a triple shift?",
+        "You're only ever up against your own usual. Chaos included." ] }
     ] },
 
   runner: {
@@ -60,19 +39,9 @@ var RALLY = {
     convos: [
       { tag: "running club · saturday", lines: [
         "You skipped your run?",
-        "Delayed it. Ori noticed my HRV had been sliding all week.",
+        "Delayed it. Ori saw my HRV sliding under par all week.",
         "You never do that.",
-        "Ran it today instead. PR'd." ] },
-      { tag: "running club · race week", lines: [
-        "Race week. I feel lazy.",
-        "You're not lazy, you're tapering.",
-        "Ori said the same thing.",
-        "Then it's two against one. Sit down." ] },
-      { tag: "long-run group · 8 PM", lines: [
-        "Twenty miles tomorrow.",
-        "Bedtime then.",
-        "It's eight o'clock.",
-        "Exactly." ] }
+        "Ran it today instead. Beat my own par by nine." ] }
     ] },
 
   parent: {
@@ -80,22 +49,12 @@ var RALLY = {
     ori: "a new parent's nights",
     convos: [
       { tag: "new parents · 6:05 AM", lines: [
-        "You look exhausted.",
+        "You look wrecked.",
         "Baby was up every two hours.",
         "Still posting your card?",
-        "Especially today.",
+        "Especially today. Surviving is over par on a night like that.",
         "Winning?",
-        "Surviving. It counts." ] },
-      { tag: "new parents · 5:40 AM", lines: [
-        "Four wake-ups. FOUR.",
-        "And you still posted?",
-        "The streak's the only thing I control right now.",
-        "Honestly? Iconic." ] },
-      { tag: "family chat · sunday", lines: [
-        "Dad. You're on the board?",
-        "Your brother put me on.",
-        "You have a nine-day streak??",
-        "I nap with intent." ] }
+        "Against my own usual? Yeah." ] }
     ] },
 
   oncall: {
@@ -103,20 +62,10 @@ var RALLY = {
     ori: "an on-call rotation",
     convos: [
       { tag: "on-call · 3:14 AM", lines: [
-        "Paged at three.",
+        "Paged at three. I'm in ruins.",
         "Prod okay?",
-        "Prod's thriving. I'm in ruins.",
-        "Post it anyway — wrecked mornings count double in my book." ] },
-      { tag: "on-call · handoff day", lines: [
-        "You're off rotation?",
-        "Handed the pager over at nine.",
-        "Celebrating?",
-        "Ori says my body's been bracing for two weeks. So: bed." ] },
-      { tag: "coworkers · standup", lines: [
-        "You muted the group chat?",
-        "The scores drop at eight.",
-        "And?",
-        "I can't take three green mornings from Marcus in a row." ] }
+        "Prod's thriving. My recovery's shot.",
+        "Post it anyway. You're only up against your own par, and a wrecked night still logs." ] }
     ] },
 
   travel: {
@@ -125,19 +74,8 @@ var RALLY = {
     convos: [
       { tag: "coworkers · off the red-eye", lines: [
         "Jet lag?",
-        "Tokyo yesterday.",
+        "Tokyo yesterday. Body's still somewhere over the Pacific.",
         "Thought so.",
-        "Ori basically said my body's still somewhere over the Pacific.",
-        "Fair." ] },
-      { tag: "consultants · wednesday", lines: [
-        "Three cities in four days.",
-        "Your poor par.",
-        "It's holding. Barely.",
-        "Defend it. We need you Monday." ] },
-      { tag: "travel buddies · arrivals", lines: [
-        "Landed. Everything hurts.",
-        "Post it anyway.",
-        "It's ugly.",
-        "Ugly counts. That's the whole point." ] }
+        "Ori moved my par to match. I'm not racing anyone but yesterday-me." ] }
     ] }
 };
