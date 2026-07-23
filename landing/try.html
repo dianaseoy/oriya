@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Oriya — Your Body Passport</title>
-  <meta name="description" content="Drop a recovery screenshot. We OCR-verify it, normalize it to the Oriya Index, and drop you into live recovery challenges." />
+  <meta name="description" content="Drop a recovery screenshot. We OCR-verify it, land it on one fair board — ranked against your own 90-day par, not the raw number — and drop you into live recovery challenges with real stakes." />
   <meta name="theme-color" content="#020617">
   <script>
     /* Theme boot — before first paint; same key as index.html so the choice
@@ -809,7 +809,7 @@
                 <div className="text-[10px] uppercase tracking-[0.18em] text-jade font-mono">step 2 · the handicap</div>
                 <div className="tour-flip"><span className="tour-raw">83</span><span className="tour-arrow">→</span><span className="tour-score">75</span></div>
                 <div className="tour-ocr"><i/></div>
-                <div className="text-[10px] text-ash font-mono">Whoop 83 × 0.92 − 1.0 · one number, any device</div>
+                <div className="text-[10px] text-ash font-mono">Whoop 83 × 0.92 − 1.0 → your Index · ranked vs your own par</div>
               </div>
               <div className="tour-step">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-jade font-mono">step 3 · you're on the board</div>
@@ -1872,7 +1872,7 @@
 
             <div className="mt-8 rounded-xl border border-jade/25 bg-jade/[0.04] p-5">
               <p className="text-sm text-bone font-medium">Get your Oriya Index in 60 seconds — no sync needed.</p>
-              <p className="text-xs text-ash mt-1">Drop this morning's recovery screenshot and it's normalized <span className="text-jade">on the spot</span> — one fair 0–100 score across every wearable — and you're posted to this board{myTeam ? " on " + myTeam : ""}. The only human step is a quick check it's a real device capture, and that never changes your number.</p>
+              <p className="text-xs text-ash mt-1">Drop this morning's recovery screenshot and it's normalized <span className="text-jade">on the spot</span> — one fair 0–100 board, ranked against your own par — and you're posted to this board{myTeam ? " on " + myTeam : ""}. The only human step is a quick check it's a real device capture, and that never changes your number.</p>
               <a href={proofForm} onClick={() => track("challenge_email_proof", { challenge: c.id, team: myTeam || null, method: "form" })}
                 className="mt-3 inline-flex items-center gap-2 rounded-lg bg-jade px-4 py-2.5 text-sm font-semibold text-void hover:bg-jade-glow transition">
                 <Upload className="w-4 h-4" /> Submit this morning's proof →
