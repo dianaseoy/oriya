@@ -11,7 +11,9 @@
        - persona: warm coach-friend (worker/index.js ORI_SYSTEM); everyday
          nudges are fine, medical advice never; page copy repeats the line.
        - privacy: history lives ONLY in localStorage (oriya:ori:chat); the
-         worker stores and logs nothing. Say so on the page.
+         worker keeps no accounts/DB, BUT messages + replies are traced to
+         Braintrust when BRAINTRUST_API_KEY is set — the foot copy discloses
+         this, keep it honest (see [[oriya-braintrust-tracing]] memory).
        - persona picker = the user's chosen pain (scores | builder | breathe),
          stored oriya:ori:persona, sent with every request.
        - no typing-indicator theater: pending state is one static dim line;
@@ -112,7 +114,7 @@
       <button class="send" id="send">Send</button>
     </div>
 
-    <p class="foot">Ori v0.1 is an early AI companion — not a doctor, and it can be wrong. It'll nudge you toward an easier day, never give medical advice. This chat lives only in this browser: Oriya's server keeps no copy and logs nothing. A screenshot you share is read once to write the reply, then gone — posting to the board still happens at <a href="mvp/submit.html">oriya.app/submit</a>. Voice typing uses your browser's built-in speech service. Built in the open by a solo founder.</p>
+    <p class="foot">Ori v0.1 is an early AI companion — not a doctor, and it can be wrong. It'll nudge you toward an easier day, never give medical advice. Worth knowing: your messages and Ori's replies pass through Braintrust, a tracing tool a solo founder uses to see how Ori's doing and fix it — never sold, no accounts, no database. A screenshot you share isn't kept, but the reply Ori writes about it is traced like any other message — posting to the board still happens at <a href="mvp/submit.html">oriya.app/submit</a>. Voice typing uses your browser's built-in speech service. Built in the open by a solo founder.</p>
   </div>
 
   <script>

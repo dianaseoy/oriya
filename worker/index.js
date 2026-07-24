@@ -15,6 +15,22 @@
  */
 
 import { manualSubmit } from "./submit.js";
+import { initLogger, traced } from "braintrust";
+
+/* Braintrust tracing for Ori chat. Lazily initialized from the request-scoped
+   env (Workers have no process.env), and a NO-OP when BRAINTRUST_API_KEY is
+   unset — so chat keeps working with zero tracing if the secret is absent.
+   NOTE: when enabled this sends Ori's prompts and replies (i.e. the visitor's
+   morning score + message text) to Braintrust — the privacy copy in
+   worker header, try.html PrivacyVault, and manifesto.html must reflect that. */
+let _btLogger = null;
+function getLogger(env) {
+  if (!env || !env.BRAINTRUST_API_KEY) return null;
+  if (!_btLogger) {
+    _btLogger = initLogger({ projectName: "oriya", apiKey: env.BRAINTRUST_API_KEY });
+  }
+  return _btLogger;
+}
 
 const OURA_AUTH = "https://cloud.ouraring.com/oauth/authorize";
 const OURA_TOKEN = "https://api.ouraring.com/oauth/token";
@@ -182,11 +198,15 @@ async function caddyVoice(request, env) {
 }
 
 /* Ori chat — real, text-first companion on Workers AI (env.AI binding, free
-   daily allocation). Same privacy contract as everything else here: stateless
-   pass-through, history lives ONLY in the visitor's browser, nothing stored,
-   and message content is never logged (observability is on). Copy rails live
-   in the system prompt: warm coach-friend voice, everyday nudges allowed but
-   never medical advice, no invented stats/partners/features, honest v0.1. */
+   daily allocation). Stateless pass-through: no KV/DO/D1, history lives ONLY
+   in the visitor's browser, and Cloudflare request logs stay score-free.
+   EXCEPTION — Braintrust tracing: when BRAINTRUST_API_KEY is set, each turn's
+   prompt and reply (the visitor's morning score + message text) is sent to
+   Braintrust for observability, so the old "message content is never logged"
+   promise no longer holds for Ori. The public privacy copy (try.html
+   PrivacyVault, manifesto.html) MUST be updated to say so before this ships.
+   Copy rails live in the system prompt: warm coach-friend voice, everyday
+   nudges allowed but never medical advice, no invented stats, honest v0.1. */
 /* llama-3.1-8b-instruct (non-fast) was deprecated 2026-05-30; the -fast
    variant stays active per Cloudflare's deprecation notice. Fallbacks cover
    the next deprecation wave so chat degrades to a different model, not a 502. */
@@ -250,10 +270,14 @@ const ORI_PERSONAS = {
   breathe: "\n\nThis person chose: \"I need a breather from tracking anxiety.\" Listening first, numbers second. Keep it light and human; let them vent about their wearable without piling on more optimization.",
 };
 
-async function oriChat(request, env) {
+async function oriChat(request, env, ctx) {
   if (request.method !== "POST") return new Response("POST only", { status: 405 });
   const headers = { "Content-Type": "application/json", "Cache-Control": "no-store" };
   if (!env.AI) return new Response(JSON.stringify({ error: "not_configured" }), { status: 503, headers });
+  const logger = getLogger(env);
+  // flush spans after the response is sent — Workers may not run async past
+  // return without this (no-op when tracing is off).
+  const flush = () => { if (logger && ctx) ctx.waitUntil(logger.flush()); };
   let body;
   try { body = await request.json(); } catch (e) { return new Response(JSON.stringify({ error: "bad_json" }), { status: 400, headers }); }
   const clean = [];
@@ -277,39 +301,61 @@ async function oriChat(request, env) {
     for (const m of clean.slice(-6)) convo += (m.role === "user" ? "\nThem: " : "\nOri: ") + m.content;
     const vprompt = ORI_SYSTEM + ORI_PERSONAS[persona] + who + ORI_VISION +
       "\n\nRecent conversation:" + convo + "\n\nOri replies (2 to 4 sentences, warm, no lists):";
-    let vdetail = "";
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        const out = await env.AI.run(ORI_VISION_MODEL, { prompt: vprompt, image: bytes, max_tokens: 320 });
-        const reply = String((out && out.response) || "").trim();
-        if (!reply) throw new Error("empty");
-        return new Response(JSON.stringify({ reply: reply }), { headers });
-      } catch (e) {
-        vdetail = String((e && e.message) || e).slice(0, 140);
-        if (attempt === 0 && /agree|license|accept/i.test(vdetail)) {
-          try { await env.AI.run(ORI_VISION_MODEL, { prompt: "agree" }); } catch (e2) {}
-        } else break;
+    // Traced input is the conversation text + a screenshot marker; the raw
+    // image bytes are intentionally not logged (up to ~2MB base64 per turn).
+    const vInput = convo.trim() + "\n[screenshot attached]";
+    const runVision = async (span) => {
+      let vdetail = "";
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const t0 = Date.now();
+        try {
+          const out = await env.AI.run(ORI_VISION_MODEL, { prompt: vprompt, image: bytes, max_tokens: 320 });
+          const reply = String((out && out.response) || "").trim();
+          if (!reply) throw new Error("empty");
+          if (span) span.log({ input: vInput, output: reply, metadata: { model: ORI_VISION_MODEL, persona, who: body.who || null, kind: "vision" }, metrics: { latency_ms: Date.now() - t0 } });
+          return { reply };
+        } catch (e) {
+          vdetail = String((e && e.message) || e).slice(0, 140);
+          if (attempt === 0 && /agree|license|accept/i.test(vdetail)) {
+            try { await env.AI.run(ORI_VISION_MODEL, { prompt: "agree" }); } catch (e2) {}
+          } else break;
+        }
       }
-    }
-    return new Response(JSON.stringify({ error: "vision", detail: vdetail }), { status: 502, headers });
+      if (span) span.log({ input: vInput, metadata: { model: ORI_VISION_MODEL, persona, kind: "vision" }, error: vdetail });
+      return { error: "vision", detail: vdetail };
+    };
+    const vres = logger ? await traced(runVision, { name: "ori-chat-vision" }) : await runVision(null);
+    flush();
+    if (vres.error) return new Response(JSON.stringify(vres), { status: 502, headers });
+    return new Response(JSON.stringify({ reply: vres.reply }), { headers });
   }
 
-  let detail = "";
-  for (const model of ORI_MODELS) {
-    try {
-      const out = await env.AI.run(model, {
-        messages: [{ role: "system", content: ORI_SYSTEM + ORI_PERSONAS[persona] + who }].concat(clean),
-        max_tokens: 320,
-      });
-      const reply = String((out && out.response) || "").trim();
-      if (!reply) throw new Error("empty");
-      return new Response(JSON.stringify({ reply: reply }), { headers });
-    } catch (e) {
-      // sanitized infra error only (model/binding failures) — never chat content
-      detail = String((e && e.message) || e).slice(0, 140);
+  const runChat = async (span) => {
+    let detail = "";
+    for (let i = 0; i < ORI_MODELS.length; i++) {
+      const model = ORI_MODELS[i];
+      const t0 = Date.now();
+      try {
+        const out = await env.AI.run(model, {
+          messages: [{ role: "system", content: ORI_SYSTEM + ORI_PERSONAS[persona] + who }].concat(clean),
+          max_tokens: 320,
+        });
+        const reply = String((out && out.response) || "").trim();
+        if (!reply) throw new Error("empty");
+        if (span) span.log({ input: clean, output: reply, metadata: { model, persona, who: body.who || null, fallback_index: i }, metrics: { latency_ms: Date.now() - t0 } });
+        return { reply };
+      } catch (e) {
+        // sanitized infra error only (model/binding failures) — never chat content
+        detail = String((e && e.message) || e).slice(0, 140);
+      }
     }
-  }
-  return new Response(JSON.stringify({ error: "upstream", detail: detail }), { status: 502, headers });
+    if (span) span.log({ input: clean, metadata: { persona, models_tried: ORI_MODELS.length }, error: detail });
+    return { error: "upstream", detail };
+  };
+  const cres = logger ? await traced(runChat, { name: "ori-chat" }) : await runChat(null);
+  flush();
+  if (cres.error) return new Response(JSON.stringify(cres), { status: 502, headers });
+  return new Response(JSON.stringify({ reply: cres.reply }), { headers });
 }
 
 /* Outreach-friendly short routes (assets match first, so these only fire when
@@ -340,7 +386,7 @@ function withCors(res) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const pathname = url.pathname;
     if (pathname === "/auth/oura/start") return start(request, env);
@@ -350,7 +396,7 @@ export default {
     }
     if (pathname === "/api/manual-submit") return withCors(await manualSubmit(request, env));
     if (pathname === "/api/caddy-voice") return withCors(await caddyVoice(request, env));
-    if (pathname === "/api/ori-chat") return withCors(await oriChat(request, env));
+    if (pathname === "/api/ori-chat") return withCors(await oriChat(request, env, ctx));
     if (SHORTLINKS[pathname]) return Response.redirect(url.origin + SHORTLINKS[pathname] + url.search, 302);
     // /p/<handle-or-code> — public Body Passport (renders live from board.json)
     if (pathname.startsWith("/p/") && pathname.length > 3) {
