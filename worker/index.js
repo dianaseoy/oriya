@@ -15,6 +15,8 @@
  */
 
 import { manualSubmit } from "./submit.js";
+import { generateBrief } from "../lib/ori";
+import { extractMetrics } from "./vision.js";
 import { initLogger, traced } from "braintrust";
 
 /* Braintrust tracing for Ori chat. Lazily initialized from the request-scoped
@@ -358,6 +360,56 @@ async function oriChat(request, env, ctx) {
   return new Response(JSON.stringify({ reply: cres.reply }), { headers });
 }
 
+/* Ori Daily Brief — turns a wearable into natural-language coaching.
+   Pipeline: a screenshot (body.image) is read into metrics by the free Workers
+   AI vision binding (worker/vision.js); those metrics — or typed ones — are
+   reasoned into a brief by lib/ori.js, which uses Fireworks when
+   FIREWORKS_API_KEY is set and a mock brain when it isn't (source:"mock"). The
+   endpoint never crashes without a key. Stateless: the screenshot lives only
+   inside this invocation, never stored. When BRAINTRUST_API_KEY is set each
+   brief is traced so interpretation quality can be evaluated across wearable
+   brands (WHOOP/Oura/Garmin/Apple). */
+async function askOri(request, env, ctx) {
+  if (request.method !== "POST") return new Response("POST only", { status: 405 });
+  const headers = { "Content-Type": "application/json", "Cache-Control": "no-store" };
+  let body;
+  try { body = await request.json(); } catch (e) { return new Response(JSON.stringify({ error: "bad_json" }), { status: 400, headers }); }
+
+  const req = {
+    wearable: body && body.wearable,
+    metrics: (body && body.metrics) || {},
+    userQuestion: body && body.userQuestion,
+  };
+  // Screenshot path: extract metrics, then discard the image. Extracted values
+  // win over anything typed; the raw bytes are never logged or traced.
+  let usedImage = false;
+  if (typeof body.image === "string" && body.image) {
+    usedImage = true;
+    const extracted = await extractMetrics(env, body.image);
+    if (extracted.wearable) req.wearable = extracted.wearable;
+    req.metrics = Object.assign({}, req.metrics, extracted);
+    delete req.metrics.wearable;
+  }
+
+  const config = { fireworksApiKey: env && env.FIREWORKS_API_KEY };
+  const logger = getLogger(env);
+  const flush = () => { if (logger && ctx) ctx.waitUntil(logger.flush()); };
+  const run = async (span) => {
+    const t0 = Date.now();
+    const out = await generateBrief(config, req);
+    if (span) span.log({
+      input: { wearable: req.wearable, metrics: req.metrics, question: req.userQuestion || null, from_screenshot: usedImage },
+      output: out,
+      metadata: { wearable: out.wearable, kind: req.userQuestion ? "ask" : "brief", source: out.source },
+      metrics: { latency_ms: Date.now() - t0 },
+    });
+    return out;
+  };
+  const out = logger ? await traced(run, { name: "ori-daily-brief" }) : await run(null);
+  flush();
+  return new Response(JSON.stringify(out), { headers });
+}
+
 /* Outreach-friendly short routes (assets match first, so these only fire when
    no static file exists at the path). 302 so they stay repointable. */
 const SHORTLINKS = {
@@ -397,6 +449,7 @@ export default {
     if (pathname === "/api/manual-submit") return withCors(await manualSubmit(request, env));
     if (pathname === "/api/caddy-voice") return withCors(await caddyVoice(request, env));
     if (pathname === "/api/ori-chat") return withCors(await oriChat(request, env, ctx));
+    if (pathname === "/api/ask-ori") return withCors(await askOri(request, env, ctx));
     if (SHORTLINKS[pathname]) return Response.redirect(url.origin + SHORTLINKS[pathname] + url.search, 302);
     // /p/<handle-or-code> — public Body Passport (renders live from board.json)
     if (pathname.startsWith("/p/") && pathname.length > 3) {

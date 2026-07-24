@@ -79,6 +79,27 @@
     @keyframes recPulse { 50% { background:rgba(230,106,106,.12); } }
     @media (prefers-reduced-motion: reduce) { .abtn.rec { animation:none; } }
     .msg .shot { display:block; max-width:100%; border-radius:9px; margin-bottom:7px; }
+    /* morning brief card — a full-width structured read inside the feed */
+    .brief { align-self:stretch; max-width:100%; background:var(--panel); border:1px solid rgba(127,183,158,.3); border-radius:14px; padding:15px 16px; }
+    .brief .b-greet { font-size:12px; color:var(--accent); letter-spacing:.02em; margin-bottom:7px; }
+    .brief .b-sum { font-size:16px; line-height:1.45; font-weight:500; margin-bottom:14px; }
+    .brief .b-obs { list-style:none; padding:0; margin:0 0 14px; display:flex; flex-direction:column; gap:10px; }
+    .brief .b-obs li { position:relative; padding-left:15px; font-size:13.5px; color:#CFD2D8; line-height:1.5; }
+    .brief .b-obs li::before { content:""; position:absolute; left:0; top:7px; width:6px; height:6px; border-radius:99px; background:var(--accent); opacity:.6; }
+    .brief .b-block { border-radius:10px; padding:11px 12px; font-size:13.5px; line-height:1.5; }
+    .brief .b-rec { background:rgba(127,183,158,.08); border:1px solid rgba(127,183,158,.25); margin-bottom:9px; }
+    .brief .b-rea { background:rgba(215,162,92,.07); border:1px solid rgba(215,162,92,.22); }
+    .brief .b-block b { display:block; font-size:10px; letter-spacing:.06em; text-transform:uppercase; margin-bottom:4px; font-weight:600; }
+    .brief .b-rec b { color:var(--accent); } .brief .b-rea b { color:var(--amber); }
+    .brief .b-meta { display:flex; align-items:center; gap:9px; margin-top:13px; flex-wrap:wrap; }
+    .brief .b-pill { font-size:10.5px; color:var(--dim); border:1px solid var(--line); border-radius:99px; padding:3px 9px; }
+    .brief .b-pill b { color:var(--accent); font-weight:600; }
+    .brief .b-why { background:none; border:1px solid var(--line); color:var(--dim); border-radius:8px; padding:4px 11px; font:inherit; font-size:11.5px; cursor:pointer; transition:all .2s ease; }
+    .brief .b-why:hover { color:var(--text); border-color:#3A3D45; }
+    .brief .b-reason { margin-top:11px; font-size:13px; line-height:1.6; color:#BFC3CA; border-left:2px solid var(--line); padding:2px 0 2px 12px; }
+    .b-ex { display:flex; flex-wrap:wrap; gap:6px; align-self:stretch; }
+    .b-ex button { background:none; border:1px dashed var(--line); color:var(--dim); border-radius:8px; padding:5px 10px; font:inherit; font-size:11.5px; cursor:pointer; }
+    .b-ex button:hover { color:var(--text); border-color:var(--accent); }
     .foot { font-size:10.5px; font-family:ui-monospace,monospace; color:#5A5F68; line-height:1.6; margin-top:12px; }
   </style>
 </head>
@@ -110,7 +131,7 @@
       <button class="abtn" id="micBtn" title="Speak instead of typing" aria-label="Voice input" hidden>🎤</button>
       <button class="abtn" id="shotBtn" title="Share a screenshot of your score" aria-label="Share a screenshot">📷</button>
       <input type="file" id="shotFile" accept="image/*" hidden>
-      <textarea id="input" rows="1" maxlength="600" placeholder="Say anything — your scores, your ring, your morning…" aria-label="Message Ori"></textarea>
+      <textarea id="input" rows="1" maxlength="600" placeholder="Share a screenshot 📷 for your Morning Brief — or just say how your morning's going…" aria-label="Message Ori"></textarea>
       <button class="send" id="send">Send</button>
     </div>
 
@@ -126,6 +147,9 @@
           bar = document.getElementById("bar"), input = document.getElementById("input"),
           send = document.getElementById("send");
       var pending = false;
+      // Set once a screenshot brief lands — routes follow-up text to the
+      // grounded /api/ask-ori path so answers stay tied to the same numbers.
+      var activeBrief = null; // { wearable, metrics }
 
       var HELLO = {
         scores: "Hey, I'm Ori — the friend who actually enjoys decoding this stuff. What did your wearable throw at you this morning? Give me the number and the face you made at it.",
@@ -193,6 +217,7 @@
       }
 
       function paint() {
+        activeBrief = null; // feed is being rebuilt; drop any stale brief context
         var has = !!persona;
         pick.hidden = has; feed.hidden = !has; bar.hidden = !has;
         if (!has) return;
@@ -247,7 +272,100 @@
           .finally(function () { pending = false; send.disabled = false; input.focus(); });
       }
 
-      function ask() { sendMsg(input.value.trim(), null); }
+      /* Screenshot → Morning Brief. Extraction + reasoning happen server-side
+         (/api/ask-ori); the image rides this one request and is never stored. */
+      function getBrief(shot) {
+        if (pending) return;
+        var ub = bubble("user", "");
+        var im = document.createElement("img");
+        im.className = "shot"; im.src = shot; im.alt = "your screenshot";
+        ub.insertBefore(im, ub.firstChild);
+        pending = true; send.disabled = true;
+        var wait = document.createElement("div");
+        wait.className = "pending arrive"; wait.textContent = "Ori is reading your screenshot…";
+        feed.appendChild(wait); feed.scrollTop = feed.scrollHeight;
+        fetch(API + "/api/ask-ori", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: shot, userQuestion: "" }),
+        }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (res) {
+            wait.remove();
+            if (!res.ok || !res.j.summary) {
+              bubble("bot", "I couldn't quite read that screenshot — try a clearer shot of your recovery or readiness screen, or just type the numbers and I'll give you the same read.", "err");
+              return;
+            }
+            activeBrief = { wearable: res.j.wearable, metrics: res.j.metrics };
+            renderBrief(res.j);
+          })
+          .catch(function () { wait.remove(); bubble("bot", "No connection just now — try sharing that screenshot again in a moment.", "err"); })
+          .finally(function () { pending = false; send.disabled = false; input.focus(); });
+      }
+
+      /* Render the structured brief as a full-width card, then offer example
+         follow-ups. Reasoning hides behind Why?; text is escaped via textContent. */
+      function renderBrief(d) {
+        var card = document.createElement("div");
+        card.className = "brief arrive";
+        add(card, "div", "b-greet", d.greeting || "🌅 Morning Brief");
+        add(card, "p", "b-sum", d.summary);
+        var ul = document.createElement("ul"); ul.className = "b-obs";
+        (d.observations || []).forEach(function (o) { var li = document.createElement("li"); li.textContent = o; ul.appendChild(li); });
+        card.appendChild(ul);
+        card.appendChild(block("b-rec", "What I'd do", d.recommendation));
+        card.appendChild(block("b-rea", "Don't worry about", d.reassurance));
+        var meta = document.createElement("div"); meta.className = "b-meta";
+        if (d.confidence) { var p = document.createElement("span"); p.className = "b-pill"; p.innerHTML = "confidence <b></b>"; p.querySelector("b").textContent = d.confidence; meta.appendChild(p); }
+        var whyBtn = document.createElement("button"); whyBtn.className = "b-why"; whyBtn.textContent = "Why?";
+        meta.appendChild(whyBtn); card.appendChild(meta);
+        var reason = add(card, "div", "b-reason", d.reasoning || ""); reason.hidden = true;
+        whyBtn.addEventListener("click", function () { reason.hidden = !reason.hidden; whyBtn.textContent = reason.hidden ? "Why?" : "Hide"; });
+        feed.appendChild(card);
+        // Ask Ori — example follow-ups, grounded in this brief's numbers
+        var ex = document.createElement("div"); ex.className = "b-ex arrive";
+        ["Can I push today's workout?", "Why is my recovery lower?", "What changed this week?"].forEach(function (q) {
+          var b = document.createElement("button"); b.textContent = q;
+          b.addEventListener("click", function () { input.value = q; ask(); });
+          ex.appendChild(b);
+        });
+        feed.appendChild(ex);
+        feed.scrollTop = feed.scrollHeight;
+      }
+      function block(cls, label, text) {
+        var d = document.createElement("div"); d.className = "b-block " + cls;
+        var b = document.createElement("b"); b.textContent = label; d.appendChild(b);
+        d.appendChild(document.createTextNode(text || "")); return d;
+      }
+      function add(host, tag, cls, text) {
+        var el = document.createElement(tag); el.className = cls; el.textContent = text || ""; host.appendChild(el); return el;
+      }
+
+      /* Grounded follow-up — reuses the brief's extracted numbers so Ori keeps
+         talking about the same morning. */
+      function askBrief(text) {
+        if (pending || !text) return;
+        input.value = "";
+        bubble("user", text);
+        pending = true; send.disabled = true;
+        var wait = document.createElement("div");
+        wait.className = "pending arrive"; wait.textContent = "Ori is thinking…";
+        feed.appendChild(wait); feed.scrollTop = feed.scrollHeight;
+        fetch(API + "/api/ask-ori", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ wearable: activeBrief.wearable, metrics: activeBrief.metrics, userQuestion: text }),
+        }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (res) {
+            wait.remove();
+            bubble("bot", (res.ok && res.j.answer) ? res.j.answer : "That one didn't get through — try asking again in a moment.", (res.ok && res.j.answer) ? null : "err");
+          })
+          .catch(function () { wait.remove(); bubble("bot", "No connection just now — your question is still here, try again in a moment.", "err"); })
+          .finally(function () { pending = false; send.disabled = false; input.focus(); });
+      }
+
+      function ask() {
+        var text = input.value.trim();
+        if (activeBrief) return askBrief(text); // grounded in the current brief
+        sendMsg(text, null);                    // otherwise the persona chat
+      }
 
       /* 📷 — downscale in-browser so a 12MP phone shot becomes a ~100KB JPEG
          before it ever leaves the device */
@@ -264,7 +382,7 @@
           c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
           c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
           URL.revokeObjectURL(url);
-          sendMsg(input.value.trim(), c.toDataURL("image/jpeg", 0.85));
+          getBrief(c.toDataURL("image/jpeg", 0.85)); // screenshot → Morning Brief
         };
         img.onerror = function () {
           URL.revokeObjectURL(url);
@@ -307,7 +425,7 @@
         persona = null; pick.hidden = false; feed.hidden = true; bar.hidden = true;
       });
       document.getElementById("clearBtn").addEventListener("click", function () {
-        chat = []; save(KEY_C, chat); paint();
+        chat = []; save(KEY_C, chat); activeBrief = null; paint();
       });
       send.addEventListener("click", ask);
       input.addEventListener("keydown", function (e) {
