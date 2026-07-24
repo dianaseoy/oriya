@@ -13,6 +13,11 @@
  * fireworks.ts, mock.ts, ori.ts): Fireworks when FIREWORKS_API_KEY is set, the
  * mock brain otherwise. Ori interprets wearable metrics; it never just repeats
  * them.
+ *
+ * NOTE: the live surface has since grown a 7-day baseline (lib/baseline.ts +
+ * a "Your Ori Baseline" view + multi-screenshot upload). This port does not
+ * mirror that yet — when it does, feed AskOriRequest.baseline into ask() and
+ * add a BaselineSummary panel. Kept minimal here on purpose.
  */
 
 import { useState } from "react";

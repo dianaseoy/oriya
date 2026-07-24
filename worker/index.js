@@ -384,6 +384,9 @@ async function askOri(request, env, ctx) {
     wearable: body.wearable,
     metrics: (body.metrics && typeof body.metrics === "object") ? body.metrics : {},
     userQuestion: body.userQuestion,
+    // The person's own 7-day history, computed client-side and sent per request.
+    // It is never stored server-side; lib/ori.ts sanitizes it before use.
+    baseline: (body.baseline && typeof body.baseline === "object") ? body.baseline : null,
   };
   // Screenshot path: extract metrics, then discard the image. Extracted values
   // win over anything typed; the raw bytes are never logged or traced.
@@ -408,16 +411,38 @@ async function askOri(request, env, ctx) {
     delete req.metrics.wearable;
   }
 
+  // Extract-only: used when the client uploads several screenshots to build a
+  // baseline. Return the read metrics, skip all reasoning (no Fireworks call).
+  // Requires an image — there's nothing to extract otherwise.
+  if (body.extractOnly) {
+    if (!usedImage) return new Response(JSON.stringify({ error: "no_image" }), { status: 400, headers });
+    traceMeta(env, ctx, {
+      wearable: req.wearable || null, kind: "extract", source: "vision", from_screenshot: true,
+      present: presence(req.metrics), latency_ms: 0,
+    });
+    return new Response(JSON.stringify({ ok: true, extractOnly: true, wearable: req.wearable || null, metrics: req.metrics }), { headers });
+  }
+
   const config = { fireworksApiKey: env && env.FIREWORKS_API_KEY };
   const logger = getLogger(env);
   const flush = () => { if (logger && ctx) ctx.waitUntil(logger.flush()); };
   const run = async (span) => {
     const t0 = Date.now();
     const out = await generateBrief(config, req);
+    // METADATA ONLY — never the biometric values or the generated brief text.
+    // We log which wearable, whether a screenshot/baseline was involved, the
+    // confidence label, coarse presence flags, and latency. No recovery/HRV/RHR/
+    // sleep numbers, no question text, no reasoning ever reaches the tracer.
     if (span) span.log({
-      input: { wearable: req.wearable, metrics: req.metrics, question: req.userQuestion || null, from_screenshot: usedImage },
-      output: out,
-      metadata: { wearable: out.wearable, kind: req.userQuestion ? "ask" : "brief", source: out.source },
+      metadata: {
+        wearable: out.wearable,
+        kind: req.userQuestion ? "ask" : "brief",
+        source: out.source,
+        from_screenshot: usedImage,
+        has_baseline: !!(req.baseline && req.baseline.days),
+        confidence: out.confidence || null,
+        present: presence(req.metrics),
+      },
       metrics: { latency_ms: Date.now() - t0 },
     });
     return out;
@@ -425,6 +450,28 @@ async function askOri(request, env, ctx) {
   const out = logger ? await traced(run, { name: "ori-daily-brief" }) : await run(null);
   flush();
   return new Response(JSON.stringify(out), { headers });
+}
+
+/* Coarse presence flags — booleans only, never the values. Lets us see how
+ * often a screenshot yields each field without ever tracing a biometric. */
+function presence(m) {
+  m = m || {};
+  return {
+    recovery: m.recovery != null,
+    hrv: m.hrv != null,
+    rhr: m.rhr != null,
+    sleep: m.sleep != null && m.sleep !== "",
+  };
+}
+
+/* One-shot metadata-only trace for the extract-only path (no reasoning to
+ * wrap in a span). No-ops without a Braintrust key. */
+function traceMeta(env, ctx, meta) {
+  const logger = getLogger(env);
+  if (!logger) return;
+  const { latency_ms, ...rest } = meta;
+  const p = traced(async (span) => { if (span) span.log({ metadata: rest, metrics: { latency_ms: latency_ms || 0 } }); }, { name: "ori-daily-brief" });
+  if (ctx) ctx.waitUntil(p.then(function () { return logger.flush(); }));
 }
 
 /* Outreach-friendly short routes (assets match first, so these only fire when

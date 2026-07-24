@@ -8,7 +8,22 @@
 
 import { ORI_SYSTEM_PROMPT } from "./prompts";
 import { WEARABLES } from "./mock";
-import type { OriBrief, Signals } from "./types";
+import type { BaselineSummary, OriBrief, Signals } from "./types";
+
+/* Turn a real baseline into a line the model can compare against — or an
+ * explicit no-history instruction so it never fabricates one. */
+function baselineLine(b: BaselineSummary | null | undefined): string {
+  if (!b || b.days < 2) {
+    return `No baseline or history is available for this person. Read ONLY today's numbers. Do not reference "usually", a "normal" range, past nights, "this week", or any trend — say plainly that a single morning is limited context.`;
+  }
+  const bits: string[] = [];
+  if (b.avgRecovery != null) bits.push(`avg recovery ${b.avgRecovery}`);
+  if (b.avgSleepH != null) bits.push(`avg sleep ${b.avgSleepH}h`);
+  if (b.hrvMin != null && b.hrvMax != null) bits.push(`HRV range ${b.hrvMin}-${b.hrvMax}ms (avg ${b.hrvAvg ?? "?"})`);
+  if (b.avgRhr != null) bits.push(`avg resting HR ${b.avgRhr}`);
+  const patterns = b.patterns && b.patterns.length ? ` Known patterns from their data: ${b.patterns.join("; ")}.` : "";
+  return `Their real ${b.days}-day baseline (from their own logged days): ${bits.join(", ")}.${patterns} Compare today against this baseline only — do not invent history beyond these figures.`;
+}
 
 export const FIREWORKS_ENDPOINT = "https://api.fireworks.ai/inference/v1/chat/completions";
 // ← swap the model here; any Fireworks chat model with JSON mode works.
@@ -27,7 +42,8 @@ This person's device is ${w.label}${w.native ? "" : ", which ships no single rec
 
 ${schemaInstruction(!!s.question)}`;
   const user = `Wearable: ${w.label}
-Metrics: ${JSON.stringify({ recovery: s.recovery, hrv: s.hrv, restingHr: s.rhr, sleepHours: s.sleepH })}
+Today's metrics: ${JSON.stringify({ recovery: s.recovery, hrv: s.hrv, restingHr: s.rhr, sleepHours: s.sleepH })}
+${baselineLine(s.baseline)}
 ${s.question ? `The person also asks: "${s.question}"` : "Write the opening morning brief."}`;
 
   const res = await fetch(FIREWORKS_ENDPOINT, {

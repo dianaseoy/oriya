@@ -18,6 +18,34 @@ export interface AskOriRequest {
   metrics?: OriMetrics;
   image?: string; // data: URL of a wearable screenshot
   userQuestion?: string; // set for an "Ask Ori" follow-up
+  baseline?: BaselineSummary | null; // the person's own 7-day history, if built
+  extractOnly?: boolean; // true = read metrics from the image, skip reasoning
+}
+
+/** One day of extracted metrics. This is the ONLY historical record Ori keeps,
+ * and it lives client-side (localStorage) — never on the server. sleepH is
+ * hours (normalized from "5h31" etc.). */
+export interface BaselineEntry {
+  day: string; // "YYYY-MM-DD" — one entry per day, latest upload wins
+  wearable: Wearable;
+  recovery: number | null;
+  hrv: number | null;
+  rhr: number | null;
+  sleepH: number | null;
+}
+
+/** The rolling 7-day baseline, summarized. Real aggregates only — every field
+ * is computed from stored BaselineEntry rows, never assumed. null when there
+ * isn't enough data to state it honestly. */
+export interface BaselineSummary {
+  days: number; // how many days actually contributed (0-7)
+  avgRecovery: number | null;
+  avgSleepH: number | null;
+  hrvMin: number | null;
+  hrvMax: number | null;
+  hrvAvg: number | null;
+  avgRhr: number | null;
+  patterns: string[]; // plain-language patterns derived from the data (may be empty)
 }
 
 /** The one response shape every caller depends on. Never contains markdown. */
@@ -43,6 +71,7 @@ export interface Signals {
   rhr: number | null;
   sleepH: number | null;
   question: string;
+  baseline: BaselineSummary | null; // real history when the user has built one
 }
 
 export interface OriConfig {

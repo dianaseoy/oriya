@@ -5,9 +5,33 @@
 
 import { fireworksBrief } from "./fireworks";
 import { mockBrief } from "./mock";
-import type { AskOriRequest, OriBrief, OriConfig, OriMetrics, Signals, Wearable } from "./types";
+import type { AskOriRequest, BaselineSummary, OriBrief, OriConfig, OriMetrics, Signals, Wearable } from "./types";
 
 const WEARABLE_KEYS: Wearable[] = ["whoop", "oura", "garmin", "apple"];
+
+/* The baseline arrives from the client (localStorage) — untrusted. Keep only
+ * numeric aggregates and a few plain-string patterns; drop anything else so a
+ * malformed body can never reach the reasoning layer or a trace. */
+function cleanBaseline(b: unknown): BaselineSummary | null {
+  if (!b || typeof b !== "object") return null;
+  const o = b as Record<string, unknown>;
+  const n = (v: unknown): number | null => (typeof v === "number" && isFinite(v) ? v : null);
+  const days = Math.max(0, Math.min(7, Math.floor(n(o.days) ?? 0)));
+  if (days < 1) return null;
+  const patterns = Array.isArray(o.patterns)
+    ? o.patterns.filter((p): p is string => typeof p === "string").slice(0, 5).map((p) => p.slice(0, 200))
+    : [];
+  return {
+    days,
+    avgRecovery: n(o.avgRecovery),
+    avgSleepH: n(o.avgSleepH),
+    hrvMin: n(o.hrvMin),
+    hrvMax: n(o.hrvMax),
+    hrvAvg: n(o.hrvAvg),
+    avgRhr: n(o.avgRhr),
+    patterns,
+  };
+}
 
 function num(v: unknown): number | null {
   if (v == null || v === "") return null;
@@ -37,6 +61,7 @@ export function normalize(req: AskOriRequest): Signals {
     rhr: num(m.rhr),
     sleepH: parseSleep(m.sleep),
     question: String(req?.userQuestion || "").slice(0, 300).trim(),
+    baseline: cleanBaseline(req?.baseline),
   };
 }
 
