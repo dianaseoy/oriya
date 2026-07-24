@@ -374,11 +374,16 @@ async function askOri(request, env, ctx) {
   const headers = { "Content-Type": "application/json", "Cache-Control": "no-store" };
   let body;
   try { body = await request.json(); } catch (e) { return new Response(JSON.stringify({ error: "bad_json" }), { status: 400, headers }); }
+  // request.json() can yield null, a number, a string, or an array — any of
+  // which would make body.image / body.metrics throw below. Reject non-objects.
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return new Response(JSON.stringify({ error: "bad_json" }), { status: 400, headers });
+  }
 
   const req = {
-    wearable: body && body.wearable,
-    metrics: (body && body.metrics) || {},
-    userQuestion: body && body.userQuestion,
+    wearable: body.wearable,
+    metrics: (body.metrics && typeof body.metrics === "object") ? body.metrics : {},
+    userQuestion: body.userQuestion,
   };
   // Screenshot path: extract metrics, then discard the image. Extracted values
   // win over anything typed; the raw bytes are never logged or traced.
@@ -386,6 +391,18 @@ async function askOri(request, env, ctx) {
   if (typeof body.image === "string" && body.image) {
     usedImage = true;
     const extracted = await extractMetrics(env, body.image);
+    // Nothing legible came back. Do NOT invent a health brief from empty
+    // metrics — ask for a clearer shot instead (the client renders .message).
+    const readable = extracted && (
+      extracted.recovery != null || extracted.hrv != null || extracted.rhr != null ||
+      (extracted.sleep != null && extracted.sleep !== "")
+    );
+    if (!readable) {
+      return new Response(JSON.stringify({
+        error: "unreadable_screenshot",
+        message: "I couldn't read any recovery, HRV, or sleep numbers from that screenshot. Try a clearer shot of your recovery or readiness screen — or just type the numbers and I'll give you the same read.",
+      }), { status: 422, headers });
+    }
     if (extracted.wearable) req.wearable = extracted.wearable;
     req.metrics = Object.assign({}, req.metrics, extracted);
     delete req.metrics.wearable;
@@ -437,6 +454,24 @@ function withCors(res) {
   return out;
 }
 
+/* Best-effort abuse guard for the reasoning endpoint (Fireworks + Workers AI
+   vision both cost money per call). In-memory and per-isolate — Workers run many
+   isolates, so this is a soft cap that blunts a hot loop or a single abusive
+   client, not a hard global quota (that would need a KV/Durable Object binding).
+   Fixed 60s window keyed by client IP. Returns seconds-to-wait, or 0 if OK. */
+const RL_WINDOW_MS = 60000;
+const RL_MAX = 20;
+const rlHits = new Map(); // ip -> { count, resetAt }
+function rateLimited(request) {
+  const ip = request.headers.get("CF-Connecting-IP") || "anon";
+  const now = Date.now();
+  let e = rlHits.get(ip);
+  if (!e || now >= e.resetAt) { e = { count: 0, resetAt: now + RL_WINDOW_MS }; rlHits.set(ip, e); }
+  e.count++;
+  if (rlHits.size > 5000) { for (const [k, v] of rlHits) if (now >= v.resetAt) rlHits.delete(k); } // bound memory
+  return e.count > RL_MAX ? Math.max(1, Math.ceil((e.resetAt - now) / 1000)) : 0;
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -449,7 +484,14 @@ export default {
     if (pathname === "/api/manual-submit") return withCors(await manualSubmit(request, env));
     if (pathname === "/api/caddy-voice") return withCors(await caddyVoice(request, env));
     if (pathname === "/api/ori-chat") return withCors(await oriChat(request, env, ctx));
-    if (pathname === "/api/ask-ori") return withCors(await askOri(request, env, ctx));
+    if (pathname === "/api/ask-ori") {
+      const retry = rateLimited(request);
+      if (retry) return withCors(new Response(
+        JSON.stringify({ error: "rate_limited", message: "One moment — you're going a little fast. Try again in a few seconds." }),
+        { status: 429, headers: { "Content-Type": "application/json", "Retry-After": String(retry) } }
+      ));
+      return withCors(await askOri(request, env, ctx));
+    }
     if (SHORTLINKS[pathname]) return Response.redirect(url.origin + SHORTLINKS[pathname] + url.search, 302);
     // /p/<handle-or-code> — public Body Passport (renders live from board.json)
     if (pathname.startsWith("/p/") && pathname.length > 3) {

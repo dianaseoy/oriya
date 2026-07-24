@@ -48,8 +48,12 @@ export async function generateBrief(config: OriConfig, req: AskOriRequest): Prom
     try {
       return await fireworksBrief(config.fireworksApiKey, s);
     } catch {
+      // Fireworks unreachable — fall back to the mock brain so a demo never goes
+      // blank. mockBrief() stamps source:"mock" so the UI can label it honestly;
+      // it must never be presented as live analysis.
       return mockBrief(s);
     }
   }
+  // No key configured → demo/mock mode. source:"mock" travels to the client.
   return mockBrief(s);
 }

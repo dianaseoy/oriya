@@ -93,6 +93,7 @@
     .brief .b-rec b { color:var(--accent); } .brief .b-rea b { color:var(--amber); }
     .brief .b-meta { display:flex; align-items:center; gap:9px; margin-top:13px; flex-wrap:wrap; }
     .brief .b-pill { font-size:10.5px; color:var(--dim); border:1px solid var(--line); border-radius:99px; padding:3px 9px; }
+    .brief .b-demo { font-size:10.5px; color:var(--amber); border:1px solid rgba(215,162,92,.4); background:rgba(215,162,92,.08); border-radius:99px; padding:3px 9px; }
     .brief .b-pill b { color:var(--accent); font-weight:600; }
     .brief .b-why { background:none; border:1px solid var(--line); color:var(--dim); border-radius:8px; padding:4px 11px; font:inherit; font-size:11.5px; cursor:pointer; transition:all .2s ease; }
     .brief .b-why:hover { color:var(--text); border-color:#3A3D45; }
@@ -291,7 +292,7 @@
           .then(function (res) {
             wait.remove();
             if (!res.ok || !res.j.summary) {
-              bubble("bot", "I couldn't quite read that screenshot — try a clearer shot of your recovery or readiness screen, or just type the numbers and I'll give you the same read.", "err");
+              bubble("bot", (res.j && res.j.message) ? res.j.message : "I couldn't quite read that screenshot — try a clearer shot of your recovery or readiness screen, or just type the numbers and I'll give you the same read.", "err");
               return;
             }
             activeBrief = { wearable: res.j.wearable, metrics: res.j.metrics };
@@ -315,6 +316,8 @@
         card.appendChild(block("b-rea", "Don't worry about", d.reassurance));
         var meta = document.createElement("div"); meta.className = "b-meta";
         if (d.confidence) { var p = document.createElement("span"); p.className = "b-pill"; p.innerHTML = "confidence <b></b>"; p.querySelector("b").textContent = d.confidence; meta.appendChild(p); }
+        // Honest mode label — a mock/demo brief must never read as live analysis.
+        if (d.source === "mock") { var dm = document.createElement("span"); dm.className = "b-demo"; dm.textContent = "Demo mode · sample analysis"; meta.appendChild(dm); }
         var whyBtn = document.createElement("button"); whyBtn.className = "b-why"; whyBtn.textContent = "Why?";
         meta.appendChild(whyBtn); card.appendChild(meta);
         var reason = add(card, "div", "b-reason", d.reasoning || ""); reason.hidden = true;
