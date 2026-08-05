@@ -74,8 +74,15 @@
     .brand-mark{width:38px;height:38px;border-radius:10px;border:1px solid var(--accent-line);background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:21px;color:var(--accent);flex-shrink:0}
     .brand-face{width:48px;height:48px;border-radius:13px;object-fit:cover;object-position:50% 32%;border:1px solid var(--accent-line);background:var(--accent-dim);flex-shrink:0;filter:grayscale(1) contrast(1.07) brightness(1.03)}
     .brand-name{font-weight:600;font-size:16px;letter-spacing:-0.01em}
-    .brand-role{font-family:var(--mono);font-size:11px;color:var(--text-3);margin-top:1px}
-    .brand-role b{color:var(--accent);font-weight:500}
+    /* role stack: static, each role carries a noun of proof and resolves to its
+       evidence (no animated job-title flourish — authority is stated, not performed) */
+    .brand-roles{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+    .role{font-family:var(--mono);font-size:11px;line-height:1.45;color:var(--text-3)}
+    .role b{color:var(--accent);font-weight:500}
+    a.role{transition:color .2s var(--ease)}
+    a.role:hover{color:var(--text-2)}
+    .role .role-arr{font-size:9px;color:var(--text-3);opacity:0;transition:opacity .2s var(--ease),transform .2s var(--ease)}
+    a.role:hover .role-arr{opacity:1;transform:translate(1px,-1px);color:var(--accent)}
 
     .bio{font-size:13.5px;color:var(--text-2);line-height:1.62}
     .bio b{color:var(--text);font-weight:500}
@@ -249,13 +256,31 @@
     .cmd-list{max-height:46vh;overflow-y:auto;padding:7px}
     .cmd-grouplabel{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-3);padding:9px 11px 5px}
     .cmd-item{display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:9px;cursor:pointer}
-    .cmd-item .ci-mk{font-family:var(--mono);font-size:12px;color:var(--text-3);width:14px}
-    .cmd-item .ci-t{font-size:14px;color:var(--text-2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .cmd-item .ci-meta{font-family:var(--mono);font-size:10px;color:var(--text-3)}
+    .cmd-item .ci-mk{font-family:var(--mono);font-size:12px;color:var(--text-3);width:14px;align-self:flex-start;margin-top:1px}
+    .cmd-item .ci-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+    .cmd-item .ci-t{font-size:14px;color:var(--text-2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    /* keyword-match snippet: shows WHERE in the essay the term lives, with the hit marked */
+    .cmd-item .ci-snip{font-family:var(--mono);font-size:11px;line-height:1.45;color:var(--text-3);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .cmd-item .ci-snip mark{background:var(--accent-dim);color:var(--accent);border-radius:3px;padding:0 2px}
+    .cmd-item.sel .ci-snip{color:var(--text-2)}
+    .cmd-item .ci-meta{font-family:var(--mono);font-size:10px;color:var(--text-3);align-self:flex-start;margin-top:1px;white-space:nowrap}
     .cmd-item.sel{background:var(--accent-dim)}
     .cmd-item.sel .ci-t{color:var(--text)}
     .cmd-item.sel .ci-mk{color:var(--accent)}
     .cmd-empty{padding:22px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--text-3)}
+
+    /* ---- top-right fold-out search ("magnet"): collapsed to a magnifier, folds
+       out to a labeled bar on hover/focus, opens the full-text command palette ---- */
+    .search-fold{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 11px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--text-3);cursor:pointer;font-family:var(--mono);font-size:12px;line-height:1;transition:border-color .25s var(--ease),color .25s var(--ease),box-shadow .3s var(--ease)}
+    .search-fold:hover,.search-fold:focus-visible{border-color:var(--accent-line);color:var(--accent);outline:none;box-shadow:0 0 0 4px var(--accent-dim)}
+    .search-fold .sf-ico{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;flex:none}
+    .search-fold .sf-label{max-width:0;overflow:hidden;white-space:nowrap;opacity:0;transform:translateX(-4px);transition:max-width .34s var(--spring),opacity .25s var(--ease),transform .3s var(--ease)}
+    .search-fold:hover .sf-label,.search-fold:focus-visible .sf-label{max-width:130px;opacity:1;transform:none}
+    .search-fold .sf-kbd{display:none;gap:2px}
+    .search-fold:hover .sf-kbd,.search-fold:focus-visible .sf-kbd{display:inline-flex}
+    .search-fold .sf-kbd b{font-family:var(--mono);font-size:9px;font-weight:500;color:var(--text-3);border:1px solid var(--line);border-radius:4px;padding:1px 4px}
+    .head-right{display:flex;align-items:center;gap:14px}
+    @media(prefers-reduced-motion:reduce){.search-fold .sf-label{transition:none}}
 
     /* ---- responsive ------------------------------------------- */
     @media(max-width:820px){
@@ -309,7 +334,11 @@
         <img class="brand-face" src="assets/diana-milan-tight.jpg" alt="Diana Seo" width="48" height="48" loading="eager" decoding="async">
         <div>
           <div class="brand-name">Diana Seo</div>
-          <div class="brand-role"><b>Founder</b> · category strategy · investor</div>
+          <div class="brand-roles">
+            <a class="role" href="https://oriya.app" target="_blank" rel="noopener"><b>Founder</b> Oriya, the recovery network <span class="role-arr">↗</span></a>
+            <a class="role" href="essay.html?id=ai-control-plane"><b>Category strategy</b> the layer beneath AI infra <span class="role-arr">→</span></a>
+            <span class="role"><b>Investor</b> pre-seed, in markets most funds skip</span>
+          </div>
         </div>
       </div>
 
@@ -358,7 +387,14 @@
     <main class="main">
       <div class="main-head">
         <div class="main-title">Writing — a working ledger</div>
-        <div class="main-count" id="count"></div>
+        <div class="head-right">
+          <div class="main-count" id="count"></div>
+          <button class="search-fold" id="searchFold" type="button" aria-label="Search every essay by keyword" aria-keyshortcuts="Meta+K Control+K">
+            <svg class="sf-ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M12.8 12.8l4.7 4.7"/></svg>
+            <span class="sf-label">Search essays</span>
+            <span class="sf-kbd"><b>⌘</b><b>K</b></span>
+          </button>
+        </div>
       </div>
       <p class="lede">A ledger of <em>non-consensus bets</em> — from early crypto and cross-border fintech to building in AI today.</p>
 
@@ -464,7 +500,7 @@
     <div class="cmd" role="dialog" aria-modal="true" aria-label="Command menu">
       <div class="cmd-in">
         <span class="pr">›</span>
-        <input id="cmdInput" type="text" placeholder="Jump to an essay, era, or link…" autocomplete="off" spellcheck="false">
+        <input id="cmdInput" type="text" placeholder="Search every essay by keyword — or jump to an era, link…" autocomplete="off" spellcheck="false">
         <span class="cmd-esc">esc</span>
       </div>
       <div class="cmd-list" id="cmdList"></div>
@@ -590,10 +626,27 @@
     var list = document.getElementById("cmdList");
     var sel = 0, results = [];
 
+    /* flatten an essay's real prose (dek + every body block, incl. table/deck text)
+       so search matches any WORD in any essay — not just titles. Retrieval only:
+       we surface her actual sentences, never generate. */
+    function essayText(e){
+      var parts=[e.dek||""];
+      (e.body||[]).forEach(function(b){
+        if(typeof b==="string"){ parts.push(b); return; }
+        if(!b) return;
+        if(b.text) parts.push(b.text);
+        if(b.cap) parts.push(b.cap);
+        if(b.label) parts.push(b.label);
+        if(b.rows) b.rows.forEach(function(r){ if(Array.isArray(r)) parts.push(r.join(" ")); });
+        if(b.cards) b.cards.forEach(function(c){ parts.push([c.kicker,c.title,c.see,c.stop].filter(Boolean).join(" ")); });
+      });
+      return parts.join("  ");
+    }
     function buildCommands(){
       var cmds = [];
       ESSAYS.forEach(function(e){
-        cmds.push({ type:"Essay", label:e.title, meta:e.period, mk:"›", href:"essay.html?id="+encodeURIComponent(e.slug), key:(e.title+" "+e.category+" "+e.era).toLowerCase() });
+        var full = essayText(e);
+        cmds.push({ type:"Essay", label:e.title, meta:e.period, mk:"›", href:"essay.html?id="+encodeURIComponent(e.slug), key:(e.title+" "+e.category+" "+e.era).toLowerCase(), full:full, fullLC:full.toLowerCase() });
       });
       ERAS.forEach(function(era){
         cmds.push({ type:"Jump", label:era.period+" — "+era.label, meta:"era", mk:"#", anchorEra:era.key, key:(era.period+" "+era.label).toLowerCase() });
@@ -605,12 +658,32 @@
     }
     var ALL = buildCommands();
 
-    function score(q,c){ return c.key.indexOf(q)>=0 || c.label.toLowerCase().indexOf(q)>=0; }
+    function score(q,c){ return c.key.indexOf(q)>=0 || c.label.toLowerCase().indexOf(q)>=0 || (c.fullLC && c.fullLC.indexOf(q)>=0); }
+    /* rank matches by depth: title hit beats category/era hit beats a body-only
+       mention, so the deepest treatment of a term surfaces first */
+    function matchRank(c,q){
+      var t=c.label.toLowerCase();
+      if(t.indexOf(q)===0) return 0;
+      if(t.indexOf(q)>=0) return 1;
+      if(c.key.indexOf(q)>=0) return 2;
+      return 3;
+    }
+    /* pull the sentence-ish window around the hit and mark the term — each result
+       becomes a proof-of-depth sample of her actual writing */
+    function makeSnip(full,q){
+      var lc=full.toLowerCase(), i=lc.indexOf(q); if(i<0) return "";
+      var s=Math.max(0,i-38), e=Math.min(full.length,i+q.length+64);
+      var raw=full.slice(s,e).replace(/\s+/g," ").trim();
+      var pre=(s>0?"…":""), post=(e<full.length?"…":"");
+      var j=raw.toLowerCase().indexOf(q); if(j<0) return pre+esc(raw)+post;
+      return pre+esc(raw.slice(0,j))+'<mark>'+esc(raw.slice(j,j+q.length))+'</mark>'+esc(raw.slice(j+q.length))+post;
+    }
     function renderResults(){
       var q = input.value.trim().toLowerCase();
       results = q ? ALL.filter(function(c){return score(q,c);}) : ALL.slice();
+      if(q) results.sort(function(a,b){ return matchRank(a,q)-matchRank(b,q); });
       sel = 0;
-      if(!results.length){ list.innerHTML = '<div class="cmd-empty">No matches</div>'; return; }
+      if(!results.length){ list.innerHTML = '<div class="cmd-empty">No essay uses “'+esc(input.value.trim())+'.” Try another word.</div>'; return; }
       var groups = {}; var order = [];
       results.forEach(function(c){ if(!groups[c.type]){groups[c.type]=[];order.push(c.type);} groups[c.type].push(c); });
       var html = ""; var idx = 0;
@@ -618,7 +691,11 @@
         html += '<div class="cmd-grouplabel">'+g+'</div>';
         groups[g].forEach(function(c){
           c._i = idx;
-          html += '<div class="cmd-item'+(idx===sel?' sel':'')+'" data-i="'+idx+'"><span class="ci-mk">'+c.mk+'</span><span class="ci-t">'+esc(c.label)+'</span><span class="ci-meta">'+esc(c.meta)+'</span></div>';
+          var snip = "";
+          if(q && c.type==="Essay" && c.label.toLowerCase().indexOf(q)<0 && c.fullLC){
+            var sn=makeSnip(c.full,q); if(sn) snip='<span class="ci-snip">'+sn+'</span>';
+          }
+          html += '<div class="cmd-item'+(idx===sel?' sel':'')+'" data-i="'+idx+'"><span class="ci-mk">'+c.mk+'</span><span class="ci-body"><span class="ci-t">'+esc(c.label)+'</span>'+snip+'</span><span class="ci-meta">'+esc(c.meta)+'</span></div>';
           idx++;
         });
       });
@@ -650,6 +727,8 @@
 
     document.getElementById("kbdChip").addEventListener("click", openCmd);
     document.getElementById("kbdChip").addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){e.preventDefault();openCmd();} });
+    var searchFold=document.getElementById("searchFold");
+    if(searchFold) searchFold.addEventListener("click", openCmd);
     input.addEventListener("input", renderResults);
     list.addEventListener("click", function(e){
       var it = e.target.closest(".cmd-item"); if(!it) return;
