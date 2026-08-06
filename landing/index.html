@@ -1088,9 +1088,15 @@
       .lede { font-size:1rem; }
       /* comfortable tap targets on touch (>=~40px hit height) */
       .pp-dev { padding:11px 16px; font-size:12px; }
-      .demo-tab { padding:9px 15px; font-size:11px; }
+      .demo-tab { padding:9px 15px; font-size:11px; min-height:40px; }
       .merge-btn { padding:13px 22px; }
       .btn-ghost { padding:12px 6px; }
+      .theme-toggle { width:40px; height:40px; }
+      .nav-link { padding:11px 6px; }
+      .qt-chip { min-height:36px; }
+      /* lift the Talk-to-Ori FAB clear of the centered quick-jump dock (the two
+         overlap below ~508px) and above the mobile browser's bottom toolbar */
+      .ori-fab { bottom:88px; right:16px; }
       .science-details > summary { padding:16px 22px; }
       /* keep the science equation + table from forcing page-wide scroll */
       .science-eq { font-size:13px; word-break:break-word; }
@@ -1801,7 +1807,12 @@
       .orbit-viz.merged .orbit-core { transform:scale(1.16); }
       .orbit-caption { max-width:62ch; margin:26px auto 0; text-align:center; font-size:14.5px; line-height:1.6; color:var(--ash); }
       .orbit-caption b { color:var(--bone); font-weight:600; }
-      @media (max-width:520px){ .orbit-ring-2 { width:300px; height:300px; } }
+      /* mobile: outer items orbit at r=180 (reach ~200px from center) and clip past
+         the viewport — scale the whole constellation so every tile + label stays on
+         screen. Scaling the viz keeps the dashed guide rings and items in sync. */
+      @media (max-width:520px){ .orbit-viz { transform:scale(.9); } }
+      @media (max-width:400px){ .orbit-viz { transform:scale(.8); } }
+      @media (max-width:340px){ .orbit-viz { transform:scale(.72); } }
       @media (prefers-reduced-motion:reduce){ .orbit-item { animation-play-state:paused; } }
     </style>
     <div class="orbit-viz" id="orbitViz">
@@ -2145,7 +2156,7 @@
 <div class="ori-panel" id="oriPanel" role="dialog" aria-label="Chat with Ori">
   <div class="ori-head">
     <div class="ava">O</div>
-    <div class="meta"><div class="nm">Ori</div><div class="st"><span class="d"></span>Your Oriya guide</div></div>
+    <div class="meta"><div class="nm">Ori</div><div class="st"><span class="d"></span>Your guide to the boards</div></div>
     <button class="x" onclick="oriToggle(false)" aria-label="Close chat">×</button>
   </div>
   <div class="ori-body" id="oriBody"></div>
@@ -3031,7 +3042,7 @@
      fund pots, athletes win them; no invented device list.
      ============================================================ */
   const oriQA = {
-    walkthrough: { q: "Show me how a season plays (60 sec)", a: "Meet Alex — our sample athlete. Demo boards, real rules. His whole season in 4 taps 👇",
+    walkthrough: { q: "Watch a season play out (60s)", a: "Meet Alex — our sample athlete. Demo boards, real rules. His whole season in 4 taps 👇",
       next: ["play", "challenges"],
       steps: [
         { t: "📲 1. One screenshot → your Index", d: "Alex hands Ori his Oura Readiness screenshot. Seconds later he has his Oriya Index — ranked against his own par, not the other guy's raw number.", cta: "Try Ori →", href: "ori.html" },
@@ -3039,28 +3050,28 @@
         { t: "⌚ 3. Pick a side in Ring vs Band", d: "Oura wearers vs Whoop wearers, 7 days, team average decides. He logs every morning — a missed day counts as 0.", cta: "See the board →", href: "try.html?challenge=devicewars" },
         { t: "🏆 4. Higher average takes it", d: "Alex's side holds the better week and takes the board. On sponsor-backed boards there's a pot: sponsors fund it, athletes win it.", cta: "How the money moves →", href: "partners.html" }
       ] },
-    play: { q: "How do I enter? (the 5-step game)", a: "Five steps, nothing to install: pick a side, screenshot your wearable each morning, we score it against your own baseline into your Oriya Index, the board moves, higher team average takes the pot. The whole rulebook fits on one page 👇",
+    play: { q: "How do I get in the game?", a: "Five steps, nothing to install: pick a side, screenshot your wearable each morning, we score it against your own baseline into your Oriya Index, the board moves, higher team average takes the pot. The whole rulebook fits on one page 👇",
       next: ["challenges", "scoring"],
       steps: [
         { t: "🎮 The 7-Day Sprint Blueprint", d: "Par 71 baseline, the morning drop, calling the winner, how the pot splits — every question answered before you join.", cta: "How to play →", href: "play.html" },
         { t: "📸 Ready now? Send this morning's proof", d: "Email + device + score + screenshot. 60 seconds — a person posts you to the board, usually within the hour.", cta: "Submit your proof →", href: "mvp/submit.html" }
       ] },
-    challenges: { q: "What challenges are live?", a: "Run clubs, founder crews, on-call eng teams — live boards you can join today. Pick a side and your Index counts toward the team average every day you log. Some boards carry a sponsor-backed pot; others play for bragging rights. Founding season — sample athletes on the demo boards.",
+    challenges: { q: "What's live right now?", a: "Run clubs, founder crews, on-call eng teams — live boards you can join today. Pick a side and your Index counts toward the team average every day you log. Some boards carry a sponsor-backed pot; others play for bragging rights. Founding season — sample athletes on the demo boards.",
       next: ["play", "partners"],
       steps: [
         { t: "⚔️ Live challenges", d: "Three live now, more starting soon.", cta: "Pick a side →", href: "try.html" },
         { t: "🎮 New here?", d: "The whole game in five steps — read it once, know everything a player knows.", cta: "How to play →", href: "play.html" }
       ] },
-    scoring: { q: "How is the Index scored?", a: "Sleep 40% + Recovery 35% + Activity 25% blend into one Index — but the ranking that matters is against your own 90-day baseline, your par, never a raw public number. That's the Biometric Handicap: you're only ever measured against your own usual, not someone else's raw score.",
+    scoring: { q: "How's my number scored?", a: "Sleep 40% + Recovery 35% + Activity 25% blend into one Index — but the ranking that matters is against your own 90-day baseline, your par, never a raw public number. That's the Biometric Handicap: you're only ever measured against your own usual, not someone else's raw score.",
       next: ["devices", "privacy"],
       steps: [{ t: "🔬 The Science", d: "Every factor, every source, the whole method — nothing behind a curtain.", cta: "Read the full method →", href: "science.html" }] },
-    devices: { q: "Which devices work?", a: "Oura, Whoop, Garmin and Apple Watch connect read-only. Apple has no single native score, so we compute yours from Health signals — HRV, sleep, resting HR. Anything else (Samsung, Pixel, an app we don't sync yet): drop a screenshot, we read it.",
+    devices: { q: "Which wearables work?", a: "Oura, Whoop, Garmin and Apple Watch connect read-only. Apple has no single native score, so we compute yours from Health signals — HRV, sleep, resting HR. Anything else (Samsung, Pixel, an app we don't sync yet): drop a screenshot, we read it.",
       next: ["scoring", "walkthrough"],
       steps: [{ t: "📲 Try it now", d: "Hand Ori this morning's recovery screen — screenshot or paste, takes ~45 seconds.", cta: "Try Ori →", href: "ori.html" }] },
     privacy: { q: "What happens to my data?", a: "Your trial runs in your browser — saved locally, never sold or shared. On boards you can compete as ◒ anon · @yourco.com: the domain flexes, your name stays out. The vault spells out exactly what's walled off.",
       next: ["devices", "scoring"],
       steps: [{ t: "🔒 The privacy vault", d: "What we store, what we never see, and how to delete it.", cta: "Open the vault →", href: "try.html#privacy" }] },
-    partners: { q: "Sponsor a board / run one for my team", a: "Straight answer: there are no signed partners yet — founding season is where that starts. Gyms and communities run free. Sponsors back a pot as prize money: you fund it, athletes win it, and checkout only ever comes from team@oriya.app after we verify the board.",
+    partners: { q: "Run a board for my team", a: "Straight answer: there are no signed partners yet — founding season is where that starts. Gyms and communities run free. Sponsors back a pot as prize money: you fund it, athletes win it, and checkout only ever comes from team@oriya.app after we verify the board.",
       next: ["challenges", "walkthrough"],
       steps: [{ t: "🤝 Partners & sponsors", d: "Tracks, pledge form, and exactly how the money moves.", cta: "See the partner tracks →", href: "partners.html" }] },
     referral: { q: "I have an invite code", a: "Got an invite code? Drop it below — it unlocks your Founding Athlete access and credits the person who sent you.", ref: true }
@@ -3074,7 +3085,7 @@
     if (open) { try { localStorage.setItem("oriSeen", "1"); } catch (e) {} clearTimeout(window.__oriAutoTimer); }
     document.getElementById("oriPanel").classList.toggle("open", open);
     document.getElementById("oriFab").classList.toggle("hidden", open);
-    if (open && !oriStarted) { oriStarted = true; oriBubble("bot", "Hey 👋 I'm Ori. Ask me anything about the boards, the science, or your data — or watch a full season play out in 60 seconds."); oriRenderChips(); }
+    if (open && !oriStarted) { oriStarted = true; oriBubble("bot", "Hey 👋 I'm Ori. Ask me how the boards work, why your number's fair, or what this morning actually means — or watch a whole season play out in 60 seconds."); oriRenderChips(); }
   }
   (function () {
     let seen = true;
