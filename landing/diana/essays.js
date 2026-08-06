@@ -17,6 +17,17 @@
       slug:"ai-maturity-ladder", era:"current", period:"2026-07", category:"Thesis", status:"live",
       title:"The AI Maturity Ladder",
       dek:"No company wakes up needing a control plane — they earn their way there. The ladder every AI deployment climbs, and a ten-agent budget simulation that shows why the same policy holds at the point of execution and leaks at the gateway. Part 2 of the Control Plane series.",
+      sections:[
+        {at:0, kicker:"the ladder", thesis:"Nobody wakes up needing a control plane — companies earn their way there one bottleneck at a time, and the sequence is more predictable than the noise around it."},
+        {at:6, kicker:"a dependency order", thesis:"The rungs aren't the order things happen in; they're the order things depend on. Each inherits the problem the last one created, and the stack accumulates rather than churns."},
+        {at:11, kicker:"where policy sits", thesis:"Where a policy physically sits decides what it can enforce — the same budget rule that holds at the point of action leaks completely at the gateway."},
+        {at:16, kicker:"four layers", thesis:"Evaluation, observability, governance, and control are not the same layer, and only control decides whether an action can happen at all."},
+        {at:19, kicker:"the scarce thing", thesis:"The scarce thing won't be a marginally better model — it'll be making thousands of autonomous decisions cheap and safe to run at once."}
+      ],
+      cites:[
+        {at:13, phrase:"a 449% overspend", label:"Governance simulator", href:"https://dianaseo.ai.studio", note:"Ten agents, one $10,000 budget, run under gateway vs. action-layer enforcement. The figures come straight from it — reproducible in the browser."},
+        {at:15, phrase:"reproducible on the public simulator", label:"Governance simulator", href:"https://dianaseo.ai.studio", note:"Run the same two architectures against each other yourself; the numbers in this essay are the ones it returns."}
+      ],
       body:[
         "The question I get asked most about enterprise AI is a scheduling question: when do companies put agents into production, when does the pilot become part of the org chart. I've stopped answering it, because the timing hides the thing that actually tells you what a company needs next — which rung of maturity it's already standing on. Nobody wakes up and decides they need a control plane. They arrive one bottleneck at a time, and the sequence is more predictable than the noise around it suggests.",
         "It starts small. A team finds one workflow worth automating — support triage, code review, contract redlines, procurement — and the only thing that matters is proving the thing is useful at all. Governance is not a word anyone says yet. Then the workflow gets wired to real data: Slack, GitHub, Jira, Salesforce, SAP. The moment an agent can read the systems a company actually runs on, it stops being a demo and starts carrying leverage — and the same wiring that gives it leverage gives it blast radius.",
@@ -126,6 +137,15 @@
       slug:"ai-control-plane", era:"current", period:"2026-05", category:"Thesis", status:"live",
       title:"The Gateway Is Plumbing. The Control Plane Is the Prize.",
       dek:"Everyone in AI infrastructure is racing to route tokens faster. The durable fight is one layer up: who becomes the operating system where an enterprise runs its AI workforce. A map of the stack, the players, and the playbook for winning it.",
+      sections:[
+        {at:0, kicker:"the pattern", thesis:"Twice before, the rails became a commodity and the layer that governed them kept the money. AI is repeating it on a faster clock — and the market is pricing the wrong layer."},
+        {at:6, kicker:"the gateway", thesis:"The gateway is plumbing: routing is becoming table stakes, and every serious gateway team is already climbing toward the layer where policy gets written."},
+        {at:10, kicker:"observability", thesis:"Agents fail silently, so someone has to watch them — and whoever can see every decision is one product cycle from being asked to control it."},
+        {at:13, kicker:"the runtime", thesis:"An agent is an employee, not a prompt. Whoever gives the fleet identity, memory, and a budget inherits the position Kubernetes held in the cloud."},
+        {at:19, kicker:"the control plane", thesis:"The control plane owns identity, policy, and budget — the three things an enterprise never rips out — and it's the only layer with the authority to say no."},
+        {at:22, kicker:"why a startup wins", thesis:"On paper the hyperscalers win the bundle. Neutrality and developer love are why a startup still can — but only if it sells the governance, not just ships the wedge."},
+        {at:27, kicker:"how it consolidates", thesis:"The market consolidates in three phases; the category-defining company forms at the runtime and the control plane, and the primitive to own is agent identity."}
+      ],
       body:[
         "Three questions come up in almost every engineering org I talk to right now: how do we use more than one model without rewriting everything, why did the agent give that answer, and who just spent two million dollars on inference. Each one has become its own funding category with a few dozen startups in it. I've seen this pattern twice before, once from a distance and once up close.",
         "The distant one was cloud. A decade of fragmented tooling for monitoring, deployment, and orchestration consolidated into a stack, most of that stack became a commodity, and the durable money went to the layers that governed and observed everything rather than the layers that moved bytes. The close one was crypto, where I watched [the L1 wars](essay.html?id=infrastructure-trap) burn billions competing on throughput while Infura and Alchemy quietly became the layer every transaction passed through. The rails became interchangeable. The access layer on top of them didn't. AI infrastructure is going through the same consolidation on a much faster clock, and most of the market is pricing the wrong layer.",

@@ -85,7 +85,7 @@
     /* inline citations — understated underline, never a button; the prose stays the object */
     .e-body p a{color:inherit;text-decoration:underline;text-decoration-color:var(--accent-line);text-decoration-thickness:1px;text-underline-offset:3px;transition:color .2s var(--ease),text-decoration-color .2s var(--ease)}
     .e-body p a:hover{color:var(--accent);text-decoration-color:var(--accent)}
-    .e-body p:first-child::first-letter{font-family:var(--serif);font-size:54px;float:left;line-height:.82;padding:4px 12px 0 0;color:var(--accent)}
+    .e-body > p:first-of-type::first-letter{font-family:var(--serif);font-size:54px;float:left;line-height:.82;padding:4px 12px 0 0;color:var(--accent)}
 
     .e-nav{margin-top:48px;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:14px}
     .e-nav a{flex:1;border:1px solid var(--line);border-radius:11px;padding:14px 16px;transition:all .22s var(--ease);min-width:0}
@@ -217,6 +217,55 @@
     .e-ref a:hover .arr{transform:translate(2px,-2px);color:var(--accent)}
     .e-ref-meta{font-family:var(--mono);font-size:10.5px;color:var(--text-3);letter-spacing:0.02em}
 
+    /* ── section thesis headers (Control Plane series only): a mono kicker + a one-line
+       CLAIM that carries the argument when read alone — never a topic label. Rendered
+       from a separate sections[] array so body indices (and audio marks) never shift. ── */
+    .e-body .e-sec{margin:44px 0 20px;padding-top:24px;border-top:1px solid var(--line);scroll-margin-top:22px}
+    .e-body .e-sec:first-child{margin-top:4px;padding-top:0;border-top:0}
+    .e-sec .es-k{display:block;font-family:var(--mono);font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:9px}
+    .e-sec .es-t{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(20px,3.1vw,25px);line-height:1.26;letter-spacing:0.005em;color:var(--text)}
+
+    /* ── scroll-spy rail (desktop ≥1080px): a hairline section index tracking reading
+       position. Mono labels, one accent on the active tick; it disappears into the skin
+       and carries no motion beyond the active-state colour change. Hidden on narrow
+       viewports — the in-body thesis headers + top progress bar do the wayfinding there. ── */
+    .spy{position:fixed;top:50%;left:max(18px,calc((100vw - 680px)/2 - 174px));transform:translateY(-50%);
+      z-index:40;display:none;flex-direction:column;gap:1px;width:160px}
+    .spy-item{display:flex;align-items:center;gap:11px;padding:7px 0;background:none;border:0;cursor:pointer;
+      text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:0.02em;color:var(--text-3);
+      transition:color .25s var(--ease)}
+    .spy-tick{flex:none;width:14px;height:1px;background:var(--line);transition:background .25s var(--ease),width .25s var(--ease)}
+    .spy-k{min-width:0;line-height:1.3}
+    .spy-item:hover{color:var(--text-2)}
+    .spy-item:hover .spy-tick{background:var(--text-3);width:20px}
+    .spy-item.on{color:var(--accent)}
+    .spy-item.on .spy-tick{background:var(--accent);width:26px}
+    @media(min-width:1080px){.spy.ready{display:flex}}
+    @media(prefers-reduced-motion:reduce){.spy-item,.spy-tick{transition:none}}
+
+    /* ── inline citation (primary sources): a bracketed superscript marker that reveals a
+       source card on hover/focus/tap. Never a button in the flow; the prose stays the object.
+       Attaches inside an existing <p> (after the sourced phrase), so it adds no .e-body child
+       and the transcript-sync marks are untouched. ── */
+    .cite{position:relative;display:inline-block}
+    .cite-mk{font-family:var(--mono);font-size:0.64em;font-weight:500;color:var(--accent);cursor:pointer;
+      padding:0 1px;vertical-align:super;line-height:0;transition:color .2s var(--ease);outline:none}
+    .cite-mk::before{content:"["}
+    .cite-mk::after{content:"]"}
+    .cite:hover .cite-mk,.cite.open .cite-mk,.cite-mk:focus-visible{color:var(--text)}
+    .cite-card{position:absolute;left:0;bottom:calc(100% + 9px);z-index:50;width:272px;max-width:76vw;
+      background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 15px 13px;
+      box-shadow:0 18px 42px -22px rgba(28,27,25,0.5);
+      opacity:0;transform:translateY(5px);pointer-events:none;transition:opacity .22s var(--ease),transform .22s var(--ease)}
+    .cite:hover .cite-card,.cite:focus-within .cite-card,.cite.open .cite-card{opacity:1;transform:none;pointer-events:auto}
+    .cite-src{display:block;font-family:var(--mono);font-size:10px;letter-spacing:0.11em;text-transform:uppercase;color:var(--accent);margin-bottom:7px}
+    .cite-note{display:block;font-size:12.5px;line-height:1.5;color:var(--text-2);margin-bottom:11px}
+    .cite-link{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--text-2);border:1px solid var(--line);border-radius:8px;padding:6px 11px;transition:border-color .2s var(--ease),color .2s var(--ease)}
+    .cite-link:hover{border-color:var(--accent-line);color:var(--accent)}
+    .cite-link .carr{color:var(--text-3);transition:transform .2s var(--ease)}
+    .cite-link:hover .carr{transform:translate(2px,-2px);color:var(--accent)}
+    @media(prefers-reduced-motion:reduce){.cite-card{transition:none;transform:none}}
+
     /* keep-reading loop — related essays + cross-links into stack/reading */
     .related{margin-top:46px;padding-top:26px;border-top:1px solid var(--line)}
     .rel-head{font-family:var(--mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:12px}
@@ -261,6 +310,7 @@
   <div class="prog" id="prog" aria-hidden="true"></div>
   <div class="spot" id="spot" aria-hidden="true"></div>
   <div class="page" id="page"><div class="wrap" id="wrap"></div></div>
+  <nav class="spy" id="spy" aria-label="Sections in this essay"></nav>
   <script src="essays.js"></script>
   <script src="audio-manifest.js"></script>
   <script>
@@ -356,6 +406,54 @@
       if(b.t==="ref") return '<div class="e-ref"><a href="'+esc(b.href)+'" target="_blank" rel="noopener">'+esc(b.text)+' <span class="arr">↗</span></a>'+(b.meta?'<span class="e-ref-meta">'+esc(b.meta)+'</span>':'')+'</div>';
       return "";
     }
+    /* stamp the body index onto each block's root element, so the transcript-sync
+       seek-map can look a block up by attribute (querySelector('[data-b="N"]'))
+       instead of by child position. That makes injected section headers (which carry
+       no data-b) transparent to the audio marks — no reindex, no manifest edit. */
+    function stampB(html,i){ return html.replace(/^<([a-zA-Z0-9]+)/, '<$1 data-b="'+i+'"'); }
+    /* section thesis header, rendered from the essay's sections[] array (Control Plane
+       series only). A separate .e-body child that carries no data-b — pure navigation. */
+    function secHeadHtml(sections,i){
+      if(!sections) return "";
+      for(var s=0;s<sections.length;s++){
+        if(sections[s].at===i){
+          return '<h2 class="e-sec" id="sec-'+s+'" data-sec="'+s+'">'+
+            '<span class="es-k">'+esc(sections[s].kicker||"")+'</span>'+
+            '<span class="es-t">'+esc(sections[s].thesis||"")+'</span></h2>';
+        }
+      }
+      return "";
+    }
+    /* inline citation marker — a designed source-card reveal. Primary sources only:
+       we upgrade a claim that already has a real, held source; we never invent one.
+       Injected AFTER the sourced phrase inside the paragraph's own HTML, so it adds no
+       .e-body child (audio marks stay put). Marker is a role=button span (so a tap
+       toggles the card rather than navigating); the real link lives inside the card. */
+    function citeMarkerHtml(n,c){
+      var host=""; try{ host=c.href?c.href.replace(/^https?:\/\//,"").replace(/\/$/,""):""; }catch(_){}
+      var link=c.href?'<a class="cite-link" href="'+esc(c.href)+'" target="_blank" rel="noopener">'+esc(host||c.label||"source")+' <span class="carr" aria-hidden="true">↗</span></a>':'';
+      return '<span class="cite">'+
+        '<span class="cite-mk" role="button" tabindex="0" aria-label="Source: '+esc(c.label||"citation")+'">'+n+'</span>'+
+        '<span class="cite-card" role="note">'+
+          '<span class="cite-src">'+esc(c.label||"Source")+'</span>'+
+          (c.note?'<span class="cite-note">'+esc(c.note)+'</span>':'')+
+          link+
+        '</span></span>';
+    }
+    /* find the (escaped) sourced phrase in the rendered paragraph HTML and splice the
+       marker in right after it. First occurrence only; silently skips if not found. */
+    function applyCites(html,i,cites,ctr){
+      if(!cites) return html;
+      for(var ci=0;ci<cites.length;ci++){
+        var c=cites[ci]; if(c.at!==i || !c.phrase) continue;
+        var needle=esc(c.phrase), pos=html.indexOf(needle);
+        if(pos<0) continue;
+        ctr.n++;
+        var cut=pos+needle.length;
+        html=html.slice(0,cut)+citeMarkerHtml(ctr.n,c)+html.slice(cut);
+      }
+      return html;
+    }
     /* honest reading time — counted off the actual body text, ~220 wpm */
     function readMins(e){
       var w = 0;
@@ -375,7 +473,13 @@
       if(md && e.dek) md.setAttribute("content", e.dek);
       var prev = idx>0 ? ESSAYS[idx-1] : null;
       var next = idx<ESSAYS.length-1 ? ESSAYS[idx+1] : null;
-      var bodyHtml = (e.body||[]).map(blockHtml).join("");
+      /* section headers (from sections[]) + inline citations (from cites[]) attach
+         without adding/removing narrated body children, then each block is stamped
+         with its body index for the attribute-based seek lookup. */
+      var citeCtr={n:0};
+      var bodyHtml = (e.body||[]).map(function(b,bi){
+        return secHeadHtml(e.sections,bi) + stampB(applyCites(blockHtml(b),bi,e.cites,citeCtr),bi);
+      }).join("");
       var au = (window.ESSAY_AUDIO||{})[e.slug];
       var hasMarks = au && au.marks && au.marks.length;
       var skipHtml =
@@ -426,10 +530,84 @@
           (next?'<a class="next" href="essay.html?id='+encodeURIComponent(next.slug)+'"><div class="dir">Older →</div><div class="nt">'+esc(next.title)+'</div></a>':'<a class="next disabled"><div class="dir">Older →</div><div class="nt">—</div></a>')+
         '</nav>'+
         '<a class="back" href="index.html">← All writing</a>';
+      /* scroll-spy rail: built only for essays that carry sections (the Control Plane
+         series); cleared otherwise so every other essay is visually unchanged. */
+      var spyEl=document.getElementById("spy");
+      if(spyEl){
+        if(e.sections && e.sections.length){
+          spyEl.innerHTML=e.sections.map(function(s,si){
+            return '<button class="spy-item" type="button" data-to="sec-'+si+'">'+
+              '<span class="spy-tick" aria-hidden="true"></span><span class="spy-k">'+esc(s.kicker||"")+'</span></button>';
+          }).join("");
+          spyEl.classList.add("ready");
+        } else { spyEl.innerHTML=""; spyEl.classList.remove("ready"); }
+      }
       reveal();
       wireListen();
       wireDecks();
+      wireSpy();
+      wireCites();
     }
+
+    /* scroll-spy: track which section thesis is being read and let the rail jump to it.
+       Re-wired each render (SPA nav); the observer is disconnected first so detached
+       nodes don't leak. Click-scroll respects prefers-reduced-motion. */
+    var spyObserver=null;
+    function wireSpy(){
+      if(spyObserver){ spyObserver.disconnect(); spyObserver=null; }
+      var spyEl=document.getElementById("spy");
+      if(!spyEl || !spyEl.classList.contains("ready")) return;
+      var items=Array.prototype.slice.call(spyEl.querySelectorAll(".spy-item"));
+      var heads=Array.prototype.slice.call(wrap.querySelectorAll(".e-sec"));
+      if(!items.length || !heads.length) return;
+      function activate(k){ for(var j=0;j<items.length;j++) items[j].classList.toggle("on", j===k); }
+      items.forEach(function(it){
+        it.addEventListener("click", function(){
+          var t=document.getElementById(it.getAttribute("data-to")); if(!t) return;
+          t.scrollIntoView({behavior:reduce?"auto":"smooth", block:"start"});
+        });
+      });
+      activate(0);
+      if("IntersectionObserver" in window){
+        var vis={};
+        spyObserver=new IntersectionObserver(function(entries){
+          entries.forEach(function(en){ var k=heads.indexOf(en.target); if(k>=0) vis[k]=en.isIntersecting; });
+          var best=-1; for(var k=0;k<heads.length;k++){ if(vis[k]){ best=k; break; } }
+          if(best>=0) activate(best);
+        }, {rootMargin:"-14% 0px -72% 0px", threshold:0});
+        heads.forEach(function(h){ spyObserver.observe(h); });
+      }
+    }
+
+    /* inline citations: a tap/click on the bracketed marker toggles its source card
+       (hover/focus already reveal it via CSS). stopPropagation keeps the tap from also
+       firing the tap-to-seek transcript handler on the paragraph. */
+    function closeCites(){ var o=wrap.querySelectorAll(".cite.open"); Array.prototype.forEach.call(o,function(c){ c.classList.remove("open"); }); }
+    /* keep the source card inside the viewport regardless of where the marker wraps —
+       shift it left if it would overrun the right edge, but never past the left edge. */
+    function placeCard(box){
+      var card=box.querySelector(".cite-card"); if(!card) return;
+      card.style.left="0px";
+      var r=card.getBoundingClientRect(), pad=10, dx=0;
+      if(r.right>window.innerWidth-pad) dx=(window.innerWidth-pad)-r.right;
+      if(r.left+dx<pad) dx=pad-r.left;
+      if(dx) card.style.left=dx+"px";
+    }
+    function wireCites(){
+      var boxes=wrap.querySelectorAll(".cite");
+      Array.prototype.forEach.call(boxes, function(box){
+        var mk=box.querySelector(".cite-mk");
+        box.addEventListener("mouseenter", function(){ placeCard(box); });
+        if(!mk) return;
+        function toggle(ev){ ev.stopPropagation(); ev.preventDefault();
+          var was=box.classList.contains("open"); closeCites(); if(!was){ box.classList.add("open"); placeCard(box); } }
+        mk.addEventListener("click", toggle);
+        mk.addEventListener("focus", function(){ placeCard(box); });
+        mk.addEventListener("keydown", function(ev){ if(ev.key==="Enter"||ev.key===" ") toggle(ev); });
+      });
+    }
+    document.addEventListener("click", function(ev){ if(!ev.target.closest(".cite")) closeCites(); });
+    document.addEventListener("keydown", function(ev){ if(ev.key==="Escape") closeCites(); });
 
     /* interactive card deck: fanned display-card stack, cycled like a carousel.
        Deals itself once on scroll-in (staggered), front card tilts to the pointer,
@@ -536,7 +714,9 @@
       if(eBody && MK && MK.length){
         eBody.classList.add("seekable");
         for(var mi=0;mi<MK.length;mi++){
-          var el=eBody.children[MK[mi].b];
+          /* look up by stamped body index, not child position, so injected section
+             headers don't shift the mapping (marks reference original body indices). */
+          var el=eBody.querySelector('[data-b="'+MK[mi].b+'"]');
           if(el){ el.setAttribute("data-seek",""); segs.push({el:el, t:MK[mi].t}); }
         }
       }
@@ -554,7 +734,7 @@
          Ignore clicks on inline links/figures so citations still navigate. */
       if(segs.length){
         eBody.addEventListener("click", function(ev){
-          if(ev.target.closest("a")) return;
+          if(ev.target.closest("a") || ev.target.closest(".cite")) return;
           var line=ev.target.closest("[data-seek]"); if(!line) return;
           for(var j=0;j<segs.length;j++){ if(segs[j].el===line){
             au.currentTime=segs[j].t+0.001; eBody.classList.add("listening"); setReading(j);
