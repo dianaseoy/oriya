@@ -177,7 +177,14 @@
       padding:12px 14px; color:var(--bone); font-family:var(--font-mono); font-size:12px; min-width:0; }
     .pform input:focus, .pform select:focus { outline:none; border-color:var(--jade-deep); }
     .pform select:invalid { color:var(--ash); }
-    .pform #pOrg { width:220px; } .pform #pEmail { width:220px; } .pform #pType { width:210px; }
+    .pform #pOrg { width:220px; } .pform #pEmail { width:220px; }
+    .pchips { display:flex; flex-wrap:wrap; align-items:center; gap:8px; width:100%; margin-top:2px; }
+    .pchip-label { font-family:var(--font-mono); font-size:11px; letter-spacing:.06em; color:var(--ash); margin-right:2px; }
+    .pchip { font-family:var(--font-sans); font-size:13px; color:var(--ash); background:rgba(var(--wash),.03);
+      border:1px solid var(--hairline); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .2s, color .2s, background .2s; }
+    .pchip:hover { border-color:var(--jade-deep); color:var(--bone); }
+    .pchip.active { background:var(--jade); border-color:var(--jade); color:var(--void); font-weight:600; }
+    .pchips.err .pchip { border-color:var(--amber); }
     .pform .btn { display:inline-flex; align-items:center; gap:8px; background:var(--jade); color:var(--void); border:0; cursor:pointer;
       border-radius:999px; padding:12px 22px; font-weight:600; font-size:14px; font-family:var(--font-sans); transition:filter .25s; }
     .pform .btn:hover { filter:brightness(1.08); }
@@ -214,7 +221,7 @@
     <header class="head">
       <span class="eyebrow">Oriya for partners · free founding window · SF &amp; NYC</span>
       <h1>Everyone in your room already wears a tracker.<br><em>Give them a reason to compete.</em></h1>
-      <p class="lede">Oriya reads any wearable — Oura, Whoop, Garmin, Apple Watch — onto <b>one live 0–100 board</b>, where everyone's ranked against <b>their own baseline</b>, not each other's raw number. You bring the prize and the room. We bring the board and a founder who shows up <b>in person</b> to run it. <span class="free">Free founding pilots — 3 in SF and 2 in NYC, through July 31, 2026.</span></p>
+      <p class="lede">Oriya reads any wearable — Oura, Whoop, Garmin, Apple Watch — onto <b>one live 0–100 board</b>, where everyone's ranked against <b>their own baseline</b>, not each other's raw number. You bring the prize and the room. We bring the board and a founder who shows up <b>in person</b> to run it. <span class="free">Free founding pilots — 3 in SF and 2 in NYC, this founding season.</span></p>
 
       <div class="flow" aria-label="Any device lands on one board, ranked against your own baseline">
         <div class="grp">
@@ -226,6 +233,73 @@
         <span class="board">YOUR LIVE BOARD</span>
       </div>
 
+      <style>
+        /* the thing the captain is actually selling — an own-par board their
+           mixed-device crew lands on. Rows stagger in + count up on reveal. */
+        .pboard { margin:28px 0 6px; max-width:452px; border:1px solid var(--hairline); border-radius:16px;
+          background:linear-gradient(180deg, rgba(var(--wash),.05), rgba(var(--wash),.01)); padding:16px 16px 14px;
+          box-shadow:0 24px 54px -32px rgba(0,0,0,.6); }
+        .pboard-top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+        .pboard-live { display:inline-flex; align-items:center; gap:7px; font-family:var(--font-mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--jade); }
+        .pboard-live i { width:7px; height:7px; border-radius:50%; background:var(--jade); animation:pbPulse 2s infinite; }
+        @keyframes pbPulse { 0%{ box-shadow:0 0 0 0 rgba(127,183,158,.5); } 70%{ box-shadow:0 0 0 7px rgba(127,183,158,0); } 100%{ box-shadow:0 0 0 0 rgba(127,183,158,0); } }
+        .pboard-tag { font-family:var(--font-mono); font-size:9px; letter-spacing:.07em; text-transform:uppercase; color:var(--ash); }
+        .pboard-rows { list-style:none; display:flex; flex-direction:column; gap:6px; }
+        .pboard-row { display:grid; grid-template-columns:20px 1fr auto auto; align-items:center; gap:12px; padding:9px 12px; border-radius:10px;
+          background:rgba(var(--wash),.03); border:1px solid transparent;
+          opacity:0; transform:translateY(9px); transition:opacity .5s var(--settle), transform .5s var(--settle); }
+        .pboard.on .pboard-row { opacity:1; transform:none; }
+        .pboard-row.me { background:rgba(127,183,158,.11); border-color:var(--jade-deep); }
+        .pr-rk { font-family:var(--font-mono); font-size:12px; color:var(--ash); }
+        .pr-who { font-size:14px; color:var(--bone); font-weight:500; }
+        .pr-who small { color:var(--ash); font-weight:400; font-family:var(--font-mono); font-size:9.5px; letter-spacing:.06em; margin-left:6px; text-transform:uppercase; }
+        .pr-idx { font-family:var(--font-mono); font-variant-numeric:tabular-nums; font-size:16px; color:var(--bone); }
+        .pr-gap { font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--jade); }
+        .pboard-foot { margin-top:12px; font-family:var(--font-mono); font-size:10px; line-height:1.6; color:var(--ash); }
+        @media (prefers-reduced-motion:reduce){ .pboard-row { opacity:1; transform:none; transition:none; } .pboard-live i { animation:none; } }
+        @media (max-width:460px){ .pboard-row { grid-template-columns:18px 1fr auto auto; gap:8px; padding:9px 10px; } .pr-who small { display:block; margin:2px 0 0; } }
+      </style>
+      <div class="pboard" id="pboard" aria-label="Illustrative own-par board — mixed devices ranked against each person's own par">
+        <div class="pboard-top">
+          <span class="pboard-live"><i></i> Live board · your room</span>
+          <span class="pboard-tag">ranked vs each own par · illustrative</span>
+        </div>
+        <ol class="pboard-rows">
+          <li class="pboard-row"><span class="pr-rk">1</span><span class="pr-who">Priya <small>Oura</small></span><span class="pr-idx" data-count="88">0</span><span class="pr-gap">+9</span></li>
+          <li class="pboard-row"><span class="pr-rk">2</span><span class="pr-who">Marcus <small>Garmin</small></span><span class="pr-idx" data-count="84">0</span><span class="pr-gap">+7</span></li>
+          <li class="pboard-row me"><span class="pr-rk">3</span><span class="pr-who">Dana <small>Whoop</small></span><span class="pr-idx" data-count="79">0</span><span class="pr-gap">+5</span></li>
+          <li class="pboard-row"><span class="pr-rk">4</span><span class="pr-who">Wei <small>Apple</small></span><span class="pr-idx" data-count="76">0</span><span class="pr-gap">+4</span></li>
+          <li class="pboard-row"><span class="pr-rk">5</span><span class="pr-who">Devin <small>Fitbit</small></span><span class="pr-idx" data-count="72">0</span><span class="pr-gap">+3</span></li>
+        </ol>
+        <p class="pboard-foot">The newest tracker can top the fittest — nobody's measured against a stranger's raw number, only their own par.</p>
+      </div>
+      <script>
+        (function () {
+          var b = document.getElementById("pboard"); if (!b) return;
+          var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          var rows = b.querySelectorAll(".pboard-row");
+          rows.forEach(function (r, i) { r.style.transitionDelay = (i * 90) + "ms"; });
+          function countUp() {
+            b.querySelectorAll(".pr-idx").forEach(function (el, i) {
+              var target = parseInt(el.dataset.count, 10), start = 0, dur = 900, delay = 200 + i * 90;
+              if (reduce) { el.textContent = target; return; }
+              function step(now) {
+                if (!start) start = now;
+                var k = Math.min((now - start - delay) / dur, 1);
+                if (k < 0) { requestAnimationFrame(step); return; }
+                el.textContent = Math.round(target * (1 - Math.pow(1 - k, 3)));
+                if (k < 1) requestAnimationFrame(step);
+              }
+              requestAnimationFrame(step);
+            });
+          }
+          if (reduce || !("IntersectionObserver" in window)) { b.classList.add("on"); countUp(); return; }
+          new IntersectionObserver(function (es, ob) {
+            es.forEach(function (e) { if (!e.isIntersecting) return; ob.disconnect(); b.classList.add("on"); countUp(); });
+          }, { threshold: 0.35 }).observe(b);
+        })();
+      </script>
+
       <div class="chips">
         <span class="chip"><span class="dot"></span>You bring: a prize + the room</span>
         <span class="chip"><span class="dot"></span>We bring: instant scoring + a live board</span>
@@ -233,7 +307,7 @@
         <span class="chip free"><span class="dot"></span>Turnout misses 10? I cover the prize</span>
       </div>
 
-      <p class="aud-note">Wearing the device instead of running the room? This page is for partners — <a href="try.html">the athlete side is here →</a></p>
+      <p class="aud-note">Wearing the device instead of running the room? This page is for partners — <a href="ori.html">try Ori, the athlete side →</a></p>
     </header>
 
     <div class="sec-head reveal">
@@ -416,21 +490,22 @@
       <form class="pform" id="partnerForm">
         <input type="text" required placeholder="run club / event / studio / brand" id="pOrg" aria-label="Organization">
         <input type="email" required placeholder="you@yourplace.com" id="pEmail" aria-label="Email">
-        <select required id="pType" aria-label="Partner type">
-          <option value="" disabled selected>which playbook?</option>
-          <option value="run">run club / training crew</option>
-          <option value="event">event / host</option>
-          <option value="studio">gym / studio</option>
-          <option value="other">something else</option>
-        </select>
+        <div class="pchips" id="pChips" role="group" aria-label="Which playbook?">
+          <span class="pchip-label">which playbook?</span>
+          <button type="button" class="pchip" data-val="run">run club</button>
+          <button type="button" class="pchip" data-val="event">event / host</button>
+          <button type="button" class="pchip" data-val="studio">gym / studio</button>
+          <button type="button" class="pchip" data-val="other">something else</button>
+        </div>
+        <input type="hidden" id="pType" value="">
         <button class="btn" type="submit">Start the conversation →</button>
       </form>
-      <p class="form-note"><b>Free founding pilots — 3 SF, 2 NYC, through July 31, 2026.</b> And the risk is mine: if fewer than 10 people log a score at your pilot, I cover the prize myself. A founder replies from <a href="mailto:team@oriya.app">team@oriya.app</a>, usually same-day. You bring the prize and the room — no money ever moves through Oriya. Data is never sold; team views are aggregate-only.</p>
+      <p class="form-note"><b>Free founding pilots — 3 SF, 2 NYC, this founding season.</b> And the risk is mine: if fewer than 10 people log a score at your pilot, I cover the prize myself. A founder replies from <a href="mailto:team@oriya.app">team@oriya.app</a>, usually same-day. You bring the prize and the room — no money ever moves through Oriya. Data is never sold; team views are aggregate-only.</p>
     </section>
 
     <footer class="footer">
       <a href="index.html">← oriya.app · for athletes</a>
-      <a href="try.html">The Body Passport demo</a>
+      <a href="ori.html">Try Ori</a>
       <a href="manifesto.html">The Manifesto</a>
       <a href="builds.html">What builders make with the data</a>
       <a href="reads.html">The Long Game</a>
@@ -462,12 +537,20 @@
     (function () {
       var f = document.getElementById("partnerForm");
       if (!f) return;
+      // playbook chips (single-select) write the hidden #pType value
+      var chips = document.getElementById("pChips"), pType = document.getElementById("pType");
+      if (chips) chips.addEventListener("click", function (e) {
+        var b = e.target.closest(".pchip"); if (!b) return;
+        chips.querySelectorAll(".pchip").forEach(function (x) { x.classList.toggle("active", x === b); });
+        pType.value = b.dataset.val; chips.classList.remove("err");
+      });
       f.addEventListener("submit", function (ev) {
         ev.preventDefault();
         var email = String(document.getElementById("pEmail").value || "").trim().toLowerCase();
         var org = String(document.getElementById("pOrg").value || "").trim();
-        var type = document.getElementById("pType").value;
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+        var type = pType.value;
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { document.getElementById("pEmail").focus(); return; }
+        if (!type) { if (chips) chips.classList.add("err"); return; }
         var uid = function () { return window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(16).slice(2); };
         var responses = {};
         responses["37cd2a09-f318-438a-91f8-2ef0fa02d065"] = email;                          // Email question

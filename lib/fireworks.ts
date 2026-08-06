@@ -6,9 +6,39 @@
  * change providers entirely, replace this file — OriBrief is the only contract
  * the rest of the app depends on. */
 
-import { ORI_SYSTEM_PROMPT } from "./prompts";
-import { WEARABLES } from "./mock";
-import type { BaselineSummary, OriBrief, Signals } from "./types";
+import { ORI_SYSTEM_PROMPT } from "./prompts.ts";
+import { WEARABLES, readState } from "./mock.ts";
+import { buildActions } from "./actions.ts";
+import type { BaselineSummary, OriAction, OriActionKind, OriBrief, Signals } from "./types.ts";
+
+const ACTION_KINDS: OriActionKind[] = ["draft_checkin", "plan_today", "frame_stake"];
+
+/* Coerce the model's `actions` into a trusted OriAction[]. Drops anything with an
+ * unknown kind or an empty draft; de-dupes by kind. Returns null when nothing
+ * usable survives, so the caller can fall back to the deterministic generator and
+ * the field is never empty. */
+function coerceActions(raw: unknown): OriAction[] | null {
+  if (!Array.isArray(raw)) return null;
+  const seen = new Set<string>();
+  const out: OriAction[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const o = item as Record<string, unknown>;
+    const kind = String(o.kind || "") as OriActionKind;
+    const draft = String(o.draft || "").trim();
+    if (!ACTION_KINDS.includes(kind) || !draft || seen.has(kind)) continue;
+    seen.add(kind);
+    out.push({
+      id: kind,
+      kind,
+      label: String(o.label || "").trim() || "Copy",
+      why: String(o.why || "").trim(),
+      draft,
+      source: "fireworks",
+    });
+  }
+  return out.length ? out : null;
+}
 
 /* Turn a real baseline into a line the model can compare against — or an
  * explicit no-history instruction so it never fabricates one. */
@@ -31,7 +61,7 @@ export const FIREWORKS_MODEL = "accounts/fireworks/models/llama-v3p3-70b-instruc
 
 /** JSON contract appended to the persona so ORI_SYSTEM_PROMPT stays reusable. */
 function schemaInstruction(hasQuestion: boolean): string {
-  return `Return ONLY a JSON object (no markdown, no code fences) with exactly these keys: "greeting" (short, e.g. "🌅 Morning Brief"), "summary" (one-sentence overall read), "observations" (array of exactly 3 short interpreted strings), "recommendation" (the one thing to do today), "reassurance" (the one thing NOT to worry about), "confidence" ("low"|"medium"|"medium-high"|"high"), "reasoning" (2-3 sentences of the "why" behind the read), "answer" (${hasQuestion ? "a direct reply to the user's question in the same voice" : "null"}).`;
+  return `Return ONLY a JSON object (no markdown, no code fences) with exactly these keys: "greeting" (short, e.g. "🌅 Morning Brief"), "summary" (one-sentence overall read), "observations" (array of exactly 3 short interpreted strings), "recommendation" (the one thing to do today), "reassurance" (the one thing NOT to worry about), "confidence" ("low"|"medium"|"medium-high"|"high"), "reasoning" (2-3 sentences of the "why" behind the read), "answer" (${hasQuestion ? "a direct reply to the user's question in the same voice" : "null"}), "actions" (array of 1-3 done-for-you items the person can copy and use immediately, each an object {"kind","label","why","draft"}). The three allowed kinds, use each at most once: "draft_checkin" = a short, ready-to-post accountability check-in for their squad or duel partner; "plan_today" = 2-3 concrete training/recovery swaps for today as bullet lines (coaching only, never medical); "frame_stake" = a PROPOSED accountability stake line they place themselves in Duels — always phrase it as a proposal they set, never say it is already placed or that any money moved. "draft" is the copy-ready text; "label" is a short button like "Copy my check-in"; "why" is one short line tying it to today's read.`;
 }
 
 export async function fireworksBrief(apiKey: string, s: Signals): Promise<OriBrief> {
@@ -77,5 +107,8 @@ ${s.question ? `The person also asks: "${s.question}"` : "Write the opening morn
     wearable: s.wearable,
     metrics: { recovery: s.recovery, hrv: s.hrv, rhr: s.rhr, sleep: s.sleepH },
     source: "fireworks",
+    // Model-authored actions when valid; else the deterministic generator so the
+    // field is never empty. Stamped "fireworks" either way (this is the live path).
+    actions: coerceActions(parsed.actions) || buildActions(s, readState(s), "fireworks"),
   };
 }

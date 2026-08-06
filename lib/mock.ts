@@ -9,7 +9,8 @@
  * (Signals.baseline, built from the user's own stored days). With no baseline
  * it reads today alone and says so — no fabricated "usual HRV", no "this week". */
 
-import type { OriBrief, Signals, Wearable } from "./types";
+import { buildActions } from "./actions.ts";
+import type { OriBrief, Signals, Wearable } from "./types.ts";
 
 /* Every wearable speaks a different language; Ori translates all of them.
  * native:false = the brand ships no single recovery number (Apple). */
@@ -27,7 +28,7 @@ export function fmtSleep(h: number): string {
 }
 
 type State = "strained" | "primed" | "steady";
-function readState(s: Signals): State {
+export function readState(s: Signals): State {
   const veryShort = s.sleepH != null && s.sleepH < 5.5;
   const short = s.sleepH != null && s.sleepH < 6.2;
   const lowRec = s.recovery != null && s.recovery < 50;
@@ -151,6 +152,7 @@ export function mockBrief(s: Signals): OriBrief {
     wearable: s.wearable,
     metrics: echo(s),
     source: "mock",
+    actions: buildActions(s, state, "mock"),
   };
 }
 

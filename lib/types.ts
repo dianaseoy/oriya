@@ -3,6 +3,22 @@
 
 export type Wearable = "whoop" | "oura" | "garmin" | "apple";
 
+/** The done-for-you actions Ori can produce from a read. Each `kind` is also the
+ * dispatch name in lib/actions.ts (runAction) — the seam a future /api/ori/act
+ * route + MCP tool reuse verbatim. */
+export type OriActionKind = "draft_checkin" | "plan_today" | "frame_stake";
+
+/** A single done-for-you output: Ori did the work, the user hands it off (copies
+ * it). v0 is draft-only — no side effects, nothing placed or posted. */
+export interface OriAction {
+  id: string; // stable id, equal to the dispatch name (== kind for v0)
+  kind: OriActionKind;
+  label: string; // button/bubble text, e.g. "Copy my check-in"
+  why: string; // one line tying it to today's read (own-par framed)
+  draft: string; // the copy-ready work-product
+  source: "fireworks" | "mock"; // live vs mock, surfaced honestly like the brief
+}
+
 /** Raw metrics as they arrive — from a screenshot extraction or typed input.
  * Loose on purpose (strings like "5h31" are allowed); normalize() tightens it. */
 export interface OriMetrics {
@@ -61,6 +77,7 @@ export interface OriBrief {
   wearable: Wearable; // echoed so follow-ups stay grounded
   metrics: OriMetrics; // echoed (extracted from the screenshot when applicable)
   source: "fireworks" | "mock"; // live vs mock, surfaced honestly
+  actions: OriAction[]; // done-for-you outputs from this read (may be empty)
 }
 
 /** Internal normalized signals the reasoning engines work on. */

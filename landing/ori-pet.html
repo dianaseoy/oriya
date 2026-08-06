@@ -1,0 +1,1475 @@
+<!--
+  Ori — desktop pet / companion (Three.js prototype, wired to the real brief).
+
+  Ori is a small living orb of light. It breathes, blinks, tracks your cursor,
+  and shifts colour + mood with a Recovery value. POKING ORI SPEAKS YOUR REAL
+  MORNING READ: it POSTs the current recovery to the live /api/ask-ori endpoint
+  and voices Ori's actual generated brief (Fireworks when the key is set, the
+  honest mock brain otherwise — labelled "demo" so it's never passed off as live).
+
+  Expressions: calm smile when rested, droopy sleepy lids + periodic yawns when
+  depleted, a "thinking" look while a brief is loading, and a celebratory bounce
+  + sparkle burst when recovery jumps day-over-day.
+
+  Runs three ways:
+    • deployed on oriya.app  (relative /api/ask-ori)
+    • opened as a file://    (calls https://oriya.app/api/ask-ori — CORS is open)
+    • inside a Tauri window  (transparent, always-on-top desktop pet; auto-detected)
+  Add ?pet=1 in a browser to preview the transparent pet-mode layout.
+
+  If Three.js can't load, a graceful fallback shows instead of a blank stare.
+  Design tokens mirror /ori: --bg 0B0C0E, --accent 7FB79E, --amber D7A25C.
+-->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Ori — companion</title>
+
+<style>
+  :root {
+    --bg: #0B0C0E;
+    --panel: #101114;
+    --line: #23252B;
+    --text: #E6E7EA;
+    --dim: #8A8F98;
+    --accent: #7FB79E;
+    --amber: #D7A25C;
+    --low: #6F8AA6;
+    --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%;
+    background: var(--bg); color: var(--text);
+    font-family: var(--font); overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #stage {
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(60% 55% at 50% 46%, rgba(127,183,158,0.10), transparent 70%),
+      radial-gradient(120% 120% at 50% 120%, #05060700, #050607 78%),
+      var(--bg);
+    transition: background 900ms ease;
+    cursor: grab;
+  }
+  #stage.dragging { cursor: grabbing; }
+  canvas { display: block; }
+  /* Size the WebGL canvas to the window at ALL device-pixel ratios. Without an explicit
+     CSS size, renderer.setSize(w,h,false) leaves the canvas laid out at its 2x drawing-
+     buffer size on a Retina screen — twice the window, top-left anchored — which shoves
+     the orb off into the bottom-right corner (the old "trapped black box" / blank pet). */
+  #scene { width: 100%; height: 100%; }
+
+  .chip {
+    position: fixed; top: 20px; left: 22px;
+    display: flex; align-items: center; gap: 9px;
+    font-size: 13px; letter-spacing: 0.02em; color: var(--dim);
+    user-select: none; z-index: 5;
+  }
+  .chip .dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 10px 1px var(--accent);
+    transition: background 700ms ease, box-shadow 700ms ease;
+  }
+  .chip b { color: var(--text); font-weight: 600; }
+  .chip .src {
+    margin-left: 4px; padding: 2px 7px; border-radius: 999px;
+    border: 1px solid var(--line); font-size: 11px; color: var(--dim);
+    opacity: 0; transition: opacity 400ms ease;
+  }
+  .chip .src.on { opacity: 1; }
+  .chip .src.live { color: var(--accent); border-color: rgba(127,183,158,0.4); }
+
+  /* Ori's speech bubble is deliberately NOT a system/notification card: soft pill, warm glass,
+     a little glowing "Ori" avatar so it always reads as the companion talking, and a gentle
+     recovery-tinted glow (--tint, set from the live colour) instead of a hard border. Calm
+     entrance, no red, no chrome — it should feel like a friend leaning in, never a work alert. */
+  #bubble {
+    position: fixed; z-index: 6; max-width: 262px;
+    display: flex; align-items: flex-start; gap: 9px;
+    padding: 10px 15px 11px 12px; border-radius: 18px;
+    background: linear-gradient(180deg, rgba(27,30,35,0.90), rgba(18,20,24,0.93));
+    border: 1px solid rgba(127,183,158,0.14);
+    color: var(--text); font-size: 14px; line-height: 1.5; letter-spacing: 0.004em;
+    box-shadow: 0 10px 34px -14px rgba(0,0,0,0.7), 0 0 22px -7px var(--tint, transparent);
+    /* JS sets left/top to an explicit, viewport-clamped top-left (see placeBubble) so the
+       bubble is never cut off by the window edge — including when Ori is docked in a corner. */
+    transform: scale(0.92) translateY(5px); transform-origin: left bottom; opacity: 0;
+    pointer-events: none; overflow-wrap: anywhere;
+    transition: opacity 300ms ease, transform 340ms cubic-bezier(0.22,1,0.36,1.25);
+    backdrop-filter: blur(9px) saturate(1.1); -webkit-backdrop-filter: blur(9px) saturate(1.1);
+  }
+  #bubble.show { opacity: 1; transform: scale(1) translateY(0); }
+  #bubble .ava {
+    flex: 0 0 auto; width: 15px; height: 15px; margin-top: 3px; border-radius: 50%;
+    background: radial-gradient(circle at 38% 34%, rgba(255,255,255,0.55), var(--tint, #7FB79E) 60%, transparent 74%);
+    box-shadow: 0 0 10px -1px var(--tint, #7FB79E);
+    animation: oriPulse 3.4s ease-in-out infinite;
+  }
+  #bubble .txt { flex: 1 1 auto; }
+  @keyframes oriPulse { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.16); opacity: 1; } }
+
+  .bar {
+    position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 18px;
+    padding: 12px 16px; border-radius: 16px;
+    background: rgba(16,17,20,0.72); border: 1px solid var(--line);
+    box-shadow: 0 18px 50px -20px rgba(0,0,0,0.9);
+    backdrop-filter: blur(10px); z-index: 5; user-select: none;
+    max-width: calc(100vw - 32px); flex-wrap: wrap; justify-content: center;
+  }
+  .rec { display: flex; align-items: center; gap: 11px; }
+  .rec label { font-size: 12px; color: var(--dim); white-space: nowrap; }
+  .rec .val { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 14px; min-width: 92px; }
+  .rec .val .mood { color: var(--dim); font-weight: 400; }
+
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 150px; height: 4px; border-radius: 3px;
+    background: linear-gradient(90deg, var(--low), var(--amber), var(--accent)); outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--text); border: 2px solid var(--bg); cursor: pointer;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 16px; height: 16px; border: 2px solid var(--bg);
+    border-radius: 50%; background: var(--text); cursor: pointer;
+  }
+  .sep { width: 1px; height: 26px; background: var(--line); }
+  button.act {
+    font-family: inherit; font-size: 13px; color: var(--text);
+    background: #181A1F; border: 1px solid var(--line);
+    padding: 8px 14px; border-radius: 10px; cursor: pointer;
+    transition: border-color 160ms ease, background 160ms ease, transform 120ms ease;
+  }
+  button.act:hover { border-color: #3a3d45; background: #1d2026; }
+  button.act:active { transform: translateY(1px); }
+
+  .hint {
+    position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%);
+    font-size: 12px; color: #5c616b; letter-spacing: 0.02em;
+    z-index: 4; text-align: center; pointer-events: none;
+    transition: opacity 600ms ease;
+  }
+  .note {
+    position: fixed; top: 18px; right: 20px; max-width: 220px;
+    font-size: 11px; line-height: 1.5; color: #565b64; text-align: right;
+    z-index: 4; user-select: none;
+  }
+  .note b { color: var(--dim); font-weight: 600; }
+
+  /* ---------- transparent pet-mode (Tauri window, or ?pet=1 preview) ---------- */
+  /* html is included so the ROOT element goes transparent too — otherwise it keeps
+     painting var(--bg) (#0B0C0E) across the whole window and the Tauri shell reads
+     as a solid black box instead of showing only the orb. */
+  html.pet, body.pet, body.pet #stage { background: transparent !important; }
+  body.pet .bar, body.pet .note, body.pet .hint, body.pet .chip,
+  body.pet .teach, body.pet #teachTab { display: none !important; }
+  body.pet #stage { cursor: default; }
+
+  #fallback {
+    position: fixed; inset: 0; display: none; place-items: center;
+    text-align: center; padding: 40px; z-index: 20;
+  }
+  #fallback.on { display: grid; }
+  #fallback .orb {
+    width: 90px; height: 90px; border-radius: 50%; margin: 0 auto 22px;
+    background: radial-gradient(circle at 38% 34%, #a7d8c4, var(--accent) 62%, #375a4c);
+    box-shadow: 0 0 60px -6px var(--accent);
+    animation: breathe 4s ease-in-out infinite;
+  }
+  @keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+  #fallback p { color: var(--dim); font-size: 14px; max-width: 340px; line-height: 1.5; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #fallback .orb { animation: none; }
+    #bubble { transition: opacity 200ms ease; }
+    #bubble .ava { animation: none; }
+  }
+  @media (max-width: 520px) {
+    .note { display: none; }
+    input[type="range"] { width: 108px; }
+  }
+
+  /* ---------- "Talk to Ori" teacher chat (BROWSER-ONLY — hidden in pet mode) ----------
+     A compact conversation so a first-time visitor can feel how Ori synthesises a
+     recovery read into plain-language coaching. Replies also drive the orb's own
+     speech bubble (window.Ori.say), so the pet feels alive while you chat. */
+  .teach {
+    position: fixed; top: 88px; right: 18px; z-index: 6;
+    width: min(340px, calc(100vw - 36px));
+    max-height: min(560px, calc(100vh - 150px));
+    display: flex; flex-direction: column;
+    background: linear-gradient(180deg, rgba(20,22,26,0.92), rgba(14,16,19,0.94));
+    border: 1px solid var(--line); border-radius: 16px;
+    box-shadow: 0 20px 54px -20px rgba(0,0,0,0.85);
+    backdrop-filter: blur(11px) saturate(1.1); -webkit-backdrop-filter: blur(11px) saturate(1.1);
+    overflow: hidden;
+    transition: opacity 260ms ease, transform 300ms cubic-bezier(0.22,1,0.36,1.25);
+  }
+  .teach.closed { opacity: 0; transform: translateY(-6px) scale(0.98); pointer-events: none; }
+  .teach-head {
+    display: flex; align-items: center; gap: 8px; flex: none;
+    padding: 12px 12px 10px 14px; border-bottom: 1px solid var(--line);
+  }
+  .teach-head .t-dot {
+    width: 9px; height: 9px; border-radius: 50%; flex: none;
+    background: var(--accent); box-shadow: 0 0 10px 1px var(--accent);
+  }
+  .teach-head b { font-size: 13.5px; color: var(--text); font-weight: 600; }
+  .teach-head .t-tag { font-size: 10.5px; color: var(--dim); letter-spacing: 0.02em; }
+  .teach-head .t-min {
+    margin-left: auto; flex: none; width: 26px; height: 26px; padding: 0;
+    background: transparent; border: 1px solid var(--line); border-radius: 8px;
+    color: var(--dim); font-size: 15px; line-height: 1; cursor: pointer;
+    transition: color 160ms ease, border-color 160ms ease;
+  }
+  .teach-head .t-min:hover { color: var(--text); border-color: #3a3d45; }
+  .tfeed {
+    flex: 1 1 auto; overflow-y: auto; padding: 13px 13px 4px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .tmsg {
+    max-width: 90%; border-radius: 13px; padding: 9px 12px;
+    font-size: 13px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: break-word;
+  }
+  .tmsg.bot { background: var(--panel); border: 1px solid rgba(127,183,158,0.28);
+    border-top-left-radius: 4px; align-self: flex-start; color: var(--text); }
+  .tmsg.user { background: rgba(127,183,158,0.12); border: 1px solid transparent;
+    border-top-right-radius: 4px; align-self: flex-end; color: var(--text); }
+  .tmsg.err { border-color: rgba(215,162,92,0.45); color: var(--dim); background: rgba(215,162,92,0.06); }
+  .tmsg.wait { font-size: 12px; color: var(--dim); align-self: flex-start; padding: 3px 6px; }
+  .tarrive { animation: tArrive .34s ease both; }
+  @keyframes tArrive { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+  .tbar {
+    flex: none; display: flex; align-items: flex-end; gap: 6px;
+    padding: 9px 10px; border-top: 1px solid var(--line);
+  }
+  .tbar textarea {
+    flex: 1; resize: none; font: inherit; font-size: 13.5px; line-height: 1.45;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    color: var(--text); padding: 9px 11px; outline: none; height: 40px; max-height: 104px;
+  }
+  .tbar textarea:focus { border-color: var(--accent); }
+  .tbar textarea::placeholder { color: var(--dim); }
+  .tsend {
+    flex: none; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 12px;
+    background: var(--accent); color: var(--bg); font-size: 18px; line-height: 1; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: transform 120ms ease, filter 160ms ease;
+  }
+  .tsend:hover { filter: brightness(1.08); transform: scale(1.05); }
+  .tsend:disabled { opacity: 0.5; cursor: default; transform: none; }
+  .t-shot { flex: none; width: 40px; height: 40px; padding: 0; border: 1px solid var(--line);
+    border-radius: 12px; background: var(--panel); color: var(--dim); font-size: 16px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; transition: color 160ms ease, border-color 160ms ease; }
+  .t-shot:hover { color: var(--text); border-color: #3a3d45; }
+  .teach-foot { flex: none; margin: 0; padding: 8px 14px 11px; font-size: 10px;
+    line-height: 1.5; color: #565b64; border-top: 1px solid var(--line); }
+  /* desktop-download seam inside the teacher panel */
+  .t-dl { flex: none; padding: 10px 14px; border-top: 1px solid var(--line);
+    display: flex; flex-direction: column; gap: 7px; }
+  .t-dl-lead { font-size: 12px; color: var(--dim); line-height: 1.45; }
+  .t-dl .t-dl-row { display: flex; gap: 6px; }
+  .t-dl input { flex: 1; font: inherit; font-size: 13px; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 10px; color: var(--text); padding: 8px 10px; outline: none; }
+  .t-dl input:focus { border-color: var(--accent); }
+  .t-dl .t-dl-btn { flex: none; font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer;
+    border-radius: 10px; padding: 8px 12px; border: 1px solid var(--amber);
+    background: rgba(215,162,92,0.14); color: var(--amber); white-space: nowrap; text-decoration: none;
+    display: inline-flex; align-items: center; }
+  .t-dl .t-dl-btn:hover { background: rgba(215,162,92,0.22); }
+  .t-dl .t-dl-hide { display: none; }
+  .t-dl .t-dl-cav { font-size: 10px; color: #565b64; line-height: 1.5; }
+
+  /* collapsed launcher pill */
+  #teachTab {
+    position: fixed; top: 88px; right: 18px; z-index: 6;
+    display: none; align-items: center; gap: 7px;
+    padding: 9px 14px; border-radius: 999px; cursor: pointer;
+    background: rgba(20,22,26,0.9); border: 1px solid var(--line); color: var(--text);
+    font: inherit; font-size: 12.5px; box-shadow: 0 12px 32px -16px rgba(0,0,0,0.8);
+    backdrop-filter: blur(8px);
+  }
+  #teachTab.on { display: inline-flex; }
+  #teachTab:hover { border-color: #3a3d45; }
+  #teachTab .t-dot { width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 9px 1px var(--accent); }
+
+  @media (max-width: 720px) {
+    .teach { top: auto; bottom: 92px; right: 10px; left: 10px; width: auto;
+      max-height: 54vh; }
+    #teachTab { top: auto; bottom: 100px; right: 12px; }
+  }
+</style>
+
+<div id="stage"><canvas id="scene"></canvas></div>
+
+<div class="chip">
+  <span class="dot" id="chipDot"></span>
+  <span id="chipLabel"><b>Ori</b> · companion</span>
+  <span class="src" id="chipSrc"></span>
+</div>
+
+<div class="note">
+  <b>Prototype.</b> Auto-goes transparent &amp; always-on-top inside the Tauri shell
+  (see <b>desktop/README.md</b>) — then Ori lives in the corner of your real screen.
+</div>
+
+<div id="bubble"><span class="ava" aria-hidden="true"></span><span class="txt"></span></div>
+<div class="hint" id="hint">hand me a recovery screen below · I read it against your own par (your ~90-day usual) · poke me for your read</div>
+
+<div class="bar">
+  <div class="rec">
+    <label for="rec">Recovery</label>
+    <input type="range" id="rec" min="0" max="100" value="78" />
+    <span class="val"><span id="recVal">78</span> · <span class="mood" id="recMood">rested</span></span>
+  </div>
+  <div class="sep"></div>
+  <button class="act" id="poke">poke</button>
+  <button class="act" id="hi">say hi</button>
+  <div class="sep"></div>
+  <div class="feedrow" id="feedRow" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap" aria-label="Hand Ori a recovery screen">
+    <span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.6">hand me a screen →</span>
+    <button class="act" type="button" data-dev="Oura" data-rec="79">Oura 82</button>
+    <button class="act" type="button" data-dev="Whoop" data-rec="62">Whoop 61</button>
+    <button class="act" type="button" data-dev="Apple" data-rec="73">Apple</button>
+  </div>
+</div>
+
+<!-- Talk to Ori — compact recovery-coach chat (BROWSER-ONLY; hidden in pet mode).
+     Bot replies also drive the orb's speech bubble via window.Ori.say, so the
+     pet feels alive while you chat. The desktop-download seam lives in its footer. -->
+<div class="teach" id="teach">
+  <div class="teach-head">
+    <span class="t-dot" aria-hidden="true"></span>
+    <b>Talk to Ori</b>
+    <span class="t-tag">your recovery coach · v0.1, early AI</span>
+    <button class="t-min" id="teachMin" type="button" aria-label="Minimise chat" title="Minimise">–</button>
+  </div>
+  <div class="tfeed" id="tfeed" aria-live="polite"></div>
+  <div class="tbar">
+    <button class="t-shot" id="teachShot" type="button" aria-label="Share a recovery screenshot" title="Share a recovery screenshot">📷</button>
+    <input type="file" id="teachShotFile" accept="image/*" hidden>
+    <textarea id="teachInput" rows="1" maxlength="500" placeholder="Tell me your number, or ask me anything…" aria-label="Message Ori"></textarea>
+    <button class="tsend" id="teachSend" type="button" aria-label="Send">↑</button>
+  </div>
+  <div class="t-dl" id="teachDl">
+    <p class="t-dl-lead">Want me living on your desktop? Try me — no scrutiny.</p>
+    <div class="t-dl-row" id="teachDlReveal">
+      <button class="t-dl-btn" id="teachDlOpen" type="button">Live on your desktop →</button>
+    </div>
+    <div class="t-dl-row t-dl-hide" id="teachDlForm">
+      <input type="email" id="teachDlEmail" placeholder="you@wherever.com" aria-label="Email for the desktop build">
+      <button class="t-dl-btn" id="teachDlSave" type="button">Get it →</button>
+    </div>
+    <a class="t-dl-btn t-dl-hide" id="teachDlLink" href="downloads/Ori_0.1.0_aarch64.dmg" download>Download Ori for Mac →</a>
+    <p class="t-dl-cav">Apple Silicon · unsigned early build · first open: right-click → Open.</p>
+  </div>
+  <p class="teach-foot">Ori nudges, never diagnoses — not medical advice. This chat stays in your browser.</p>
+</div>
+<button id="teachTab" type="button"><span class="t-dot" aria-hidden="true"></span>💬 Talk to Ori</button>
+
+<div id="fallback">
+  <div>
+    <div class="orb"></div>
+    <p>Ori needs Three.js to come alive, and it couldn't load right now.
+       Reconnect (or serve this page instead of blocking the CDN) and Ori will be here.</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script>
+(function () {
+  "use strict";
+  if (!window.THREE) { document.getElementById("fallback").classList.add("on"); return; }
+
+  var RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var QS = new URLSearchParams(location.search);
+  var isTauri = !!(window.__TAURI__ || window.__TAURI_INTERNALS__);
+  var PET = isTauri || QS.has("pet");
+  // add .pet to BOTH <html> and <body> so the root element goes transparent too
+  // (a black <html> background is what makes the Tauri window read as a solid box)
+  if (PET) { document.documentElement.classList.add("pet"); document.body.classList.add("pet"); }
+
+  // ---- where the real brief comes from (CORS is open, so file:// / Tauri work) ----
+  var sameHost = /(^|\.)oriya\.app$/.test(location.hostname) ||
+                 location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  var API = (sameHost && location.protocol.indexOf("http") === 0)
+    ? "/api/ask-ori" : "https://oriya.app/api/ask-ori";
+  var WEARABLE = "whoop", fedSource = null;   // fedSource = the wearable you actually handed in, shown on the chip
+
+  var LS = {
+    get: function (k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+
+  // ================================================================= three.js scene
+  var canvas = document.getElementById("scene");
+  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.set(0, 0, 4.4);
+  var R = 1.0;
+
+  var uniforms = {
+    uTime:  { value: 0 },
+    uColor: { value: new THREE.Color("#7FB79E") },
+    uAlive: { value: RM ? 0.4 : 1.0 },
+    // ---- per-skin surface knobs (see SKINS below); defaults are the "orb" look ----
+    uDisp:  { value: 0.022 },   // surface displacement amplitude
+    uFreq:  { value: 1.0 },     // displacement noise frequency
+    uFuzz:  { value: 0.0 },     // furry rim grain (0..1)
+    uGlass: { value: 0.0 }      // translucent / glassy look (0..1)
+  };
+  var coreMat = new THREE.ShaderMaterial({
+    uniforms: uniforms,
+    vertexShader: [
+      "uniform float uTime;", "uniform float uAlive;", "uniform float uDisp;", "uniform float uFreq;",
+      "varying vec3 vN;", "varying vec3 vV;",
+      "void main() {",
+      "  float n = sin(position.x*3.1*uFreq + uTime) * sin(position.y*2.7*uFreq + uTime*1.13) * sin(position.z*3.3*uFreq + uTime*0.9);",
+      "  vec3 pos = position + normal * n * uDisp * uAlive;",
+      "  vec4 wp = modelMatrix * vec4(pos, 1.0);",
+      "  vN = normalize(mat3(modelMatrix) * normal);",
+      "  vV = normalize(cameraPosition - wp.xyz);",
+      "  gl_Position = projectionMatrix * viewMatrix * wp;",
+      "}"
+    ].join("\n"),
+    fragmentShader: [
+      "uniform vec3 uColor;", "uniform float uTime;", "uniform float uFuzz;", "uniform float uGlass;",
+      "varying vec3 vN;", "varying vec3 vV;",
+      "void main() {",
+      "  float fres = pow(1.0 - max(dot(normalize(vN), normalize(vV)), 0.0), 2.0);",
+      "  vec3 col = mix(uColor * (0.42 - uGlass*0.24), uColor, fres);",   // glassy → dimmer core
+      "  col += uColor * fres * (0.85 + uGlass*0.7);",                    // glassy → hotter rim
+      "  col += uColor * 0.05 * (0.5 + 0.5 * sin(uTime * 1.4 + vN.y * 4.0));",
+      "  if (uFuzz > 0.001) {",                                           // furry rim grain
+      "    float g = fract(sin(dot(vN.xy, vec2(91.7, 47.3)) + uTime*0.7) * 4372.13);",
+      "    col += uColor * uFuzz * fres * (g - 0.5) * 0.9;",
+      "  }",
+      "  gl_FragColor = vec4(col, 1.0);",
+      "}"
+    ].join("\n")
+  });
+  var haloMat = new THREE.ShaderMaterial({
+    uniforms: uniforms, transparent: true,
+    blending: THREE.AdditiveBlending, depthWrite: false,
+    vertexShader: coreMat.vertexShader.replace("* uAlive", "* 0.0"),
+    fragmentShader: [
+      "uniform vec3 uColor;", "varying vec3 vN;", "varying vec3 vV;",
+      "void main() {",
+      "  float fres = pow(1.0 - max(dot(normalize(vN), normalize(vV)), 0.0), 3.2);",
+      "  gl_FragColor = vec4(uColor, fres * 0.7);",
+      "}"
+    ].join("\n")
+  });
+
+  var pet = new THREE.Group();
+  var body = new THREE.Group();
+  var core = new THREE.Mesh(new THREE.SphereGeometry(R, 64, 64), coreMat);
+  var halo = new THREE.Mesh(new THREE.SphereGeometry(R * 1.2, 48, 48), haloMat);
+  body.add(core, halo);
+  pet.add(body);
+  scene.add(pet);
+
+  // ================================================================= skins (on-brand looks)
+  /* Three switchable looks that keep Ori's identity — same green mood palette, same face,
+     same breathing/poke. A skin only tweaks the surface shader (via uniforms) plus how much
+     Ori squashes / wobbles; no meshes are rebuilt, so switching is instant and leak-free.
+       orb   — smooth luminous sphere (default)
+       fuzzy — noisy displaced surface + rim grain → a soft "furry" blob
+       jelly — glassy surface + big springy squash → a slime / stress-ball
+     Cycle with a double-click (pet-mode) or window.Ori.cycleSkin(). */
+  var SKINS = {
+    orb:   { disp: 0.022, freq: 1.0, fuzz: 0.0, glass: 0.0, squash: 1.0,  wobble: 1.0, morph: 0.55 },
+    fuzzy: { disp: 0.070, freq: 2.2, fuzz: 0.9, glass: 0.0, squash: 1.05, wobble: 1.7, morph: 0.85 },
+    jelly: { disp: 0.030, freq: 1.1, fuzz: 0.0, glass: 0.8, squash: 1.7,  wobble: 1.2, morph: 1.8 }
+  };
+  var SKIN_ORDER = ["orb", "fuzzy", "jelly"];
+  var squashGain = 1.0, wobbleGain = 1.0, morphGain = 0.55;
+  var skinName = SKINS[LS.get("oriya:pet:skin")] ? LS.get("oriya:pet:skin") : "orb";
+  function applySkin(name) {
+    var s = SKINS[name] || SKINS.orb;
+    skinName = SKINS[name] ? name : "orb";
+    uniforms.uDisp.value = s.disp; uniforms.uFreq.value = s.freq;
+    uniforms.uFuzz.value = s.fuzz; uniforms.uGlass.value = s.glass;
+    squashGain = s.squash; wobbleGain = s.wobble; morphGain = s.morph != null ? s.morph : 1.0;
+    LS.set("oriya:pet:skin", skinName);
+  }
+  function cycleSkin() {
+    applySkin(SKIN_ORDER[(SKIN_ORDER.indexOf(skinName) + 1) % SKIN_ORDER.length]);
+    pokeVel += 3; hop = Math.max(hop, 0.6); bump();   // a little acknowledgement squish
+  }
+
+  // ---- face (2D canvas billboard) ----
+  var fcv = document.createElement("canvas");
+  fcv.width = 256; fcv.height = 220;
+  var fx = fcv.getContext("2d");
+  var faceTex = new THREE.CanvasTexture(fcv);
+  faceTex.minFilter = THREE.LinearFilter;
+  var faceMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(R * 2.0, R * 1.72),
+    new THREE.MeshBasicMaterial({ map: faceTex, transparent: true, depthWrite: false })
+  );
+  faceMesh.position.z = R * 0.64;
+  pet.add(faceMesh);
+
+  var face = { open: 1, openT: 1, lookX: 0, lookY: 0, happy: 0, sleepy: 0, sleepyT: 0, yawn: 0, think: 0, thinkT: 0, emote: 0, emoteT: 0 };
+
+  function drawFace() {
+    fx.clearRect(0, 0, fcv.width, fcv.height);
+    var cx = 128, cy = 96, ex = 40, eyeCol = "#0B0C0E";
+    var gx = face.lookX * 9, gy = face.lookY * 7;
+    var yawning = face.yawn > 0.15;
+    var happy = face.happy > 0.5;
+    var thinking = face.think > 0.5 && !happy && !yawning;
+    if (thinking) { gx = 4; gy = -8; }               // eyes drift up while loading
+
+    for (var s = -1; s <= 1; s += 2) {
+      var x = cx + s * ex + gx, y = cy + gy + face.sleepy * 6;
+      fx.save(); fx.translate(x, y);
+      if (yawning) {                                  // squeezed-shut yawn eyes ^ ^
+        fx.strokeStyle = eyeCol; fx.lineWidth = 9; fx.lineCap = "round";
+        fx.beginPath(); fx.arc(0, 7, 13, Math.PI * 1.12, Math.PI * 1.88); fx.stroke();
+      } else if (happy) {                             // content crescents
+        fx.strokeStyle = eyeCol; fx.lineWidth = 10; fx.lineCap = "round";
+        fx.beginPath(); fx.arc(0, 8, 15, Math.PI * 1.15, Math.PI * 1.85); fx.stroke();
+      } else {
+        var h = Math.max(2, 24 * face.open * (1 - face.sleepy * 0.55)) * (thinking ? 0.7 : 1);
+        fx.fillStyle = eyeCol;
+        fx.beginPath(); fx.ellipse(0, 0, 15, h, 0, 0, Math.PI * 2); fx.fill();
+        fx.fillStyle = "rgba(230,231,234,0.85)";
+        fx.beginPath(); fx.arc(-5, -7, 3.2, 0, Math.PI * 2); fx.fill();
+      }
+      fx.restore();
+    }
+
+    // mouth
+    var my = cy + 46 + gy * 0.4;
+    if (yawning) {                                    // wide O
+      fx.fillStyle = "#0B0C0E";
+      fx.beginPath(); fx.ellipse(cx + gx, my + 4, 13, 8 + 12 * face.yawn, 0, 0, Math.PI * 2); fx.fill();
+    } else {
+      fx.strokeStyle = eyeCol; fx.lineWidth = 6; fx.lineCap = "round"; fx.beginPath();
+      if (happy) fx.arc(cx + gx, my - 4, 20, Math.PI * 0.12, Math.PI * 0.88);
+      else if (thinking) { fx.moveTo(cx - 8 + gx, my); fx.lineTo(cx + 8 + gx, my); }
+      else if (face.sleepy > 0.4) { fx.moveTo(cx - 11 + gx, my); fx.lineTo(cx + 11 + gx, my); }
+      else {   // resting mouth curves with mood: a soft smile above your line, a weary flat/dip below
+        var curve = 11 * face.emote;
+        fx.moveTo(cx - 14 + gx, my); fx.quadraticCurveTo(cx + gx, my + curve, cx + 14 + gx, my);
+      }
+      fx.stroke();
+    }
+    faceTex.needsUpdate = true;
+  }
+
+  // ---- ambient motes ----
+  var COUNT = RM ? 60 : 150;
+  var pgeo = new THREE.BufferGeometry();
+  var ppos = new Float32Array(COUNT * 3);
+  for (var i = 0; i < COUNT; i++) {
+    var rr = 1.5 + Math.random() * 1.9, th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1);
+    ppos[i * 3] = rr * Math.sin(ph) * Math.cos(th);
+    ppos[i * 3 + 1] = rr * Math.sin(ph) * Math.sin(th);
+    ppos[i * 3 + 2] = rr * Math.cos(ph);
+  }
+  pgeo.setAttribute("position", new THREE.BufferAttribute(ppos, 3));
+  var pmat = new THREE.PointsMaterial({ color: new THREE.Color("#7FB79E"), size: 0.035, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false });
+  pet.add(new THREE.Points(pgeo, pmat));
+
+  // ---- celebration sparkles ----
+  var SPN = 34;
+  var sgeo = new THREE.BufferGeometry();
+  var spos = new Float32Array(SPN * 3);
+  var svel = [];
+  for (i = 0; i < SPN; i++) { svel.push(new THREE.Vector3()); }
+  sgeo.setAttribute("position", new THREE.BufferAttribute(spos, 3));
+  var smat = new THREE.PointsMaterial({ color: new THREE.Color("#E6E7EA"), size: 0.06, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+  pet.add(new THREE.Points(sgeo, smat));
+  var sparkLife = 0;
+  function burst() {
+    for (var k = 0; k < SPN; k++) {
+      spos[k * 3] = spos[k * 3 + 1] = spos[k * 3 + 2] = 0;
+      var th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1), sp = 1.6 + Math.random() * 1.8;
+      svel[k].set(Math.sin(ph) * Math.cos(th) * sp, Math.sin(ph) * Math.sin(th) * sp + 0.6, Math.cos(ph) * sp);
+    }
+    smat.color.copy(targetColor).lerp(new THREE.Color("#ffffff"), 0.5);
+    sparkLife = 1;
+    sgeo.attributes.position.needsUpdate = true;
+  }
+
+  // ================================================================= mood + brief
+  // Recovery → mood. Thresholds 80 / 50 (energetic → warm → muted-cool); breathing held
+  // to ~12–16 bpm (breath Hz × 60), slower when depleted. Colours stay on Oriya's brand
+  // tokens (--accent / --amber / --low) rather than literal cyan/violet/magenta so the pet
+  // matches the rest of the site — swap the hexes here for a different palette.
+  function moodFor(r) {
+    if (r >= 80) return { key: "rested", color: "#7FB79E", breath: 0.24, amp: 0.045, sleepy: 0 }; // ~14 bpm
+    if (r >= 50) return { key: "steady", color: "#D7A25C", breath: 0.26, amp: 0.04,  sleepy: 0 }; // ~16 bpm
+    return             { key: "low",    color: "#6F8AA6", breath: 0.19, amp: 0.058, sleepy: 1 }; // ~11 bpm
+  }
+  // Colour tracks recovery *continuously* (not just the 3 mood bands above), so a 62 and a 78
+  // read as visibly different greens-of-amber rather than snapping. Anchors stay on brand tokens:
+  // low → --low, mid → --amber, high → --accent, with a touch extra glow at the very top.
+  var C_LOW = new THREE.Color("#6F8AA6"), C_MID = new THREE.Color("#D7A25C"),
+      C_HIGH = new THREE.Color("#7FB79E"), C_PEAK = new THREE.Color("#9BD3B8");
+  var _cf = new THREE.Color();
+  function colorForRec(r) {
+    r = Math.max(0, Math.min(100, r));
+    if (r <= 50)      _cf.copy(C_LOW).lerp(C_MID, r / 50);
+    else if (r <= 82) _cf.copy(C_MID).lerp(C_HIGH, (r - 50) / 32);
+    else              _cf.copy(C_HIGH).lerp(C_PEAK, (r - 82) / 18);
+    return _cf;
+  }
+  // All user-facing lines are Sable-approved (own-par body language, permission-to-rest, never
+  // work-notification voice). Keep any additions in that register.
+  var LINES = {
+    rested: ["Slept deep. Body's got range today.", "Green off your own line. Go use the room.", "Recovered clean — you can afford to push."],
+    steady: ["Middle of your range. Ease in, then decide.", "Not your ceiling, not your floor. Keep it honest.", "Amber. Warm up longer than feels necessary."],
+    low:    ["Running low. Rest counts as training.", "Red day. No hero sets — I've got you.", "Depleted. Let's go gentle. Breathe with me?"],
+    poke:   ["Hey, that tickles.", "Boop. Still here.", "Careful, I'm soft.", "Poke all you want, I'm not leaving."],
+    greet:  ["Hey you. Good to see you check in.", "I'm Ori. I sit here and watch your baseline.", "Whenever you're ready. No rush, ever."],
+    up:     ["Big climb off your own baseline today.", "Real jump. The rest paid off.", "Up and to the right. Go spend it."],
+    // Ambient, unprompted nudges — every one skippable and permission-shaped, never a demand.
+    remind: ["Water first. You're probably behind already.", "Screens down soon — protect tonight's sleep.",
+             "Stand up. Look out a window for a minute.", "One slow breath with me? That's the whole ask.",
+             "Wind-down window's open. Ease off when you can.", "You've been strained a while. Okay to stop here.",
+             "Hydrate now. 6am-you says thanks."]
+  };
+  // Data-synthesis one-liners: ONE human sentence off fresh wearable data, ranked vs your own
+  // baseline — never a raw stat dump. Directional, not diagnostic (honest hedges, no medical claim).
+  // Only spoken when real metrics are fed in (window.Ori.feed) so it's never a fabricated read.
+  function synthLine(r) {
+    if (r >= 85) return "Sleep ran deep and your heart settled early — full tank today.";
+    if (r >= 72) return "Recovery's above your line. Room to push if you want it.";
+    if (r >= 58) return "Short on deep sleep, so you're a half-step down. Pace it.";
+    if (r >= 45) return "Your heart was still working overnight. Steady beats hard today.";
+    return "You didn't reset last night. Today's a keep-the-lights-on day.";
+  }
+
+  var targetColor = new THREE.Color("#7FB79E");
+  var WHITE = new THREE.Color("#ffffff");            // poke flash target
+  var moodKey = "rested", breathRate = 0.34, breathAmp = 0.045;
+  var recovery = 78, prevBand = null;
+
+  function hexA(hex, a) {
+    var n = parseInt(hex.slice(1), 16);
+    return "rgba(" + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")";
+  }
+  var recSlider = document.getElementById("rec");
+  function setRecovery(r, quiet) {
+    r = Math.max(0, Math.min(100, Math.round(r)));
+    recovery = r;
+    var m = moodFor(r);
+    var hex = "#" + colorForRec(r).getHexString();   // continuous colour for this exact score
+    moodKey = m.key; targetColor.set(hex);
+    breathRate = m.breath; breathAmp = RM ? m.amp * 0.5 : m.amp;
+    face.sleepyT = m.sleepy;
+    face.emoteT = Math.max(-1, Math.min(1, (r - 62) / 32));   // continuous mood on the face, not just colour
+    if (recSlider) recSlider.value = r;
+    var vv = document.getElementById("recVal"); if (vv) vv.textContent = r;
+    var vm = document.getElementById("recMood"); if (vm) vm.textContent = m.key;
+    var dot = document.getElementById("chipDot");
+    dot.style.background = hex; dot.style.boxShadow = "0 0 10px 1px " + hex;
+    bubble.style.setProperty("--tint", hex);      // bubble glow + avatar track the live colour
+    if (!PET) document.getElementById("stage").style.background =
+      "radial-gradient(60% 55% at 50% 46%, " + hexA(hex, 0.12) + ", transparent 70%)," +
+      "radial-gradient(120% 120% at 50% 120%, #05060700, #050607 78%), #0B0C0E";
+    // celebrate an upward band crossing (steady→rested, low→steady, …)
+    var band = r >= 80 ? 2 : r >= 50 ? 1 : 0;
+    if (!quiet && prevBand !== null && band > prevBand) celebrate(false);
+    prevBand = band;
+    LS.set("oriya:pet:rec", r);
+  }
+
+  // ---- speech bubble ----
+  var bubble = document.getElementById("bubble");
+  var bubbleTxt = bubble.querySelector(".txt");
+  var bubbleUntil = 0;
+  function say(text) {
+    if (!text) return;
+    bubbleTxt.textContent = text;                 // set the text node, keep the Ori avatar dot
+    bubble.classList.add("show");
+    bubbleUntil = performance.now() + Math.min(6500, 2600 + text.length * 45);
+  }
+  function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
+
+  // ---- the real brief ----
+  var brief = null, briefLines = [], briefIdx = 0, actions = [], fetching = false, greeted = false, offeredAction = false;
+  // ---- integration state (fed from outside; see the feed seam near boot) ----
+  var fedMetrics = {};          // extra wearable fields (sleep/hrv/strain/…), merged into every brief request
+  var nextEvent = null;         // soonest upcoming calendar event, if a calendar source fed one
+  var nudgesPausedUntil = 0;    // ambient nudges muted until this timestamp
+  function buildLines(b) {
+    var L = [];
+    if (b.summary) L.push(b.summary);
+    if (b.recommendation) L.push("What I'd do — " + b.recommendation);
+    if (b.reassurance) L.push("Don't sweat — " + b.reassurance);
+    (b.observations || []).forEach(function (o) { if (o) L.push(o); });
+    return L;
+  }
+  function setSrc(source) {
+    var el = document.getElementById("chipSrc");
+    el.className = "src on" + (source === "fireworks" ? " live" : "");
+    el.textContent = source === "fireworks" ? "live read" : source === "mock" ? "demo read" : "offline";
+    if (!source) el.className = "src on";
+  }
+  // Honest provenance: Ori shows WHICH wearable you handed it — never a fabricated "connected/online"
+  // state. No source fed → it's just the companion (or the drag-to-explore demo).
+  var DEVICE_NAMES = { whoop: "Whoop", oura: "Oura", apple: "Apple Health", "apple health": "Apple Health",
+                       garmin: "Garmin", fitbit: "Fitbit", manual: "your number", demo: null };
+  function setDevice(name) {
+    var el = document.getElementById("chipLabel"); if (!el) return;
+    var key = (name || "").toString().toLowerCase();
+    var pretty = DEVICE_NAMES.hasOwnProperty(key) ? DEVICE_NAMES[key] : (name || null);
+    el.innerHTML = pretty ? "<b>Ori</b> · reading your " + pretty : "<b>Ori</b> · companion";
+  }
+  var fetchTimer = null;
+  function scheduleFetch() { clearTimeout(fetchTimer); fetchTimer = setTimeout(function () { fetchBrief("update"); }, 550); }
+
+  function fetchBrief(reason) {
+    if (fetching) return;
+    fetching = true; face.thinkT = 1; bump();
+    fetch(API, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ wearable: WEARABLE, metrics: Object.assign({ recovery: recovery }, fedMetrics) })
+    })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (b) {
+      brief = b; briefLines = buildLines(b); briefIdx = 0; setSrc(b.source);
+      actions = Array.isArray(b.actions) ? b.actions : []; offeredAction = false;
+      if (reason === "load" || reason === "greet") {
+        greeted = true;
+        var g = (b.greeting ? b.greeting.replace(/^[^\w]*/, "").trim() + " — " : "") + (b.summary || pick(LINES[moodKey]));
+        say(g);
+        if (celebrateOnGreet) { celebrate(true); celebrateOnGreet = false; }
+        offerActionSoon();                       // proactively surface the top done-for-you draft
+      }
+    })
+    .catch(function () { brief = null; briefLines = []; setSrc(null); })
+    .then(function () { fetching = false; face.thinkT = 0; });
+  }
+
+  /* Poke cycles the read lines first, then Ori's done-for-you actions. Reaching an
+     action is the operator moment: it copies the draft to the clipboard (poke is a
+     user gesture, so the Clipboard API is allowed) and confirms what it did. This is
+     the advisor→operator shift — Ori doesn't just tell you, it hands you the work. */
+  function speak() {
+    var total = briefLines.length + actions.length;
+    if (!total) { say(pick(LINES.poke)); return; }   // offline / not-yet-loaded → playful fallback
+    offeredAction = true;                            // they're poking now — stop the proactive nudge
+    var i = briefIdx % total; briefIdx++;
+    if (i < briefLines.length) say(briefLines[i]);
+    else doAction(actions[i - briefLines.length]);
+  }
+  function actionNoun(a) {
+    return !a ? "note"
+      : a.kind === "draft_checkin" ? "check-in"
+      : a.kind === "plan_today" ? "plan for today"
+      : a.kind === "frame_stake" ? "stake line" : "note";
+  }
+  function doAction(a) {
+    if (!a || !a.draft) { say(pick(LINES.poke)); return; }
+    copyToClipboard(a.draft);
+    face.happy = 1; setTimeout(function () { face.happy = 0; }, 900);
+    say(a.kind === "draft_checkin" ? "Check-in drafted. Paste it to your squad. ✅"
+      : a.kind === "plan_today" ? "Today's plan's ready. Drop it where you train. ✅"
+      : a.kind === "frame_stake" ? "Stake line's written. Set it in Duels when you want. ✅"
+      : "Ready for you. ✅");
+  }
+  // One-time proactive offer once the greeting bubble has cleared. Never auto-copies —
+  // it just tells you the draft is ready and to poke for it.
+  function offerActionSoon(tries) {
+    if (offeredAction || !actions.length) return;
+    tries = tries || 0;
+    setTimeout(function () {
+      if (offeredAction || !actions.length) return;
+      if (performance.now() < bubbleUntil && tries < 3) { offerActionSoon(tries + 1); return; }
+      offeredAction = true;
+      say("I drafted your " + actionNoun(actions[0]) + " — poke me to grab it. 📋");
+    }, 3600);
+  }
+  // Copy with a file:// / older-webview fallback (Clipboard API needs a secure context).
+  function copyToClipboard(text) {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(function () { fallbackCopy(text); });
+        return;
+      }
+    } catch (e) {}
+    fallbackCopy(text);
+  }
+  function fallbackCopy(text) {
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", "");
+      ta.style.position = "fixed"; ta.style.top = "-1000px"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      document.execCommand("copy"); document.body.removeChild(ta);
+    } catch (e) {}
+  }
+
+  // ================================================================= interaction
+  var raycaster = new THREE.Raycaster();
+  var ndc = new THREE.Vector2(), lookTarget = new THREE.Vector2();
+  var dragPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), hitPt = new THREE.Vector3();
+  var home = new THREE.Vector2(0, 0);
+  var pressing = false, movedFar = false, dragging = false, downPt = null;
+  var poke = 0, pokeVel = 0, pokeFlash = 0, hop = 0, party = 0, celebrateOnGreet = false;
+
+  /* ─────────────────── desktop toss physics + sizing (Tauri only) ───────────────────
+     In the desktop shell Ori IS the window. We drive the drag from JS (not the native
+     drag-region) so we can measure release velocity and FLING the window: it coasts with
+     friction and bounces off the screen edges, squishing on each hit — the "stress ball"
+     feel. Tauri calls are async, so window position / size / monitor bounds are cached in
+     physical px and refreshed on drag-start and resize. Pinch (ctrl+wheel) and +/- resize
+     the window, aspect-locked and persisted. In a browser (?pet=1) none of this runs —
+     drag stays in-canvas (the `home` vector). */
+  var TWapi = (isTauri && window.__TAURI__ && window.__TAURI__.window) ? window.__TAURI__.window : null;
+  var TW = TWapi ? (TWapi.getCurrentWindow || TWapi.getCurrent).call(TWapi) : null;
+  var TWscale = 1;
+  var winPos = null, winSize = { w: 0, h: 0 }, monBounds = null;
+  var dragVel = { x: 0, y: 0 }, lastScreen = null, lastMoveT = 0, downId = null, winDragging = false;
+  var flingRAF = 0, dockRAF = 0;
+  var DOCK_NEAR = 150, DOCK_INSET = 44;     // release within 150px of an edge → rest tucked 44px in
+
+  if (TW) { TW.scaleFactor().then(function (s) { TWscale = s || 1; }).catch(function () {}); }
+  function tauriRefresh() {                 // cache position / size / monitor bounds (physical px)
+    if (!TW) return Promise.resolve();
+    return Promise.all([TW.outerPosition(), TW.outerSize(), TWapi.currentMonitor()]).then(function (r) {
+      winPos = { x: r[0].x, y: r[0].y };
+      winSize = { w: r[1].width, h: r[1].height };
+      if (r[2]) monBounds = { x: r[2].position.x, y: r[2].position.y, w: r[2].size.width, h: r[2].size.height };
+    }).catch(function () {});
+  }
+  function setWin() { TW.setPosition(new TWapi.PhysicalPosition(Math.round(winPos.x), Math.round(winPos.y))); }
+  // Keep the ORB (= window centre) within the screen so Ori can tuck up to a corner and show only a
+  // partial circle, but never fully leaves — and stays grabbable.
+  function clampWin() {
+    if (!winPos || !monBounds) return;
+    var hw = winSize.w / 2, hh = winSize.h / 2;
+    winPos.x = Math.max(monBounds.x - hw, Math.min(monBounds.x + monBounds.w - hw, winPos.x));
+    winPos.y = Math.max(monBounds.y - hh, Math.min(monBounds.y + monBounds.h - hh, winPos.y));
+  }
+  function moveWinBy(dxCss, dyCss) {        // move the window by a CSS-px delta, tuck-clamped
+    if (!TW || !winPos) return;
+    winPos.x += dxCss * TWscale; winPos.y += dyCss * TWscale;
+    clampWin(); setWin();
+  }
+  // Ease the orb into a tidy corner/edge "peek" when it's released nearby.
+  function dockSnap() {
+    if (!TW || !winPos || !monBounds) return;
+    cancelAnimationFrame(dockRAF);
+    var hw = winSize.w / 2, hh = winSize.h / 2, near = DOCK_NEAR * TWscale, inset = DOCK_INSET * TWscale;
+    var L = monBounds.x, Rr = L + monBounds.w, Tp = monBounds.y, B = Tp + monBounds.h;
+    var cx = winPos.x + hw, cy = winPos.y + hh, tx = cx, ty = cy;
+    if (cx - L < near) tx = L + inset; else if (Rr - cx < near) tx = Rr - inset;
+    if (cy - Tp < near) ty = Tp + inset; else if (B - cy < near) ty = B - inset;
+    var targetX = tx - hw, targetY = ty - hh;
+    (function ease() {
+      winPos.x += (targetX - winPos.x) * 0.25; winPos.y += (targetY - winPos.y) * 0.25;
+      setWin();
+      if (Math.abs(targetX - winPos.x) > 1 || Math.abs(targetY - winPos.y) > 1) dockRAF = requestAnimationFrame(ease);
+    })();
+  }
+  function startFling() {                   // coast with friction, bounce off screen edges, then dock
+    if (!TW || !winPos || !monBounds) return;
+    cancelAnimationFrame(flingRAF);
+    var vx = dragVel.x * TWscale, vy = dragVel.y * TWscale;
+    if (Math.hypot(vx, vy) < 0.8) { dockSnap(); return; }  // a gentle drop, not a throw → just settle
+    vx = Math.max(-90, Math.min(90, vx)); vy = Math.max(-90, Math.min(90, vy));
+    (function step() {
+      winPos.x += vx; winPos.y += vy; vx *= 0.94; vy *= 0.94;
+      var hw = winSize.w / 2, hh = winSize.h / 2;
+      var minX = monBounds.x - hw, maxX = monBounds.x + monBounds.w - hw;
+      var minY = monBounds.y - hh, maxY = monBounds.y + monBounds.h - hh;
+      var hit = false;
+      if (winPos.x <= minX) { winPos.x = minX; vx = -vx * 0.6; hit = true; }
+      else if (winPos.x >= maxX) { winPos.x = maxX; vx = -vx * 0.6; hit = true; }
+      if (winPos.y <= minY) { winPos.y = minY; vy = -vy * 0.6; hit = true; }
+      else if (winPos.y >= maxY) { winPos.y = maxY; vy = -vy * 0.6; hit = true; }
+      if (hit) { pokeVel += Math.min(6, Math.hypot(vx, vy) * 0.15) + 1.5; hop = Math.min(1, hop + 0.4); bump(); }
+      setWin();
+      if (Math.hypot(vx, vy) > 0.5) flingRAF = requestAnimationFrame(step);
+      else dockSnap();                      // settled → tuck into the nearby corner/edge
+    })();
+  }
+
+  // ---- idle roam (desktop companion only) ------------------------------------------------
+  /* Left alone a while, Ori takes a slow clockwise stroll around the edge of your screen — just
+     enough drift to catch your eye when you're heads-down or stuck, never fast enough to pull
+     focus. ANY touch (grab / poke / scroll) resets the idle timer and stops it; it pauses while a
+     bubble is up so text stays readable, respects the nudge-pause, and is OFF under Reduce Motion. */
+  var PATROL_AFTER = 30000, PATROL_LAP_MS = 60000, PATROL_TOP = 30, patrolP = null;
+  // The path is the SCREEN EDGE itself: the window CENTRE rides the very border, so only Ori's
+  // outer half peeks in — never a full orb parked mid-screen. One clockwise lap takes 60s, clock-like.
+  function patrolRect() {
+    var L = monBounds.x, Rr = monBounds.x + monBounds.w;
+    var Tp = monBounds.y + PATROL_TOP * TWscale;              // small top clearance so it clears the menu bar
+    var B = monBounds.y + monBounds.h;
+    return { L: L, R: Math.max(L, Rr), T: Tp, B: Math.max(Tp, B) };
+  }
+  function patrolPoint(p, q) {              // param → centre point, clockwise from the top-left
+    var W = q.R - q.L, H = q.B - q.T, per = 2 * (W + H);
+    if (per <= 0) return { x: q.L, y: q.T };
+    p = ((p % per) + per) % per;
+    if (p < W) return { x: q.L + p, y: q.T };
+    p -= W; if (p < H) return { x: q.R, y: q.T + p };
+    p -= H; if (p < W) return { x: q.R - p, y: q.B };
+    p -= W; return { x: q.L, y: q.B - p };
+  }
+  function patrolNearest(cx, cy, q) {       // project current centre onto the path so it never jumps
+    var W = q.R - q.L, H = q.B - q.T;
+    cx = Math.max(q.L, Math.min(q.R, cx)); cy = Math.max(q.T, Math.min(q.B, cy));
+    var dT = cy - q.T, dB = q.B - cy, dL = cx - q.L, dR = q.R - cx, m = Math.min(dT, dB, dL, dR);
+    if (m === dT) return cx - q.L;
+    if (m === dR) return W + (cy - q.T);
+    if (m === dB) return W + H + (q.R - cx);
+    return 2 * W + H + (q.B - cy);
+  }
+
+  var PET_ASPECT = 360 / 420;
+  var PET_MIN_W = 96;                       // Ori can shrink to a tiny corner bead now (was 180)
+  var petW = (function () { var v = LS.get("oriya:pet:size"); return (typeof v === "number" && v >= PET_MIN_W) ? v : 360; })();
+  function applyWinSize(w) {                // logical px, aspect-locked, clamped, persisted
+    petW = Math.max(PET_MIN_W, Math.min(640, Math.round(w)));
+    LS.set("oriya:pet:size", petW);
+    if (TW) { TW.setSize(new TWapi.LogicalSize(petW, Math.round(petW / PET_ASPECT))).then(tauriRefresh).catch(function () {}); }
+  }
+
+  function pointerNDC(e) {
+    var rect = canvas.getBoundingClientRect();
+    ndc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    ndc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  }
+  function hitsOri() { raycaster.setFromCamera(ndc, camera); return raycaster.intersectObject(core, false).length > 0; }
+
+  /* ───────────────────────── vision seam (designed, not built) ─────────────────────────
+     Ori's gaze + reactions are driven through two entry points so an on-device vision
+     module can be added later WITHOUT touching the render loop:
+
+       setGaze(nx, ny)  — where Ori looks, nx/ny in [-1,1]. Today the mouse calls it;
+                          tomorrow a FaceLandmarker worker calls it from head/eye position.
+       onGesture(name)  — "wave" | "thumbsup" | "peace", mapped to actions that exist here.
+
+     A future landing/vision.js would run @mediapipe/tasks-vision 100% on-device — camera
+     frames stay in memory and are never sent anywhere (Oriya's privacy spine) — at low
+     res / low fps in a Web Worker, behind a visible camera indicator, and simply call
+     window.Ori.setGaze(...) / window.Ori.onGesture(...). No camera code ships here. */
+  function setGaze(nx, ny) {                 // where Ori looks; nx,ny clamped to [-1,1]
+    lookTarget.set(Math.max(-1, Math.min(1, nx)), Math.max(-1, Math.min(1, ny)));
+  }
+  function onGesture(name) {
+    if (name === "wave") sayHi();                       // 👋 → greeting
+    else if (name === "thumbsup") celebrate(false);     // 👍 → log / celebrate a win
+    else if (name === "peace") {                        // ✌️ → pause nudges
+      pauseNudges(120);
+      say("Nudges paused — I'll stay quiet a bit.");
+      face.happy = 1; setTimeout(function () { face.happy = 0; }, 900);
+    }
+  }
+
+  function triggerPoke() {
+    pokeVel += 5; pokeFlash = 1; hop = 1; face.happy = 1;   // springy punch + brief brighten
+    bump();
+    setTimeout(function () { face.happy = 0; }, 900);
+    speak();                                 // POKE SPEAKS THE REAL READ
+  }
+  function celebrate(fromGreet) {
+    party = 1; hop = 1; burst(); face.happy = 1; bump();
+    setTimeout(function () { face.happy = 0; }, 1300);
+    say(brief && moodKey === "rested" && briefLines.length ? briefLines[0] : pick(LINES.up));
+  }
+
+  var stage = document.getElementById("stage");
+  // No data-tauri-drag-region: the window drag is driven from JS (see the toss physics
+  // above) so we can measure release velocity and fling + bounce Ori like a stress ball.
+
+  window.addEventListener("pointermove", function (e) {
+    pointerNDC(e);
+    setGaze(ndc.x, ndc.y);
+    if (pressing && downPt && (Math.abs(e.clientX - downPt.x) + Math.abs(e.clientY - downPt.y)) > 6) movedFar = true;
+    if (winDragging && lastScreen) {              // Tauri: drag the whole window, measure velocity
+      var dx = e.screenX - lastScreen.x, dy = e.screenY - lastScreen.y;
+      lastScreen = { x: e.screenX, y: e.screenY };
+      moveWinBy(dx, dy);
+      var now = performance.now(), dtm = Math.max(1, now - lastMoveT); lastMoveT = now;
+      dragVel.x = 0.6 * dragVel.x + 0.4 * (dx / dtm * 16);   // smoothed px/frame
+      dragVel.y = 0.6 * dragVel.y + 0.4 * (dy / dtm * 16);
+    }
+    if (dragging) {                               // browser: drag Ori inside the canvas
+      raycaster.setFromCamera(ndc, camera);
+      if (raycaster.ray.intersectPlane(dragPlane, hitPt))
+        home.set(Math.max(-1.9, Math.min(1.9, hitPt.x)), Math.max(-0.7, Math.min(1.1, hitPt.y)));
+    }
+  });
+  canvas.addEventListener("pointerdown", function (e) {
+    pointerNDC(e);
+    if (hitsOri()) {
+      pressing = true; movedFar = false; downPt = { x: e.clientX, y: e.clientY };
+      if (isTauri) {                              // grab the window; cancel any in-flight fling/dock
+        winDragging = true; cancelAnimationFrame(flingRAF); cancelAnimationFrame(dockRAF);
+        lastScreen = { x: e.screenX, y: e.screenY }; dragVel = { x: 0, y: 0 }; lastMoveT = performance.now();
+        downId = e.pointerId; try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+        tauriRefresh();
+      } else {
+        dragging = true; stage.classList.add("dragging");
+      }
+      hideHint();
+    }
+  });
+  window.addEventListener("pointerup", function (e) {
+    if (winDragging) {                            // Tauri: release → poke (tap) or fling (throw)
+      winDragging = false;
+      try { if (downId != null) canvas.releasePointerCapture(downId); } catch (_) {}
+      downId = null;
+      if (!movedFar) triggerPoke(); else startFling();
+    } else if (pressing && !movedFar) {
+      triggerPoke();                              // browser: a click (not a drag) = poke
+    }
+    pressing = false; dragging = false; downPt = null;
+    stage.classList.remove("dragging");
+  });
+
+  // pet-mode has no slider — scroll sets recovery; pinch (ctrl+wheel) resizes the window;
+  // right-click refreshes the brief; double-click cycles Ori's look; +/- also resize.
+  window.addEventListener("wheel", function (e) {
+    if (!PET) return;
+    e.preventDefault();
+    if (e.ctrlKey && TW) { applyWinSize(petW - e.deltaY * 0.5); return; }   // trackpad pinch → resize
+    setRecovery(recovery + (e.deltaY < 0 ? 4 : -4));
+    scheduleFetch();
+  }, { passive: false });
+  window.addEventListener("contextmenu", function (e) { if (PET) { e.preventDefault(); fetchBrief("update"); } });
+  canvas.addEventListener("dblclick", function (e) { if (PET) { e.preventDefault(); cycleSkin(); } });
+  window.addEventListener("keydown", function (e) {
+    if (!PET || !TW) return;
+    if (e.key === "+" || e.key === "=") applyWinSize(petW + 24);
+    else if (e.key === "-" || e.key === "_") applyWinSize(petW - 24);
+  });
+
+  if (recSlider) recSlider.addEventListener("input", function (e) { setRecovery(parseInt(e.target.value, 10)); scheduleFetch(); });
+  var pokeBtn = document.getElementById("poke"); if (pokeBtn) pokeBtn.addEventListener("click", function () { triggerPoke(); hideHint(); });
+  function sayHi() {
+    hideHint();
+    if (brief) { say((brief.greeting ? brief.greeting.replace(/^[^\w]*/, "").trim() + " — " : "") + (brief.summary || "")); }
+    else say(pick(LINES.greet));
+    face.happy = 1; setTimeout(function () { face.happy = 0; }, 900);
+  }
+  var hiBtn = document.getElementById("hi"); if (hiBtn) hiBtn.addEventListener("click", sayHi);
+
+  // "hand me a screen" — tap a sample wearable read; it flows through the SAME
+  // feed() seam a real screenshot/paste would, so the orb recolours + Ori speaks
+  // one synthesised read scored against your par. Browser-only (hidden in pet mode).
+  var feedRow = document.getElementById("feedRow");
+  if (feedRow) feedRow.addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-dev]"); if (!b) return;
+    hideHint();
+    feed({ recovery: parseInt(b.dataset.rec, 10), source: b.dataset.dev });
+  });
+
+  var hintEl = document.getElementById("hint"), hintGone = false;
+  function hideHint() { if (!hintGone && hintEl) { hintGone = true; hintEl.style.opacity = 0; } }
+  setTimeout(hideHint, 9000);
+
+  // ================================================================= integrations (feed seam)
+  /* Ori is a *done-for-you* health pet — it doesn't wait for you to open an app. Any source (a
+     wearable bridge, a browser extension, a manual paste, a future native connector) pushes data
+     in through ONE public door, window.Ori.feed(...), exactly like the vision seam above. No OAuth
+     is wired here; this is the honest integration point everything plugs into. What Ori SAYS about
+     the data is a single synthesised sentence ranked against your own baseline — never a raw stat
+     dump — and it stays directional, not diagnostic (no medical claims). Entry points:
+        Ori.feed({ recovery, sleep, hrv, strain, steps, rhr, readiness })
+             recovery 0–100 drives colour/mood; the rest ride along to the brief.
+        Ori.feedCalendar([{ title, start }])   a calendar MCP hands Ori your day so it can time
+             nudges around it (stored for the brief + reminder timing; no calendar code here).
+        Ori.remindNow() / Ori.pauseNudges(mins)  ambient-nudge controls. */
+  function feed(m) {
+    if (!m || typeof m !== "object") return;
+    var keep = {};
+    ["sleep", "hrv", "strain", "steps", "rhr", "readiness"].forEach(function (k) {
+      if (typeof m[k] === "number") keep[k] = m[k];
+    });
+    fedMetrics = keep;
+    if (typeof m.source === "string" && m.source) {   // honest provenance: name the wearable you handed in
+      fedSource = m.source; WEARABLE = m.source.toLowerCase(); setDevice(m.source);
+    }
+    if (typeof m.recovery === "number") {
+      setRecovery(m.recovery);                 // colour + mood track the real number
+      say(synthLine(recovery));                // one synthesised read, never a stat dump
+    }
+    scheduleFetch();                           // refresh the done-for-you drafts on the new data
+  }
+  function feedCalendar(events) {
+    if (!Array.isArray(events)) { nextEvent = null; return; }
+    var now = Date.now();
+    var soon = events.filter(function (e) { return e && e.start && +new Date(e.start) > now; })
+                     .sort(function (a, b) { return +new Date(a.start) - +new Date(b.start); });
+    nextEvent = soon.length ? soon[0] : null;
+  }
+  function pauseNudges(mins) { nudgesPausedUntil = performance.now() + (mins > 0 ? mins : 90) * 60000; }
+  function remindNow() { say(pick(LINES.remind)); }
+
+  // ---- ambient proactive nudges (desktop companion only) ----
+  /* Ori speaks unprompted a few times a day — permission-shaped copy, quiet-hours aware (10pm–7am
+     silent), never while you're dragging it or already reading a bubble, and pausable. Kept RARE on
+     purpose (~42–82 min apart, desktop-only) so it stays ambient and never becomes work-mode noise. */
+  var REMIND_MIN = 42 * 60000, REMIND_JITTER = 40 * 60000;
+  function quietHours() { var h = new Date().getHours(); return h >= 22 || h < 7; }
+  function scheduleReminder() {
+    setTimeout(function () {
+      var ok = PET && !quietHours() && performance.now() > nudgesPausedUntil &&
+               !winDragging && !dragging && performance.now() > bubbleUntil && !document.hidden;
+      if (ok) { say(pick(LINES.remind)); face.happy = 1; setTimeout(function () { face.happy = 0; }, 1000); }
+      scheduleReminder();
+    }, REMIND_MIN + Math.random() * REMIND_JITTER);
+  }
+
+  // ================================================================= resize + loop
+  function resize() {
+    var w = window.innerWidth, h = window.innerHeight;
+    renderer.setSize(w, h);   // updateStyle:true → canvas CSS size tracks the window at any DPR
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resize); resize();
+
+  // ---- idle GPU throttle (battery) ----
+  var IDLE_AFTER = 120000, IDLE_FPS = 8;     // >2min idle & nothing animating → 8fps
+  var lastActivity = performance.now(), lastRender = 0;
+  function bump() { lastActivity = performance.now(); }
+  ["pointermove", "pointerdown", "wheel", "focus"].forEach(function (ev) {
+    window.addEventListener(ev, bump, { passive: true });
+  });
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) bump(); });
+
+  var blinkAt = 2 + Math.random() * 3, yawnAt = 12, yawnStart = -99, proj = new THREE.Vector3(), projT = new THREE.Vector3(), lastMS = performance.now();
+
+  /* Place the speech bubble above Ori, flip it below when there's no room, and clamp it to the
+     ON-SCREEN part of the window (the window can straddle a screen edge when Ori is docked in a
+     corner) so the text is never cut off. */
+  function placeBubble(breath) {
+    var iw = window.innerWidth, ih = window.innerHeight, M = 8, GAP = 10;
+    proj.set(pet.position.x, pet.position.y, pet.position.z).project(camera);
+    projT.set(pet.position.x, pet.position.y + R * breath, pet.position.z).project(camera);
+    var cx = (proj.x * 0.5 + 0.5) * iw;
+    var orbTop = (-projT.y * 0.5 + 0.5) * ih;
+    var orbCy = (-proj.y * 0.5 + 0.5) * ih;
+    var orbBot = orbCy + (orbCy - orbTop);
+    var bw = bubble.offsetWidth, bh = bubble.offsetHeight;
+    var vL = M, vR = iw - M, vT = M, vB = ih - M;                 // visible rect in window-local CSS px
+    if (TW && winPos && monBounds && TWscale) {
+      vL = Math.max(M, (monBounds.x - winPos.x) / TWscale + M);
+      vR = Math.min(iw - M, (monBounds.x + monBounds.w - winPos.x) / TWscale - M);
+      vT = Math.max(M + 26, (monBounds.y - winPos.y) / TWscale + M + 26);   // +26 clears the menu bar
+      vB = Math.min(ih - M, (monBounds.y + monBounds.h - winPos.y) / TWscale - M);
+    }
+    var top = orbTop - GAP - bh;                                  // prefer above the orb
+    if (top < vT) top = orbBot + GAP;                             // no room above → drop below
+    bubble.style.left = Math.max(vL, Math.min(vR - bw, cx - bw / 2)) + "px";
+    bubble.style.top = Math.max(vT, Math.min(vB - bh, top)) + "px";
+  }
+
+  function tick(now) {
+    requestAnimationFrame(tick);
+
+    // idle GPU throttle: full 60fps while interacting or animating; ~8fps after >2min
+    // untouched with nothing moving; ~2fps when the window is hidden. Rendering is the
+    // battery cost, so we skip the frame's work when the next one isn't due yet.
+    var animating = bubble.classList.contains("show") || sparkLife > 0 || fetching ||
+                    Math.abs(poke) > 0.002 || Math.abs(pokeVel) > 0.01 ||
+                    hop > 0.002 || party > 0.002 || face.happy > 0.5;
+    var idleMs = now - lastActivity;
+    var patrolling = TW && !RM && winPos && monBounds && TWscale && winSize &&
+                     !winDragging && !dragging && !document.hidden &&
+                     idleMs > PATROL_AFTER && !bubble.classList.contains("show") && now > nudgesPausedUntil;
+    if (!patrolling) patrolP = null;
+    var fps = document.hidden ? 2
+            : animating ? 60
+            : patrolling ? 30
+            : (idleMs > IDLE_AFTER) ? IDLE_FPS : 60;
+    if (fps < 60 && now - lastRender < 1000 / fps) return;
+    lastRender = now;
+
+    var dt = Math.min(0.05, (now - lastMS) / 1000); lastMS = now;
+    var t = now / 1000;
+    uniforms.uTime.value = t;
+
+    // idle stroll: ease the whole window along a slow clockwise loop of the screen edge
+    if (patrolling) {
+      var pq = patrolRect(), hw = winSize.w / 2, hh = winSize.h / 2;
+      if (patrolP === null) patrolP = patrolNearest(winPos.x + hw, winPos.y + hh, pq);
+      var per = 2 * ((pq.R - pq.L) + (pq.B - pq.T));          // full screen-edge perimeter, physical px
+      patrolP += (per / (PATROL_LAP_MS / 1000)) * dt;         // one clockwise lap per 60s, like a clock hand
+      var tp = patrolPoint(patrolP, pq), ah = patrolPoint(patrolP + per * 0.02, pq);
+      winPos.x += ((tp.x - hw) - winPos.x) * 0.12;
+      winPos.y += ((tp.y - hh) - winPos.y) * 0.12;
+      setWin();
+      setGaze(Math.sign(ah.x - tp.x) * 0.5, -Math.sign(ah.y - tp.y) * 0.3);   // glance where it's headed
+    }
+    uniforms.uColor.value.lerp(targetColor, 0.05);
+    if (pokeFlash > 0.002) uniforms.uColor.value.lerp(WHITE, pokeFlash * 0.4);   // brief brighten
+    pmat.color.lerp(targetColor, 0.05);
+
+    // breathing + poke jelly + yawn inhale
+    var breath = 1 + Math.sin(t * breathRate * Math.PI * 2) * breathAmp;
+    if (moodKey === "low" && !RM && t > yawnAt && face.happy < 0.5 && !dragging && sparkLife <= 0 && now > bubbleUntil) {
+      yawnStart = t; yawnAt = t + 11 + Math.random() * 9;
+    }
+    var yp = 0, ya = t - yawnStart;
+    if (ya >= 0 && ya < 1.9) { var u = ya / 1.9; yp = u < 0.35 ? u / 0.35 : u < 0.6 ? 1 : Math.max(0, 1 - (u - 0.6) / 0.4); }
+    face.yawn += (yp - face.yawn) * 0.35;
+    breath *= 1 + 0.06 * face.yawn;
+
+    // springy poke: underdamped spring so the squash overshoots then settles
+    pokeVel += (-180 * poke - 14 * pokeVel) * dt;
+    poke += pokeVel * dt;
+    hop *= 0.88; party *= 0.9; pokeFlash *= 0.9;
+
+    // living "jellyfish" morph: a slow, continuous non-uniform pulse (taller-narrower → flatter-
+    // wider) layered under the breath + poke squash, so Ori is a soft creature, never a rigid ball.
+    // Two out-of-phase sines keep it organic; jelly skin pulses hardest (morphGain), orb barely.
+    var mAmp = (RM ? 0.02 : 0.05) * morphGain;
+    var pulse = Math.sin(t * 1.15) * 0.7 + Math.sin(t * 0.53 + 0.8) * 0.3;
+    var ovalY = pulse * mAmp, ovalX = -pulse * mAmp * 0.72;
+    var sqx = 0.22 * squashGain, sqy = 0.20 * squashGain;   // skin-scaled squash-and-stretch
+    body.scale.set(
+      breath * (1 + sqx * poke + ovalX),
+      breath * (1 - sqy * poke + ovalY),
+      breath * (1 + sqx * poke + ovalX)
+    );
+
+    var driftY = RM ? 0 : Math.sin(t * 0.5) * 0.05 * wobbleGain, driftX = RM ? 0 : Math.sin(t * 0.33 + 1.3) * 0.04 * wobbleGain;
+    var swim = RM ? 0 : pulse * 0.03 * morphGain;           // jellyfish rises as it contracts, sinks as it relaxes
+    var partyHop = party * Math.sin(t * 15) * 0.9;
+    pet.position.x += (home.x + driftX - pet.position.x) * 0.08;
+    pet.position.y += (home.y + driftY + swim + (hop + partyHop) * 0.22 - pet.position.y) * 0.14;
+
+    face.lookX += (lookTarget.x - face.lookX) * 0.1;
+    face.lookY += (lookTarget.y - face.lookY) * 0.1;
+    pet.rotation.y += (lookTarget.x * 0.35 - pet.rotation.y) * 0.06;
+    pet.rotation.x += (-lookTarget.y * 0.22 - pet.rotation.x) * 0.06;
+
+    if (t > blinkAt) { face.openT = 0; if (t > blinkAt + 0.11) { face.openT = 1; blinkAt = t + 2.4 + Math.random() * 3.6; } }
+    face.open += (face.openT - face.open) * 0.45;
+    face.sleepy += (face.sleepyT - face.sleepy) * 0.06;
+    face.emote += (face.emoteT - face.emote) * 0.04;   // mood settles onto the face slowly
+    face.think += (face.thinkT - face.think) * 0.12;
+    drawFace();
+
+    // sparkles
+    if (sparkLife > 0) {
+      sparkLife -= dt / 1.1; smat.opacity = Math.max(0, sparkLife);
+      for (var k = 0; k < SPN; k++) {
+        spos[k * 3] += svel[k].x * dt; spos[k * 3 + 1] += svel[k].y * dt; spos[k * 3 + 2] += svel[k].z * dt;
+        svel[k].y -= 1.4 * dt;
+      }
+      sgeo.attributes.position.needsUpdate = true;
+    }
+
+    if (bubble.classList.contains("show")) {
+      placeBubble(breath);
+      if (now > bubbleUntil) bubble.classList.remove("show");
+    }
+
+    renderer.render(scene, camera);
+  }
+
+  // ================================================================= boot
+  var saved = LS.get("oriya:pet:rec");
+  var startRec = (saved == null ? 78 : saved);
+  var prevSession = LS.get("oriya:pet:prevRec");
+  if (prevSession != null && startRec - prevSession >= 12) celebrateOnGreet = true;   // day-over-day jump
+  LS.set("oriya:pet:prevRec", startRec);
+
+  setRecovery(startRec, true);
+  applySkin(skinName);                              // restore last look
+  if (TW) {                                         // restore last size, then start tucked in the bottom-right corner
+    TW.setSize(new TWapi.LogicalSize(petW, Math.round(petW / PET_ASPECT)))
+      .then(tauriRefresh)
+      .then(function () {
+        if (!winPos || !monBounds) return;
+        winPos.x = monBounds.x + monBounds.w - winSize.w / 2 - DOCK_INSET * TWscale;
+        winPos.y = monBounds.y + monBounds.h - winSize.h / 2 - DOCK_INSET * TWscale;
+        setWin();
+      })
+      .catch(function () {});
+  }
+  requestAnimationFrame(tick);
+  fetchBrief("load");
+  // if the network is slow/blocked, still greet warmly so Ori is never silent
+  setTimeout(function () { if (!greeted) { greeted = true; say(pick(LINES.greet)); if (celebrateOnGreet) { celebrate(true); celebrateOnGreet = false; } } }, 4000);
+  scheduleReminder();                               // start the rare, ambient proactive nudges
+
+  // Public API. Vision seam (setGaze/onGesture — a future on-device vision.js) + the integration
+  // feed seam (feed/feedCalendar/remindNow/pauseNudges — wearables, calendar MCP, extensions).
+  // Everything Ori ingests comes through here without touching the render loop.
+  window.Ori = {
+    setGaze: setGaze, onGesture: onGesture, cycleSkin: cycleSkin, say: say,
+    feed: feed, feedCalendar: feedCalendar, remindNow: remindNow, pauseNudges: pauseNudges
+  };
+})();
+</script>
+
+<script>
+/* Talk to Ori — BROWSER-ONLY recovery-coach chat. Adapts the self-contained chat
+   core from /ori (bubble + sendMsg → POST /api/ori-chat, persona "scores"). Bot
+   replies also call window.Ori.say() so the orb speaks along and the pet feels
+   alive while you chat. Hidden AND inert in the Tauri pet window. */
+(function () {
+  "use strict";
+  if (document.body.classList.contains("pet")) return;   // pet mode: no chat chrome
+  var teach = document.getElementById("teach"),
+      tab = document.getElementById("teachTab"),
+      tfeed = document.getElementById("tfeed"),
+      tinput = document.getElementById("teachInput"),
+      tsend = document.getElementById("teachSend"),
+      tmin = document.getElementById("teachMin"),
+      tshot = document.getElementById("teachShot"),
+      tshotFile = document.getElementById("teachShotFile");
+  if (!teach || !tfeed || !tinput || !tsend || !tab) return;
+
+  // file:// / non-oriya host → talk to prod (the worker sends CORS)
+  var sameHost = /(^|\.)oriya\.app$/.test(location.hostname) ||
+                 location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  var CHAT_API = (sameHost && location.protocol.indexOf("http") === 0)
+    ? "/api/ori-chat" : "https://oriya.app/api/ori-chat";
+
+  var KEY_C = "oriya:pet:teachchat", KEY_OPEN = "oriya:pet:teachopen";
+  var RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function load(k, fb) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? fb : v; } catch (e) { return fb; } }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+  var chat = load(KEY_C, []); if (!Array.isArray(chat)) chat = [];   // [{role, content}]
+  var pending = false, seeded = false;
+  var SEED = "Hey — I'm Ori. Drop this morning's recovery screen here, or just tell me your number, and I'll read it against your own par — not some stranger's baseline. No scrutiny, I promise. What'd your wearable hand you today?";
+
+  function tbubble(role, text, cls) {
+    var d = document.createElement("div");
+    d.className = "tmsg " + role + (RM ? "" : " tarrive") + (cls ? " " + cls : "");
+    d.textContent = text;
+    tfeed.appendChild(d); tfeed.scrollTop = tfeed.scrollHeight;
+    return d;
+  }
+  function shotImg(host, src) {
+    var im = document.createElement("img");
+    im.src = src; im.alt = "your screenshot";
+    im.style.cssText = "display:block;max-width:100%;border-radius:9px;margin-bottom:7px";
+    host.insertBefore(im, host.firstChild);
+  }
+  // speak the reply through the orb too (truncate at a sentence under the bubble cap)
+  function speakOrb(text) {
+    if (!window.Ori || typeof window.Ori.say !== "function") return;
+    var t = text;
+    if (t.length > 220) {
+      var cut = t.slice(0, 220), stop = Math.max(cut.lastIndexOf(". "), cut.lastIndexOf("! "), cut.lastIndexOf("? "));
+      t = stop > 60 ? cut.slice(0, stop + 1) : cut.slice(0, 217) + "…";
+    }
+    window.Ori.say(t);
+  }
+  function render() {
+    tfeed.textContent = "";
+    tbubble("bot", SEED);
+    chat.forEach(function (m) { tbubble(m.role === "user" ? "user" : "bot", m.content); });
+  }
+
+  function sendMsg(text, shot) {
+    if (pending || (!text && !shot)) return;
+    tinput.value = "";
+    chat.push({ role: "user", content: text || "(shared a screenshot of this morning's score)" });
+    chat = chat.slice(-40); save(KEY_C, chat);
+    var ub = tbubble("user", text || "");
+    if (shot) shotImg(ub, shot);
+    pending = true; tsend.disabled = true;
+    var wait = tbubble("bot", shot ? "Ori's looking at your screen…" : "Ori's reading…", "wait");
+    var payload = { messages: chat.slice(-12), persona: "scores", who: null };
+    if (shot) payload.image = shot;
+    fetch(CHAT_API, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        wait.remove();
+        if (!res.ok || !res.j.reply) {
+          var why = res.j && res.j.error === "not_configured"
+            ? "My chat brain isn't switched on in this build yet — but poke the orb or hand me a screen and I'll still read your morning."
+            : res.j && (res.j.error === "vision" || res.j.error === "bad_image")
+            ? "I couldn't open that screenshot — type the number instead and I'll give you the same read."
+            : "That one didn't get through. Give it another go in a moment.";
+          tbubble("bot", why, "err");
+        } else {
+          chat.push({ role: "assistant", content: res.j.reply });
+          chat = chat.slice(-40); save(KEY_C, chat);
+          tbubble("bot", res.j.reply);
+          speakOrb(res.j.reply);
+        }
+      })
+      .catch(function () { wait.remove(); tbubble("bot", "No connection just now — your message is still here, try again in a moment.", "err"); })
+      .finally(function () { pending = false; tsend.disabled = false; tinput.focus(); });
+  }
+  function ask() { sendMsg(tinput.value.trim(), null); }
+
+  tsend.addEventListener("click", ask);
+  tinput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(); }
+  });
+
+  // 📷 — downscale in-browser so a phone shot becomes a ~100KB JPEG before it ever leaves the device
+  if (tshot && tshotFile) {
+    tshot.addEventListener("click", function () { if (!pending) tshotFile.click(); });
+    tshotFile.addEventListener("change", function () {
+      var f = tshotFile.files && tshotFile.files[0]; tshotFile.value = "";
+      if (!f || !/^image\//.test(f.type)) return;
+      var url = URL.createObjectURL(f), img = new Image();
+      img.onload = function () {
+        var max = 1280, s = Math.min(1, max / Math.max(img.width, img.height));
+        var c = document.createElement("canvas");
+        c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url); sendMsg("", c.toDataURL("image/jpeg", 0.85));
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); tbubble("bot", "That file didn't open as an image — try a plain screenshot (PNG or JPG).", "err"); };
+      img.src = url;
+    });
+  }
+
+  // ---- open / minimise (persisted; default open on desktop, collapsed on phones) ----
+  function setOpen(open) {
+    teach.classList.toggle("closed", !open);
+    tab.classList.toggle("on", !open);
+    save(KEY_OPEN, open ? 1 : 0);
+    if (open && !seeded) { seeded = true; render(); }
+    if (open) setTimeout(function () { tinput.focus(); }, 60);
+  }
+  if (tmin) tmin.addEventListener("click", function () { setOpen(false); });
+  tab.addEventListener("click", function () { setOpen(true); });
+  var startOpen = load(KEY_OPEN, null);
+  if (startOpen == null) startOpen = window.innerWidth > 720 ? 1 : 0;
+  setOpen(!!startOpen);
+
+  // ---- desktop-download seam (email-gated; the real unsigned early build) ----
+  var dlOpen = document.getElementById("teachDlOpen"),
+      dlReveal = document.getElementById("teachDlReveal"),
+      dlForm = document.getElementById("teachDlForm"),
+      dlEmail = document.getElementById("teachDlEmail"),
+      dlSave = document.getElementById("teachDlSave"),
+      dlLink = document.getElementById("teachDlLink");
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (dlOpen) dlOpen.addEventListener("click", function () {
+    dlReveal.classList.add("t-dl-hide"); dlForm.classList.remove("t-dl-hide");
+    setTimeout(function () { dlEmail.focus(); }, 40);
+  });
+  function grantDownload() {
+    var v = (dlEmail.value || "").trim();
+    if (!EMAIL_RE.test(v)) { dlEmail.focus(); dlEmail.style.borderColor = "var(--amber)"; return; }
+    if (window.oriyaLogEmail) { try { window.oriyaLogEmail(v, "pet_desktop_download"); } catch (e) {} }
+    dlForm.classList.add("t-dl-hide"); dlLink.classList.remove("t-dl-hide"); dlLink.focus();
+  }
+  if (dlSave) dlSave.addEventListener("click", grantDownload);
+  if (dlEmail) dlEmail.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); grantDownload(); } });
+})();
+</script>

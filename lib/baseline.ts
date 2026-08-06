@@ -6,7 +6,7 @@
  *
  * Keep this in sync with the mirror in landing/ori.html (search "baseline"). */
 
-import type { BaselineEntry, BaselineSummary } from "./types";
+import type { BaselineEntry, BaselineSummary } from "./types.ts";
 
 export const BASELINE_DAYS = 7;
 

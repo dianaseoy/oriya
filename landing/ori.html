@@ -64,27 +64,39 @@
     .msg.bot { background:var(--panel); border:1px solid rgba(127,183,158,.3); border-top-left-radius:4px; align-self:flex-start; }
     .msg.user { background:rgba(127,183,158,.12); border:1px solid transparent; border-top-right-radius:4px; align-self:flex-end; }
     .msg.err { border-color:rgba(215,162,92,.45); color:var(--dim); }
-    .pending { font-size:12px; color:var(--dim); align-self:flex-start; padding:2px 4px; }
+    /* pending "Ori is …" line — a restrained shine on the honest wait copy; it
+       exists only while a real request is in flight, so it signals genuine work,
+       not typing theater. Reduced-motion = the plain static dim line. */
+    .pending { font-size:12px; align-self:flex-start; padding:2px 4px; --shine-ms:2400ms; --shine-hi:#E6E7EA;
+      color:transparent; background:linear-gradient(90deg,var(--dim) 25%,var(--shine-hi) 50%,var(--dim) 75%);
+      background-size:200% 100%; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+      animation:shine var(--shine-ms) linear infinite; }
+    /* the wait line also carries .arrive; both set `animation`, so combine them at
+       higher specificity — it fades up once AND keeps shining while it waits. */
+    .pending.arrive { opacity:0; animation:arrive .4s ease forwards, shine var(--shine-ms) linear infinite; }
+    @keyframes shine { 0% { background-position:200% 0; } 100% { background-position:-200% 0; } }
+    @media (prefers-reduced-motion: reduce) { .pending, .pending.arrive { animation:none; opacity:1; background:none; color:var(--dim); -webkit-text-fill-color:var(--dim); } }
     .vrow { display:flex; align-items:center; gap:7px; margin-top:7px; }
     .vbtn { width:24px; height:24px; flex:none; border:0; border-radius:99px; background:var(--accent); color:var(--void); font-size:9px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
     .vrow span { font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--dim); }
     .arrive { opacity:0; animation:arrive .4s ease forwards; }
     @keyframes arrive { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
     @media (prefers-reduced-motion: reduce) { .arrive { animation:none; opacity:1; transform:none; } }
-    /* composer */
-    .bar { display:flex; gap:8px; margin-top:14px; }
-    .bar textarea { flex:1; resize:none; font:inherit; font-size:13.5px; background:var(--panel); border:1px solid var(--line); border-radius:12px; color:var(--text); padding:11px 13px; outline:none; height:44px; max-height:120px; }
-    .bar textarea:focus { border-color:var(--accent); }
+    /* composer — a floating pill: attachment · input · mic · circular send */
+    .bar { display:flex; align-items:center; gap:5px; margin-top:14px; background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:5px 6px 5px 8px; box-shadow:0 6px 22px rgba(0,0,0,.30); transition:border-color .2s ease, box-shadow .2s ease; }
+    .bar:focus-within { border-color:var(--accent); box-shadow:0 9px 28px rgba(0,0,0,.36); }
+    .bar textarea { flex:1; resize:none; font:inherit; font-size:13.5px; background:transparent; border:0; color:var(--text); padding:9px 6px; outline:none; height:40px; max-height:120px; line-height:1.5; }
+    .bar textarea::placeholder { color:var(--dim); }
     /* 16px floor stops iOS Safari's zoom-on-focus jump */
     @media (max-width:640px) { .bar textarea { font-size:16px; } }
-    .send { flex:none; background:var(--accent); color:var(--void); border:0; border-radius:12px; padding:0 18px; font:inherit; font-weight:600; cursor:pointer; transition:all .2s ease; }
-    .send:hover { filter:brightness(1.08); }
-    .send:disabled { opacity:.5; cursor:default; }
-    .abtn { flex:none; width:44px; height:44px; background:var(--panel); border:1px solid var(--line); border-radius:12px; color:var(--dim); font-size:17px; cursor:pointer; transition:all .2s ease; }
-    .abtn:hover { color:var(--text); border-color:#3A3D45; }
-    .abtn.rec { color:#E66A6A; border-color:rgba(230,106,106,.6); animation:recPulse 1.2s ease infinite; }
+    .send { flex:none; width:40px; height:40px; padding:0; background:var(--accent); color:var(--void); border:0; border-radius:999px; font:inherit; font-size:18px; line-height:1; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:transform .12s ease, filter .2s ease; }
+    .send:hover { filter:brightness(1.08); transform:scale(1.06); }
+    .send:disabled { opacity:.5; cursor:default; transform:none; }
+    .abtn { flex:none; width:38px; height:38px; background:transparent; border:0; border-radius:999px; color:var(--dim); font-size:17px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:transform .12s ease, color .2s ease, background .2s ease; }
+    .abtn:hover { color:var(--text); background:rgba(255,255,255,.06); transform:scale(1.06); }
+    .abtn.rec { color:#E66A6A; animation:recPulse 1.2s ease infinite; }
     @keyframes recPulse { 50% { background:rgba(230,106,106,.12); } }
-    @media (prefers-reduced-motion: reduce) { .abtn.rec { animation:none; } }
+    @media (prefers-reduced-motion: reduce) { .abtn.rec { animation:none; } .send:hover, .abtn:hover { transform:none; } }
     .msg .shot { display:block; max-width:100%; border-radius:9px; margin-bottom:7px; }
     /* morning brief card — a full-width structured read inside the feed */
     .brief { align-self:stretch; max-width:100%; background:var(--panel); border:1px solid rgba(127,183,158,.3); border-radius:14px; padding:15px 16px; }
@@ -127,6 +139,7 @@
       <b>Ori · your recovery companion</b>
       <span class="vtag">v0.1 · early AI</span>
       <span class="sp"></span>
+      <a class="hbtn" href="ori-pet.html" title="Ori as a desktop pet — a living orb in the corner of your screen" style="text-decoration:none">🟢 desktop pet →</a>
       <button class="hbtn" id="baseBtn" title="Your Ori baseline — averages from your own days" hidden>baseline</button>
       <button class="hbtn" id="personaBtn" title="Change what Ori focuses on">focus</button>
       <button class="hbtn" id="clearBtn">clear</button>
@@ -145,11 +158,11 @@
     <div class="feed" id="feed" hidden></div>
 
     <div class="bar" id="bar" hidden>
-      <button class="abtn" id="micBtn" title="Speak instead of typing" aria-label="Voice input" hidden>🎤</button>
       <button class="abtn" id="shotBtn" title="Share a screenshot of your score" aria-label="Share a screenshot">📷</button>
       <input type="file" id="shotFile" accept="image/*" multiple hidden>
       <textarea id="input" rows="1" maxlength="600" placeholder="Share a screenshot 📷 (or several — I'll build your baseline) for your Morning Brief…" aria-label="Message Ori"></textarea>
-      <button class="send" id="send">Send</button>
+      <button class="abtn" id="micBtn" title="Speak instead of typing" aria-label="Voice input" hidden>🎤</button>
+      <button class="send" id="send" aria-label="Send">↑</button>
     </div>
 
     <p class="foot">Ori v0.1 is an early AI companion — not a doctor, and it can be wrong. It'll nudge you toward an easier day, never give medical advice. Worth knowing: your messages and Ori's replies pass through Braintrust, a tracing tool a solo founder uses to see how Ori's doing and fix it — never sold, no accounts, no database. A screenshot you share isn't kept, but the reply Ori writes about it is traced like any other message — posting to the board still happens at <a href="mvp/submit.html">oriya.app/submit</a>. Your Morning Brief works differently: the numbers Ori reads from a screenshot and the 7-day baseline built from them stay in your browser (never uploaded or stored), and only anonymous quality signals — which wearable, how confident, whether a screenshot was used — are traced, never the values or the brief text. Voice typing uses your browser's built-in speech service. Built in the open by a solo founder.</p>
@@ -332,10 +345,7 @@
           ub.insertBefore(im, ub.firstChild);
         }
         pending = true; send.disabled = true;
-        var wait = document.createElement("div");
-        wait.className = "pending arrive";
-        wait.textContent = shot ? "Ori is looking at your screenshot…" : "Ori is reading…";
-        feed.appendChild(wait); feed.scrollTop = feed.scrollHeight;
+        var wait = pendingLine(shot ? "Ori is looking at your screenshot…" : "Ori is reading…");
         var payload = { messages: chat.slice(-12), persona: persona, who: who };
         if (shot) payload.image = shot;
         fetch(API + "/api/ori-chat", {
@@ -370,9 +380,7 @@
         im.className = "shot"; im.src = shot; im.alt = "your screenshot";
         ub.insertBefore(im, ub.firstChild);
         pending = true; send.disabled = true;
-        var wait = document.createElement("div");
-        wait.className = "pending arrive"; wait.textContent = "Ori is reading your screenshot…";
-        feed.appendChild(wait); feed.scrollTop = feed.scrollHeight;
+        var wait = pendingLine("Ori is reading your screenshot…");
         fetch(API + "/api/ask-ori", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ image: shot, userQuestion: "", baseline: priorBaseline() }),
@@ -430,6 +438,18 @@
       function add(host, tag, cls, text) {
         var el = document.createElement(tag); el.className = cls; el.textContent = text || ""; host.appendChild(el); return el;
       }
+      /* The one "Ori is …" wait line. It carries the honest per-path copy, the
+         approved .arrive fade-up, the .pending shine, and role="status" so screen
+         readers announce the wait. Removed the moment the reply lands. */
+      function pendingLine(text) {
+        var wait = document.createElement("div");
+        wait.className = "pending arrive";
+        wait.setAttribute("role", "status");
+        wait.setAttribute("aria-live", "polite");
+        wait.textContent = text;
+        feed.appendChild(wait); feed.scrollTop = feed.scrollHeight;
+        return wait;
+      }
 
       /* "Your Ori Baseline" — built ONLY from real stored days. Averages, HRV
          range and patterns; honest empty/thin states, nothing invented. */
@@ -483,9 +503,7 @@
         input.value = "";
         bubble("user", text);
         pending = true; send.disabled = true;
-        var wait = document.createElement("div");
-        wait.className = "pending arrive"; wait.textContent = "Ori is thinking…";
-        feed.appendChild(wait); feed.scrollTop = feed.scrollHeight;
+        var wait = pendingLine("Ori is thinking…");
         fetch(API + "/api/ask-ori", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ wearable: activeBrief.wearable, metrics: activeBrief.metrics, userQuestion: text, baseline: currentBaseline() }),
@@ -545,8 +563,7 @@
         pending = true; send.disabled = true;
         var total = files.length, added = 0, failed = 0, i = 0;
         bubble("user", "(shared " + total + " screenshots to build my baseline)");
-        var wait = document.createElement("div"); wait.className = "pending arrive";
-        wait.textContent = "Ori is reading " + total + " screenshots…"; feed.appendChild(wait); feed.scrollTop = feed.scrollHeight;
+        var wait = pendingLine("Ori is reading " + total + " screenshots…");
         function finish() {
           wait.remove(); pending = false; send.disabled = false; input.focus();
           bubble("bot", added

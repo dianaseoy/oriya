@@ -11,7 +11,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 78 22 A 40 40 0 1 0 79 23' stroke='%230E6B4F' stroke-width='5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='50' cy='55' r='14' fill='%230E6B4F'/%3E%3Ccircle cx='78' cy='22' r='7' fill='%2394631A'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <meta name="theme-color" content="#F7F4EC" />
   <style>
     :root{
@@ -27,7 +27,7 @@
       --jade-soft:rgba(14,107,79,.09);
       --jade-line:rgba(14,107,79,.32);
       --amber:#94631A;        /* whisper warm — citations only */
-      --font-display:"Fraunces", ui-serif, Georgia, serif;
+      --font-display:"Instrument Serif", "PP Editorial New", ui-serif, Georgia, serif;
       --font-sans:"Inter", system-ui, sans-serif;
       --font-mono:"JetBrains Mono", ui-monospace, monospace;
       --settle:cubic-bezier(0.22,0.61,0.36,1);
@@ -51,7 +51,7 @@
       background:rgba(247,244,236,.86); border-bottom:1px solid var(--line); }
     .nav-inner{ display:flex; align-items:center; justify-content:space-between; height:68px; }
     .logo{ display:flex; align-items:center; gap:11px; font-family:var(--font-display);
-      font-weight:600; font-size:21px; letter-spacing:-.01em; }
+      font-weight:400; font-size:23px; letter-spacing:0; }
     .logo svg{ width:25px; height:25px; }
     .nav-actions{ display:flex; align-items:center; gap:26px; }
     .nav-link{ font-family:var(--font-mono); font-size:12px; letter-spacing:.02em; color:var(--stone); transition:color .2s; }
@@ -81,22 +81,51 @@
     .eyebrow{ display:inline-flex; align-items:center; gap:11px; font-family:var(--font-mono);
       font-size:11.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--stone); }
     .eyebrow::before{ content:""; width:26px; height:1px; background:var(--jade); display:inline-block; }
-    h1{ font-family:var(--font-display); font-weight:600; font-size:clamp(2.4rem,6vw,4.4rem);
-      line-height:1.03; letter-spacing:-.022em; margin-top:30px; max-width:17ch; }
-    h1 .hi{ font-weight:600; }
+    h1{ font-family:var(--font-display); font-weight:400; font-size:clamp(2.7rem,6.6vw,5rem);
+      line-height:1.0; letter-spacing:-.012em; margin-top:30px; max-width:16ch; }
+    h1 .hi{ font-weight:400; }
     .hero .lede{ font-family:var(--font-display); font-weight:400; font-size:clamp(1.16rem,2.1vw,1.5rem);
       color:var(--ink-2); max-width:52ch; margin-top:34px; line-height:1.48; }
-    .hero .lede b{ font-weight:500; color:var(--ink); }
+    .hero .lede b{ font-weight:400; color:var(--ink); }
     .hero .lede em{ color:var(--ink); }
     .hero-cta{ display:flex; flex-wrap:wrap; gap:14px; margin-top:40px; }
     .byline{ margin-top:34px; font-family:var(--font-mono); font-size:11.5px; color:var(--stone); letter-spacing:.02em; max-width:60ch; line-height:1.7; }
+
+    /* ---- Ori's living mark: the narrator, present on the page. Starts amber
+       (unsure, the anxious morning) and settles to jade (calm, in your corner)
+       as you read down the letter. Motion off under Reduce Motion. ---- */
+    .ori-mark{ display:flex; align-items:center; gap:16px; margin-bottom:30px; }
+    .ori-mark-orb{ position:relative; width:70px; height:70px; flex:0 0 70px; border-radius:50%;
+      background:radial-gradient(circle at 38% 34%, #eccf9c, var(--amber) 56%, #6b4a24 100%);
+      box-shadow:0 12px 40px -12px rgba(148,99,26,.55), inset 0 -8px 22px -10px rgba(0,0,0,.4);
+      animation:oriBreathe 4.8s ease-in-out infinite;
+      transition:background 1.4s var(--settle), box-shadow 1.4s var(--settle); }
+    .ori-mark-orb::after{ content:""; position:absolute; inset:-15px; border-radius:50%;
+      background:radial-gradient(circle, rgba(148,99,26,.16), transparent 70%); transition:background 1.4s var(--settle); }
+    .ori-mark-orb.calm{ background:radial-gradient(circle at 38% 34%, #8ec3a8, var(--jade) 56%, #0a4c38 100%);
+      box-shadow:0 12px 40px -12px rgba(14,107,79,.5), inset 0 -8px 22px -10px rgba(0,0,0,.4); }
+    .ori-mark-orb.calm::after{ background:radial-gradient(circle, rgba(14,107,79,.16), transparent 70%); }
+    .ori-mark-cap{ font-family:var(--font-mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--stone); line-height:1.6; }
+    .ori-mark-cap b{ color:var(--ink-2); font-weight:500; }
+    @keyframes oriBreathe{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.055) translateY(-3px); } }
+
+    /* drawn par-underline under the hero's key phrase */
+    .u-accent{ position:relative; border-bottom:none; padding-bottom:1.5px; }
+    .u-accent::after{ content:""; position:absolute; left:0; right:0; bottom:-1px; height:1px;
+      background:var(--jade); transform:scaleX(0); transform-origin:left; transition:transform 1s var(--settle) .5s; }
+    .u-accent.drawn::after{ transform:scaleX(1); }
+
+    @media (prefers-reduced-motion: reduce){
+      .ori-mark-orb{ animation:none; }
+      .u-accent::after{ transition:none; transform:scaleX(1); }
+    }
 
     /* ---------------- sections ---------------- */
     section{ position:relative; padding:clamp(64px,9vw,104px) 0; border-top:1px solid var(--line); }
     .kicker{ font-family:var(--font-mono); font-size:11.5px; letter-spacing:.18em; text-transform:uppercase;
       color:var(--jade); margin-bottom:20px; }
-    h2{ font-family:var(--font-display); font-weight:600; font-size:clamp(1.8rem,4vw,2.7rem);
-      line-height:1.1; letter-spacing:-.018em; max-width:22ch; }
+    h2{ font-family:var(--font-display); font-weight:400; font-size:clamp(2rem,4.3vw,3rem);
+      line-height:1.06; letter-spacing:-.01em; max-width:22ch; }
     h2 em{ color:var(--ink); }
     .prose{ font-size:clamp(16px,1.6vw,18px); color:var(--ink-2); max-width:62ch; margin-top:24px; }
     .prose + .prose{ margin-top:20px; }
@@ -106,7 +135,7 @@
       background:var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
     .vault{ background:var(--paper-2); padding:22px 20px 20px; display:flex; flex-direction:column; gap:8px; }
     .vault .dev{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--stone); }
-    .vault .num{ font-family:var(--font-display); font-weight:600; font-size:clamp(2.1rem,4.4vw,2.9rem); line-height:1; color:var(--ink); }
+    .vault .num{ font-family:var(--font-display); font-weight:400; font-size:clamp(2.3rem,4.6vw,3.1rem); line-height:1; color:var(--ink); }
     .vault .lab{ font-size:12.5px; color:var(--stone); }
     .vault-note{ font-family:var(--font-mono); font-size:11.5px; color:var(--stone); margin-top:18px; line-height:1.7; max-width:70ch; }
 
@@ -143,7 +172,7 @@
     .pillar{ background:var(--paper-2); padding:30px 28px; transition:background .25s var(--settle); }
     .pillar:hover{ background:#FFFDF7; }
     .pillar .pn{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--jade); }
-    .pillar h3{ font-family:var(--font-display); font-weight:600; font-size:1.42rem; line-height:1.1; margin:14px 0 12px; letter-spacing:-.01em; }
+    .pillar h3{ font-family:var(--font-display); font-weight:400; font-size:1.62rem; line-height:1.08; margin:14px 0 12px; letter-spacing:-.005em; }
     .pillar p{ font-size:14.5px; color:var(--stone); line-height:1.62; }
     .pillar p b{ color:var(--ink-2); font-weight:600; }
 
@@ -205,7 +234,7 @@
       <div class="nav-actions">
         <a href="index.html" class="nav-link">← Home</a>
         <a href="reads.html" class="nav-link">The Long Game</a>
-        <a href="try.html" class="btn btn-primary">Build your Passport →</a>
+        <a href="ori.html" class="btn btn-primary">Try Ori →</a>
       </div>
     </div>
   </nav>
@@ -213,6 +242,10 @@
   <!-- ============ HERO ============ -->
   <header class="hero">
     <div class="wrap narrow">
+      <div class="ori-mark reveal" aria-hidden="true">
+        <span class="ori-mark-orb" id="oriMarkOrb"></span>
+        <span class="ori-mark-cap"><b>Ori</b><br>reading along</span>
+      </div>
       <span class="eyebrow reveal">A note from Ori · two-minute read</span>
       <h1 class="reveal">six apps to answer one question: <em class="hi">am i okay today?</em></h1>
       <p class="lede reveal">Hey, it's Ori. I sit on top of whatever you already wear (the ring, the watch, the strap), and I've got one job: give you a straight answer from someone in <b>your</b> corner. Before you meet me, let me tell you why I exist. Because a strange thing happened to all of us. We strapped little laboratories to our bodies to feel <em>more</em> sure of ourselves, and started waking up feeling <span class="u-accent">less</span>.</p>
@@ -254,9 +287,9 @@
       <p class="prose reveal">That's the part I can't stand. The whole point of listening to your body was to trust it <em>more</em>. Instead, the more sensors we added, the more second opinions we woke up to, until "how did you sleep?" became a question you answer by checking your phone. <b>Technology was supposed to reduce the anxiety. It multiplied it.</b> I was built to take that back.</p>
 
       <div class="vaults reveal" role="group" aria-label="Illustrative: same night, four different verdicts">
-        <div class="vault"><span class="dev">Oura</span><span class="num">62</span><span class="lab">"Pay attention"</span></div>
-        <div class="vault"><span class="dev">Whoop</span><span class="num">41%</span><span class="lab">"In the red"</span></div>
-        <div class="vault"><span class="dev">Garmin</span><span class="num">73</span><span class="lab">"Balanced"</span></div>
+        <div class="vault"><span class="dev">Oura</span><span class="num" data-count="62">62</span><span class="lab">"Pay attention"</span></div>
+        <div class="vault"><span class="dev">Whoop</span><span class="num" data-count="41" data-suffix="%">41%</span><span class="lab">"In the red"</span></div>
+        <div class="vault"><span class="dev">Garmin</span><span class="num" data-count="73">73</span><span class="lab">"Balanced"</span></div>
         <div class="vault"><span class="dev">Apple</span><span class="num">—</span><span class="lab">no single score</span></div>
       </div>
       <p class="vault-note reveal">Illustrative: one night, four devices, four verdicts. So who's lying? Honestly, nobody. Each one weighs your night differently (heart-rate variability here, sleep staging there), and none of them ever agreed on a language. (Apple ships the raw signals and no score at all.) They're all sincere. They're just not talking to each other. <b>I speak all of them.</b></p>
@@ -338,8 +371,8 @@
       <h2 class="reveal">give me one morning.</h2>
       <p class="prose reveal">That's the whole pitch. Post tomorrow's score, whatever it turns out to be, and notice how it feels when the number lands like a friend leaning over instead of a verdict. Rough morning? Even better. Those count too. Every day, one better decision, and I'll be in your corner for all of it.</p>
       <div class="final-cta reveal">
-        <a href="try.html" class="btn btn-primary">Put one morning on the board →</a>
-        <a href="ori.html" class="btn btn-ghost">Talk to me first →</a>
+        <a href="ori.html" class="btn btn-primary">Try Ori →</a>
+        <a href="play.html" class="btn btn-ghost">See how to play first →</a>
       </div>
     </div>
   </section>
@@ -349,7 +382,7 @@
     <div class="wrap foot">
       <div class="foot-links">
         <a href="index.html">← oriya.app</a>
-        <a href="try.html">Build your Passport</a>
+        <a href="ori.html">Try Ori</a>
         <a href="reads.html">The Long Game</a>
       </div>
       <span class="co">© 2026 Oriya · founder-run · aggregate-only, never sold</span>
@@ -363,6 +396,7 @@
       var els = document.querySelectorAll(".reveal");
       if (reduce || !("IntersectionObserver" in window)) {
         els.forEach(function (el) { el.classList.add("on"); });
+        var mo = document.getElementById("oriMarkOrb"); if (mo) mo.classList.add("calm");
         return;
       }
       var io = new IntersectionObserver(function (entries) {
@@ -377,6 +411,40 @@
       document.querySelectorAll(".pillars .pillar").forEach(function (el, i) {
         el.style.transitionDelay = (i * 70) + "ms";
       });
+
+      /* Ori's mark: amber (unsure) → jade (calm) as you read down the letter */
+      var markOrb = document.getElementById("oriMarkOrb");
+      if (markOrb) {
+        var onMarkScroll = function () {
+          var max = document.documentElement.scrollHeight - window.innerHeight;
+          markOrb.classList.toggle("calm", max > 0 && (window.scrollY / max) > 0.34);
+        };
+        window.addEventListener("scroll", onMarkScroll, { passive: true }); onMarkScroll();
+      }
+
+      /* draw the hero underline + count up the four disagreeing verdicts, on reveal */
+      function countVaults(root) {
+        root.querySelectorAll("[data-count]").forEach(function (el) {
+          var target = parseInt(el.dataset.count, 10), suf = el.dataset.suffix || "", start = 0, dur = 900;
+          function step(now) {
+            if (!start) start = now;
+            var k = Math.min((now - start) / dur, 1), e = 1 - Math.pow(1 - k, 3);
+            el.textContent = Math.round(target * e) + suf;
+            if (k < 1) requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        });
+      }
+      var enh = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (!en.isIntersecting) return;
+          var t = en.target;
+          if (t.classList.contains("u-accent")) t.classList.add("drawn");
+          if (t.classList.contains("vaults")) countVaults(t);
+          enh.unobserve(t);
+        });
+      }, { threshold: 0.3 });
+      document.querySelectorAll(".u-accent, .vaults").forEach(function (el) { enh.observe(el); });
 
       /* founder's-note player — static MP3, tap-to-play; if the file is
          missing the card hides and the transcript opens itself. */

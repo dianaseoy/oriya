@@ -3,9 +3,9 @@
  * brain. Mock vs live is decided in exactly one place: whether a Fireworks key
  * is present. Everything downstream sees the same typed OriBrief. */
 
-import { fireworksBrief } from "./fireworks";
-import { mockBrief } from "./mock";
-import type { AskOriRequest, BaselineSummary, OriBrief, OriConfig, OriMetrics, Signals, Wearable } from "./types";
+import { fireworksBrief } from "./fireworks.ts";
+import { mockBrief } from "./mock.ts";
+import type { AskOriRequest, BaselineSummary, OriBrief, OriConfig, OriMetrics, Signals, Wearable } from "./types.ts";
 
 const WEARABLE_KEYS: Wearable[] = ["whoop", "oura", "garmin", "apple"];
 

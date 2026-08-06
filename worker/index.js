@@ -442,6 +442,10 @@ async function askOri(request, env, ctx) {
         has_baseline: !!(req.baseline && req.baseline.days),
         confidence: out.confidence || null,
         present: presence(req.metrics),
+        // Actions layer: kinds + count only — NEVER the drafted text (same
+        // metadata-only rule as present()/biometrics).
+        actions_count: Array.isArray(out.actions) ? out.actions.length : 0,
+        action_kinds: Array.isArray(out.actions) ? out.actions.map(function (a) { return a.kind; }) : [],
       },
       metrics: { latency_ms: Date.now() - t0 },
     });
