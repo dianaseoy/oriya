@@ -62,6 +62,18 @@
     .step { position:relative; padding:0 0 24px 48px; }
     .stepn { position:absolute; left:0; top:0; width:32px; height:32px; border-radius:50%; background:var(--panel); border:1px solid var(--line); color:var(--accent); font:600 13px/30px ui-monospace,monospace; text-align:center; transition:all .2s ease; }
     .step.seen .stepn { background:var(--accent); border-color:var(--accent); color:var(--void); }
+    /* playful checklist — tap a step badge to tick it done (persisted) */
+    .stepn { cursor:pointer; }
+    .stepn:hover { transform:scale(1.09); }
+    .stepn:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+    .step.done .stepn { background:var(--accent); border-color:var(--accent); color:transparent; }
+    .step.done .stepn::after { content:"✓"; position:absolute; inset:0; color:var(--void); font:600 15px/32px ui-monospace,monospace; text-align:center; }
+    .chk-prog { margin:20px 0 4px; }
+    .chk-prog-top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:7px; }
+    .chk-prog-k { font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); }
+    .chk-prog-n { font-size:12px; color:var(--accent); font-weight:600; }
+    .chk-bar { height:4px; border-radius:4px; background:var(--line); overflow:hidden; }
+    .chk-bar i { display:block; height:100%; width:0; background:var(--accent); transition:width .5s cubic-bezier(.22,.61,.36,1); }
     .step h2 { font-size:15.5px; font-weight:600; letter-spacing:-0.01em; padding-top:5px; }
     .step p { font-size:13px; color:var(--dim); margin-top:5px; }
     .step p b { color:var(--text); font-weight:600; }
@@ -332,6 +344,39 @@
         }, { rootMargin: "0px 0px -55% 0px" });
         document.querySelectorAll(".step").forEach(function (s) { io.observe(s); });
       }
+
+      /* playful checklist — the five steps become tickable; a progress bar
+         fills as you go, persisted per device. Pure enhancement over the
+         existing blueprint; no audio, no scene touched. */
+      (function () {
+        var steps = Array.prototype.slice.call(document.querySelectorAll("#blueprint .step"));
+        var bp = document.getElementById("blueprint");
+        if (!steps.length || !bp) return;
+        var KEY = "oriya:play:done", done = {};
+        try { done = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) {}
+        var prog = document.createElement("div");
+        prog.className = "chk-prog";
+        prog.innerHTML = '<div class="chk-prog-top"><span class="chk-prog-k">Your checklist — tap a step to tick it</span><span class="chk-prog-n" id="chkN"></span></div><div class="chk-bar"><i id="chkFill"></i></div>';
+        bp.parentNode.insertBefore(prog, bp);
+        var fill = document.getElementById("chkFill"), nEl = document.getElementById("chkN");
+        function render() {
+          var c = 0;
+          steps.forEach(function (s, i) { var d = !!done[i]; s.classList.toggle("done", d); if (d) c++; });
+          fill.style.width = Math.round(c / steps.length * 100) + "%";
+          nEl.textContent = c === steps.length ? "all " + steps.length + " ✓ — you've got the whole game" : c + " of " + steps.length;
+        }
+        steps.forEach(function (s, i) {
+          var badge = s.querySelector(".stepn");
+          if (!badge) return;
+          badge.setAttribute("role", "button");
+          badge.setAttribute("tabindex", "0");
+          badge.setAttribute("aria-label", "Mark step " + (i + 1) + " done");
+          function toggle() { done[i] = !done[i]; try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) {} render(); }
+          badge.addEventListener("click", toggle);
+          badge.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } });
+        });
+        render();
+      })();
 
       /* straw polls — call-the-winner (step 4) + payout split (step 5).
          Device-local only; the binding versions live with the board. */
@@ -607,10 +652,10 @@
             { t: "Pick your side →", href: "/play/foundersvsoperators" }
           ] },
         connect: { q: "🔌 Connect my wearable",
-          a: "You don't have to — a screenshot works for every device. Own an Oura? Live read-only sync is on /try. Everything else runs screenshot-first for now.",
+          a: "You don't have to — a screenshot works for every device. Hand Ori this morning's recovery screen and it reads it on the spot. Everything runs screenshot-first for now.",
           cards: [
             { t: "Send a screenshot →", href: "mvp/submit.html?challenge=Founders%20vs%20Operators&back=founders" },
-            { t: "Try Oura live sync →", href: "try.html" }
+            { t: "Try Ori →", href: "ori.html" }
           ] },
         score: { q: "📐 How is my number scored?",
           a: "Never as a raw number. Your score becomes your Oriya Index — where this morning sits against your own ~90-day baseline — and the board ranks your gap to Par 71, where a typical morning lands. Genetics and generous algorithms buy you nothing here. (First ~14 days run on a labelled per-device estimate while your baseline builds.)",

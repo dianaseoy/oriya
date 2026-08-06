@@ -15,6 +15,8 @@
  */
 
 import { manualSubmit } from "./submit.js";
+import { generateBrief } from "../lib/ori";
+import { extractMetrics } from "./vision.js";
 import { initLogger, traced } from "braintrust";
 
 /* Braintrust tracing for Ori chat. Lazily initialized from the request-scoped
@@ -358,6 +360,124 @@ async function oriChat(request, env, ctx) {
   return new Response(JSON.stringify({ reply: cres.reply }), { headers });
 }
 
+/* Ori Daily Brief — turns a wearable into natural-language coaching.
+   Pipeline: a screenshot (body.image) is read into metrics by the free Workers
+   AI vision binding (worker/vision.js); those metrics — or typed ones — are
+   reasoned into a brief by lib/ori.js, which uses Fireworks when
+   FIREWORKS_API_KEY is set and a mock brain when it isn't (source:"mock"). The
+   endpoint never crashes without a key. Stateless: the screenshot lives only
+   inside this invocation, never stored. When BRAINTRUST_API_KEY is set each
+   brief is traced so interpretation quality can be evaluated across wearable
+   brands (WHOOP/Oura/Garmin/Apple). */
+async function askOri(request, env, ctx) {
+  if (request.method !== "POST") return new Response("POST only", { status: 405 });
+  const headers = { "Content-Type": "application/json", "Cache-Control": "no-store" };
+  let body;
+  try { body = await request.json(); } catch (e) { return new Response(JSON.stringify({ error: "bad_json" }), { status: 400, headers }); }
+  // request.json() can yield null, a number, a string, or an array — any of
+  // which would make body.image / body.metrics throw below. Reject non-objects.
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return new Response(JSON.stringify({ error: "bad_json" }), { status: 400, headers });
+  }
+
+  const req = {
+    wearable: body.wearable,
+    metrics: (body.metrics && typeof body.metrics === "object") ? body.metrics : {},
+    userQuestion: body.userQuestion,
+    // The person's own 7-day history, computed client-side and sent per request.
+    // It is never stored server-side; lib/ori.ts sanitizes it before use.
+    baseline: (body.baseline && typeof body.baseline === "object") ? body.baseline : null,
+  };
+  // Screenshot path: extract metrics, then discard the image. Extracted values
+  // win over anything typed; the raw bytes are never logged or traced.
+  let usedImage = false;
+  if (typeof body.image === "string" && body.image) {
+    usedImage = true;
+    const extracted = await extractMetrics(env, body.image);
+    // Nothing legible came back. Do NOT invent a health brief from empty
+    // metrics — ask for a clearer shot instead (the client renders .message).
+    const readable = extracted && (
+      extracted.recovery != null || extracted.hrv != null || extracted.rhr != null ||
+      (extracted.sleep != null && extracted.sleep !== "")
+    );
+    if (!readable) {
+      return new Response(JSON.stringify({
+        error: "unreadable_screenshot",
+        message: "I couldn't read any recovery, HRV, or sleep numbers from that screenshot. Try a clearer shot of your recovery or readiness screen — or just type the numbers and I'll give you the same read.",
+      }), { status: 422, headers });
+    }
+    if (extracted.wearable) req.wearable = extracted.wearable;
+    req.metrics = Object.assign({}, req.metrics, extracted);
+    delete req.metrics.wearable;
+  }
+
+  // Extract-only: used when the client uploads several screenshots to build a
+  // baseline. Return the read metrics, skip all reasoning (no Fireworks call).
+  // Requires an image — there's nothing to extract otherwise.
+  if (body.extractOnly) {
+    if (!usedImage) return new Response(JSON.stringify({ error: "no_image" }), { status: 400, headers });
+    traceMeta(env, ctx, {
+      wearable: req.wearable || null, kind: "extract", source: "vision", from_screenshot: true,
+      present: presence(req.metrics), latency_ms: 0,
+    });
+    return new Response(JSON.stringify({ ok: true, extractOnly: true, wearable: req.wearable || null, metrics: req.metrics }), { headers });
+  }
+
+  const config = { fireworksApiKey: env && env.FIREWORKS_API_KEY };
+  const logger = getLogger(env);
+  const flush = () => { if (logger && ctx) ctx.waitUntil(logger.flush()); };
+  const run = async (span) => {
+    const t0 = Date.now();
+    const out = await generateBrief(config, req);
+    // METADATA ONLY — never the biometric values or the generated brief text.
+    // We log which wearable, whether a screenshot/baseline was involved, the
+    // confidence label, coarse presence flags, and latency. No recovery/HRV/RHR/
+    // sleep numbers, no question text, no reasoning ever reaches the tracer.
+    if (span) span.log({
+      metadata: {
+        wearable: out.wearable,
+        kind: req.userQuestion ? "ask" : "brief",
+        source: out.source,
+        from_screenshot: usedImage,
+        has_baseline: !!(req.baseline && req.baseline.days),
+        confidence: out.confidence || null,
+        present: presence(req.metrics),
+        // Actions layer: kinds + count only — NEVER the drafted text (same
+        // metadata-only rule as present()/biometrics).
+        actions_count: Array.isArray(out.actions) ? out.actions.length : 0,
+        action_kinds: Array.isArray(out.actions) ? out.actions.map(function (a) { return a.kind; }) : [],
+      },
+      metrics: { latency_ms: Date.now() - t0 },
+    });
+    return out;
+  };
+  const out = logger ? await traced(run, { name: "ori-daily-brief" }) : await run(null);
+  flush();
+  return new Response(JSON.stringify(out), { headers });
+}
+
+/* Coarse presence flags — booleans only, never the values. Lets us see how
+ * often a screenshot yields each field without ever tracing a biometric. */
+function presence(m) {
+  m = m || {};
+  return {
+    recovery: m.recovery != null,
+    hrv: m.hrv != null,
+    rhr: m.rhr != null,
+    sleep: m.sleep != null && m.sleep !== "",
+  };
+}
+
+/* One-shot metadata-only trace for the extract-only path (no reasoning to
+ * wrap in a span). No-ops without a Braintrust key. */
+function traceMeta(env, ctx, meta) {
+  const logger = getLogger(env);
+  if (!logger) return;
+  const { latency_ms, ...rest } = meta;
+  const p = traced(async (span) => { if (span) span.log({ metadata: rest, metrics: { latency_ms: latency_ms || 0 } }); }, { name: "ori-daily-brief" });
+  if (ctx) ctx.waitUntil(p.then(function () { return logger.flush(); }));
+}
+
 /* Outreach-friendly short routes (assets match first, so these only fire when
    no static file exists at the path). 302 so they stay repointable. */
 const SHORTLINKS = {
@@ -385,6 +505,24 @@ function withCors(res) {
   return out;
 }
 
+/* Best-effort abuse guard for the reasoning endpoint (Fireworks + Workers AI
+   vision both cost money per call). In-memory and per-isolate — Workers run many
+   isolates, so this is a soft cap that blunts a hot loop or a single abusive
+   client, not a hard global quota (that would need a KV/Durable Object binding).
+   Fixed 60s window keyed by client IP. Returns seconds-to-wait, or 0 if OK. */
+const RL_WINDOW_MS = 60000;
+const RL_MAX = 20;
+const rlHits = new Map(); // ip -> { count, resetAt }
+function rateLimited(request) {
+  const ip = request.headers.get("CF-Connecting-IP") || "anon";
+  const now = Date.now();
+  let e = rlHits.get(ip);
+  if (!e || now >= e.resetAt) { e = { count: 0, resetAt: now + RL_WINDOW_MS }; rlHits.set(ip, e); }
+  e.count++;
+  if (rlHits.size > 5000) { for (const [k, v] of rlHits) if (now >= v.resetAt) rlHits.delete(k); } // bound memory
+  return e.count > RL_MAX ? Math.max(1, Math.ceil((e.resetAt - now) / 1000)) : 0;
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -397,6 +535,14 @@ export default {
     if (pathname === "/api/manual-submit") return withCors(await manualSubmit(request, env));
     if (pathname === "/api/caddy-voice") return withCors(await caddyVoice(request, env));
     if (pathname === "/api/ori-chat") return withCors(await oriChat(request, env, ctx));
+    if (pathname === "/api/ask-ori") {
+      const retry = rateLimited(request);
+      if (retry) return withCors(new Response(
+        JSON.stringify({ error: "rate_limited", message: "One moment — you're going a little fast. Try again in a few seconds." }),
+        { status: 429, headers: { "Content-Type": "application/json", "Retry-After": String(retry) } }
+      ));
+      return withCors(await askOri(request, env, ctx));
+    }
     if (SHORTLINKS[pathname]) return Response.redirect(url.origin + SHORTLINKS[pathname] + url.search, 302);
     // /p/<handle-or-code> — public Body Passport (renders live from board.json)
     if (pathname.startsWith("/p/") && pathname.length > 3) {

@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "description": "Oriya worker — Oura OAuth pass-through + Ori chat on Workers AI.",
+  "scripts": {
+    "test": "node --test \"lib/**/*.test.ts\""
+  },
   "dependencies": {
     "braintrust": "^3.24.0"
   }

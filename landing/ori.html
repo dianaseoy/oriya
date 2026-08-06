@@ -14,6 +14,13 @@
          worker keeps no accounts/DB, BUT messages + replies are traced to
          Braintrust when BRAINTRUST_API_KEY is set — the foot copy discloses
          this, keep it honest (see [[oriya-braintrust-tracing]] memory).
+       - baseline: the 7-day recovery/HRV/sleep history (oriya:ori:baseline)
+         is client-side ONLY — never sent to be stored. It rides the brief
+         request per-call so Ori compares today to the user's own normal, and
+         the /api/ask-ori trace is METADATA-ONLY (wearable, confidence, presence
+         flags) — biometric values and brief text are never traced. Keep it so.
+       - no fabricated history: Ori references averages/ranges/trends ONLY from
+         this real baseline. With <2 days it reads today alone and says so.
        - persona picker = the user's chosen pain (scores | builder | breathe),
          stored oriya:ori:persona, sent with every request.
        - no typing-indicator theater: pending state is one static dim line;
@@ -57,28 +64,70 @@
     .msg.bot { background:var(--panel); border:1px solid rgba(127,183,158,.3); border-top-left-radius:4px; align-self:flex-start; }
     .msg.user { background:rgba(127,183,158,.12); border:1px solid transparent; border-top-right-radius:4px; align-self:flex-end; }
     .msg.err { border-color:rgba(215,162,92,.45); color:var(--dim); }
-    .pending { font-size:12px; color:var(--dim); align-self:flex-start; padding:2px 4px; }
+    /* pending "Ori is …" line — a restrained shine on the honest wait copy; it
+       exists only while a real request is in flight, so it signals genuine work,
+       not typing theater. Reduced-motion = the plain static dim line. */
+    .pending { font-size:12px; align-self:flex-start; padding:2px 4px; --shine-ms:2400ms; --shine-hi:#E6E7EA;
+      color:transparent; background:linear-gradient(90deg,var(--dim) 25%,var(--shine-hi) 50%,var(--dim) 75%);
+      background-size:200% 100%; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+      animation:shine var(--shine-ms) linear infinite; }
+    /* the wait line also carries .arrive; both set `animation`, so combine them at
+       higher specificity — it fades up once AND keeps shining while it waits. */
+    .pending.arrive { opacity:0; animation:arrive .4s ease forwards, shine var(--shine-ms) linear infinite; }
+    @keyframes shine { 0% { background-position:200% 0; } 100% { background-position:-200% 0; } }
+    @media (prefers-reduced-motion: reduce) { .pending, .pending.arrive { animation:none; opacity:1; background:none; color:var(--dim); -webkit-text-fill-color:var(--dim); } }
     .vrow { display:flex; align-items:center; gap:7px; margin-top:7px; }
     .vbtn { width:24px; height:24px; flex:none; border:0; border-radius:99px; background:var(--accent); color:var(--void); font-size:9px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
     .vrow span { font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--dim); }
     .arrive { opacity:0; animation:arrive .4s ease forwards; }
     @keyframes arrive { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
     @media (prefers-reduced-motion: reduce) { .arrive { animation:none; opacity:1; transform:none; } }
-    /* composer */
-    .bar { display:flex; gap:8px; margin-top:14px; }
-    .bar textarea { flex:1; resize:none; font:inherit; font-size:13.5px; background:var(--panel); border:1px solid var(--line); border-radius:12px; color:var(--text); padding:11px 13px; outline:none; height:44px; max-height:120px; }
-    .bar textarea:focus { border-color:var(--accent); }
+    /* composer — a floating pill: attachment · input · mic · circular send */
+    .bar { display:flex; align-items:center; gap:5px; margin-top:14px; background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:5px 6px 5px 8px; box-shadow:0 6px 22px rgba(0,0,0,.30); transition:border-color .2s ease, box-shadow .2s ease; }
+    .bar:focus-within { border-color:var(--accent); box-shadow:0 9px 28px rgba(0,0,0,.36); }
+    .bar textarea { flex:1; resize:none; font:inherit; font-size:13.5px; background:transparent; border:0; color:var(--text); padding:9px 6px; outline:none; height:40px; max-height:120px; line-height:1.5; }
+    .bar textarea::placeholder { color:var(--dim); }
     /* 16px floor stops iOS Safari's zoom-on-focus jump */
     @media (max-width:640px) { .bar textarea { font-size:16px; } }
-    .send { flex:none; background:var(--accent); color:var(--void); border:0; border-radius:12px; padding:0 18px; font:inherit; font-weight:600; cursor:pointer; transition:all .2s ease; }
-    .send:hover { filter:brightness(1.08); }
-    .send:disabled { opacity:.5; cursor:default; }
-    .abtn { flex:none; width:44px; height:44px; background:var(--panel); border:1px solid var(--line); border-radius:12px; color:var(--dim); font-size:17px; cursor:pointer; transition:all .2s ease; }
-    .abtn:hover { color:var(--text); border-color:#3A3D45; }
-    .abtn.rec { color:#E66A6A; border-color:rgba(230,106,106,.6); animation:recPulse 1.2s ease infinite; }
+    .send { flex:none; width:40px; height:40px; padding:0; background:var(--accent); color:var(--void); border:0; border-radius:999px; font:inherit; font-size:18px; line-height:1; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:transform .12s ease, filter .2s ease; }
+    .send:hover { filter:brightness(1.08); transform:scale(1.06); }
+    .send:disabled { opacity:.5; cursor:default; transform:none; }
+    .abtn { flex:none; width:38px; height:38px; background:transparent; border:0; border-radius:999px; color:var(--dim); font-size:17px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:transform .12s ease, color .2s ease, background .2s ease; }
+    .abtn:hover { color:var(--text); background:rgba(255,255,255,.06); transform:scale(1.06); }
+    .abtn.rec { color:#E66A6A; animation:recPulse 1.2s ease infinite; }
     @keyframes recPulse { 50% { background:rgba(230,106,106,.12); } }
-    @media (prefers-reduced-motion: reduce) { .abtn.rec { animation:none; } }
+    @media (prefers-reduced-motion: reduce) { .abtn.rec { animation:none; } .send:hover, .abtn:hover { transform:none; } }
     .msg .shot { display:block; max-width:100%; border-radius:9px; margin-bottom:7px; }
+    /* morning brief card — a full-width structured read inside the feed */
+    .brief { align-self:stretch; max-width:100%; background:var(--panel); border:1px solid rgba(127,183,158,.3); border-radius:14px; padding:15px 16px; }
+    .brief .b-greet { font-size:12px; color:var(--accent); letter-spacing:.02em; margin-bottom:7px; }
+    .brief .b-sum { font-size:16px; line-height:1.45; font-weight:500; margin-bottom:14px; }
+    .brief .b-obs { list-style:none; padding:0; margin:0 0 14px; display:flex; flex-direction:column; gap:10px; }
+    .brief .b-obs li { position:relative; padding-left:15px; font-size:13.5px; color:#CFD2D8; line-height:1.5; }
+    .brief .b-obs li::before { content:""; position:absolute; left:0; top:7px; width:6px; height:6px; border-radius:99px; background:var(--accent); opacity:.6; }
+    .brief .b-block { border-radius:10px; padding:11px 12px; font-size:13.5px; line-height:1.5; }
+    .brief .b-rec { background:rgba(127,183,158,.08); border:1px solid rgba(127,183,158,.25); margin-bottom:9px; }
+    .brief .b-rea { background:rgba(215,162,92,.07); border:1px solid rgba(215,162,92,.22); }
+    .brief .b-block b { display:block; font-size:10px; letter-spacing:.06em; text-transform:uppercase; margin-bottom:4px; font-weight:600; }
+    .brief .b-rec b { color:var(--accent); } .brief .b-rea b { color:var(--amber); }
+    .brief .b-meta { display:flex; align-items:center; gap:9px; margin-top:13px; flex-wrap:wrap; }
+    .brief .b-pill { font-size:10.5px; color:var(--dim); border:1px solid var(--line); border-radius:99px; padding:3px 9px; }
+    .brief .b-demo { font-size:10.5px; color:var(--amber); border:1px solid rgba(215,162,92,.4); background:rgba(215,162,92,.08); border-radius:99px; padding:3px 9px; }
+    .brief .b-pill b { color:var(--accent); font-weight:600; }
+    .brief .b-why { background:none; border:1px solid var(--line); color:var(--dim); border-radius:8px; padding:4px 11px; font:inherit; font-size:11.5px; cursor:pointer; transition:all .2s ease; }
+    .brief .b-why:hover { color:var(--text); border-color:#3A3D45; }
+    .brief .b-reason { margin-top:11px; font-size:13px; line-height:1.6; color:#BFC3CA; border-left:2px solid var(--line); padding:2px 0 2px 12px; }
+    .brief.base { border-color:rgba(215,162,92,.3); }
+    .brief .b-stats { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin:12px 0; }
+    .brief .b-stat { background:var(--void); border:1px solid var(--line); border-radius:10px; padding:10px 12px; }
+    .brief .b-stat b { display:block; font-size:19px; font-weight:600; color:var(--text); letter-spacing:.01em; font-variant-numeric:tabular-nums; }
+    .brief .b-stat span { font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:.05em; }
+    .brief .b-pat { background:rgba(215,162,92,.06); border:1px solid rgba(215,162,92,.2); margin-top:4px; }
+    .brief .b-pat b { color:var(--amber); }
+    .brief .b-note { font-size:11px; color:#5A5F68; margin-top:10px; line-height:1.5; }
+    .b-ex { display:flex; flex-wrap:wrap; gap:6px; align-self:stretch; }
+    .b-ex button { background:none; border:1px dashed var(--line); color:var(--dim); border-radius:8px; padding:5px 10px; font:inherit; font-size:11.5px; cursor:pointer; }
+    .b-ex button:hover { color:var(--text); border-color:var(--accent); }
     .foot { font-size:10.5px; font-family:ui-monospace,monospace; color:#5A5F68; line-height:1.6; margin-top:12px; }
   </style>
 </head>
@@ -90,6 +139,8 @@
       <b>Ori · your recovery companion</b>
       <span class="vtag">v0.1 · early AI</span>
       <span class="sp"></span>
+      <a class="hbtn" href="ori-pet.html" title="Ori as a desktop pet — a living orb in the corner of your screen" style="text-decoration:none">🟢 desktop pet →</a>
+      <button class="hbtn" id="baseBtn" title="Your Ori baseline — averages from your own days" hidden>baseline</button>
       <button class="hbtn" id="personaBtn" title="Change what Ori focuses on">focus</button>
       <button class="hbtn" id="clearBtn">clear</button>
     </div>
@@ -107,25 +158,29 @@
     <div class="feed" id="feed" hidden></div>
 
     <div class="bar" id="bar" hidden>
-      <button class="abtn" id="micBtn" title="Speak instead of typing" aria-label="Voice input" hidden>🎤</button>
       <button class="abtn" id="shotBtn" title="Share a screenshot of your score" aria-label="Share a screenshot">📷</button>
-      <input type="file" id="shotFile" accept="image/*" hidden>
-      <textarea id="input" rows="1" maxlength="600" placeholder="Say anything — your scores, your ring, your morning…" aria-label="Message Ori"></textarea>
-      <button class="send" id="send">Send</button>
+      <input type="file" id="shotFile" accept="image/*" multiple hidden>
+      <textarea id="input" rows="1" maxlength="600" placeholder="Share a screenshot 📷 (or several — I'll build your baseline) for your Morning Brief…" aria-label="Message Ori"></textarea>
+      <button class="abtn" id="micBtn" title="Speak instead of typing" aria-label="Voice input" hidden>🎤</button>
+      <button class="send" id="send" aria-label="Send">↑</button>
     </div>
 
-    <p class="foot">Ori v0.1 is an early AI companion — not a doctor, and it can be wrong. It'll nudge you toward an easier day, never give medical advice. Worth knowing: your messages and Ori's replies pass through Braintrust, a tracing tool a solo founder uses to see how Ori's doing and fix it — never sold, no accounts, no database. A screenshot you share isn't kept, but the reply Ori writes about it is traced like any other message — posting to the board still happens at <a href="mvp/submit.html">oriya.app/submit</a>. Voice typing uses your browser's built-in speech service. Built in the open by a solo founder.</p>
+    <p class="foot">Ori v0.1 is an early AI companion — not a doctor, and it can be wrong. It'll nudge you toward an easier day, never give medical advice. Worth knowing: your messages and Ori's replies pass through Braintrust, a tracing tool a solo founder uses to see how Ori's doing and fix it — never sold, no accounts, no database. A screenshot you share isn't kept, but the reply Ori writes about it is traced like any other message — posting to the board still happens at <a href="mvp/submit.html">oriya.app/submit</a>. Your Morning Brief works differently: the numbers Ori reads from a screenshot and the 7-day baseline built from them stay in your browser (never uploaded or stored), and only anonymous quality signals — which wearable, how confident, whether a screenshot was used — are traced, never the values or the brief text. Voice typing uses your browser's built-in speech service. Built in the open by a solo founder.</p>
   </div>
 
   <script>
     (function () {
-      var KEY_P = "oriya:ori:persona", KEY_C = "oriya:ori:chat";
+      var KEY_P = "oriya:ori:persona", KEY_C = "oriya:ori:chat", KEY_B = "oriya:ori:baseline";
+      var BASELINE_DAYS = 7;
       // file:// previews have no /api/* — talk to prod (worker sends CORS)
       var API = location.protocol === "file:" ? "https://oriya.app" : "";
       var pick = document.getElementById("pick"), feed = document.getElementById("feed"),
           bar = document.getElementById("bar"), input = document.getElementById("input"),
-          send = document.getElementById("send");
+          send = document.getElementById("send"), baseBtn = document.getElementById("baseBtn");
       var pending = false;
+      // Set once a screenshot brief lands — routes follow-up text to the
+      // grounded /api/ask-ori path so answers stay tied to the same numbers.
+      var activeBrief = null; // { wearable, metrics }
 
       var HELLO = {
         scores: "Hey, I'm Ori — the friend who actually enjoys decoding this stuff. What did your wearable throw at you this morning? Give me the number and the face you made at it.",
@@ -138,6 +193,77 @@
 
       var persona = load(KEY_P, null);
       var chat = load(KEY_C, []);   // [{role, content}]
+      // Up to 7 days of extracted metrics — the ONLY history Ori keeps, and it
+      // lives here in the browser only. [{day,wearable,recovery,hrv,rhr,sleepH}]
+      var baseline = load(KEY_B, []);
+      if (!Array.isArray(baseline)) baseline = [];
+
+      /* ---- 7-day baseline model (mirror of lib/baseline.ts; keep in sync) ---- */
+      function dayStr(offset) { var d = new Date(); d.setDate(d.getDate() - (offset || 0)); return d.toISOString().slice(0, 10); }
+      function toNum(v) { if (typeof v === "number") return isFinite(v) ? v : null; if (v == null || v === "") return null; var n = parseFloat(v); return isNaN(n) ? null : n; }
+      function parseSleepH(v) {
+        if (v == null || v === "") return null;
+        if (typeof v === "number") return v > 24 ? v / 60 : v;
+        var str = String(v).trim(), m = /^(\d+)\s*[h:]\s*(\d+)/i.exec(str);
+        if (m) return +m[1] + +m[2] / 60;
+        m = /^(\d+(?:\.\d+)?)\s*h/i.exec(str); if (m) return +m[1];
+        var n = parseFloat(str); return isNaN(n) ? null : (n > 24 ? n / 60 : n);
+      }
+      function fmtSleepH(h) { var hh = Math.floor(h), mm = Math.round((h - hh) * 60); return mm ? hh + "h " + mm + "m" : hh + "h"; }
+
+      /* Record one day's reading. day defaults to today; batch upload passes an
+         assumed day (disclosed in the UI). Latest write for a day wins; keep 7. */
+      function recordBaseline(wearable, m, day) {
+        if (!m) return;
+        var e = { day: day || dayStr(0), wearable: wearable || "whoop",
+                  recovery: toNum(m.recovery), hrv: toNum(m.hrv), rhr: toNum(m.rhr), sleepH: parseSleepH(m.sleep) };
+        if (e.recovery == null && e.hrv == null && e.rhr == null && e.sleepH == null) return; // nothing real
+        var byDay = {}; baseline.forEach(function (x) { byDay[x.day] = x; }); byDay[e.day] = e;
+        baseline = Object.keys(byDay).map(function (k) { return byDay[k]; })
+          .sort(function (a, b) { return a.day < b.day ? -1 : a.day > b.day ? 1 : 0; }).slice(-BASELINE_DAYS);
+        save(KEY_B, baseline);
+      }
+
+      function avgArr(xs) { return xs.length ? xs.reduce(function (a, b) { return a + b; }, 0) / xs.length : null; }
+      function round1(n) { return n == null ? null : Math.round(n * 10) / 10; }
+      function col(entries, key) { return entries.map(function (e) { return e[key]; }).filter(function (v) { return typeof v === "number" && !isNaN(v); }); }
+      function summarizeBaseline(entries) {
+        var rec = col(entries, "recovery"), hrv = col(entries, "hrv"), rhr = col(entries, "rhr"), sl = col(entries, "sleepH");
+        var s = { days: entries.length, avgRecovery: round1(avgArr(rec)), avgSleepH: round1(avgArr(sl)),
+                  hrvMin: hrv.length ? Math.min.apply(null, hrv) : null, hrvMax: hrv.length ? Math.max.apply(null, hrv) : null,
+                  hrvAvg: round1(avgArr(hrv)), avgRhr: round1(avgArr(rhr)), patterns: [] };
+        s.patterns = derivePatterns(entries, s); return s;
+      }
+      // Patterns are emitted only when the real rows support them (>= 3 days).
+      function derivePatterns(entries, s) {
+        var out = []; if (entries.length < 3) return out;
+        var sleep = col(entries, "sleepH");
+        if (sleep.length >= 3) {
+          var spread = Math.max.apply(null, sleep) - Math.min.apply(null, sleep);
+          if (spread <= 1) out.push("Your sleep is remarkably consistent night to night.");
+          else if (spread >= 2.5) out.push("Your sleep swings a lot night to night — that variability tends to drive the rest.");
+        }
+        var paired = entries.filter(function (e) { return typeof e.recovery === "number" && typeof e.sleepH === "number"; });
+        if (paired.length >= 3 && s.avgRecovery != null && s.avgSleepH != null) {
+          var belowSleep = paired.filter(function (e) { return e.sleepH < s.avgSleepH; });
+          var both = belowSleep.filter(function (e) { return e.recovery < s.avgRecovery; });
+          if (belowSleep.length >= 2 && both.length >= Math.ceil(belowSleep.length * 0.75))
+            out.push("Your shorter nights are the ones your recovery dips on — sleep looks like your biggest lever.");
+        }
+        var rec = entries.filter(function (e) { return typeof e.recovery === "number"; }).map(function (e) { return e.recovery; });
+        if (rec.length >= 4) {
+          var half = Math.floor(rec.length / 2), dh = avgArr(rec.slice(0, half)), dt = avgArr(rec.slice(-half));
+          if (dh != null && dt != null) {
+            if (dt - dh >= 8) out.push("Your recovery has been trending up across these days.");
+            else if (dh - dt >= 8) out.push("Your recovery has been drifting down across these days — worth an easier stretch.");
+          }
+        }
+        return out;
+      }
+      // Summary of days OTHER than today — what Ori compares this morning against.
+      function priorBaseline() { var s = summarizeBaseline(baseline.filter(function (e) { return e.day !== dayStr(0); })); return s.days >= 2 ? s : null; }
+      // Full summary incl. today — used for grounded follow-ups.
+      function currentBaseline() { var s = summarizeBaseline(baseline); return s.days >= 2 ? s : null; }
 
       /* ?who= identity hint from the homepage picker — whitelisted again
          server-side (ORI_WHO); anything unknown is dropped. Stored so the
@@ -193,8 +319,9 @@
       }
 
       function paint() {
+        activeBrief = null; // feed is being rebuilt; drop any stale brief context
         var has = !!persona;
-        pick.hidden = has; feed.hidden = !has; bar.hidden = !has;
+        pick.hidden = has; feed.hidden = !has; bar.hidden = !has; baseBtn.hidden = !has;
         if (!has) return;
         feed.textContent = "";
         var hi = HELLO[persona] || HELLO.breathe;
@@ -218,10 +345,7 @@
           ub.insertBefore(im, ub.firstChild);
         }
         pending = true; send.disabled = true;
-        var wait = document.createElement("div");
-        wait.className = "pending arrive";
-        wait.textContent = shot ? "Ori is looking at your screenshot…" : "Ori is reading…";
-        feed.appendChild(wait); feed.scrollTop = feed.scrollHeight;
+        var wait = pendingLine(shot ? "Ori is looking at your screenshot…" : "Ori is reading…");
         var payload = { messages: chat.slice(-12), persona: persona, who: who };
         if (shot) payload.image = shot;
         fetch(API + "/api/ori-chat", {
@@ -247,31 +371,225 @@
           .finally(function () { pending = false; send.disabled = false; input.focus(); });
       }
 
-      function ask() { sendMsg(input.value.trim(), null); }
+      /* Screenshot → Morning Brief. Extraction + reasoning happen server-side
+         (/api/ask-ori); the image rides this one request and is never stored. */
+      function getBrief(shot) {
+        if (pending) return;
+        var ub = bubble("user", "");
+        var im = document.createElement("img");
+        im.className = "shot"; im.src = shot; im.alt = "your screenshot";
+        ub.insertBefore(im, ub.firstChild);
+        pending = true; send.disabled = true;
+        var wait = pendingLine("Ori is reading your screenshot…");
+        fetch(API + "/api/ask-ori", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: shot, userQuestion: "", baseline: priorBaseline() }),
+        }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (res) {
+            wait.remove();
+            if (!res.ok || !res.j.summary) {
+              bubble("bot", (res.j && res.j.message) ? res.j.message : "I couldn't quite read that screenshot — try a clearer shot of your recovery or readiness screen, or just type the numbers and I'll give you the same read.", "err");
+              return;
+            }
+            activeBrief = { wearable: res.j.wearable, metrics: res.j.metrics };
+            recordBaseline(res.j.wearable, res.j.metrics, dayStr(0)); // today's reading joins the baseline
+            renderBrief(res.j);
+          })
+          .catch(function () { wait.remove(); bubble("bot", "No connection just now — try sharing that screenshot again in a moment.", "err"); })
+          .finally(function () { pending = false; send.disabled = false; input.focus(); });
+      }
+
+      /* Render the structured brief as a full-width card, then offer example
+         follow-ups. Reasoning hides behind Why?; text is escaped via textContent. */
+      function renderBrief(d) {
+        var card = document.createElement("div");
+        card.className = "brief arrive";
+        add(card, "div", "b-greet", d.greeting || "🌅 Morning Brief");
+        add(card, "p", "b-sum", d.summary);
+        var ul = document.createElement("ul"); ul.className = "b-obs";
+        (d.observations || []).forEach(function (o) { var li = document.createElement("li"); li.textContent = o; ul.appendChild(li); });
+        card.appendChild(ul);
+        card.appendChild(block("b-rec", "What I'd do", d.recommendation));
+        card.appendChild(block("b-rea", "Don't worry about", d.reassurance));
+        var meta = document.createElement("div"); meta.className = "b-meta";
+        if (d.confidence) { var p = document.createElement("span"); p.className = "b-pill"; p.innerHTML = "confidence <b></b>"; p.querySelector("b").textContent = d.confidence; meta.appendChild(p); }
+        // Honest mode label — a mock/demo brief must never read as live analysis.
+        if (d.source === "mock") { var dm = document.createElement("span"); dm.className = "b-demo"; dm.textContent = "Demo mode · sample analysis"; meta.appendChild(dm); }
+        var whyBtn = document.createElement("button"); whyBtn.className = "b-why"; whyBtn.textContent = "Why?";
+        meta.appendChild(whyBtn); card.appendChild(meta);
+        var reason = add(card, "div", "b-reason", d.reasoning || ""); reason.hidden = true;
+        whyBtn.addEventListener("click", function () { reason.hidden = !reason.hidden; whyBtn.textContent = reason.hidden ? "Why?" : "Hide"; });
+        feed.appendChild(card);
+        // Ask Ori — example follow-ups, grounded in this brief's numbers
+        var ex = document.createElement("div"); ex.className = "b-ex arrive";
+        ["Can I push today's workout?", "Why is my recovery lower?", "What changed this week?"].forEach(function (q) {
+          var b = document.createElement("button"); b.textContent = q;
+          b.addEventListener("click", function () { input.value = q; ask(); });
+          ex.appendChild(b);
+        });
+        feed.appendChild(ex);
+        feed.scrollTop = feed.scrollHeight;
+      }
+      function block(cls, label, text) {
+        var d = document.createElement("div"); d.className = "b-block " + cls;
+        var b = document.createElement("b"); b.textContent = label; d.appendChild(b);
+        d.appendChild(document.createTextNode(text || "")); return d;
+      }
+      function add(host, tag, cls, text) {
+        var el = document.createElement(tag); el.className = cls; el.textContent = text || ""; host.appendChild(el); return el;
+      }
+      /* The one "Ori is …" wait line. It carries the honest per-path copy, the
+         approved .arrive fade-up, the .pending shine, and role="status" so screen
+         readers announce the wait. Removed the moment the reply lands. */
+      function pendingLine(text) {
+        var wait = document.createElement("div");
+        wait.className = "pending arrive";
+        wait.setAttribute("role", "status");
+        wait.setAttribute("aria-live", "polite");
+        wait.textContent = text;
+        feed.appendChild(wait); feed.scrollTop = feed.scrollHeight;
+        return wait;
+      }
+
+      /* "Your Ori Baseline" — built ONLY from real stored days. Averages, HRV
+         range and patterns; honest empty/thin states, nothing invented. */
+      function stat(label, val) {
+        var d = document.createElement("div"); d.className = "b-stat";
+        var v = document.createElement("b"); v.textContent = val;
+        var l = document.createElement("span"); l.textContent = label;
+        d.appendChild(v); d.appendChild(l); return d;
+      }
+      function renderBaseline() {
+        var s = summarizeBaseline(baseline);
+        var card = document.createElement("div"); card.className = "brief base arrive";
+        add(card, "div", "b-greet", "📈 Your Ori Baseline");
+        if (s.days < 1) {
+          add(card, "p", "b-sum", "No days logged yet. Share a screenshot 📷 each morning — after 2–3 days your baseline builds here, and Ori reads today against your own normal instead of guessing.");
+          feed.appendChild(card); feed.scrollTop = feed.scrollHeight; return;
+        }
+        add(card, "p", "b-sum", s.days === 1
+          ? "1 day logged so far — a couple more and the averages below start meaning something."
+          : s.days + " days logged. Here's your normal, built only from screenshots you've shared:");
+        var grid = document.createElement("div"); grid.className = "b-stats";
+        grid.appendChild(stat("Avg recovery", s.avgRecovery != null ? String(s.avgRecovery) : "—"));
+        grid.appendChild(stat("Avg sleep", s.avgSleepH != null ? fmtSleepH(s.avgSleepH) : "—"));
+        grid.appendChild(stat("HRV range", (s.hrvMin != null && s.hrvMax != null) ? (s.hrvMin + "–" + s.hrvMax + " ms") : "—"));
+        grid.appendChild(stat("Resting HR", s.avgRhr != null ? (s.avgRhr + " bpm") : "—"));
+        card.appendChild(grid);
+        var pat = document.createElement("div"); pat.className = "b-block b-pat";
+        var pb = document.createElement("b"); pb.textContent = "Personal patterns"; pat.appendChild(pb);
+        if (s.patterns.length) {
+          var ul = document.createElement("ul"); ul.className = "b-obs";
+          s.patterns.forEach(function (p) { var li = document.createElement("li"); li.textContent = p; ul.appendChild(li); });
+          pat.appendChild(ul);
+        } else {
+          pat.appendChild(document.createTextNode(s.days < 3
+            ? "Patterns need about 3 days before I'll call them out — I won't guess before then."
+            : "Nothing jumps out as a strong pattern across these days — that's fine, steady is a pattern too."));
+        }
+        card.appendChild(pat);
+        add(card, "p", "b-note", "Kept in your browser only — never uploaded or stored. Batch-uploaded screenshots are assumed one per day, most recent first.");
+        var meta = document.createElement("div"); meta.className = "b-meta";
+        var forget = document.createElement("button"); forget.className = "b-why"; forget.textContent = "Forget my baseline";
+        forget.addEventListener("click", function () { baseline = []; save(KEY_B, baseline); card.remove(); bubble("bot", "Cleared — your baseline's a blank slate again.", "hello"); });
+        meta.appendChild(forget); card.appendChild(meta);
+        feed.appendChild(card); feed.scrollTop = feed.scrollHeight;
+      }
+
+      /* Grounded follow-up — reuses the brief's extracted numbers so Ori keeps
+         talking about the same morning. */
+      function askBrief(text) {
+        if (pending || !text) return;
+        input.value = "";
+        bubble("user", text);
+        pending = true; send.disabled = true;
+        var wait = pendingLine("Ori is thinking…");
+        fetch(API + "/api/ask-ori", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ wearable: activeBrief.wearable, metrics: activeBrief.metrics, userQuestion: text, baseline: currentBaseline() }),
+        }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (res) {
+            wait.remove();
+            bubble("bot", (res.ok && res.j.answer) ? res.j.answer : "That one didn't get through — try asking again in a moment.", (res.ok && res.j.answer) ? null : "err");
+          })
+          .catch(function () { wait.remove(); bubble("bot", "No connection just now — your question is still here, try again in a moment.", "err"); })
+          .finally(function () { pending = false; send.disabled = false; input.focus(); });
+      }
+
+      function ask() {
+        var text = input.value.trim();
+        if (activeBrief) return askBrief(text); // grounded in the current brief
+        sendMsg(text, null);                    // otherwise the persona chat
+      }
 
       /* 📷 — downscale in-browser so a 12MP phone shot becomes a ~100KB JPEG
-         before it ever leaves the device */
+         before it ever leaves the device. One file → Morning Brief; several →
+         extract-only baseline build (no per-shot reasoning call). */
       var shotBtn = document.getElementById("shotBtn"), shotFile = document.getElementById("shotFile");
       shotBtn.addEventListener("click", function () { if (!pending) shotFile.click(); });
-      shotFile.addEventListener("change", function () {
-        var f = shotFile.files && shotFile.files[0];
-        shotFile.value = "";
-        if (!f || !/^image\//.test(f.type)) return;
-        var url = URL.createObjectURL(f), img = new Image();
+      function downscale(file, cb) {
+        var url = URL.createObjectURL(file), img = new Image();
         img.onload = function () {
           var max = 1280, s = Math.min(1, max / Math.max(img.width, img.height));
           var c = document.createElement("canvas");
           c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
           c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-          URL.revokeObjectURL(url);
-          sendMsg(input.value.trim(), c.toDataURL("image/jpeg", 0.85));
+          URL.revokeObjectURL(url); cb(c.toDataURL("image/jpeg", 0.85));
         };
-        img.onerror = function () {
-          URL.revokeObjectURL(url);
-          bubble("bot", "That file didn't open as an image — try a plain screenshot (PNG or JPG).", "err");
-        };
+        img.onerror = function () { URL.revokeObjectURL(url); cb(null); };
         img.src = url;
+      }
+      shotFile.addEventListener("change", function () {
+        var files = shotFile.files ? Array.prototype.slice.call(shotFile.files) : [];
+        shotFile.value = "";
+        files = files.filter(function (f) { return f && /^image\//.test(f.type); });
+        if (!files.length) return;
+        if (files.length === 1) {
+          downscale(files[0], function (u) {
+            if (u) getBrief(u);
+            else bubble("bot", "That file didn't open as an image — try a plain screenshot (PNG or JPG).", "err");
+          });
+          return;
+        }
+        ingestMany(files);
       });
+
+      /* Several screenshots at once → read each with the extract-only path and
+         fold the metrics into the baseline. Sequential (respects the endpoint's
+         rate limit); assumes one shot per day, most recent first, and says so. */
+      function ingestMany(files) {
+        if (pending) return;
+        files = files.slice(0, BASELINE_DAYS); // 7 days is the whole window
+        pending = true; send.disabled = true;
+        var total = files.length, added = 0, failed = 0, i = 0;
+        bubble("user", "(shared " + total + " screenshots to build my baseline)");
+        var wait = pendingLine("Ori is reading " + total + " screenshots…");
+        function finish() {
+          wait.remove(); pending = false; send.disabled = false; input.focus();
+          bubble("bot", added
+            ? ("Read " + added + " of " + total + (failed ? (" — " + failed + " I couldn't make out") : "") + ". I lined them up newest-first, one per day. Here's the baseline they build:")
+            : "I couldn't read numbers from those — try clearer shots of your recovery, readiness or sleep screens.", added ? "hello" : "err");
+          if (added) renderBaseline();
+        }
+        function next() {
+          if (i >= files.length) return finish();
+          var idx = i++; // 0 = today, 1 = yesterday, …
+          downscale(files[idx], function (u) {
+            if (!u) { failed++; return next(); }
+            fetch(API + "/api/ask-ori", {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ image: u, extractOnly: true }),
+            }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+              .then(function (res) {
+                if (res.ok && res.j && res.j.metrics) { recordBaseline(res.j.wearable, res.j.metrics, dayStr(idx)); added++; }
+                else failed++;
+              })
+              .catch(function () { failed++; })
+              .finally(function () { next(); });
+          });
+        }
+        next();
+      }
 
       /* 🎤 — browser speech recognition fills the box; you still hit Send,
          so a botched transcription never fires on its own */
@@ -303,11 +621,12 @@
           paint(); input.focus();
         });
       });
+      baseBtn.addEventListener("click", function () { if (persona) renderBaseline(); });
       document.getElementById("personaBtn").addEventListener("click", function () {
-        persona = null; pick.hidden = false; feed.hidden = true; bar.hidden = true;
+        persona = null; pick.hidden = false; feed.hidden = true; bar.hidden = true; baseBtn.hidden = true;
       });
       document.getElementById("clearBtn").addEventListener("click", function () {
-        chat = []; save(KEY_C, chat); paint();
+        chat = []; save(KEY_C, chat); activeBrief = null; paint();
       });
       send.addEventListener("click", ask);
       input.addEventListener("keydown", function (e) {
