@@ -416,20 +416,8 @@
        by TALLY_FORM_ID in the script. */
     .tally-wrap { max-width:460px; margin:30px auto 0; min-height:148px; }
     .join-open { display:inline-flex; margin:26px auto 0; }
-    /* ---- builder strip (#builder · Hypothesis B: data-sovereignty ICP) ---- */
-    #builder .wrap { text-align:center; max-width:760px; }
-    .pain-lines { margin:26px auto 0; max-width:48ch; display:flex; flex-direction:column; gap:11px; text-align:left; }
-    .pain-lines p { font-family:var(--font-mono); font-size:13px; line-height:1.65; color:var(--ash); padding-left:16px; border-left:1px solid var(--hairline); }
-    .pain-lines p:first-child { color:var(--bone); border-left-color:var(--jade-deep); }
-    .builder-essay { display:inline-block; margin-top:22px; font-family:var(--font-mono); font-size:12px; letter-spacing:.02em; color:var(--jade); border-bottom:1px solid rgba(127,183,158,.35); padding-bottom:2px; transition:color .3s, border-color .3s; }
-    .builder-essay:hover { color:var(--bone); border-color:var(--bone); }
-    .builder-form { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:26px; }
-    .builder-form input, .builder-form select { background:rgba(var(--wash),.03); border:1px solid var(--hairline); border-radius:10px; padding:12px 14px; color:var(--bone); font-family:var(--font-mono); font-size:12px; min-width:0; appearance:auto; }
-    .builder-form input:focus, .builder-form select:focus { outline:none; border-color:var(--jade-deep); }
-    .builder-form select:invalid { color:var(--ash); }
-    .builder-form #builderEmail { width:200px; }
-    .builder-form #builderBreaks { width:330px; }
-    @media (max-width:560px){ .builder-form input, .builder-form select, .builder-form .btn { width:100% !important; } }
+    /* builder strip moved to builds.html; one quiet pointer remains here */
+    .builder-pointer { text-align:center; padding:18px 20px 6px; }
     .tally-embed { width:100%; border:0; display:block; }
     .tally-fallback { padding:24px 20px; text-align:center; font-family:var(--font-mono); font-size:12px; line-height:1.8; color:var(--ash); }
     .tally-fallback code { color:var(--jade); }
@@ -1944,40 +1932,13 @@
 </section>
 
 <!-- ACT 6 — DAWN / CTA -->
-<!-- ACT 6.5 — THE PRIVATE-LANGUAGE PROBLEM · Hypothesis B (builder/sovereignty ICP)
-     Panel-agreed (dawn+sable+vera): single builder CTA, capture under source
-     "builder_waitlist", placed BELOW #reads so the social funnel above stays
-     an unbiased test. The essay lives as a #reads card; the strip's one link
-     is builds.html. Export copy stays roadmap-honest. -->
-<section class="act" id="builder">
-  <div class="wrap reveal">
-    <span class="eyebrow">The private-language problem</span>
-    <h2 class="display display-l" style="margin-top:14px;">Six apps, one body —<br>and not one of them agrees.</h2>
-    <!-- v2 ladder, focused (founder feedback: "too much going on"): one line per
-         ICP mood — confusion → build → lapse. One grievance per row, air between rows.
-         Panel-reviewed 2026-07-09: concrete Oura/Whoop contrast folded into line 1;
-         pain select KEPT (vera: recipe demand lives in builds.html — index measures pain). -->
-    <div class="pain-lines">
-      <p>Oura says 82. Whoop says 61. A year on your finger and you still can't say eighty-two what.</p>
-      <p>You just want the number to mean something — not to babysit six apps or stitch exports together to get one straight answer.</p>
-      <p>The subscription was a gift — bank points, HR's wellness budget, a friend. When it lapses, the paywall is around your own history.</p>
-    </div>
-    <a class="builder-essay" id="builderBuilds" href="builds.html">Vote what gets built first — the recipe board →</a>
-    <form class="builder-form" id="builderForm">
-      <input type="email" required placeholder="you@yourco.com" id="builderEmail" aria-label="Email">
-      <!-- required enumerated intent (Vera): three pains feed one CTA, so the mood
-           must ride into the Tally label or the builder signal is uncountable -->
-      <select required id="builderBreaks" aria-label="What is the actual pain">
-        <option value="" disabled selected>what's the actual pain?</option>
-        <option value="opaque_number">the number doesn't mean anything to me</option>
-        <option value="build_query">I want to build on / do more with the data I already collect</option>
-        <option value="lapsed_sub">my free subscription lapses — history's paywalled</option>
-      </select>
-      <button class="btn btn-primary" type="submit">Put me on the export list →</button>
-    </form>
-    <p class="form-note" style="max-width:54ch;margin-left:auto;margin-right:auto;">The normalized export — one schema, yours — is on the roadmap, not shipped yet. This list is first in line when the endpoint goes live, and the highest-voted recipe on the board gets built first.</p>
-  </div>
-</section>
+<!-- The private-language problem + builder / data-sovereignty hypothesis (Hyp. B)
+     now lives in full on builds.html — the poem, the recipe-board vote, and the
+     builder_waitlist capture. The landing keeps one quiet pointer so the primary
+     funnel stays focused on Ori + the board (moved 2026-08-08, founder call). -->
+<div class="builder-pointer reveal">
+  <a class="reads-all" href="builds.html">Building on the data you already collect? See what a readable export unlocks →</a>
+</div>
 
 <section class="act dawn" id="join">
   <canvas id="dustCanvas" class="dust-canvas" aria-hidden="true"></canvas>
@@ -2224,26 +2185,8 @@
       if (inp) window.oriyaLogEmail(inp.value, "substack", { from: "index_reads" });
     });
   })();
-  // Builder strip (Hypothesis B): capture on explicit submit only; the "what
-  // breaks" text is the costly signal and rides into the Tally source label.
-  (function () {
-    var f = document.getElementById("builderForm");
-    if (!f) return;
-    var sec = document.getElementById("builder");
-    if (sec) new IntersectionObserver(function (es, ob) {
-      es.forEach(function (e) { if (e.isIntersecting) { window.oriyaTrack("builder_strip_view"); ob.disconnect(); } });
-    }, { threshold: 0.35 }).observe(sec);
-    var builds = document.getElementById("builderBuilds");
-    if (builds) builds.addEventListener("click", function () { window.oriyaTrack("builder_builds_click"); });
-    f.addEventListener("submit", function (ev) {
-      ev.preventDefault();
-      var em = document.getElementById("builderEmail").value;
-      var br = (document.getElementById("builderBreaks").value || "").trim();
-      var ok = window.oriyaLogEmail(em, "builder_waitlist", br ? { breaks: br } : null);
-      if (!ok) return;
-      f.innerHTML = '<p class="form-note" style="margin:0">On the list ✓ — reply to any email with what you&rsquo;d build; that&rsquo;s what we build first.</p>';
-    });
-  })();
+  // Builder strip (Hypothesis B) moved to builds.html — the recipe-board vote
+  // there owns the builder_waitlist capture; the landing keeps one quiet link.
   // Theme toggle — boot script in <head> already set data-theme pre-paint.
   (function () {
     var btn = document.getElementById("themeToggle");
@@ -2262,7 +2205,7 @@
       window.oriyaTrack("theme_toggled", { theme: next });
     });
   })();
-  // join_view impression — denominator for the social capture (mirrors builder_strip_view).
+  // join_view impression — denominator for the social capture.
   (function () {
     var j = document.getElementById("join");
     if (!j) return;
