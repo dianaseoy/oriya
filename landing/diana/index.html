@@ -441,7 +441,7 @@
       <div id="ledger"><!-- rendered from essays.js --></div>
 
       <!-- ===== WORK / TRUST ===== -->
-      <section class="work">
+      <section class="work" id="work">
         <div class="main-title">Work &amp; track record</div>
         <div class="work-grid">
           <div class="card span">
@@ -482,7 +482,7 @@
       </section>
 
       <!-- reach-out coda — quiet, own voice; problems she reaches for, not a service menu -->
-      <section class="reach">
+      <section class="reach" id="reach">
         <p>AI is making the product itself easy to copy. What it can't copy is distribution, trust, and a growth loop that compounds — the part I've spent my career on, in the hard version of fintech and web3 and now in AI. These days I take on a couple of fractional growth engagements at a time, and back the startups I believe in — sometimes with a check, always with the work: the loop that hasn't clicked, the developer tool individuals love but enterprises won't yet buy, the market your team can't reach, the inference bill outrunning the product. My edge is the growth most advisors can't do — cross-border, into the markets where the next users actually are. If you're teaching yourself into tech, that conversation's free — those I answer first.</p>
         <a class="reach-link" href="mailto:diana@oriya.app">my inbox is open <span>↗</span></a>
       </section>
@@ -812,6 +812,90 @@
 
     /* ---- page in ---- */
     requestAnimationFrame(function(){ document.getElementById("page").classList.add("in"); });
+  })();
+  </script>
+
+  <!-- FLOATING DOCK — quiet wayfinding once you're into the ledger; macOS-dock magnify, house skin -->
+  <nav class="dk" id="dk" aria-label="Jump to a section">
+    <style>
+      .dk{ position:fixed; left:50%; bottom:22px; transform:translateX(-50%); z-index:70;
+        display:flex; align-items:flex-end; gap:5px; padding:7px 10px; border-radius:18px;
+        border:1px solid var(--line); background:color-mix(in srgb, var(--panel) 84%, transparent);
+        backdrop-filter:blur(14px) saturate(1.05); -webkit-backdrop-filter:blur(14px) saturate(1.05);
+        box-shadow:0 14px 40px -16px rgba(28,27,25,.32), 0 1px 0 rgba(255,255,255,.6) inset;
+        opacity:0; translate:0 14px; pointer-events:none;
+        transition:opacity .45s var(--ease), translate .45s var(--ease); }
+      .dk.in{ opacity:1; translate:0 0; pointer-events:auto; }
+      .dk-i{ position:relative; width:42px; height:42px; border-radius:12px; display:grid; place-items:center;
+        color:var(--text-2); text-decoration:none; font-size:18px; line-height:1; cursor:pointer;
+        background:transparent; border:1px solid transparent; padding:0; font-family:var(--serif);
+        transition:transform .22s var(--spring), color .22s var(--ease), background .22s var(--ease), border-color .22s var(--ease); }
+      .dk-i svg{ width:21px; height:21px; display:block; overflow:visible; }
+      .dk-i:hover, .dk-i:focus-visible{ transform:translateY(-9px) scale(1.26); color:var(--accent);
+        background:var(--accent-dim); border-color:var(--accent-line); outline:none; }
+      .dk-i:hover + .dk-i, .dk-i:has(+ .dk-i:hover){ transform:translateY(-3px) scale(1.09); }
+      .dk-i.on{ color:var(--accent); }
+      .dk-i.on::after{ content:""; position:absolute; bottom:4px; left:50%; transform:translateX(-50%);
+        width:4px; height:4px; border-radius:50%; background:var(--accent); }
+      .dk-tip{ position:absolute; bottom:calc(100% + 11px); left:50%; transform:translateX(-50%) translateY(4px);
+        white-space:nowrap; padding:5px 9px; border-radius:8px; background:var(--text); border:1px solid var(--text);
+        font-family:var(--sans); font-size:11.5px; letter-spacing:.01em; color:var(--bg); opacity:0; pointer-events:none;
+        transition:opacity .18s var(--ease), transform .18s var(--ease); }
+      .dk-i:hover .dk-tip, .dk-i:focus-visible .dk-tip{ opacity:1; transform:translateX(-50%) translateY(0); }
+      @media (max-width:560px){ .dk{ gap:2px; padding:6px 8px; } .dk-i{ width:38px; height:38px; font-size:16px; } .dk-i svg{ width:19px; height:19px; } }
+      @media (prefers-reduced-motion:reduce){ .dk, .dk-i{ transition:opacity .2s; } .dk-i:hover, .dk-i:focus-visible{ transform:none; } }
+    </style>
+    <button class="dk-i" type="button" data-cmd aria-label="Search every essay">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.2"/><path d="M15.2 15.2 20 20"/></svg>
+      <span class="dk-tip">Search the ledger</span></button>
+    <a class="dk-i" href="#series" data-sec="series">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.4 20.5 8 12 12.6 3.5 8 12 3.4Z"/><path d="M3.5 12 12 16.6 20.5 12"/><path d="M3.5 16 12 20.6 20.5 16"/></svg>
+      <span class="dk-tip">The Control Plane series</span></a>
+    <a class="dk-i" href="#ledger" data-sec="ledger">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9L18.5 7v13.5H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z"/><path d="M14.5 3.5V7h3.8"/><path d="M8 11.5h7M8 15h7M8 18h4"/></svg>
+      <span class="dk-tip">All essays</span></a>
+    <a class="dk-i" href="#work" data-sec="work">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><path d="m4.5 15 4.3-4.4 3 2.4L20 5.5"/><path d="M15.5 5.5H20v4.4"/></svg>
+      <span class="dk-tip">Work &amp; track record</span></a>
+    <a class="dk-i" href="#reach" data-sec="reach">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 4 3.6 10.6a.55.55 0 0 0 .04 1.03l6.4 2.1 2.3 6.3a.55.55 0 0 0 1.02.05L20.5 4Z"/><path d="M20.5 4 10.04 13.73"/></svg>
+      <span class="dk-tip">Reach out</span></a>
+  </nav>
+  <script>
+  (function(){
+    var dk = document.getElementById("dk"); if(!dk) return;
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // reveal once the reader is into the ledger; tuck away near the very top
+    function onScroll(){ dk.classList.toggle("in", window.scrollY > 320); }
+    window.addEventListener("scroll", onScroll, { passive:true }); onScroll();
+
+    // search item reuses the existing command palette (decoupled from its IIFE)
+    var cmdBtn = dk.querySelector("[data-cmd]");
+    if(cmdBtn) cmdBtn.addEventListener("click", function(){ var c=document.getElementById("kbdChip"); if(c) c.click(); });
+
+    // smooth-scroll the section links (reduced-motion → instant)
+    dk.querySelectorAll("a[href^='#']").forEach(function(a){
+      a.addEventListener("click", function(e){
+        var t = document.querySelector(a.getAttribute("href"));
+        if(t){ e.preventDefault(); t.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" }); }
+      });
+    });
+
+    // active-section indicator — the dot follows what you're reading
+    var links = Array.prototype.slice.call(dk.querySelectorAll("a[data-sec]"));
+    var byId = {}; links.forEach(function(a){ byId[a.getAttribute("data-sec")] = a; });
+    var targets = links.map(function(a){ return document.getElementById(a.getAttribute("data-sec")); }).filter(Boolean);
+    if(targets.length && "IntersectionObserver" in window){
+      var visible = {};
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(en){ visible[en.target.id] = en.isIntersecting ? en.intersectionRatio : 0; });
+        var best=null, top=0;
+        Object.keys(visible).forEach(function(id){ if(visible[id] > top){ top=visible[id]; best=id; } });
+        links.forEach(function(a){ a.classList.toggle("on", a.getAttribute("data-sec")===best); });
+      }, { rootMargin:"-20% 0px -55% 0px", threshold:[0,.15,.4,.75] });
+      targets.forEach(function(t){ io.observe(t); });
+    }
   })();
   </script>
 </body>
