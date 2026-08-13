@@ -620,6 +620,32 @@
       transition:opacity 1s var(--circadian), transform 1s var(--circadian), filter 1s var(--circadian); will-change:transform,opacity,filter; }
     .reveal.awake { opacity:1; transform:none; filter:blur(0); }
 
+    /* ------------------------------------------------------------
+       CASCADE — stream a stacked text cluster's children in one at a
+       time so a dense block reads as guided rhythm, not a wall. This
+       is what keeps the phone from feeling text-heavy. Opt-in via
+       .cascade; JS assigns --i per child and adds .casc-go on wake.
+       A cascade cluster carries its own motion, so its parent .reveal
+       drops the block translate/blur (children do the moving).
+       ------------------------------------------------------------ */
+    html.js .reveal.cascade { transform:none; filter:none; }
+    html.js .cascade > *:not([data-still]) { opacity:0; transform:translateY(22px); will-change:transform,opacity; }
+    html.js .cascade.casc-go > *:not([data-still]) {
+      animation:cascadeUp 0.72s var(--circadian) both;
+      animation-delay:calc(var(--i, 0) * 80ms);
+    }
+    @keyframes cascadeUp { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:none; } }
+    /* mobile: a touch more travel + a longer beat between items, so the phone
+       actively walks the eye down the section instead of dropping text at once */
+    @media (max-width:640px) {
+      html.js .cascade > *:not([data-still]) { transform:translateY(28px); }
+      html.js .cascade.casc-go > *:not([data-still]) { animation-duration:0.64s; animation-delay:calc(var(--i, 0) * 108ms); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.js .cascade > *:not([data-still]),
+      html.js .cascade.casc-go > *:not([data-still]) { opacity:1 !important; transform:none !important; animation:none !important; }
+    }
+
     /* ============================================================
        REFERRAL CONFIRM MODAL  (preserved)
        ============================================================ */
@@ -1537,7 +1563,7 @@
     .board-legend .dot { width:11px; height:11px; border-radius:50%; box-shadow:0 0 9px 1px currentColor; }
     @media (max-width:640px){ .tl-step { padding-left:50px; } }
   </style>
-  <div class="wrap reveal">
+  <div class="wrap reveal cascade">
     <span class="eyebrow">One morning, done for you</span>
     <h2 id="journey-h">Ori ran four tools before your coffee was cold.</h2>
     <p class="journey-lede">This is how you get the most out of Oriya: you hand it <b>one screenshot</b>. Ori reads it, drafts your day, shows where you stand in colour, and lines up your squad — and it shows its work, every step.</p>
@@ -1600,7 +1626,7 @@
 <!-- ACT 1.5 — HOW IT WORKS (3-step product flow) -->
 <section class="act" id="how">
   <div class="wrap reveal">
-    <div class="act-head" style="margin:0 auto; text-align:center;">
+    <div class="act-head cascade" style="margin:0 auto; text-align:center;">
       <span class="eyebrow">How it works · about a minute</span>
       <h2 class="display display-l">From screenshot<br>to leaderboard.</h2>
       <p class="lede" style="margin:18px auto 0;">No new hardware. No manual entry. Drop the recovery screen you already get every morning — or sync the device directly. Oriya reads it, scores it against your own baseline, and puts you on a board with people on every other device.</p>
@@ -1775,7 +1801,7 @@
 <!-- ACT 2 — THE BIOMETRIC HANDICAP -->
 <section class="act" id="handicap">
   <div class="wrap reveal">
-    <div class="act-head" style="margin:0 auto; text-align:center;">
+    <div class="act-head cascade" style="margin:0 auto; text-align:center;">
       <span class="eyebrow">How Ori reads you</span>
       <h2 class="display display-l">Whatever you wear, one number —<br>scored against your own line.</h2>
       <p class="lede" style="margin:16px auto 0; max-width:56ch;">Ori learns your baseline from the one thing you wear, then tells you where today lands — par, above, or under. One scale for every brand means you and friends on different devices share a board; switch brands and your par follows you. Here's <a href="#science" style="color:var(--jade);">the science</a>.</p>
@@ -1856,7 +1882,7 @@
 <!-- ACT 2.7 — THE SCIENCE (credibility behind the number) -->
 <section class="act" id="science">
   <div class="wrap reveal">
-    <div class="act-head" style="margin:0 auto; text-align:center;">
+    <div class="act-head cascade" style="margin:0 auto; text-align:center;">
       <span class="eyebrow">The science · grounded in research</span>
       <h2 class="display display-l">A number you can<br>actually trust.</h2>
       <p class="lede" style="margin:18px auto 0;">Comparing a Whoop score to an Oura score directly is like mixing Celsius and Fahrenheit — and no one can honestly convert one into the other. So Oriya doesn't. Every device lands on one scale, then you're ranked against your own 90-day baseline — your par.</p>
@@ -1907,7 +1933,7 @@
 <!-- ACT 5 — THE LONG GAME (Substack) -->
 <section class="act reads" id="reads">
   <div class="wrap reveal">
-    <div class="act-head reads-head">
+    <div class="act-head reads-head cascade">
       <span class="eyebrow">The Long Game · our newsletter</span>
       <h2 class="display display-l">The thinking<br>behind the score.</h2>
       <p class="lede">One essay a week on wearables, recovery, and the psychology of the morning number.</p>
@@ -2285,8 +2311,23 @@
 
   /* ========== Scroll "wake into focus" ========== */
   (function () {
+    // Pre-assign stagger indices to each cascade cluster's animatable children
+    // (skip inert nodes and opted-out .[data-still] like the breathing orb).
+    document.querySelectorAll(".cascade").forEach((c) => {
+      let i = 0;
+      Array.prototype.forEach.call(c.children, (ch) => {
+        if (ch.hasAttribute("data-still") || ch.tagName === "STYLE" || ch.tagName === "SCRIPT") return;
+        ch.style.setProperty("--i", i++);
+      });
+    });
+    const wake = (el) => {
+      el.classList.add("awake");
+      const casc = el.matches(".cascade") ? [el] : [];
+      Array.prototype.push.apply(casc, el.querySelectorAll(".cascade"));
+      casc.forEach((c) => c.classList.add("casc-go"));
+    };
     const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("awake"); io.unobserve(e.target); } });
+      entries.forEach((e) => { if (e.isIntersecting) { wake(e.target); io.unobserve(e.target); } });
     }, { threshold: 0.12, rootMargin: "0px 0px -10% 0px" });
     document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
     // hero line-mask trigger
