@@ -166,8 +166,32 @@
      painting var(--bg) (#0B0C0E) across the whole window and the Tauri shell reads
      as a solid black box instead of showing only the orb. */
   html.pet, body.pet, body.pet #stage { background: transparent !important; }
-  body.pet .bar, body.pet .note, body.pet .hint, body.pet .chip,
-  body.pet .teach, body.pet #teachTab { display: none !important; }
+  body.pet .bar, body.pet .note, body.pet .hint, body.pet .chip { display: none !important; }
+  /* In the pet, the chat lives on too (local, on-device via Ollama). The desktop-download
+     seam is meaningless there — you're already on the desktop — so only it is hidden. */
+  body.pet .t-dl { display: none !important; }
+  body.pet .teach {
+    top: 8px; right: 8px; left: 8px; bottom: 8px; width: auto;
+    max-height: none; height: auto;
+  }
+  /* In the pet the chat launcher is a small ICON inside the orb's click-catching circle
+     (a wide pill's corners fall outside the 0.42 hit-radius and wouldn't be clickable). */
+  body.pet #teachTab {
+    top: 24%; left: 27%; right: auto; bottom: auto;
+    width: 30px; height: 30px; padding: 0; gap: 0; border-radius: 50%;
+    justify-content: center; font-size: 15px;
+  }
+  body.pet #teachTab .tt-label, body.pet #teachTab .t-dot { display: none; }
+  /* Ori's two in-circle controls (gear + chat) stay hidden until you're interacting with
+     Ori, then fade in — "appear when the mouse comes close". Revealed via body.ctrl-show,
+     which the render loop sets whenever there's recent pointer activity over the orb. */
+  body.pet #osetGear, body.pet #teachTab.on {
+    opacity: 0; pointer-events: none;
+    transition: opacity 260ms ease, transform 160ms ease, border-color 160ms ease, color 160ms ease;
+  }
+  body.pet.ctrl-show #osetGear, body.pet.ctrl-show #teachTab.on {
+    opacity: 1; pointer-events: auto;
+  }
   body.pet #stage { cursor: default; }
 
   #fallback {
@@ -221,17 +245,40 @@
   }
   .teach-head b { font-size: 13.5px; color: var(--text); font-weight: 600; }
   .teach-head .t-tag { font-size: 10.5px; color: var(--dim); letter-spacing: 0.02em; }
+  .teach-head .t-mode {
+    margin-left: auto; flex: none; font: inherit; font-size: 10.5px; cursor: pointer;
+    color: var(--dim); background: #181A1F; border: 1px solid var(--line);
+    border-radius: 999px; padding: 4px 9px; white-space: nowrap;
+    transition: color 160ms ease, border-color 160ms ease;
+  }
+  .teach-head .t-mode:hover { color: var(--text); border-color: #3a3d45; }
+  .teach-head .t-mode.local { color: var(--accent); border-color: rgba(127,183,158,0.42); }
   .teach-head .t-min {
-    margin-left: auto; flex: none; width: 26px; height: 26px; padding: 0;
+    margin-left: 6px; flex: none; width: 26px; height: 26px; padding: 0;
     background: transparent; border: 1px solid var(--line); border-radius: 8px;
     color: var(--dim); font-size: 15px; line-height: 1; cursor: pointer;
     transition: color 160ms ease, border-color 160ms ease;
   }
   .teach-head .t-min:hover { color: var(--text); border-color: #3a3d45; }
+  /* per-message source tag (local / cloud) under a bot reply */
+  .tmsg .t-src { display: block; margin-top: 5px; font-size: 9.5px; letter-spacing: 0.04em;
+    text-transform: uppercase; color: var(--dim); opacity: 0.75; }
+  .tmsg.local-src { border-color: rgba(127,183,158,0.4); }
+  /* onboarding note when on-device is picked but no local model is reachable */
+  .t-ob { flex: none; margin: 0 13px 8px; padding: 9px 11px; border-radius: 10px;
+    background: rgba(215,162,92,0.07); border: 1px solid rgba(215,162,92,0.3);
+    font-size: 11.5px; line-height: 1.5; color: var(--dim); }
+  .t-ob b { color: var(--text); font-weight: 600; }
+  .t-ob code { font-family: ui-monospace, Menlo, monospace; font-size: 11px;
+    background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; color: var(--text); }
+  .t-ob.hide { display: none; }
   .tfeed {
     flex: 1 1 auto; overflow-y: auto; padding: 13px 13px 4px;
     display: flex; flex-direction: column; gap: 8px;
+    overscroll-behavior: contain; -webkit-overflow-scrolling: touch; scroll-behavior: smooth;
   }
+  /* image dragged over the chat → highlight the drop target */
+  .teach.drag-over { outline: 2px dashed var(--accent); outline-offset: -6px; }
   .tmsg {
     max-width: 90%; border-radius: 13px; padding: 9px 12px;
     font-size: 13px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: break-word;
@@ -304,6 +351,97 @@
       max-height: 54vh; }
     #teachTab { top: auto; bottom: 100px; right: 12px; }
   }
+
+  /* ---------- settings: shape + colour (BOTH modes; reachable in the pet too) ----------
+     The gear opens a compact card to switch Ori's look (skin) and colour theme and to pin
+     it in place. In the Tauri pet the gear sits INSIDE the orb's click-catching circle (the
+     aspect is locked, so a %-based offset always lands inside it); opening the panel asks
+     Rust to make the whole window interactive so every control is clickable. */
+  #osetGear {
+    position: fixed; left: 18px; bottom: 22px; z-index: 6;
+    width: 38px; height: 38px; border-radius: 50%; cursor: pointer;
+    display: grid; place-items: center; font-size: 17px; line-height: 1;
+    background: rgba(20,22,26,0.9); border: 1px solid var(--line); color: var(--dim);
+    box-shadow: 0 12px 32px -16px rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+    transition: border-color 160ms ease, color 160ms ease, opacity 200ms ease, transform 160ms ease;
+  }
+  #osetGear:hover { border-color: #3a3d45; color: var(--text); transform: rotate(35deg); }
+  body.pet #osetGear {
+    left: auto; bottom: auto; top: 24%; right: 27%;   /* inside the locked-aspect hit circle */
+    width: 30px; height: 30px; font-size: 14px;       /* opacity handled by the ctrl-show reveal above */
+    background: rgba(16,17,20,0.82);
+  }
+
+  #oset {
+    position: fixed; left: 18px; bottom: 70px; z-index: 7; width: 244px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 15px;
+    box-shadow: 0 22px 60px -22px rgba(0,0,0,0.9);
+    max-height: min(82vh, 560px); overflow-y: auto; overscroll-behavior: contain;
+    transition: opacity 220ms ease, transform 240ms cubic-bezier(0.22,1,0.36,1.25);
+  }
+  body.pet #oset { left: 50%; bottom: auto; top: 50%; transform: translate(-50%,-50%); width: 236px; }
+  #oset.closed { opacity: 0; transform: translateY(8px) scale(0.97); pointer-events: none; }
+  body.pet #oset.closed { transform: translate(-50%,-46%) scale(0.97); }
+  .oset-head {
+    display: flex; align-items: center; gap: 8px; padding: 12px 14px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .oset-head b { font-size: 13px; color: var(--text); font-weight: 600; flex: 1; }
+  .oset-head .o-x {
+    border: 1px solid var(--line); background: transparent; color: var(--dim);
+    width: 24px; height: 24px; border-radius: 7px; cursor: pointer; font-size: 15px; line-height: 1;
+  }
+  .oset-head .o-x:hover { color: var(--text); border-color: #3a3d45; }
+  .oset-sec { padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  .oset-sec:last-of-type { border-bottom: none; }
+  .oset-lbl { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); margin-bottom: 9px; }
+  .oset-row { display: flex; gap: 7px; }
+  .o-shape {
+    flex: 1; font: inherit; font-size: 12px; color: var(--dim); cursor: pointer;
+    background: #181A1F; border: 1px solid var(--line); border-radius: 9px; padding: 8px 4px;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    transition: border-color 140ms ease, color 140ms ease, background 140ms ease;
+  }
+  .o-shape .glyph { font-size: 16px; line-height: 1; }
+  .o-shape:hover { color: var(--text); border-color: #3a3d45; }
+  .o-shape.sel { color: var(--text); border-color: var(--accent); background: rgba(127,183,158,0.10); }
+  .o-swatch {
+    flex: 1; height: 34px; border-radius: 9px; cursor: pointer; position: relative;
+    border: 1px solid var(--line); transition: transform 140ms ease, box-shadow 140ms ease;
+  }
+  .o-swatch:hover { transform: translateY(-1px); }
+  .o-swatch.sel { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--accent); }
+  .o-swatch[data-theme="jade"]  { background: linear-gradient(135deg,#9BD3B8,#7FB79E 55%,#6F8AA6); }
+  .o-swatch[data-theme="amber"] { background: linear-gradient(135deg,#F6DCA0,#E6B569 55%,#8A6A4A); }
+  .o-swatch[data-theme="dusk"]  { background: linear-gradient(135deg,#B8E6D6,#8FBAC4 55%,#5B6B8C); }
+  .oset-pin { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .oset-pin .pin-txt { font-size: 12.5px; color: var(--text); }
+  .oset-pin .pin-txt small { display: block; font-size: 10.5px; color: var(--dim); margin-top: 2px; }
+  .o-toggle {
+    flex: none; width: 42px; height: 24px; border-radius: 999px; cursor: pointer; position: relative;
+    background: #181A1F; border: 1px solid var(--line); transition: background 160ms ease, border-color 160ms ease;
+  }
+  .o-toggle::after {
+    content: ""; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--dim); transition: transform 160ms cubic-bezier(0.22,1,0.36,1.25), background 160ms ease;
+  }
+  .o-toggle.on { background: rgba(127,183,158,0.16); border-color: var(--accent); }
+  .o-toggle.on::after { transform: translateX(18px); background: var(--accent); }
+  /* focus mode reuses .o-shape; the clock-hand pace is a tiny segmented toggle shown only in motion */
+  .o-seg { display: flex; gap: 6px; margin-top: 9px; }
+  .o-seg button { flex: 1; font: inherit; font-size: 11.5px; color: var(--dim); cursor: pointer;
+    background: #181A1F; border: 1px solid var(--line); border-radius: 8px; padding: 6px 4px;
+    transition: border-color 140ms ease, color 140ms ease; }
+  .o-seg button:hover { color: var(--text); border-color: #3a3d45; }
+  .o-seg button.sel { color: var(--text); border-color: var(--accent); background: rgba(127,183,158,0.10); }
+  .o-seg.hide { display: none; }
+  /* range rows — today's score + presence (opacity) */
+  .oset-range { display: flex; align-items: center; gap: 10px; }
+  .oset-range input[type="range"] { flex: 1; width: auto; min-width: 0; accent-color: var(--accent); }
+  .oset-range .o-num { flex: none; min-width: 40px; text-align: right; font-size: 12.5px;
+    color: var(--text); font-variant-numeric: tabular-nums; }
+  .oset-hint { margin-top: 8px; font-size: 10.5px; color: var(--dim); line-height: 1.45; }
+  .oset-foot { padding: 9px 14px 11px; font-size: 10px; color: #565b64; line-height: 1.5; }
 </style>
 
 <div id="stage"><canvas id="scene"></canvas></div>
@@ -340,14 +478,74 @@
   </div>
 </div>
 
-<!-- Talk to Ori — compact recovery-coach chat (BROWSER-ONLY; hidden in pet mode).
-     Bot replies also drive the orb's speech bubble via window.Ori.say, so the
-     pet feels alive while you chat. The desktop-download seam lives in its footer. -->
+<!-- Settings — shape + colour theme + pin. Shown in BOTH modes (incl. the Tauri pet). -->
+<button id="osetGear" type="button" aria-label="Ori settings" title="Ori settings — look, colour, pin">⚙</button>
+<div id="oset" class="closed" role="dialog" aria-label="Ori settings" aria-hidden="true">
+  <div class="oset-head">
+    <b>Ori</b>
+    <button class="o-x" id="osetClose" type="button" aria-label="Close settings">×</button>
+  </div>
+  <div class="oset-sec">
+    <div class="oset-lbl">Today's recovery</div>
+    <div class="oset-range">
+      <input type="range" id="osetRec" min="0" max="100" step="1" aria-label="Today's recovery score">
+      <span class="o-num" id="osetRecVal">78</span>
+    </div>
+    <p class="oset-hint">Your number, read against your own par — never a raw score against anyone else.</p>
+  </div>
+  <div class="oset-sec">
+    <div class="oset-lbl">Shape</div>
+    <div class="oset-row" id="osetShapes">
+      <button class="o-shape" data-skin="orb" type="button"><span class="glyph" aria-hidden="true">⬤</span>Orb</button>
+      <button class="o-shape" data-skin="fuzzy" type="button"><span class="glyph" aria-hidden="true">✺</span>Fuzzy</button>
+      <button class="o-shape" data-skin="jelly" type="button"><span class="glyph" aria-hidden="true">◍</span>Jelly</button>
+    </div>
+  </div>
+  <div class="oset-sec">
+    <div class="oset-lbl">Colour</div>
+    <div class="oset-row" id="osetThemes">
+      <button class="o-swatch" data-theme="jade" type="button" aria-label="Jade (default)" title="Jade"></button>
+      <button class="o-swatch" data-theme="amber" type="button" aria-label="Amber" title="Amber"></button>
+      <button class="o-swatch" data-theme="dusk" type="button" aria-label="Dusk" title="Dusk"></button>
+    </div>
+  </div>
+  <div class="oset-sec">
+    <div class="oset-lbl">Focus</div>
+    <div class="oset-row" id="osetFocus">
+      <button class="o-shape" data-focus="recovery" type="button"><span class="glyph" aria-hidden="true">◉</span>Recovery</button>
+      <button class="o-shape" data-focus="breathe" type="button"><span class="glyph" aria-hidden="true">〰</span>Breathe</button>
+      <button class="o-shape" data-focus="motion" type="button"><span class="glyph" aria-hidden="true">↻</span>Motion</button>
+    </div>
+    <div class="o-seg hide" id="osetPace">
+      <button data-pace="minute" type="button">Lap a minute</button>
+      <button data-pace="hour" type="button">Lap an hour</button>
+    </div>
+  </div>
+  <div class="oset-sec">
+    <div class="oset-lbl">Presence</div>
+    <div class="oset-range">
+      <input type="range" id="osetOpacity" min="35" max="100" step="1" aria-label="How solid Ori looks">
+      <span class="o-num" id="osetOpacityVal">85%</span>
+    </div>
+    <p class="oset-hint">How solid Ori looks. It softens when you step away and blooms back as your cursor comes near.</p>
+  </div>
+  <div class="oset-sec oset-pin">
+    <span class="pin-txt">Pin in place<small>or double-click Ori</small></span>
+    <button class="o-toggle" id="osetPin" type="button" role="switch" aria-checked="false" aria-label="Pin Ori in place"></button>
+  </div>
+  <p class="oset-foot">Green still means recovered — colour just changes Ori's mood palette, never your read. Saved on this device.</p>
+</div>
+
+<!-- Talk to Ori — compact recovery-coach chat. Lives in the browser AND in the desktop pet.
+     In the pet it can run 100% on-device via a local Ollama model; otherwise it uses the
+     cloud. Bot replies also drive the orb's speech bubble via window.Ori.say. The
+     desktop-download seam lives in its footer (hidden inside the pet). -->
 <div class="teach" id="teach">
   <div class="teach-head">
     <span class="t-dot" aria-hidden="true"></span>
     <b>Talk to Ori</b>
-    <span class="t-tag">your recovery coach · v0.1, early AI</span>
+    <button class="t-mode" id="teachMode" type="button" aria-label="Where Ori thinks"
+            title="Where Ori thinks — on-device (a local Ollama model) or the cloud">☁ Cloud</button>
     <button class="t-min" id="teachMin" type="button" aria-label="Minimise chat" title="Minimise">–</button>
   </div>
   <div class="tfeed" id="tfeed" aria-live="polite"></div>
@@ -357,8 +555,14 @@
     <textarea id="teachInput" rows="1" maxlength="500" placeholder="Tell me your number, or ask me anything…" aria-label="Message Ori"></textarea>
     <button class="tsend" id="teachSend" type="button" aria-label="Send">↑</button>
   </div>
+  <div class="t-ob hide" id="teachOb">
+    <b>You'll always get an answer</b> — Ori runs from the cloud until your own machine is ready.
+    Want it fully local? Install <b>Ollama</b> (ollama.com) and <code>ollama pull llama3.2</code> —
+    Ori picks it up automatically; nothing leaves your device. <small>(Big models like Kimi stay
+    cloud-only — a 3B like Llama 3.2, Qwen 2.5, or Phi runs fine on a laptop.)</small>
+  </div>
   <div class="t-dl" id="teachDl">
-    <p class="t-dl-lead">Want me living on your desktop? Try me — no scrutiny.</p>
+    <p class="t-dl-lead">Want me on your desktop? No dashboard, no leaderboard — just your number, read against your own par. Run me fully on-device: nothing has to leave your machine.</p>
     <div class="t-dl-row" id="teachDlReveal">
       <button class="t-dl-btn" id="teachDlOpen" type="button">Live on your desktop →</button>
     </div>
@@ -369,9 +573,9 @@
     <a class="t-dl-btn t-dl-hide" id="teachDlLink" href="downloads/Ori_0.1.0_aarch64.dmg" download>Download Ori for Mac →</a>
     <p class="t-dl-cav">Apple Silicon · unsigned early build · first open: right-click → Open.</p>
   </div>
-  <p class="teach-foot">Ori nudges, never diagnoses — not medical advice. This chat stays in your browser.</p>
+  <p class="teach-foot">v0.1 · early AI. Ori nudges, never diagnoses — not medical advice. On-device mode keeps chats on your machine; cloud mode sends them to oriya.app to answer.</p>
 </div>
-<button id="teachTab" type="button"><span class="t-dot" aria-hidden="true"></span>💬 Talk to Ori</button>
+<button id="teachTab" type="button"><span class="t-dot" aria-hidden="true"></span><span class="tt-ico" aria-hidden="true">💬</span><span class="tt-label">Talk to Ori</span></button>
 
 <div id="fallback">
   <div>
@@ -520,8 +724,18 @@
   pet.add(faceMesh);
 
   var face = { open: 1, openT: 1, lookX: 0, lookY: 0, happy: 0, sleepy: 0, sleepyT: 0, yawn: 0, think: 0, thinkT: 0, emote: 0, emoteT: 0 };
+  function grin(ms) { face.happy = 1; setTimeout(function () { face.happy = 0; }, ms || 900); }   // brief content-crescents smile
 
+  // The face is a 2D canvas texture re-uploaded to the GPU on change. Redrawing + re-uploading it
+  // every rendered frame is a real battery cost, so we quantize the drivers into a key and skip the
+  // draw+upload on frames where nothing visibly moved (most at-rest frames).
+  var _faceKey = "";
   function drawFace() {
+    var key = (face.open * 16 | 0) + "," + (face.lookX * 24 | 0) + "," + (face.lookY * 24 | 0) + ","
+            + (face.sleepy * 16 | 0) + "," + (face.yawn * 16 | 0) + "," + (face.happy > 0.5 ? 1 : 0) + ","
+            + (face.think > 0.5 ? 1 : 0) + "," + (face.emote * 16 | 0);
+    if (key === _faceKey) return;   // nothing quantized-changed → reuse the last texture, skip the GPU upload
+    _faceKey = key;
     fx.clearRect(0, 0, fcv.width, fcv.height);
     var cx = 128, cy = 96, ex = 40, eyeCol = "#0B0C0E";
     var gx = face.lookX * 9, gy = face.lookY * 7;
@@ -626,6 +840,25 @@
     else              _cf.copy(C_HIGH).lerp(C_PEAK, (r - 82) / 18);
     return _cf;
   }
+  // ---- curated colour themes (personalisation) ------------------------------------------
+  /* A theme only re-anchors the four recovery colour stops — the low→high LIGHTNESS order is
+     preserved so "greener/brighter = more recovered" still reads at a glance. Jade is the
+     brand default (green = recovered); the alternates are on-brand accent families. Hues +
+     labels are conservative and PENDING Sable sign-off before they're called "approved". */
+  var THEMES = {
+    jade:  { low: "#6F8AA6", mid: "#D7A25C", high: "#7FB79E", peak: "#9BD3B8" }, // default
+    amber: { low: "#8A6A4A", mid: "#C98A44", high: "#E6B569", peak: "#F6DCA0" }, // warm gold
+    dusk:  { low: "#5B6B8C", mid: "#7E86B0", high: "#8FBAC4", peak: "#B8E6D6" }  // twilight violet → mint dawn (peak keeps a recovery go-cue, per Sable)
+  };
+  var themeName = THEMES[LS.get("oriya:pet:theme")] ? LS.get("oriya:pet:theme") : "jade";
+  function applyTheme(name) {
+    var th = THEMES[name] || THEMES.jade;
+    themeName = THEMES[name] ? name : "jade";
+    C_LOW.set(th.low); C_MID.set(th.mid); C_HIGH.set(th.high); C_PEAK.set(th.peak);
+    LS.set("oriya:pet:theme", themeName);
+    targetColor.copy(colorForRec(recovery));   // re-tint to the current recovery immediately
+  }
+
   // All user-facing lines are Sable-approved (own-par body language, permission-to-rest, never
   // work-notification voice). Keep any additions in that register.
   var LINES = {
@@ -657,6 +890,27 @@
   var moodKey = "rested", breathRate = 0.34, breathAmp = 0.045;
   var recovery = 78, prevBand = null;
 
+  // ---- focus mode + ambient presence (v5, design-council) --------------------------------
+  /* Focus decides what Ori's body is DOING: "recovery" = colour tracks your own-par read
+     (default); "breathe" = a calm fixed presence that just breathes; "motion" = a clockwise
+     clock-hand lap of the screen edge (a lap a minute, or a lap an hour). */
+  var FOCUS = (function () { var v = LS.get("oriya:pet:focus"); return (v === "breathe" || v === "motion") ? v : "recovery"; })();
+  var LAP_PACE = LS.get("oriya:pet:lappace") === "hour" ? "hour" : "minute";
+  function applyFocus(name) {
+    FOCUS = (name === "breathe" || name === "motion") ? name : "recovery";
+    LS.set("oriya:pet:focus", FOCUS);
+    targetColor.copy(FOCUS === "breathe" ? C_HIGH : colorForRec(recovery));   // breathe holds a calm colour
+  }
+  function setLapPace(p) { LAP_PACE = p === "hour" ? "hour" : "minute"; LS.set("oriya:pet:lappace", LAP_PACE); }
+
+  // Ambient opacity: rests at the user's level (default 85%), softens toward a floor when you
+  // step away, blooms back as your cursor comes near. Pet only — the browser page has a bg.
+  var OPACITY_FLOOR = 0.35, FADE_AFTER = 20000;
+  var opacityActive = (function () { var v = LS.get("oriya:pet:opacity"); return (typeof v === "number" && v >= OPACITY_FLOOR && v <= 1) ? v : 0.85; })();
+  var curOpacity = opacityActive;
+  function setOpacityActive(v) { opacityActive = Math.max(OPACITY_FLOOR, Math.min(1, v)); LS.set("oriya:pet:opacity", opacityActive); }
+  var uiOpen = false;   // a panel (chat/settings) is open → suspend patrol + idle-fade
+
   function hexA(hex, a) {
     var n = parseInt(hex.slice(1), 16);
     return "rgba(" + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")";
@@ -667,7 +921,7 @@
     recovery = r;
     var m = moodFor(r);
     var hex = "#" + colorForRec(r).getHexString();   // continuous colour for this exact score
-    moodKey = m.key; targetColor.set(hex);
+    moodKey = m.key; targetColor.set(FOCUS === "breathe" ? "#" + C_HIGH.getHexString() : hex);
     breathRate = m.breath; breathAmp = RM ? m.amp * 0.5 : m.amp;
     face.sleepyT = m.sleepy;
     face.emoteT = Math.max(-1, Math.min(1, (r - 62) / 32));   // continuous mood on the face, not just colour
@@ -776,7 +1030,7 @@
   function doAction(a) {
     if (!a || !a.draft) { say(pick(LINES.poke)); return; }
     copyToClipboard(a.draft);
-    face.happy = 1; setTimeout(function () { face.happy = 0; }, 900);
+    grin();
     say(a.kind === "draft_checkin" ? "Check-in drafted. Paste it to your squad. ✅"
       : a.kind === "plan_today" ? "Today's plan's ready. Drop it where you train. ✅"
       : a.kind === "frame_stake" ? "Stake line's written. Set it in Duels when you want. ✅"
@@ -836,6 +1090,10 @@
   var winPos = null, winSize = { w: 0, h: 0 }, monBounds = null;
   var dragVel = { x: 0, y: 0 }, lastScreen = null, lastMoveT = 0, downId = null, winDragging = false;
   var flingRAF = 0, dockRAF = 0;
+  // Frozen = "pinned in place": Ori stops its idle stroll and can't be dragged, flung, or docked
+  // to a new spot, but is still alive (breathes, blinks, speaks) and still pokeable. Double-click
+  // toggles it; the choice persists so a pinned Ori stays pinned across restarts.
+  var frozen = LS.get("oriya:pet:frozen") === true;
   var DOCK_NEAR = 150, DOCK_INSET = 44;     // release within 150px of an edge → rest tucked 44px in
 
   if (TW) { TW.scaleFactor().then(function (s) { TWscale = s || 1; }).catch(function () {}); }
@@ -857,13 +1115,13 @@
     winPos.y = Math.max(monBounds.y - hh, Math.min(monBounds.y + monBounds.h - hh, winPos.y));
   }
   function moveWinBy(dxCss, dyCss) {        // move the window by a CSS-px delta, tuck-clamped
-    if (!TW || !winPos) return;
+    if (!TW || !winPos || frozen) return;   // pinned → position is locked
     winPos.x += dxCss * TWscale; winPos.y += dyCss * TWscale;
     clampWin(); setWin();
   }
   // Ease the orb into a tidy corner/edge "peek" when it's released nearby.
   function dockSnap() {
-    if (!TW || !winPos || !monBounds) return;
+    if (!TW || !winPos || !monBounds || frozen) return;   // pinned → don't re-tuck
     cancelAnimationFrame(dockRAF);
     var hw = winSize.w / 2, hh = winSize.h / 2, near = DOCK_NEAR * TWscale, inset = DOCK_INSET * TWscale;
     var L = monBounds.x, Rr = L + monBounds.w, Tp = monBounds.y, B = Tp + monBounds.h;
@@ -878,7 +1136,7 @@
     })();
   }
   function startFling() {                   // coast with friction, bounce off screen edges, then dock
-    if (!TW || !winPos || !monBounds) return;
+    if (!TW || !winPos || !monBounds || frozen) return;   // pinned → no throw
     cancelAnimationFrame(flingRAF);
     var vx = dragVel.x * TWscale, vy = dragVel.y * TWscale;
     if (Math.hypot(vx, vy) < 0.8) { dockSnap(); return; }  // a gentle drop, not a throw → just settle
@@ -899,6 +1157,20 @@
       else dockSnap();                      // settled → tuck into the nearby corner/edge
     })();
   }
+
+  // Pin / unpin Ori in place. Freezing cancels any in-flight throw or dock so it stops on the
+  // spot, and marks the moment active so the idle stroll won't immediately try to resume.
+  function setFrozen(on) {
+    frozen = !!on;
+    LS.set("oriya:pet:frozen", frozen);
+    if (frozen) { cancelAnimationFrame(flingRAF); cancelAnimationFrame(dockRAF); patrolP = null; }
+    lastActivity = performance.now();
+    if (stage) stage.classList.toggle("pinned", frozen);
+    grin();
+    say(frozen ? "Pinned — I'll stay right here. Double-click to set me free."
+              : "Free to roam again. Double-click to pin me down.");
+  }
+  function toggleFrozen() { setFrozen(!frozen); }
 
   // ---- idle roam (desktop companion only) ------------------------------------------------
   /* Left alone a while, Ori takes a slow clockwise stroll around the edge of your screen — just
@@ -942,6 +1214,34 @@
     if (TW) { TW.setSize(new TWapi.LogicalSize(petW, Math.round(petW / PET_ASPECT))).then(tauriRefresh).catch(function () {}); }
   }
 
+  // Chat needs a readable panel, but a webview can't exceed its OS window — so in the pet we
+  // grow the little orb window to a comfortable chat size on open and tuck it back on close.
+  // ONE resize each way (never per-frame), so it never fights the compositor mid-scroll.
+  var CHAT_W = 380, CHAT_H = 560, chatWinPrevW = null;
+  function petDockCorner() {
+    if (!winPos || !monBounds) return;
+    winPos.x = monBounds.x + monBounds.w - winSize.w / 2 - DOCK_INSET * TWscale;
+    winPos.y = monBounds.y + monBounds.h - winSize.h / 2 - DOCK_INSET * TWscale;
+    setWin();
+  }
+  function petChatWindow(open) {
+    if (!TW || !PET) return;
+    if (open) {
+      chatWinPrevW = petW;
+      TW.setSize(new TWapi.LogicalSize(CHAT_W, CHAT_H)).then(tauriRefresh).then(function () {
+        if (!winPos || !monBounds) return;             // keep the grown window fully on-screen
+        var m = 10 * TWscale;
+        winPos.x = Math.max(monBounds.x + m, Math.min(monBounds.x + monBounds.w - winSize.w - m, winPos.x));
+        winPos.y = Math.max(monBounds.y + 30 * TWscale, Math.min(monBounds.y + monBounds.h - winSize.h - m, winPos.y));
+        setWin();
+      }).catch(function () {});
+    } else {
+      var w = chatWinPrevW || petW; chatWinPrevW = null;
+      applyWinSize(w);                                  // back to the aspect-locked orb size
+      setTimeout(petDockCorner, 70);                    // re-tuck into the corner-peek once the resize lands
+    }
+  }
+
   function pointerNDC(e) {
     var rect = canvas.getBoundingClientRect();
     ndc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -970,19 +1270,17 @@
     else if (name === "peace") {                        // ✌️ → pause nudges
       pauseNudges(120);
       say("Nudges paused — I'll stay quiet a bit.");
-      face.happy = 1; setTimeout(function () { face.happy = 0; }, 900);
+      grin();
     }
   }
 
   function triggerPoke() {
-    pokeVel += 5; pokeFlash = 1; hop = 1; face.happy = 1;   // springy punch + brief brighten
+    pokeVel += 5; pokeFlash = 1; hop = 1; grin();   // springy punch + brief brighten
     bump();
-    setTimeout(function () { face.happy = 0; }, 900);
     speak();                                 // POKE SPEAKS THE REAL READ
   }
   function celebrate(fromGreet) {
-    party = 1; hop = 1; burst(); face.happy = 1; bump();
-    setTimeout(function () { face.happy = 0; }, 1300);
+    party = 1; hop = 1; burst(); grin(1300); bump();
     say(brief && moodKey === "rested" && briefLines.length ? briefLines[0] : pick(LINES.up));
   }
 
@@ -991,6 +1289,7 @@
   // above) so we can measure release velocity and fling + bounce Ori like a stress ball.
 
   window.addEventListener("pointermove", function (e) {
+    bump();                                       // recent activity → reveal controls + bloom opacity
     pointerNDC(e);
     setGaze(ndc.x, ndc.y);
     if (pressing && downPt && (Math.abs(e.clientX - downPt.x) + Math.abs(e.clientY - downPt.y)) > 6) movedFar = true;
@@ -1037,7 +1336,8 @@
   });
 
   // pet-mode has no slider — scroll sets recovery; pinch (ctrl+wheel) resizes the window;
-  // right-click refreshes the brief; double-click cycles Ori's look; +/- also resize.
+  // right-click refreshes the brief; double-click pins/unpins Ori in place; +/- also resize.
+  // (Ori's look is switched from the settings panel now, not the double-click.)
   window.addEventListener("wheel", function (e) {
     if (!PET) return;
     e.preventDefault();
@@ -1046,7 +1346,7 @@
     scheduleFetch();
   }, { passive: false });
   window.addEventListener("contextmenu", function (e) { if (PET) { e.preventDefault(); fetchBrief("update"); } });
-  canvas.addEventListener("dblclick", function (e) { if (PET) { e.preventDefault(); cycleSkin(); } });
+  canvas.addEventListener("dblclick", function (e) { if (PET) { e.preventDefault(); toggleFrozen(); } });
   window.addEventListener("keydown", function (e) {
     if (!PET || !TW) return;
     if (e.key === "+" || e.key === "=") applyWinSize(petW + 24);
@@ -1059,7 +1359,7 @@
     hideHint();
     if (brief) { say((brief.greeting ? brief.greeting.replace(/^[^\w]*/, "").trim() + " — " : "") + (brief.summary || "")); }
     else say(pick(LINES.greet));
-    face.happy = 1; setTimeout(function () { face.happy = 0; }, 900);
+    grin();
   }
   var hiBtn = document.getElementById("hi"); if (hiBtn) hiBtn.addEventListener("click", sayHi);
 
@@ -1125,7 +1425,7 @@
     setTimeout(function () {
       var ok = PET && !quietHours() && performance.now() > nudgesPausedUntil &&
                !winDragging && !dragging && performance.now() > bubbleUntil && !document.hidden;
-      if (ok) { say(pick(LINES.remind)); face.happy = 1; setTimeout(function () { face.happy = 0; }, 1000); }
+      if (ok) { say(pick(LINES.remind)); grin(1000); }
       scheduleReminder();
     }, REMIND_MIN + Math.random() * REMIND_JITTER);
   }
@@ -1184,10 +1484,22 @@
                     Math.abs(poke) > 0.002 || Math.abs(pokeVel) > 0.01 ||
                     hop > 0.002 || party > 0.002 || face.happy > 0.5;
     var idleMs = now - lastActivity;
-    var patrolling = TW && !RM && winPos && monBounds && TWscale && winSize &&
-                     !winDragging && !dragging && !document.hidden &&
-                     idleMs > PATROL_AFTER && !bubble.classList.contains("show") && now > nudgesPausedUntil;
+    var motionOn = FOCUS === "motion";            // motion focus = an always-on clockwise clock-hand lap
+    var patrolling = TW && !RM && !frozen && winPos && monBounds && TWscale && winSize &&
+                     !winDragging && !dragging && !document.hidden && !uiOpen &&
+                     (motionOn || idleMs > PATROL_AFTER) && !bubble.classList.contains("show") && now > nudgesPausedUntil;
     if (!patrolling) patrolP = null;
+
+    // ambient presence: rest at the user's opacity, fade toward the floor when idle & away,
+    // bloom back on cursor approach. Runs every rAF (before the fps throttle) so it stays smooth.
+    var opTarget = (PET && !uiOpen && !winDragging && !dragging && !bubble.classList.contains("show") && idleMs > FADE_AFTER)
+      ? OPACITY_FLOOR : opacityActive;
+    curOpacity += (opTarget - curOpacity) * 0.08;
+    if (PET) {
+      canvas.style.opacity = curOpacity.toFixed(3);
+      document.body.classList.toggle("ctrl-show", uiOpen || idleMs < 4000);   // reveal gear + chat near Ori
+    }
+
     var fps = document.hidden ? 2
             : animating ? 60
             : patrolling ? 30
@@ -1204,7 +1516,8 @@
       var pq = patrolRect(), hw = winSize.w / 2, hh = winSize.h / 2;
       if (patrolP === null) patrolP = patrolNearest(winPos.x + hw, winPos.y + hh, pq);
       var per = 2 * ((pq.R - pq.L) + (pq.B - pq.T));          // full screen-edge perimeter, physical px
-      patrolP += (per / (PATROL_LAP_MS / 1000)) * dt;         // one clockwise lap per 60s, like a clock hand
+      var lapMs = motionOn ? (LAP_PACE === "hour" ? 3600000 : 60000) : PATROL_LAP_MS;
+      patrolP += (per / (lapMs / 1000)) * dt;                 // one clockwise lap — clock-hand pace
       var tp = patrolPoint(patrolP, pq), ah = patrolPoint(patrolP + per * 0.02, pq);
       winPos.x += ((tp.x - hw) - winPos.x) * 0.12;
       winPos.y += ((tp.y - hh) - winPos.y) * 0.12;
@@ -1288,6 +1601,8 @@
 
   setRecovery(startRec, true);
   applySkin(skinName);                              // restore last look
+  applyTheme(themeName);                            // restore last colour theme
+  applyFocus(FOCUS);                                // restore focus mode (recovery / breathe / motion)
   if (TW) {                                         // restore last size, then start tucked in the bottom-right corner
     TW.setSize(new TWapi.LogicalSize(petW, Math.round(petW / PET_ASPECT)))
       .then(tauriRefresh)
@@ -1310,19 +1625,28 @@
   // Everything Ori ingests comes through here without touching the render loop.
   window.Ori = {
     setGaze: setGaze, onGesture: onGesture, cycleSkin: cycleSkin, say: say,
+    setFrozen: setFrozen, toggleFrozen: toggleFrozen, applySkin: applySkin, applyTheme: applyTheme,
+    applyFocus: applyFocus, setLapPace: setLapPace, setOpacity: setOpacityActive,
+    setRecovery: function (r) { setRecovery(r); scheduleFetch(); },
+    setUiOpen: function (o) { uiOpen = !!o; if (o) bump(); },
+    petChatWindow: petChatWindow,
+    getLook: function () {
+      return { skin: skinName, theme: themeName, frozen: frozen,
+               focus: FOCUS, lapPace: LAP_PACE, opacity: opacityActive, recovery: recovery };
+    },
     feed: feed, feedCalendar: feedCalendar, remindNow: remindNow, pauseNudges: pauseNudges
   };
 })();
 </script>
 
 <script>
-/* Talk to Ori — BROWSER-ONLY recovery-coach chat. Adapts the self-contained chat
-   core from /ori (bubble + sendMsg → POST /api/ori-chat, persona "scores"). Bot
-   replies also call window.Ori.say() so the orb speaks along and the pet feels
-   alive while you chat. Hidden AND inert in the Tauri pet window. */
+/* Talk to Ori — recovery-coach chat, live in the browser AND in the desktop pet.
+   Adapts the self-contained chat core from /ori (bubble + sendMsg, persona "scores").
+   Two brains: the CLOUD worker (/api/ori-chat) or, when the user opts in and a local
+   Ollama model is reachable, 100% ON-DEVICE inference. Every reply is tagged with where
+   it came from. Bot replies also call window.Ori.say() so the orb speaks along. */
 (function () {
   "use strict";
-  if (document.body.classList.contains("pet")) return;   // pet mode: no chat chrome
   var teach = document.getElementById("teach"),
       tab = document.getElementById("teachTab"),
       tfeed = document.getElementById("tfeed"),
@@ -1330,8 +1654,16 @@
       tsend = document.getElementById("teachSend"),
       tmin = document.getElementById("teachMin"),
       tshot = document.getElementById("teachShot"),
-      tshotFile = document.getElementById("teachShotFile");
+      tshotFile = document.getElementById("teachShotFile"),
+      modeBtn = document.getElementById("teachMode"),
+      obNote = document.getElementById("teachOb");
   if (!teach || !tfeed || !tinput || !tsend || !tab) return;
+
+  var isPet = document.body.classList.contains("pet");
+  var TC = (window.__TAURI__ && window.__TAURI__.core) ? window.__TAURI__.core : null;
+  function setWindowInteractive(on) {   // Tauri pet: release orb-only click-through while open
+    if (TC) { try { TC.invoke("set_interactive", { on: !!on }); } catch (e) {} }
+  }
 
   // file:// / non-oriya host → talk to prod (the worker sends CORS)
   var sameHost = /(^|\.)oriya\.app$/.test(location.hostname) ||
@@ -1371,6 +1703,78 @@
     }
     window.Ori.say(t);
   }
+  function addSrc(bubble, label) {   // small "local · model" / "cloud" tag under a bot reply
+    if (!bubble || !label) return;
+    var s = document.createElement("span"); s.className = "t-src"; s.textContent = label;
+    bubble.appendChild(s);
+  }
+
+  // ---- local (on-device) inference via Ollama ------------------------------------------
+  /* Opt-in. If the user turns on on-device mode and a local Ollama server is serving a
+     model, text chat is answered entirely on their machine — nothing leaves the device.
+     Screenshots still go to the cloud (vision), and if the local server isn't there we
+     fall back to the cloud and say so. Big models (e.g. Kimi) are cloud-only; a ~3B like
+     Llama 3.2 / Qwen 2.5 / Phi runs on a laptop. */
+  var OLLAMA = "http://localhost:11434";
+  var SYS = "You are Ori, a warm, plain-spoken recovery coach. You read a person's wearable "
+    + "recovery against THEIR OWN ~90-day baseline (their \"par\") — never against other people's "
+    + "raw scores; the person who beats their own par by more is doing better. Be encouraging and "
+    + "brief: 1-3 sentences, like a supportive friend, not a dashboard. Nudges and suggestions only "
+    + "— you are NOT a doctor: never diagnose, prescribe, or make medical claims, and if something "
+    + "sounds clinical, gently suggest they see a professional.";
+  var localPref = load("oriya:pet:chatlocal", false);
+  var ollama = { checked: false, ok: false, model: null };
+  var PREFER = ["llama3.2", "qwen2.5", "phi3.5", "phi3", "gemma2", "mistral", "llama3.1", "qwen2", "llama3"];
+  function pickModel(names) {
+    for (var i = 0; i < PREFER.length; i++)
+      for (var j = 0; j < names.length; j++)
+        if (names[j].indexOf(PREFER[i]) === 0) return names[j];
+    return names[0] || null;
+  }
+  function detectOllama() {
+    return fetch(OLLAMA + "/api/tags", { method: "GET" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        var names = ((j && j.models) || []).map(function (m) { return m.name; });
+        ollama.checked = true; ollama.ok = names.length > 0; ollama.model = pickModel(names);
+        return ollama.ok;
+      })
+      .catch(function () { ollama.checked = true; ollama.ok = false; ollama.model = null; return false; });
+  }
+  function chatOllama(msgs) {
+    var body = {
+      model: ollama.model, stream: false,
+      messages: [{ role: "system", content: SYS }].concat(msgs.map(function (m) {
+        return { role: m.role === "assistant" ? "assistant" : "user", content: m.content };
+      }))
+    };
+    return fetch(OLLAMA + "/api/chat", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+    }).then(function (r) { if (!r.ok) throw new Error("ollama " + r.status); return r.json(); })
+      .then(function (j) { return (j && j.message && j.message.content || "").trim(); });
+  }
+
+  // ---- where-Ori-thinks chip + on-device onboarding note ----
+  function renderMode() {
+    var on = localPref;
+    if (modeBtn) {
+      modeBtn.classList.toggle("local", on);
+      modeBtn.textContent = on ? "🔒 On-device" : "☁ Cloud";
+      modeBtn.title = on
+        ? "On-device: answered by a local Ollama model, nothing leaves your machine. Click for cloud."
+        : "Cloud: answered by oriya.app. Click to try 100% on-device.";
+    }
+  }
+  function refreshOb() {   // nudge to install Ollama only when they want local but it's not there
+    if (obNote) obNote.classList.toggle("hide", !(localPref && ollama.checked && !ollama.ok));
+  }
+  if (modeBtn) modeBtn.addEventListener("click", function () {
+    localPref = !localPref; save("oriya:pet:chatlocal", localPref); renderMode();
+    if (localPref && !ollama.checked) detectOllama().then(refreshOb); else refreshOb();
+  });
+  renderMode();
+  if (localPref) detectOllama().then(refreshOb);
+
   function render() {
     tfeed.textContent = "";
     tbubble("bot", SEED);
@@ -1385,31 +1789,64 @@
     var ub = tbubble("user", text || "");
     if (shot) shotImg(ub, shot);
     pending = true; tsend.disabled = true;
-    var wait = tbubble("bot", shot ? "Ori's looking at your screen…" : "Ori's reading…", "wait");
-    var payload = { messages: chat.slice(-12), persona: "scores", who: null };
-    if (shot) payload.image = shot;
-    fetch(CHAT_API, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
-      .then(function (res) {
-        wait.remove();
-        if (!res.ok || !res.j.reply) {
-          var why = res.j && res.j.error === "not_configured"
-            ? "My chat brain isn't switched on in this build yet — but poke the orb or hand me a screen and I'll still read your morning."
-            : res.j && (res.j.error === "vision" || res.j.error === "bad_image")
-            ? "I couldn't open that screenshot — type the number instead and I'll give you the same read."
-            : "That one didn't get through. Give it another go in a moment.";
-          tbubble("bot", why, "err");
-        } else {
-          chat.push({ role: "assistant", content: res.j.reply });
-          chat = chat.slice(-40); save(KEY_C, chat);
-          tbubble("bot", res.j.reply);
-          speakOrb(res.j.reply);
-        }
-      })
-      .catch(function () { wait.remove(); tbubble("bot", "No connection just now — your message is still here, try again in a moment.", "err"); })
-      .finally(function () { pending = false; tsend.disabled = false; tinput.focus(); });
+    var wait = null;
+
+    function cloudReply() {   // → { reply, src } | { err }
+      var payload = { messages: chat.slice(-12), persona: "scores", who: null };
+      if (shot) payload.image = shot;
+      return fetch(CHAT_API, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
+      }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (res) {
+          if (!res.ok || !res.j.reply) {
+            var why = res.j && res.j.error === "not_configured"
+              ? "My cloud brain isn't switched on in this build yet — but poke the orb or hand me a screen and I'll still read your morning."
+              : res.j && (res.j.error === "vision" || res.j.error === "bad_image")
+              ? "I couldn't open that screenshot — type the number instead and I'll give you the same read."
+              : "That one didn't get through. Give it another go in a moment.";
+            return { err: why };
+          }
+          return { reply: res.j.reply, src: "cloud" };
+        });
+    }
+    function finish(res, isLocal) {
+      if (wait && wait.parentNode) wait.remove();
+      if (res && res.reply) {
+        chat.push({ role: "assistant", content: res.reply });
+        chat = chat.slice(-40); save(KEY_C, chat);
+        var b = tbubble("bot", res.reply, isLocal ? "local-src" : "");
+        addSrc(b, res.src);
+        speakOrb(res.reply);
+      } else {
+        tbubble("bot", (res && res.err) || "That one didn't get through. Give it another go in a moment.", "err");
+      }
+    }
+
+    // Decide the brain: on-device only when the user opted in, a model is reachable, and it's
+    // text (screenshots need cloud vision). Detect lazily the first time they use local mode.
+    var pre = (localPref && !ollama.checked && !shot) ? detectOllama() : Promise.resolve();
+    pre.then(function () {
+      refreshOb();
+      var useLocal = localPref && ollama.ok && ollama.model && !shot;
+      wait = tbubble("bot", shot ? "Ori's looking at your screen…"
+        : useLocal ? "Ori's thinking on-device…" : "Ori's reading…", "wait");
+      if (useLocal) {
+        return chatOllama(chat.slice(-12)).then(function (reply) {
+          if (!reply) throw new Error("empty");
+          finish({ reply: reply, src: "on-device · " + ollama.model }, true);
+        }).catch(function () {                       // local server died mid-request → cloud, honestly
+          ollama.ok = false; refreshOb();
+          return cloudReply().then(function (res) {
+            if (res.reply) res.src = "cloud · on-device was unreachable";
+            finish(res, false);
+          });
+        });
+      }
+      return cloudReply().then(function (res) { finish(res, false); });
+    }).catch(function () {
+      if (wait && wait.parentNode) wait.remove();
+      tbubble("bot", "No connection just now — your message is still here, try again in a moment.", "err");
+    }).finally(function () { pending = false; tsend.disabled = false; tinput.focus(); });
   }
   function ask() { sendMsg(tinput.value.trim(), null); }
 
@@ -1418,36 +1855,81 @@
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(); }
   });
 
-  // 📷 — downscale in-browser so a phone shot becomes a ~100KB JPEG before it ever leaves the device
+  // 📷 / paste / drag-drop — downscale in-browser so a phone shot becomes a ~100KB JPEG before
+  // it ever leaves the device. Paste + drop matter in the Tauri pet, where the always-on-top
+  // transparent window can't always pop the native file picker — those paths never need it.
+  function processImageFile(f) {
+    if (!f || !/^image\//.test(f.type)) return;
+    if (teach.classList.contains("closed")) setOpen(true);   // surface the chat so the read is visible
+    var url = URL.createObjectURL(f), img = new Image();
+    img.onload = function () {
+      var max = 1280, s = Math.min(1, max / Math.max(img.width, img.height));
+      var c = document.createElement("canvas");
+      c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); sendMsg("", c.toDataURL("image/jpeg", 0.85));
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); tbubble("bot", "That file didn't open as an image — try a plain screenshot (PNG or JPG).", "err"); };
+    img.src = url;
+  }
   if (tshot && tshotFile) {
     tshot.addEventListener("click", function () { if (!pending) tshotFile.click(); });
     tshotFile.addEventListener("change", function () {
       var f = tshotFile.files && tshotFile.files[0]; tshotFile.value = "";
-      if (!f || !/^image\//.test(f.type)) return;
-      var url = URL.createObjectURL(f), img = new Image();
-      img.onload = function () {
-        var max = 1280, s = Math.min(1, max / Math.max(img.width, img.height));
-        var c = document.createElement("canvas");
-        c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
-        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-        URL.revokeObjectURL(url); sendMsg("", c.toDataURL("image/jpeg", 0.85));
-      };
-      img.onerror = function () { URL.revokeObjectURL(url); tbubble("bot", "That file didn't open as an image — try a plain screenshot (PNG or JPG).", "err"); };
-      img.src = url;
+      processImageFile(f);
     });
   }
+  // paste a screenshot (Cmd+V) — the most natural "share my screen" gesture, no file dialog
+  document.addEventListener("paste", function (e) {
+    if (!isPet && teach.classList.contains("closed")) return;   // browser: only while the chat is open
+    var items = (e.clipboardData && e.clipboardData.items) || [];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].type && items[i].type.indexOf("image/") === 0) {
+        var f = items[i].getAsFile();
+        if (f) { e.preventDefault(); processImageFile(f); return; }
+      }
+    }
+  });
+  // drag an image onto the chat
+  ["dragenter", "dragover"].forEach(function (ev) {
+    teach.addEventListener(ev, function (e) { e.preventDefault(); teach.classList.add("drag-over"); });
+  });
+  teach.addEventListener("dragleave", function () { teach.classList.remove("drag-over"); });
+  teach.addEventListener("drop", function (e) {
+    e.preventDefault(); teach.classList.remove("drag-over");
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    processImageFile(f);
+  });
 
   // ---- open / minimise (persisted; default open on desktop, collapsed on phones) ----
+  // In the pet the chat auto-hides after a stretch of no typing, so Ori stays ambient
+  // rather than a parked window you have to dismiss.
+  var chatHideT = null;
+  function scheduleChatAutoHide(open) {
+    if (chatHideT) { clearTimeout(chatHideT); chatHideT = null; }
+    if (open && isPet) chatHideT = setTimeout(function () { if (!pending) setOpen(false); }, 60000);
+  }
   function setOpen(open) {
     teach.classList.toggle("closed", !open);
     tab.classList.toggle("on", !open);
-    save(KEY_OPEN, open ? 1 : 0);
+    if (!isPet) save(KEY_OPEN, open ? 1 : 0);     // don't persist in the pet — never auto-grab the screen on launch
+    if (isPet) {
+      setWindowInteractive(open);                 // whole window catches the mouse only while chat is open
+      if (window.Ori) {
+        if (window.Ori.setUiOpen) window.Ori.setUiOpen(open);
+        if (window.Ori.petChatWindow) window.Ori.petChatWindow(open);   // grow to a readable size / restore
+      }
+    }
     if (open && !seeded) { seeded = true; render(); }
     if (open) setTimeout(function () { tinput.focus(); }, 60);
+    scheduleChatAutoHide(open);
   }
   if (tmin) tmin.addEventListener("click", function () { setOpen(false); });
   tab.addEventListener("click", function () { setOpen(true); });
-  var startOpen = load(KEY_OPEN, null);
+  // any typing / touch in the chat resets the auto-hide countdown
+  tinput.addEventListener("input", function () { scheduleChatAutoHide(true); });
+  teach.addEventListener("pointerdown", function () { scheduleChatAutoHide(true); });
+  var startOpen = isPet ? 0 : load(KEY_OPEN, null);   // pet always boots collapsed (just the orb)
   if (startOpen == null) startOpen = window.innerWidth > 720 ? 1 : 0;
   setOpen(!!startOpen);
 
@@ -1471,5 +1953,124 @@
   }
   if (dlSave) dlSave.addEventListener("click", grantDownload);
   if (dlEmail) dlEmail.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); grantDownload(); } });
+})();
+
+/* Settings — shape / colour / pin. Runs in BOTH the browser and the Tauri pet. It only
+   calls the window.Ori.* API (applySkin / applyTheme / setFrozen / getLook), so it never
+   reaches into the render loop. In the pet window, opening the panel asks Rust to make the
+   whole window catch the mouse (set_interactive) and releases it on close. */
+(function () {
+  "use strict";
+  var gear = document.getElementById("osetGear"),
+      panel = document.getElementById("oset"),
+      closeBtn = document.getElementById("osetClose"),
+      shapes = document.getElementById("osetShapes"),
+      themes = document.getElementById("osetThemes"),
+      pin = document.getElementById("osetPin"),
+      focusRow = document.getElementById("osetFocus"),
+      paceRow = document.getElementById("osetPace"),
+      recIn = document.getElementById("osetRec"),
+      recVal = document.getElementById("osetRecVal"),
+      opIn = document.getElementById("osetOpacity"),
+      opVal = document.getElementById("osetOpacityVal");
+  if (!gear || !panel) return;
+
+  var isPet = document.body.classList.contains("pet");
+  var TC = (window.__TAURI__ && window.__TAURI__.core) ? window.__TAURI__.core : null;
+  function setWindowInteractive(on) {           // Tauri only: release/restore orb-only click-through
+    if (TC) { try { TC.invoke("set_interactive", { on: !!on }); } catch (e) {} }
+  }
+  function Ori() { return window.Ori || {}; }
+
+  // reflect the live state (look + focus + presence + today's score) onto the controls
+  function syncFromState() {
+    var look = (Ori().getLook && Ori().getLook()) || {};
+    Array.prototype.forEach.call(shapes.querySelectorAll(".o-shape"), function (b) {
+      b.classList.toggle("sel", b.getAttribute("data-skin") === (look.skin || "orb"));
+    });
+    Array.prototype.forEach.call(themes.querySelectorAll(".o-swatch"), function (b) {
+      b.classList.toggle("sel", b.getAttribute("data-theme") === (look.theme || "jade"));
+    });
+    var focus = look.focus || "recovery";
+    if (focusRow) Array.prototype.forEach.call(focusRow.querySelectorAll(".o-shape"), function (b) {
+      b.classList.toggle("sel", b.getAttribute("data-focus") === focus);
+    });
+    if (paceRow) {
+      paceRow.classList.toggle("hide", focus !== "motion");   // pace only matters for the motion lap
+      Array.prototype.forEach.call(paceRow.querySelectorAll("button"), function (b) {
+        b.classList.toggle("sel", b.getAttribute("data-pace") === (look.lapPace || "minute"));
+      });
+    }
+    if (recIn && recVal && typeof look.recovery === "number") {
+      recIn.value = look.recovery; recVal.textContent = look.recovery;
+    }
+    if (opIn && opVal && typeof look.opacity === "number") {
+      var pct = Math.round(look.opacity * 100); opIn.value = pct; opVal.textContent = pct + "%";
+    }
+    var fz = !!look.frozen;
+    pin.classList.toggle("on", fz); pin.setAttribute("aria-checked", fz ? "true" : "false");
+  }
+
+  var open = false;
+  function setOpen(o) {
+    open = o;
+    panel.classList.toggle("closed", !o);
+    panel.setAttribute("aria-hidden", o ? "false" : "true");
+    gear.setAttribute("aria-expanded", o ? "true" : "false");
+    if (isPet) {
+      setWindowInteractive(o);                  // whole window clickable while the panel is up
+      if (Ori().setUiOpen) Ori().setUiOpen(o);  // suspend patrol / idle-fade while settings are open
+    }
+    if (o) syncFromState();
+  }
+  gear.addEventListener("click", function () { setOpen(!open); });
+  if (closeBtn) closeBtn.addEventListener("click", function () { setOpen(false); });
+  // click outside the panel (but not the gear) closes it
+  document.addEventListener("pointerdown", function (e) {
+    if (!open) return;
+    if (panel.contains(e.target) || gear.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && open) setOpen(false);
+    else if (e.key === "s" && isPet && !/^(input|textarea)$/i.test((e.target.tagName || ""))) setOpen(!open);
+  });
+
+  shapes.addEventListener("click", function (e) {
+    var b = e.target.closest(".o-shape"); if (!b) return;
+    if (Ori().applySkin) Ori().applySkin(b.getAttribute("data-skin"));
+    syncFromState();
+  });
+  themes.addEventListener("click", function (e) {
+    var b = e.target.closest(".o-swatch"); if (!b) return;
+    if (Ori().applyTheme) Ori().applyTheme(b.getAttribute("data-theme"));
+    syncFromState();
+  });
+  pin.addEventListener("click", function () {
+    if (Ori().setFrozen) Ori().setFrozen(!pin.classList.contains("on"));
+    syncFromState();
+  });
+  if (focusRow) focusRow.addEventListener("click", function (e) {
+    var b = e.target.closest(".o-shape"); if (!b) return;
+    if (Ori().applyFocus) Ori().applyFocus(b.getAttribute("data-focus"));
+    syncFromState();
+  });
+  if (paceRow) paceRow.addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    if (Ori().setLapPace) Ori().setLapPace(b.getAttribute("data-pace"));
+    syncFromState();
+  });
+  if (recIn) recIn.addEventListener("input", function () {
+    var v = parseInt(recIn.value, 10) || 0;
+    if (recVal) recVal.textContent = v;
+    if (Ori().setRecovery) Ori().setRecovery(v);
+  });
+  if (opIn) opIn.addEventListener("input", function () {
+    var pct = parseInt(opIn.value, 10) || 100;
+    if (opVal) opVal.textContent = pct + "%";
+    if (Ori().setOpacity) Ori().setOpacity(pct / 100);
+  });
+
+  syncFromState();
 })();
 </script>
