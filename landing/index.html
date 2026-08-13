@@ -1295,6 +1295,17 @@
     .meet-ori .mo-trust p { margin:0; font-size:13.5px; line-height:1.55; color:#c9c6bf; }
     .meet-ori .mo-tag { margin:22px 0 0; font-family:var(--font-display); font-size:19px; color:var(--jade); letter-spacing:0.01em; }
     .meet-ori .mo-note { font-family:var(--font-mono); font-size:11px; letter-spacing:0.03em; color:var(--ash); margin:14px 0 0; max-width:46ch; line-height:1.55; }
+    /* First-launch walkthrough — the unsigned early build trips macOS Gatekeeper; a calm 3-step
+       disclosure so the "can't be checked" dialog reads as expected, not a broken download. */
+    .meet-ori .mo-first { margin:10px 0 0; max-width:52ch; font-size:12px; color:var(--ash); }
+    .meet-ori .mo-first > summary { cursor:pointer; list-style:none; color:var(--amber); font-family:var(--font-mono);
+      font-size:11px; letter-spacing:0.03em; padding:2px 0; user-select:none; }
+    .meet-ori .mo-first > summary::-webkit-details-marker { display:none; }
+    .meet-ori .mo-first > summary::before { content:"▸ "; }
+    .meet-ori .mo-first[open] > summary::before { content:"▾ "; }
+    .meet-ori .mo-first ol { margin:8px 0 0; padding-left:18px; display:flex; flex-direction:column; gap:6px; line-height:1.55; }
+    .meet-ori .mo-first ol b { color:var(--bone); font-weight:600; }
+    .meet-ori .mo-first code { font-size:11px; background:rgba(var(--wash),.06); border:1px solid var(--hairline); border-radius:5px; padding:0 4px; }
     .meet-ori .mo-ea { display:none; margin-top:16px; gap:8px; flex-wrap:wrap; }
     .meet-ori .mo-ea.on { display:flex; }
     .meet-ori .mo-ea input { flex:1 1 190px; min-width:0; background:rgba(var(--wash),.04); border:1px solid var(--hairline);
@@ -1420,7 +1431,11 @@
         if (!ok) { email.focus(); email.style.borderColor = "var(--ember)"; return; }
         form.innerHTML = '<p class="mo-note" style="margin:0 0 10px">You’re in ✓ — here’s the build.</p>'
           + '<a class="btn btn-primary amber" href="downloads/Ori_0.1.0_aarch64.dmg" download>Download Ori for Mac →</a>'
-          + '<p class="mo-note" style="margin:10px 0 0">Apple Silicon · unsigned early build · first open: right-click → Open. Or just <a href="ori-pet.html" style="color:var(--jade)">meet Ori live in your browser</a>.</p>';
+          + '<p class="mo-note" style="margin:10px 0 0">Apple Silicon (M-series) · ~2.8&nbsp;MB · unsigned early build. Or just <a href="ori-pet.html" style="color:var(--jade)">meet Ori live in your browser</a>.</p>'
+          + '<details class="mo-first"><summary>First time opening Ori? (30 seconds)</summary>'
+          + '<ol><li>Open the <code>.dmg</code>, drag <b>Ori</b> into Applications.</li>'
+          + '<li>Double-click Ori. macOS says it <b>“can’t be checked for malicious software.”</b> That’s expected — an unsigned early build, not broken. Click <b>Done</b>.</li>'
+          + '<li>Open <b>System&nbsp;Settings → Privacy&nbsp;&amp;&nbsp;Security</b>, scroll down, click <b>“Open Anyway”</b> next to Ori, confirm — then Ori opens every morning with a normal double-click.</li></ol></details>';
         note.setAttribute("hidden", "");
       });
     })();
@@ -2039,7 +2054,8 @@
      the always-on desktop build is honestly framed as early-access with an email capture that
      reuses the page's own oriyaLogEmail → Tally. After the email lands, the capture reveals a
      REAL download of the current unsigned Apple-Silicon early build (downloads/Ori_0.1.0_aarch64.dmg),
-     honestly captioned (unsigned · aarch64 · right-click→Open). -->
+     honestly captioned (unsigned · aarch64) with a 3-step first-launch walkthrough:
+     Sequoia+ removed right-click→Open, so the steps route through Privacy & Security → "Open Anyway". -->
 <!-- FOOTER -->
 <footer class="footer">
   <div class="wrap">

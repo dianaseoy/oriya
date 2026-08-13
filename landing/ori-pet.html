@@ -331,6 +331,19 @@
   .t-dl .t-dl-btn:hover { background: rgba(215,162,92,0.22); }
   .t-dl .t-dl-hide { display: none; }
   .t-dl .t-dl-cav { font-size: 10px; color: #565b64; line-height: 1.5; }
+  /* First-launch walkthrough — an unsigned early build hits macOS Gatekeeper; a calm 3-step
+     disclosure so the scary "can't be checked" dialog reads as expected, not broken. */
+  .t-dl-first { font-size: 11px; color: var(--dim); }
+  .t-dl-first > summary { cursor: pointer; list-style: none; color: var(--amber); font-weight: 600;
+    padding: 2px 0; user-select: none; }
+  .t-dl-first > summary::-webkit-details-marker { display: none; }
+  .t-dl-first > summary::before { content: "▸ "; }
+  .t-dl-first[open] > summary::before { content: "▾ "; }
+  .t-dl-first ol { margin: 6px 0 0; padding-left: 16px; display: flex; flex-direction: column; gap: 5px;
+    line-height: 1.5; }
+  .t-dl-first ol b { color: var(--text); font-weight: 600; }
+  .t-dl-first code { font-size: 10.5px; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 5px; padding: 0 4px; }
 
   /* collapsed launcher pill */
   #teachTab {
@@ -571,7 +584,15 @@
       <button class="t-dl-btn" id="teachDlSave" type="button">Get it →</button>
     </div>
     <a class="t-dl-btn t-dl-hide" id="teachDlLink" href="downloads/Ori_0.1.0_aarch64.dmg" download>Download Ori for Mac →</a>
-    <p class="t-dl-cav">Apple Silicon · unsigned early build · first open: right-click → Open.</p>
+    <p class="t-dl-cav">Apple Silicon (M-series) · ~2.8&nbsp;MB · unsigned early build.</p>
+    <details class="t-dl-first">
+      <summary>First time opening Ori? (30 seconds)</summary>
+      <ol>
+        <li>Open the <code>.dmg</code>, drag <b>Ori</b> into Applications.</li>
+        <li>Double-click Ori. macOS says it <b>“can’t be checked for malicious software.”</b> That’s expected — it’s an unsigned early build, not broken. Click <b>Done</b>.</li>
+        <li>Open <b>System&nbsp;Settings → Privacy&nbsp;&amp;&nbsp;Security</b>, scroll down, click <b>“Open Anyway”</b> next to Ori, confirm — then Ori opens every morning with a normal double-click.</li>
+      </ol>
+    </details>
   </div>
   <p class="teach-foot">v0.1 · early AI. Ori nudges, never diagnoses — not medical advice. On-device mode keeps chats on your machine; cloud mode sends them to oriya.app to answer.</p>
 </div>
